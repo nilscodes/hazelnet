@@ -1,0 +1,40 @@
+{
+	"configure": {},
+	"commands": {
+		"descriptions": {
+			"policyid": "Liste alle Policy IDs und Projekte die offiziell auf diesem Server sind."
+		}
+	},
+	"start": {
+		"welcomeTitle": "Willkommen bei HAZELnet!",
+		"configureMessage": "Wähle Deine HAZELnet bot Einstellungen:",
+		"chooseLanguage": "Wähle Deine Bot-Sprache",
+		"chooseAdminRole": "Wähle Deine Admin-Rolle",
+		"chooseUserRole": "Wähle Deine Benutzer-Rolle",
+		"finishSetupButton": "Fertigstellen",
+		"setupCompleteMessage": "Konfiguration erfolgreich! ♥",
+		"selectedLanguage": "start.selectedLanguage",
+		"resetSetupButton": "start.resetSetupButton",
+		"configureLanguageTitle": "start.configureLanguageTitle",
+		"configureLanguageText": "start.configureLanguageText",
+		"configureAdminRoleTitle": "start.configureAdminRoleTitle",
+		"configureAdminRoleText": "start.configureAdminRoleText",
+		"configureUserRoleTitle": "start.configureUserRoleTitle",
+		"configureUserRoleText": "start.configureUserRoleText",
+		"chooseFeatures": "start.chooseFeatures",
+		"configureFeaturesTitle": "start.configureFeaturesTitle",
+		"configureFeaturesText": "start.configureFeaturesText"
+	},
+	"languages": {
+		"en": "Englisch",
+		"de": "Deutsch"
+	},
+	"errors": {
+		"notYetImplemented": "Noch nicht implementiert. Bitte habt Geduld mit uns."
+	},
+	"features": {
+		"pool": "features.pool",
+		"token": "features.token",
+		"whitelist": "features.whitelist"
+	}
+}

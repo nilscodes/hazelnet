@@ -1,0 +1,310 @@
+{
+	"commands": {
+		"descriptions": {
+			"policyid": "Lists all policy IDs and projects associated with this server.",
+			"info": "Shows associated pools and other crypto related info for this server.",
+			"whitelist": "View and register for whitelist events in this Discord.",
+			"whitelist-register": "Register for a whitelist",
+			"whitelist-list": "Show all whitelists and requirements for each whitelist.",
+			"whitelist-unregister": "Remove yourself from a whitelist",
+			"help": "Show general help on how to use this bot."
+		},
+		"options": {
+			"whitelist": {
+				"name": "Name of the whitelist",
+				"address": "The Cardano wallet address to add to/remove from the whitelist",
+				"includeaddress": "Use this parameter and pass True if you want your registered address displayed on screen."
+			}
+		}
+	},
+	"info": {
+		"welcomeTitle": "Welcome to {{{guildName}}}!",
+		"infoBaseText": "The team is happy to have you here!",
+		"stakepoolsBaseText": {
+			"one": "This server officially supports this Cardano stakepool:",
+			"other": "This server officially supports the following Cardano stakepools:"
+		},
+		"stakepoolDetails": "#️⃣ *Pool hash:*\n{{hash}}\n\nℹ *Description:*\n{{{description}}}\n\n🌍 *Website:*\n{{{website}}}\n\n👁 *Pool.pm:*\nhttps://pool.pm/{{hash}}"
+	},
+	"help": {
+		"messageTitle": "Get help for {{{botName}}}",
+		"generalCommands": {
+			"verify": "The */verify* command and its subcommands *add*, *list* and *remove* let you verify your own Cardano address and will enable features like automatic role-assignments based on delegation and token roles.\n**Important:** 💡 The admins of this Discord will *not* be able to see any of your verified addresses. They can only see addresses that you register for a whitelist! Your security always comes first.",
+			"help": "Shows this help text."
+		},
+		"stakepoolCommands": {
+			"info": "The */info* command gives you some basic information about the server and lists any official stakepools of the server, if it has any set up."
+		},
+		"nftCommands": {
+			"policyid": "If this server has any official Cardano policy IDs and corresponding projects, they will be displayed when you use the */policyid* command. These policies can be for both fungible tokens and NFTs."
+		},
+		"whitelistCommands": {
+			"whitelist": "You can use the */whitelist* command to see which whitelists are available on this server (via the *list* subcommand), or register and unregister from whitelists you qualified for via the respective *register* and *unregister* subcommands."
+		},
+		"adminCommands": {
+			"title": "The following are commands for administrators only (normal users do not get this text when using */help*)",
+			"configure-protection": "With */configure-protection* you can view and set up the scam and fake protection of the bot. It will let you set up automatic removal of messages with **addr1** as content, as well as an optional auditing of such messages to a dedicated channel for moderators.",
+			"configure-pool": "*/configure-pool* provides commands to add, list and remove stakepools for this Discord server. These are needed if you intend to set up delegator roles or if you want your pool information to be listed via the */info* command.",
+			"configure-delegatorroles": "Once you have set up your official stakepool information via */configure-pool* you can assign roles based on delegation to specific pools. You will need the pool hash or you can reference \"all official pools of this Discord\" by leaving the pool hash parameter empty.",
+			"configure-policy": "With */configure-policy* you can set up official policy IDs that users can inspect and easily find via the public */policyids* command.",
+			"configure-tokenroles": "The */configure-tokenroles* command will allow you to set up automatic role assignments for users that have tokens of specific policies in their verified staking addresses. Users can verify via the public */verify* command.",
+			"configure-whitelist": "With this command you can manage whitelists on this server that people can register for via the public */whitelist* command.",
+			"configure-adminaccess": "The */configure-adminaccess* command allows you to manage which users can access administrative functions of the bot, like all the */configure* commands..",
+			"configure-useraccess": "The */configure-useraccess* command allows you to manage which users on your server are allowed to access this Discord bots basic features.",
+			"start": "The */start* command is what you use to set the bot up initially, but also what you can use to reset your bot features and what you might be asked to run if new capabilities get added to the bot."
+		}
+	},
+	"policyid": {
+		"messageTitle": "Official policy IDs associated with this Discord",
+		"purpose": "This is the official list of projects that are related to this server. This does not mean that this is the official Discord for the respective projects, but that the administrators of this server added them as policies here.\n💡 Please verify on the respective project website, if you are on their official Discord server before following any buy links etc.",
+		"noProjectName": "No official policies",
+		"noPolicies": "*Currently, this server has no token policies listed.*",
+		"projectPolicyId": "The policy ID for this project is **{{policyId}}**"
+	},
+	"verify": {
+		"list": {
+			"messageTitle": "Your verified addresses",
+			"noVerifications": "You have no outstanding or confirmed verifications. If you would like to verify a Cardano address, please use the '/verify add' command.",
+			"listVerifications": "The following addresses are verified or waiting for verification:",
+			"confirmedVerifications": "✅ Confirmed verifications",
+			"confirmedData": "Address *{{verification.address}}* for stake address **{{verification.cardanoStakeAddress}}** via transaction *{{verification.transactionHash}}*, confirmed at *{{verification.confirmedAt}}*.",
+			"outstandingVerifications": "⏳ Outstanding verifications",
+			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification."
+		},
+		"add": {
+			"messageTitle": "Verify a new address",
+			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{verification.address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
+			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first.",
+			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next 15 minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.",
+			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
+			"verificationWaiting": "⏳ Still awaiting verification...",
+			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command."
+		},
+		"remove": {
+			"messageTitle": "Remove a verified address",
+			"success": "❗ All verifications with address *{{address}}* for this Discord account have been removed. This affects all Discord servers for which this verification was used!"
+		}
+	},
+	"whitelist": {
+		"list": {
+			"messageTitle": "Whitelists for this server",
+			"purpose": "These are all currently active or recently closed whitelists for this Discord server:",
+			"noWhitelistsTitle": "No whitelists",
+			"noWhitelistsDetail": "*Currently, this server has no open or recently closed whitelists.*",
+			"whitelistRoleRequirement": "Requirement for this whitelist is to have the role <@&{{whitelist.requiredRoleId}}>.{{{datePart}}}",
+			"whitelistWithEndDateOpen": "Signup is open until {{signupUntilFormatted}} UTC.",
+			"whitelistWithEndDateClosed": "Signup closed at {{signupUntilFormatted}} UTC.",
+			"whitelistWithStartDateOpen": "Signup opened at {{signupAfterFormatted}} UTC.",
+			"whitelistWithStartDateClosed": "Signup will open at {{signupAfterFormatted}} UTC.",
+			"whitelistWithStartDateClosedAndOpenEndDate": "Signup will open at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
+			"whitelistWithStartDateOpenAndOpenEndDate": "Signup opened at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
+			"whitelistWithStartDateOpenAndClosedEndDate": "Signup opened at {{signupAfterFormatted}} UTC and closed at {{signupUntilFormatted}}.",
+			"openWhitelist": "There are no start or end dates for this registration.",
+			"whitelistMembersNoLimit": "Any number of users can sign up.",
+			"whitelistMembersLimit": "{{whitelist.currentUsers}} out of {{whitelist.maxUsers}} have already registered.",
+			"whitelistMembersLimitReached": "All {{whitelist.maxUsers}} users have already registered.",
+			"youQualify": "✅ You qualify for this whitelist. Add your address via '/whitelist register', if you would like to sign up.",
+			"youDontQualify": "⛔ You currently do not qualify for this whitelist.",
+			"youAreRegistered": "♥ You successfully registered for this whitelist at {{signupTime}} UTC.",
+			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC. Your registered address is:\n\n*{{address}}*"
+		},
+		"register": {
+			"messageTitle": "Register for a whitelist",
+			"purpose": "Choose the whitelist you would like to register for:",
+			"signedupFor": "You are currently registered for the following whitelists:",
+			"signedupForEntry": "• **{{{whitelist.displayName}}}**",
+			"chooseWhitelist": "Select your whitelist",
+			"noOpenWhitelists": "We are sorry, but there are currently no other whitelists that you qualify for.",
+			"success": "✅ Congratulations, you have successfully registered for the whitelist \"**{{{whitelist.displayName}}}**\"!\n\nUsed address: *{{address}}*",
+			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*.\n\nPlease verify you are using a valid {{blockchain}} address to register.",
+			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
+			"otherError": "⚠ Error while registering for this whitelist."
+		},
+		"unregister": {
+			"messageTitle": "Unregister from a whitelist",
+			"purpose": "Choose the whitelist you would like to remove yourself from:",
+			"chooseWhitelist": "Select your whitelist",
+			"success": "✅ You have successfully removed yourself from the whitelist \"**{{{whitelist.displayName}}}**\". We're sorry to see you go and hope you'll be back soon.",
+			"errorNotFound": "⚠ Your unregistration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
+			"noRegisteredWhitelists": "⚠ You are currently not registered for any whitelists.",
+			"otherError": "⚠ Error while deleting your whitelist registration info."
+		}
+	},
+	"configure": {
+		"policy": {
+			"list": {
+				"purpose": "This is the list of official policies that this server will present when end users use the /policyid command.\n\n⚠ Do not add policy IDs for projects that are not your own or that you are not officially supporting. Reports of misused policy IDs will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage."
+			},
+			"add": {
+				"success": "✅ New official token policy added for this Discord server!"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following token policy from official token policy list of this server:",
+				"errorNotFound": "⚠ No policy with the ID **{{policyId}}** was found for this server. Nothing was removed."
+			}
+		},
+		"pool": {
+			"list": {
+				"purpose": "This is the list of official stakepools that this server will present when end users use the /info command.\n\n⚠ Do not add stakepools that are not your own or that you are not officially supporting. Reports of misused stakepools will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage.",
+				"noPoolName": "No official stakepools",
+				"noPools": "*Currently, this server has no stakepools listed.*"
+			},
+			"add": {
+				"success": "✅ New official stakepool added for this Discord server!"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following stakepool from the official stakepool list of this server:",
+				"errorNotFound": "⚠ No stakepool with the hash **{{stakepoolHash}}** was found for this server. Nothing was removed."
+			}
+		},
+		"protection": {
+			"status": {
+				"purpose": "The following protection mechanisms are active on this server:",
+				"protectionTitle": "Protection from addr1-scams",
+				"auditChannelTitle": "Auditing of potential scam messages and events"
+			},
+			"addressremove": {
+				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing *addr1*. These messages will be automatically removed in all channels where this bot has permissions to manage messages.",
+				"protectionOff": "⚠ You have turned off the autoremoval of text messags that contain *addr1* for protection of your users from address-based scams."
+			},
+			"auditchannel": {
+				"auditChannelOn": "✅ Suspicious messages and events in your server will be sent to the channel <#{{auditChannel}}>, if the bot has permissions to send messages to this channel.",
+				"auditChannelOff": "⚠ No audit channel has been configured. No potential scam-messages or events will be logged."
+			}
+		},
+		"tokenroles": {
+			"list": {
+				"purpose": "This is the list of Discord roles that will be automatically assigned, based on token (NFT and FT) ownership by verified users.",
+				"noTokenRolesTitle": "No token roles",
+				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
+				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
+				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
+				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}} tokens of the policy {{tokenRole.policyId}} will be assigned the role <@&{{tokenRole.roleId}}>."
+			},
+			"add": {
+				"success": "✅ New automatic role-assignment for the following token owners added to this server:"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following token role auto-assignment from this server:",
+				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server. Nothing was removed."
+			}
+		},
+		"delegatorroles": {
+			"list": {
+				"purpose": "This is the list of Discord roles that will be automatically assigned, based on delegated ADA amounts and stakepools for verified users.",
+				"noDelegatorRolesTitle": "No delegator roles",
+				"noDelegatorRolesDetail": "*Currently, this server has no delegation-based roles configured.*",
+				"stakepoolNameOfficial": "Stakepool {{{officialStakepool.info.ticker}}}, {{officialStakepool.poolHash}} (Role-ID: {{delegatorRole.id}})",
+				"stakepoolNameAny": "Any official stakepool of this server (see list via /info) (Role-ID: {{delegatorRole.id}})",
+				"stakepoolNameInofficial": "{{delegatorRole.poolHash}} (Role-ID: {{delegatorRole.id}})",
+				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}** to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>."
+			},
+			"add": {
+				"success": "✅ New automatic role-assignment for the following delegators added to this server:"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
+				"errorNotFound": "⚠ No delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
+			}
+		},
+		"whitelist": {
+			"list": {
+				"purpose": "This is the list of all existing whitelists for this Discord server.",
+				"noWhitelistsDetail": "*There are no configured whitelists on this server.*",
+				"adminName": "{{{whitelist.displayName}}} ({{whitelist.name}})"
+			},
+			"add": {
+				"success": "✅ New whitelist with the following requirements added to this server:"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following whitelist from this server:",
+				"purpose": "Select the whitelist to remove from your Discord server.\n\n⚠ **ALL REGISTERED ADDRESSES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE WHITELIST**.\n\nOnly do this after you have processed this whitelist for minting/distribution etc.",
+				"errorNotFound": "⚠ No whitelist with the name **{{whitelistName}}** was found for this server. Nothing was removed."
+			}
+		},
+		"adminaccess": {
+			"list": {
+				"purpose": "This is the list of all current roles that have bot administrator status on this Discord server:",
+				"administratorTitle": "Active administrator roles",
+				"administratorEntry": "• <@&{{roleId}}>"
+			},
+			"add": {
+				"success": "✅ The role <@&{{roleId}}> was successfully added as a new administrator role. The users with this role should be able to access the adminstrator commands immediately.",
+				"alreadyExists": "⚠ The role <@&{{roleId}}> is already an administrator and was not added again.",
+				"purpose": "configure.adminaccess.add.purpose"
+			},
+			"remove": {
+				"success": "🗑️ Removed the administrative role <@&{{roleId}}> from this Discord server. The following roles remain administrators:",
+				"notExists": "⚠ The role <@&{{roleId}}> is currently not an administrator role and was not removed.",
+				"cannotRemoveLastAdminRole": "⚠ You cannot remove this administrator role because it would remove your own administrative access."
+			}
+		},
+		"useraccess": {
+			"list": {
+				"purpose": "This is the list of all current roles that have basic bot usage permissions on this Discord server:",
+				"userTitle": "Active user roles",
+				"userEntry": "• <@&{{roleId}}>"
+			},
+			"add": {
+				"success": "✅ The role <@&{{roleId}}> was successfully added as a new user role. The users with this role should be able to verify and access basic commands immediately.",
+				"alreadyExists": "⚠ The role <@&{{roleId}}> is already an allowed user on this Discord server and was not added again."
+			},
+			"remove": {
+				"success": "🗑️ Removed the user role <@&{{roleId}}> from this Discord server. The following roles remain users:",
+				"notExists": "⚠ The role <@&{{roleId}}> is currently not a user role and was not removed.",
+				"cannotRemoveLastUserRole": "⚠ The role <@&{{roleId}}> is the last user role on this server and cannot be removed."
+			}
+		}
+	},
+	"start": {
+		"welcomeTitle": "Welcome to HAZELnet!",
+		"completeTitle": "Great work!",
+		"configureMessage": "The /start command will help you set up your HAZELnet bot. Select your options below:",
+		"configureLanguageTitle": "Language",
+		"configureAdminRoleTitle": "Admin Role",
+		"configureUserRoleTitle": "User Role",
+		"configureFeaturesTitle": "Features",
+		"configureLanguageText": "This setting determines the language of all bot commands and interactions. Currently it is not possible to have commands translate on a per-user basis - bot replies will in the future be able to be based on a user-selected language.",
+		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminroles* command to adjust this later.",
+		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-userroles* command to adjust this later.",
+		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available.",
+		"chooseLanguage": "Choose your bot language",
+		"chooseAdminRole": "Choose your admin role",
+		"chooseUserRole": "Choose your user role",
+		"chooseFeatures": "Choose the features you want to use",
+		"selectedLanguage": "Your selected language is **{{language}}**.",
+		"selectedAdminRoles": "The users with the following roles will be able to configure the bot:",
+		"selectedUserRoles": "The users with the following roles will be able to verify their wallets and interact with the bot:",
+		"selectedFeatures": "You have selected the following features:\n{{{selectedFeatureList}}}",
+		"selectedFeatureItem": "• **{{{feature}}}**",
+		"finishSetupButton": "Finish setup",
+		"resetSetupButton": "Reset settings",
+		"setupRoleWarningMessage": "Thank you 😻\n\n**Your setup is complete with warnings**:\n\n❗ Please be aware the bot did not find all the necessary permissions through roles assigned to it. Make sure the bot has one or multiple roles that grant at least the following permissions: Send Messages, Read Messages, Manage Messages, Manage Roles\n\n💡 Make sure the bot role is high enough in the Discord role list, so it can assign any auto-assign roles it is configured to manage.",
+		"setupCompleteMessage": "Thank you 😻\n\n**Your setup is complete!**\n\n💡 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage."
+	},
+	"features": {
+		"pool": "Stakepool features (official pools, delegator roles)",
+		"token": "Fungible tokens and NFTs (official policies, token roles)",
+		"whitelist": "Self-service address whitelists with requirements"
+	},
+	"languages": {
+		"en": "English",
+		"de": "German"
+	},
+	"errors": {
+		"notYetImplemented": "Not yet implemented. Please be patient with us.",
+		"permissionDeniedTitle": "Permission Denied",
+		"permissionDeniedInformation": "⛔ You do not have permission to access this information.",
+		"permissionDeniedChanges": "⛔ You do not have permission to make these changes.",
+		"notWhitelisted": "Thank you for your interest in HAZELnet. Unfortunately, your server is not on the early access list. Contact @NilsCodes on Twitter to see if you can participate in the beta program.",
+		"invalidIsoDateFormat": "Invalid date format for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)"
+	},
+	"about": {
+		"title": "About HAZELnet",
+		"info": "The HAZELnet Discord Community System was proudly built by the operators of HAZEL stakepool. We appreciate all our delegators and would love your support on our mission to improve feline lives.\n\nIf you would like this Discord bot in your server for free, visit https://www.hazelnet.io or https://twitter.com/HAZELnet_io",
+		"twitter": {
+			"author": "@NilsCodes on Twitter",
+			"bot": "@HAZELnet_io on Twitter"
+		}
+	}
+}

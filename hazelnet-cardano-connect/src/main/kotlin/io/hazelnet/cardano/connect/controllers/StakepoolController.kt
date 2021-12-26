@@ -1,0 +1,23 @@
+package io.hazelnet.cardano.connect.controllers
+
+import io.hazelnet.cardano.connect.services.StakepoolService
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/stakepools")
+class StakepoolController(
+        private val stakepoolService: StakepoolService
+) {
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    fun listStakepools() = stakepoolService.listStakepools()
+
+    @GetMapping("/{poolHash}/delegation")
+    @ResponseStatus(HttpStatus.OK)
+    fun getActiveDelegation(@PathVariable poolHash: String) = stakepoolService.getActiveDelegation(poolHash)
+
+    @GetMapping("/{poolHash}/delegation/{epochNo}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getDelegationInEpoch(@PathVariable poolHash: String, @PathVariable epochNo: Int) = stakepoolService.getDelegationInEpoch(poolHash, epochNo)
+}

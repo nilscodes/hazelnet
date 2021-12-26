@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'HazelNet Cardano'
+servers:
+  - url: 'localhost:8086'
+paths:
+  /wallets/{walletAddress}:
+    get:
+      summary: 'Returns address details for a given wallet address'
+      operationId: walletInfo
+      tags:
+        - wallets
+      parameters:
+        - name: walletAddress
+          in: path
+          description: The wallet address (Byron or Shelley era) to retrieve details for
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 1
+      responses:
+        '200':
+          description: 'Address details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressDetails'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /verification/{walletAddress}:
+    get:
+      summary: 'Verify if a transaction with a given amount has been done to this address from the same wallet'
+      operationId: verifyWalletAddress
+      tags:
+        - verification
+      parameters:
+        - name: walletAddress
+          in: path
+          description: The wallet address (Byron or Shelley era) to verify
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 1
+        - name: verificationAmount
+          in: query
+          description: The amount that has to have been sent to the address to verify
+          required: true
+          schema:
+            type: number
+            format: int64
+            example: 1
+        - name: earliestBlockTime
+          in: query
+          description: The earliest block time to consider for transaction with this amount
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: 2021-11-10T13:20:57Z
+      responses:
+        '200':
+          description: 'Sample response: Details about a user by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /pools:
+    get:
+      summary: Get a list of all stakepools
+      operationId: listStakepools
+      tags:
+        - stakepools
+      responses:
+        '200':
+          description: 'A list of pools'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StakepoolInfo'
+
+  /info/syncstatus:
+    get:
+      summary: 'Get Synchronization details for Cardano-DB-Sync connected to this HazelNet'
+      operationId: syncStatus
+      tags:
+        - info
+      responses:
+        '200':
+          description: 'Sample response: Details about a user by ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStatus'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    AddressDetails:
+      type: object
+      properties:
+        stakeAddress:
+          type: string
+          pattern: '^[_A-Z0-9]{56}$'
+    StakepoolInfo:
+      type: object
+      required:
+        - hash
+        - view
+        - ticker
+        - name
+      properties:
+        hash:
+          type: string
+          pattern: '^[_A-Z0-9]{56}$'
+        view:
+          type: string
+        ticker:
+          type: string
+        name:
+          type: string
+        website:
+          type: string
+        description:
+          type: string
+    SyncStatus:
+      type: object
+      required:
+        - lastSyncSeconds
+        - name
+      properties:
+        lastSyncSeconds:
+          type: integer
+          format: int64
+        syncPercentage:
+          type: number
+          format: double
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+security:
+  - BasicAuth: []

@@ -1,12 +1,110 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-- test
-sast:
-  stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+  - build
+  - docker
+
+discordbot-docker:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - cd hazelnet-discordbot
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/discordbot${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/discordbot${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "hazelnet-discordbot/Dockerfile"
+      changes:
+        - "hazelnet-discordbot/**/*"
+
+gradle-build:
+  image: gradle:alpine
+
+  variables:
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+  before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+
+  stage: build
+  script: gradle --build-cache assemble
+  artifacts:
+    paths:
+      - hazelnet-community/build/libs
+      - hazelnet-cardano-connect/build/libs
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build
+      - .gradle
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      changes:
+        - "hazelnet-community/**/*"
+        - "hazelnet-cardano-connect/**/*"
+        - "hazelnet-cardano-shared/**/*"
+
+community-docker:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - cd hazelnet-community
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/community${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/community${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "hazelnet-community/Dockerfile"
+      changes:
+        - "hazelnet-community/**/*"
+        - "hazelnet-cardano-shared/**/*"
+
+cardano-connect-docker:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - cd hazelnet-cardano-connect
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/cardano-connect${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/cardano-connect${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "hazelnet-cardano-connect/Dockerfile"
+      changes:
+        - "hazelnet-cardano-connect/**/*"
+        - "hazelnet-cardano-shared/**/*"

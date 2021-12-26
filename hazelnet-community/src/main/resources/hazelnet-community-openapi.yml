@@ -1,0 +1,721 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'HazelNet Community'
+servers:
+  - url: 'localhost:8085'
+
+paths:
+  /accounts:
+    post:
+      summary: 'Create an Account'
+      operationId: createAccount
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        '201':
+          description: 'Account data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /externalaccounts:
+    post:
+      summary: 'Create External Account'
+      operationId: createExternalAccount
+      tags:
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccount'
+      responses:
+        '201':
+          description: 'External account data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /externalaccounts/{externalAccountId}:
+    get:
+      summary: 'Get Account'
+      operationId: getExternalAccount
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'External Account Info'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /verifications:
+    post:
+      summary: 'Request Verification for an External Account'
+      operationId: requestVerification
+      tags:
+        - verification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequest'
+      responses:
+        '201':
+          description: 'Verification details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verification'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /verifications/{verificationId}:
+    get:
+      summary: 'Get Verification Info'
+      operationId: getVerification
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/VerificationPathParameter'
+      responses:
+        '200':
+          description: 'Verification Details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verification'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /discord/servers:
+    post:
+      summary: Add Discord Server
+      operationId: addDiscordServer
+      tags:
+        - discord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordServer'
+      responses:
+        '201':
+          description: 'Discord Server'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordServer'
+  /discord/servers/{guildId}:
+    get:
+      summary: Get Discord Server Details
+      operationId: getDiscordServer
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Discord Server'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordServer'
+  /discord/servers/{guildId}/members:
+    get:
+      summary: Get the list of external accounts that are members of this discord server
+      operationId: getExternalAccounts
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Discord Member List'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordMember'
+    post:
+      summary: Connect an external account to this discord server
+      operationId: connectExternalAccount
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordMember'
+      responses:
+        '201':
+          description: 'Added discord member'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordMember'
+  /discord/servers/{guildId}/tokenpolicies:
+    post:
+      summary: Add an official token policy to this discord server
+      operationId: addTokenPolicy
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenPolicy'
+      responses:
+        '201':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPolicy'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/tokenpolicies/{policyId}:
+    delete:
+      summary: Remove an official token policy from this discord server
+      operationId: deleteTokenPolicy
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PolicyIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/stakepools:
+    post:
+      summary: Add an official stakepool to this discord server
+      operationId: addStakepool
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Stakepool'
+      responses:
+        '201':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stakepool'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/stakepools/{poolHash}:
+    delete:
+      summary: Remove an official stakepool from this discord server
+      operationId: deleteStakepool
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PoolHashPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/delegatorroles:
+    post:
+      summary: Add an auto-assigned role based on stakepool delegation to this discord server
+      operationId: addDelegatorRole
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordDelegatorRole'
+      responses:
+        '201':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordDelegatorRole'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/delegatorroles/{delegatorRoleId}:
+    delete:
+      summary: Remove a delegator role assignment from this discord server
+      operationId: deleteDelegatorRole
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/DelegatorRoleIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/tokenroles:
+    post:
+      summary: Add an auto-assigned role based on token ownership to this discord server
+      operationId: addTokenOwnershipRole
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordTokenRole'
+      responses:
+        '201':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordTokenRole'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/tokenroles/{tokenRoleId}:
+    delete:
+      summary: Remove a token role assignment from this discord server
+      operationId: deleteTokenOwnershipRole
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/settings/{settingName}:
+    put:
+      summary: Add an auto-assigned role based on token ownership to this discord server
+      operationId: updateSetting
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - name: settingName
+          in: path
+          required: true
+          style: simple
+          example: PROTECTION_ADDR_REMOVAL
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordServerSetting'
+      responses:
+        '200':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordServerSetting'
+
+components:
+  parameters:
+    GuildIdPathParameter:
+      name: guildId
+      in: path
+      description: The Discord Server's Guild ID
+      required: true
+      style: simple
+      example: 717264144759390238
+      schema:
+        type: integer
+        format: int64
+    PolicyIdPathParameter:
+      name: policyId
+      in: path
+      description: The Policy ID
+      required: true
+      style: simple
+      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+      schema:
+        type: string
+    PoolHashPathParameter:
+      name: poolHash
+      in: path
+      description: The Stakepool hash
+      required: true
+      style: simple
+      example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9]{56}$'
+    DelegatorRoleIdPathParameter:
+      name: delegatorRoleId
+      in: path
+      description: The ID of this delegator role assignment
+      required: true
+      style: simple
+      example: 235
+      schema:
+        type: integer
+        format: int64
+    TokenRoleIdPathParameter:
+      name: tokenRoleId
+      in: path
+      description: The ID of this token role assignment
+      required: true
+      style: simple
+      example: 155
+      schema:
+        type: integer
+        format: int64
+    VerificationPathParameter:
+      name: verificationId
+      in: path
+      description: The ID of the verification
+      required: true
+      style: simple
+      schema:
+        type: integer
+        format: int64
+    ExternalAccountPathParameter:
+      name: externalAccountId
+      in: path
+      description: The ID of the external account
+      required: true
+      style: simple
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    Account:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+    ExternalAccount:
+      type: object
+      required:
+        - type
+        - referenceId
+      properties:
+        id:
+          type: integer
+          format: int64
+        registrationTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        type:
+          $ref: '#/components/schemas/ExternalAccountType'
+        referenceId:
+          type: string
+        referenceName:
+          type: string
+        account:
+          type: integer
+          format: int64
+    VerificationRequest:
+      type: object
+      required:
+        - blockchain
+        - address
+        - externalAccountId
+      properties:
+        blockchain:
+          $ref: '#/components/schemas/BlockchainType'
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        externalAccountId:
+          type: integer
+          format: int64
+    Verification:
+      type: object
+      required:
+        - blockchain
+        - address
+        - externalAccountId
+        - amount
+        - validAfter
+        - validBefore
+        - confirmed
+        - obsolete
+      properties:
+        blockchain:
+          $ref: '#/components/schemas/BlockchainType'
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        externalAccountId:
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int64
+        validAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        validBefore:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        confirmed:
+          type: boolean
+        obsolete:
+          type: boolean
+    DiscordServer:
+      type: object
+      required:
+        - guildId
+        - guildName
+        - guildOwner
+        - guildMemberCount
+      properties:
+        id:
+          type: integer
+          format: int64
+        guildId:
+          type: integer
+          format: int64
+          example: 717264144759390238
+        guildName:
+          type: string
+          example: Guild Name
+        guildOwner:
+          type: integer
+          format: int64
+          example: 9358923890
+        joinTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        guildMemberCount:
+          type: integer
+          format: int32
+          example: 150
+        ownerAccount:
+          type: integer
+          format: int64
+        tokenPolicies:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenPolicy'
+        stakepools:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stakepool'
+        delegatorRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordDelegatorRole'
+        tokenRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordTokenRole'
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordServerSetting'
+    TokenPolicy:
+      type: object
+      required:
+        - policyId
+        - projectName
+      properties:
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        projectName:
+          type: string
+          example: My First CNFT
+    Stakepool:
+      type: object
+      required:
+        - poolHash
+      properties:
+        poolHash:
+          $ref: '#/components/schemas/StakepoolHash'
+        info:
+          $ref: '#/components/schemas/StakepoolInfo'
+    StakepoolInfo:
+      type: object
+      required:
+        - hash
+        - view
+        - ticker
+        - name
+      properties:
+        hash:
+          $ref: '#/components/schemas/StakepoolHash'
+        view:
+          type: string
+        ticker:
+          type: string
+        name:
+          type: string
+        website:
+          type: string
+        description:
+          type: string
+    DiscordDelegatorRole:
+      type: object
+      required:
+        - id
+        - poolHash
+        - minimumStake
+        - roleId
+      properties:
+        id:
+          type: integer
+          format: int64
+        poolHash:
+          $ref: '#/components/schemas/StakepoolHash'
+        minimumStake:
+          type: integer
+          description: Minimum stake in Lovelace
+          format: int64
+          example: 1000000000
+        roleId:
+          $ref: '#/components/schemas/DiscordRole'
+    DiscordTokenRole:
+      type: object
+      required:
+        - id
+        - policyId
+        - minimumTokenQuantity
+        - roleId
+      properties:
+        id:
+          type: integer
+          format: int64
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        minimumTokenQuantity:
+          type: integer
+          format: int64
+          example: 1
+        roleId:
+          $ref: '#/components/schemas/DiscordRole'
+    DiscordServerSetting:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          pattern: '^[_A-Za-z0-9]+$'
+        value:
+          type: string
+      example:
+        name: PROTECTION_ADDR_REMOVAL
+        value: 'true'
+    DiscordMember:
+      type: object
+      required:
+        - externalAccountId
+      properties:
+        externalAccountId:
+          type: integer
+          format: int64
+    DiscordRole:
+      description: Snowflake ID matching a Discord role
+      type: integer
+      format: int64
+      example: 185829035890290
+    StakepoolHash:
+      type: string
+      description: The Stakepool hash
+      example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
+      pattern: '^[_A-Za-z0-9]{56}$'
+    TokenPolicyId:
+      type: string
+      description: The Policy ID
+      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+    WalletAddress:
+      type: string
+    ExternalAccountType:
+      type: string
+      enum:
+        - DISCORD
+    BlockchainType:
+      type: string
+      enum:
+        - CARDANO
+        - ETHEREUM
+    CreatedResponseHeader:
+      type: string
+      format: uri
+      description: URL of the newly created resource
+    ErrorResponse:
+      type: object
+      required:
+        - messages
+        - httpStatus
+        - httpStatusCode
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorMessage'
+        httpStatus:
+          type: string
+        httpStatusCode:
+          type: integer
+          format: int32
+    ErrorMessage:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        sourceField:
+          type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+security:
+  - BasicAuth: []
