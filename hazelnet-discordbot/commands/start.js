@@ -11,7 +11,7 @@ module.exports = {
   getCommandData() {
     return new SlashCommandBuilder()
       .setName('start')
-      .setDescription('Start the setup of your HAZELnet bot.');
+      .setDescription('Start the setup of your HAZELnet.io bot.');
   },
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
@@ -20,7 +20,7 @@ module.exports = {
     const serverWhitelist = serverWhitelistString?.split(',') ?? [];
     if (serverWhitelist.length && !serverWhitelist.includes(interaction.guild.id)) {
       await this.editReplyWithNotWhitelistedMessage(interaction, discordServer);
-    } else if (interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
+    } else if (interaction.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
       await this.editReplyWithSetupMessage(interaction);
     } else {
       await interaction.editReply({ content: i18n.__({ phrase: 'errors.permissionDeniedChanges', locale: discordServer.getBotLanguage() }), ephemeral: true });
