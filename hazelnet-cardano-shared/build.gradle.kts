@@ -25,6 +25,9 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation("com.google.guava:guava:30.1.1-jre")
 
+    // Use the same version as our spring boot implementation
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 

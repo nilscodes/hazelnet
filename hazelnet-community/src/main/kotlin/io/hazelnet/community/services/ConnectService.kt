@@ -69,4 +69,28 @@ class ConnectService(
                 .bodyToMono(VerificationConfirmation::class.java)
                 .block()!!
     }
+
+    fun resolvePoolView(poolView: String): List<StakepoolInfo> {
+        return connectClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder
+                            .path("/stakepools")
+                            .queryParam("poolView", poolView)
+                            .build()
+                }.retrieve()
+                .bodyToMono(object : ParameterizedTypeReference<List<StakepoolInfo>>() {})
+                .block()!!
+    }
+
+    fun resolvePoolHash(poolHash: String): List<StakepoolInfo> {
+        return connectClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder
+                            .path("/stakepools")
+                            .queryParam("poolHash", poolHash)
+                            .build()
+                }.retrieve()
+                .bodyToMono(object : ParameterizedTypeReference<List<StakepoolInfo>>() {})
+                .block()!!
+    }
 }

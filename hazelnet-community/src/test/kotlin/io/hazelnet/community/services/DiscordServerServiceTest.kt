@@ -71,6 +71,9 @@ internal class DiscordServerServiceTest {
                 connectService,
                 getMockDiscordServerRepository(),
                 mockk(),
+                mockk(),
+                mockk(),
+                mockk(),
                 mockk()
         )
 
@@ -103,6 +106,9 @@ internal class DiscordServerServiceTest {
                 getMockVerificationService(),
                 connectService,
                 getMockDiscordServerRepository(),
+                mockk(),
+                mockk(),
+                mockk(),
                 mockk(),
                 mockk()
         )

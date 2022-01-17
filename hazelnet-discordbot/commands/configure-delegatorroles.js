@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-delegatorroles')
       .setDescription('Configure delegator-roles')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds an auto-assignment for the given role.')

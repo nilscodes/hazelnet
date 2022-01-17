@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-pool')
       .setDescription('Configure pools')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.')

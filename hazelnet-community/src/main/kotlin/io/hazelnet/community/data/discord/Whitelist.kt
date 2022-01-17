@@ -22,7 +22,7 @@ class Whitelist @JsonCreator constructor(
         @Column(name = "whitelist_name")
         @field:NonNull
         @field:Size(min = 1, max = 30)
-        @field:Pattern(regexp = "^[-A-Za-z0-9]{1,30}$")
+        @field:Pattern(regexp = "^[A-Za-z][-A-Za-z0-9]{0,29}$")
         var name: String,
 
         @Column(name = "whitelist_displayname")

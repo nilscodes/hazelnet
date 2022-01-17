@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS "verifications";
 DROP TABLE IF EXISTS "external_accounts";
 DROP TABLE IF EXISTS "accounts";
 DROP TABLE IF EXISTS "global_settings";
+DROP TABLE IF EXISTS "oauth2_authorization";
 
 DROP TYPE IF EXISTS "accounts_external_type";
 DROP TYPE IF EXISTS "blockchain_type";
@@ -146,6 +147,34 @@ CREATE TABLE "discord_whitelists_signup"
     "address"                   varchar(150),
     "signup_time"               timestamp NOT NULL,
     UNIQUE("discord_whitelist_id", "external_account_id")
+);
+
+CREATE TABLE "oauth2_authorization"
+(
+    id                            varchar(100) NOT NULL PRIMARY KEY,
+    registered_client_id          varchar(100) NOT NULL,
+    principal_name                varchar(200) NOT NULL,
+    authorization_grant_type      varchar(100) NOT NULL,
+    attributes                    varchar(4000) DEFAULT NULL,
+    state                         varchar(500)  DEFAULT NULL,
+    authorization_code_value      bytea          DEFAULT NULL,
+    authorization_code_issued_at  timestamp     DEFAULT NULL,
+    authorization_code_expires_at timestamp     DEFAULT NULL,
+    authorization_code_metadata   varchar(2000) DEFAULT NULL,
+    access_token_value            bytea          DEFAULT NULL,
+    access_token_issued_at        timestamp     DEFAULT NULL,
+    access_token_expires_at       timestamp     DEFAULT NULL,
+    access_token_metadata         varchar(2000) DEFAULT NULL,
+    access_token_type             varchar(100)  DEFAULT NULL,
+    access_token_scopes           varchar(1000) DEFAULT NULL,
+    oidc_id_token_value           bytea          DEFAULT NULL,
+    oidc_id_token_issued_at       timestamp     DEFAULT NULL,
+    oidc_id_token_expires_at      timestamp     DEFAULT NULL,
+    oidc_id_token_metadata        varchar(2000) DEFAULT NULL,
+    refresh_token_value           bytea          DEFAULT NULL,
+    refresh_token_issued_at       timestamp     DEFAULT NULL,
+    refresh_token_expires_at      timestamp     DEFAULT NULL,
+    refresh_token_metadata        varchar(2000) DEFAULT NULL
 );
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");

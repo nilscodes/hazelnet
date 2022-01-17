@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.persistence.stakepool.StakepoolDao
 import org.springframework.stereotype.Service
 
@@ -7,7 +8,14 @@ import org.springframework.stereotype.Service
 class StakepoolService(
         private val stakepoolDao: StakepoolDao
 ) {
-    fun listStakepools() = stakepoolDao.listStakepools()
+    fun listStakepools(poolView: String?, poolHash: String?): List<StakepoolInfo> {
+        if(poolView != null) {
+            return stakepoolDao.findByView(poolView)
+        } else if(poolHash != null) {
+            return stakepoolDao.findByHash(poolHash)
+        }
+        return stakepoolDao.listStakepools()
+    }
     fun getActiveDelegation(poolHash: String) = stakepoolDao.getActiveDelegation(poolHash)
     fun getDelegationInEpoch(poolHash: String, epochNo: Int) = stakepoolDao.getDelegationInEpoch(poolHash, epochNo)
 }

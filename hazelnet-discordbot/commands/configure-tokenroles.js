@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-tokenroles')
       .setDescription('Manage auto-role assignments for NFT and other token-holders')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.')

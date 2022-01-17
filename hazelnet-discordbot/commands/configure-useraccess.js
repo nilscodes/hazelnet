@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-useraccess')
       .setDescription('Configure roles that can use the bot')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds a role that is allowed to use the bot.')

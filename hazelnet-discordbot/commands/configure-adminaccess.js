@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-adminaccess')
       .setDescription('Configure roles that can administer the bot')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds a role that is allowed to administer the bot.')

@@ -67,7 +67,7 @@
 			"noVerifications": "You have no outstanding or confirmed verifications. If you would like to verify a Cardano address, please use the '/verify add' command.",
 			"listVerifications": "The following addresses are verified or waiting for verification:",
 			"confirmedVerifications": "✅ Confirmed verifications",
-			"confirmedData": "Address *{{verification.address}}* for stake address **{{verification.cardanoStakeAddress}}** via transaction *{{verification.transactionHash}}*, confirmed at *{{verification.confirmedAt}}*.",
+			"confirmedData": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} via transaction https://cardanoscan.io/transaction/{{verification.transactionHash}}, confirmed at *{{verification.confirmedAt}}*.",
 			"outstandingVerifications": "⏳ Outstanding verifications",
 			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification."
 		},
@@ -164,12 +164,14 @@
 				"auditChannelTitle": "Auditing of potential scam messages and events"
 			},
 			"addressremove": {
-				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing *addr1*. These messages will be automatically removed in all channels where this bot has permissions to manage messages.",
+				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing *addr1*. These messages will be automatically removed in all channels where this bot has permissions to view and manage messages.",
 				"protectionOff": "⚠ You have turned off the autoremoval of text messags that contain *addr1* for protection of your users from address-based scams."
 			},
 			"auditchannel": {
 				"auditChannelOn": "✅ Suspicious messages and events in your server will be sent to the channel <#{{auditChannel}}>, if the bot has permissions to send messages to this channel.",
-				"auditChannelOff": "⚠ No audit channel has been configured. No potential scam-messages or events will be logged."
+				"auditChannelOff": "⚠ No audit channel has been configured. No potential scam-messages or events will be logged.",
+				"auditEventTitle": "⚠ Potential Scam Attempt",
+				"auditEventDetail": "User <@{{author}}> sent a suspicious message to channel <#{{{channel}}}> with content \"{{message}}\""
 			}
 		},
 		"tokenroles": {
@@ -254,6 +256,14 @@
 				"notExists": "⚠ The role <@&{{roleId}}> is currently not a user role and was not removed.",
 				"cannotRemoveLastUserRole": "⚠ The role <@&{{roleId}}> is the last user role on this server and cannot be removed."
 			}
+		},
+		"api": {
+			"generatetoken": {
+				"success": "✅ A new access token was generated. Please write down this token to provide to your development team.\n❗ You will not be able to access this token again. The only way to view an access token is by generating a new one.\n\n**Your token:**\n\n*{{accessToken}}*\n\nFind the REST API documentation by downloading the current OpenAPI Swagger Documentation at the following URL: {{{externalDocumentationUrl}}}"
+			},
+			"removetoken": {
+				"success": "🗑️ The API access token for this Discord server was successfully removed.\n❗ Any and all REST API integrations your project is using will currently not be able to retrieve data from HAZELnet."
+			}
 		}
 	},
 	"start": {
@@ -265,8 +275,8 @@
 		"configureUserRoleTitle": "User Role",
 		"configureFeaturesTitle": "Features",
 		"configureLanguageText": "This setting determines the language of all bot commands and interactions. Currently it is not possible to have commands translate on a per-user basis - bot replies will in the future be able to be based on a user-selected language.",
-		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminroles* command to adjust this later.",
-		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-userroles* command to adjust this later.",
+		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminaccess* command to adjust this later.",
+		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-useraccess* command to adjust this later.",
 		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available.",
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",

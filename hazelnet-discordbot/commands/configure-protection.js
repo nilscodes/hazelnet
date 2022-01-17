@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-protection')
       .setDescription('Configuration options around scammer protection')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('status')
         .setDescription('Show the status of all protection-related mechanisms.'))

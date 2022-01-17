@@ -1,6 +1,6 @@
 module.exports = {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-pool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-pool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-api'],
   async setSlashCommandPermissions(client, guildId, discordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {

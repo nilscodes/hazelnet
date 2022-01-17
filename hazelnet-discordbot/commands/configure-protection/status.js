@@ -14,7 +14,7 @@ module.exports = {
         value: i18n.__({ phrase: (addressRemoval ? 'configure.protection.addressremove.protectionOn' : 'configure.protection.addressremove.protectionOff'), locale: useLocale }),
       }, {
         name: i18n.__({ phrase: 'configure.protection.status.auditChannelTitle', locale: useLocale }),
-        value: i18n.__({ phrase: (addressRemoval ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale: useLocale }, { auditChannel }),
+        value: i18n.__({ phrase: (auditChannel?.length ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale: useLocale }, { auditChannel }),
       }];
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection status', i18n.__({ phrase: 'configure.protection.status.purpose', locale: useLocale }), settingFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });

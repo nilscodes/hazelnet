@@ -10,7 +10,6 @@ module.exports = {
       await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'PROTECTION_AUDIT_CHANNEL', newStatus === false ? '' : auditChannel.id);
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'PROTECTION_ADDR_REMOVAL', newStatus);
       const changeMessage = i18n.__({ phrase: (newStatus ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale: useLocale }, { auditChannel: auditChannel.id });
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection auditchannel', changeMessage);
       await interaction.editReply({ embeds: [embed], ephemeral: true });

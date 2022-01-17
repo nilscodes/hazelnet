@@ -11,7 +11,7 @@ class StakepoolController(
 ) {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    fun listStakepools() = stakepoolService.listStakepools()
+    fun listStakepools(@RequestParam(required = false) poolView: String?, @RequestParam(required = false) poolHash: String?) = stakepoolService.listStakepools(poolView, poolHash)
 
     @GetMapping("/{poolHash}/delegation")
     @ResponseStatus(HttpStatus.OK)

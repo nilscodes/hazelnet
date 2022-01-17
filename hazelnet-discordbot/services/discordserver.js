@@ -36,6 +36,10 @@ module.exports = {
     });
     this.clearCacheEntry(guildId);
   },
+  async deleteDiscordServerSetting(guildId, settingName) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/settings/${settingName}`);
+    this.clearCacheEntry(guildId);
+  },
   async deleteStakepool(guildId, poolToRemove) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/stakepools/${poolToRemove}`);
     this.clearCacheEntry(guildId);
@@ -131,6 +135,13 @@ module.exports = {
   async getAllDiscordServers() {
     const discordServer = await axios.get(`${hazelCommunityUrl}/discord/servers`);
     return discordServer.data;
+  },
+  async regenerateAccessToken(guildId) {
+    const roleAssignments = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);
+    return roleAssignments.data;
+  },
+  async deleteAccessToken(guildId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);
   },
   clearCacheEntry(guildId) {
     this.cache.del(`${guildId}`);

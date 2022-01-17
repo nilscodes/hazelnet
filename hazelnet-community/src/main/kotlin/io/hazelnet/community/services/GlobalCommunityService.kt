@@ -21,5 +21,10 @@ class GlobalCommunityService(
         }
     }
 
-
+    fun deleteSetting(settingName: String) {
+        val existingSetting = settingsRepository.findByName(settingName)
+        if (existingSetting.isPresent) {
+            settingsRepository.deleteById(existingSetting.get().id!!)
+        }
+    }
 }

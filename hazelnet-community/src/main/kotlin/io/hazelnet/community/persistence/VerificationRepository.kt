@@ -17,7 +17,7 @@ interface VerificationRepository : CrudRepository<Verification, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Verification SET obsolete=true WHERE validBefore<:now") // Cannot use now() or current_timestamp, need to pass the time in as parameter to get the correct time zone
+    @Query("UPDATE Verification SET obsolete=true WHERE confirmed=false AND validBefore<:now") // Cannot use now() or current_timestamp, need to pass the time in as parameter to get the correct time zone
     fun markObsolete(@Param("now") now : Date)
 
     @Query("SELECT v FROM Verification v WHERE v.confirmed=false AND v.obsolete=false")

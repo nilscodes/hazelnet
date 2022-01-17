@@ -180,10 +180,10 @@ module.exports = {
   },
   async resetSetup(interaction) {
     await interaction.deferReply({ ephemeral: true });
-    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'BOT_LANGUAGE', '');
-    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES', '');
-    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'USER_ROLES', '');
-    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS', '');
+    await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'BOT_LANGUAGE');
+    await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES');
+    await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'USER_ROLES');
+    await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS');
     await this.editReplyWithSetupMessage(interaction);
   },
   async editReplyWithNotWhitelistedMessage(interaction, discordServer) {

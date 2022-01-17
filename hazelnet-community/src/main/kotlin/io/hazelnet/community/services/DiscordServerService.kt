@@ -10,10 +10,19 @@ import io.hazelnet.community.persistence.DiscordDelegatorRoleRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordTokenOwnershipRoleRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
+import org.springframework.security.oauth2.core.AuthorizationGrantType
+import org.springframework.security.oauth2.core.OAuth2AccessToken
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
 import org.springframework.stereotype.Service
+import java.lang.NumberFormatException
+import java.time.Duration
+import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
+import kotlin.NoSuchElementException
 
 const val LOOKUP_NAME_ALL_POOLS = "all"
 
@@ -25,7 +34,9 @@ class DiscordServerService(
         private val discordServerRepository: DiscordServerRepository,
         private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
         private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
-        private val discordWhitelistRepository: DiscordWhitelistRepository
+        private val discordWhitelistRepository: DiscordWhitelistRepository,
+        private val oAuth2AuthorizationService: OAuth2AuthorizationService,
+        private val registeredClientRepository: RegisteredClientRepository
 ) {
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
@@ -50,11 +61,25 @@ class DiscordServerService(
 
     fun addStakepool(guildId: Long, stakepool: Stakepool): Stakepool {
         val discordServer = getDiscordServer(guildId)
+        this.confirmValidPoolAndUpdateHashIfNeeded(stakepool)
         discordServer.stakepools.add(stakepool)
         discordServerRepository.save(discordServer)
         val stakepoolMap = stakepoolService.getStakepools()
         stakepool.info = stakepoolMap[stakepool.poolHash]
         return stakepool
+    }
+
+    private fun confirmValidPoolAndUpdateHashIfNeeded(stakepool: Stakepool) {
+        val validPools = if (stakepool.poolHash.startsWith("pool1")) {
+            connectService.resolvePoolView(stakepool.poolHash)
+        } else {
+            connectService.resolvePoolHash(stakepool.poolHash)
+        }
+        if (!validPools.isEmpty()) {
+            stakepool.poolHash = validPools[0].hash
+            return
+        }
+        throw NoSuchElementException("No stakepool found with pool ID ${stakepool.poolHash}")
     }
 
     fun addDelegatorRole(guildId: Long, delegatorRole: DelegatorRole): DelegatorRole {
@@ -101,6 +126,13 @@ class DiscordServerService(
         return discordServerSetting
     }
 
+    fun deleteSettings(guildId: Long, settingName: String) {
+        val discordServer = getDiscordServer(guildId)
+        discordServer.settings.removeIf { it.name == settingName }
+        discordServerRepository.save(discordServer)
+    }
+
+
     fun deleteTokenPolicy(guildId: Long, policyId: String) {
         val discordServer = getDiscordServer(guildId)
         discordServer.tokenPolicies.removeIf { it.policyId.equals(policyId, ignoreCase = true) }
@@ -125,14 +157,24 @@ class DiscordServerService(
         discordWhitelistRepository.deleteById(whitelistId)
     }
 
-    fun getWhitelistSignups(guildId: Long, whitelistId: Long): Set<WhitelistSignup> {
+    fun getWhitelistSignups(guildId: Long, whitelistIdOrName: String): Set<WhitelistSignup> {
         val discordServer = getDiscordServer(guildId)
-        return getWhitelistById(discordServer, whitelistId).signups
+        return try {
+            val whitelistId = whitelistIdOrName.toLong()
+            return getWhitelistById(discordServer, whitelistId).signups
+        }
+        catch(e: NumberFormatException) {
+            getWhitelistByName(discordServer, whitelistIdOrName).signups
+        }
     }
 
     private fun getWhitelistById(discordServer: DiscordServer, whitelistId: Long) =
             discordServer.whitelists.find { it.id == whitelistId }
                     ?: throw NoSuchElementException("No whitelist with ID $whitelistId found on Discord server ${discordServer.guildId}")
+
+    private fun getWhitelistByName(discordServer: DiscordServer, whitelistName: String) =
+            discordServer.whitelists.find { it.name == whitelistName }
+                    ?: throw NoSuchElementException("No whitelist with name $whitelistName found on Discord server ${discordServer.guildId}")
 
     @Transactional
     fun addWhitelistSignup(guildId: Long, whitelistId: Long, whitelistSignup: WhitelistSignup): WhitelistSignup {
@@ -248,4 +290,31 @@ class DiscordServerService(
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() } as MutableMap
     }
 
+    fun regenerateAccessToken(guildId: Long): String {
+        val discordServer = getDiscordServer(guildId)
+        val snowflakeId = discordServer.guildId.toString()
+        deleteTokenInternal(snowflakeId)
+
+        val token = OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, "${UUID.randomUUID()}.${discordServer.guildId}", Instant.now(), Instant.now().plus(Duration.ofDays(3600)), setOf("whitelist:read"))
+        oAuth2AuthorizationService.save(OAuth2Authorization.withRegisteredClient(registeredClientRepository.findByClientId("hazelnet-external"))
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .id(snowflakeId)
+                .token(token) { it["discord"] = snowflakeId }
+                .attribute("discord", snowflakeId)
+                .principalName(snowflakeId)
+                .build())
+        return token.tokenValue
+    }
+
+    private fun deleteTokenInternal(snowflakeId: String) {
+        val existingAuthorization = oAuth2AuthorizationService.findById(snowflakeId)
+        existingAuthorization?.let {
+            oAuth2AuthorizationService.remove(it)
+        }
+    }
+
+    fun deleteAccessToken(guildId: Long) {
+        val discordServer = getDiscordServer(guildId)
+        deleteTokenInternal(discordServer.guildId.toString())
+    }
 }

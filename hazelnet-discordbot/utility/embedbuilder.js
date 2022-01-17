@@ -7,6 +7,9 @@ module.exports = {
   buildForAdmin(discordServer, title, message, fields) {
     return this.build('#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, fields);
   },
+  buildForAudit(discordServer, title, message, fields) {
+    return this.build('#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, fields);
+  },
   build(color, thumbnail, title, message, fields) {
     const baseEmbed = new MessageEmbed()
       .setColor(color)

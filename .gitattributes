@@ -4,3 +4,6 @@
 # These are explicitly windows files and should use crlf
 *.bat           text eol=crlf
 
+# For ESlint
+*.js  text eol=lf
+*.jsx  text eol=lf

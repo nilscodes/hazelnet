@@ -118,7 +118,7 @@ class DiscordServerController(
 
     @GetMapping("/{guildId}/whitelists/{whitelistId}/signups")
     @ResponseStatus(HttpStatus.OK)
-    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = discordServerService.getWhitelistSignups(guildId, whitelistId)
+    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistId: String) = discordServerService.getWhitelistSignups(guildId, whitelistId)
 
     @PostMapping("/{guildId}/whitelists/{whitelistId}/signups")
     @ResponseStatus(HttpStatus.CREATED)
@@ -138,7 +138,7 @@ class DiscordServerController(
 
     @DeleteMapping("/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = discordServerService.deleteWhitelistSignup(guildId, whitelistId, externalAccountId)
+    fun deleteWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = discordServerService.deleteWhitelistSignup(guildId, whitelistId, externalAccountId)
 
     @PostMapping("/{guildId}/members")
     @ResponseStatus(HttpStatus.CREATED)
@@ -153,6 +153,10 @@ class DiscordServerController(
         return discordServerService.updateSettings(guildId, discordServerSetting)
     }
 
+    @DeleteMapping("/{guildId}/settings/{settingName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteSetting(@PathVariable guildId: Long, @PathVariable settingName: String) = discordServerService.deleteSettings(guildId, settingName)
+
     @GetMapping("/{guildId}/members")
     @ResponseStatus(HttpStatus.OK)
     fun getExternalAccounts(@PathVariable guildId: Long) = discordServerService.getMembers(guildId)
@@ -164,4 +168,12 @@ class DiscordServerController(
     @GetMapping("/{guildId}/roleassignments/tokenroles")
     @ResponseStatus(HttpStatus.OK)
     fun getCurrentTokenRoleAssignments(@PathVariable guildId: Long) = discordServerService.getCurrentTokenRolesAssignments(guildId)
+
+    @PostMapping("/{guildId}/accesstoken")
+    @ResponseStatus(HttpStatus.OK)
+    fun regenerateAccessToken(@PathVariable guildId: Long) = discordServerService.regenerateAccessToken(guildId)
+
+    @DeleteMapping("/{guildId}/accesstoken")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteAccessToken(@PathVariable guildId: Long) = discordServerService.deleteAccessToken(guildId)
 }

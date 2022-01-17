@@ -6,6 +6,7 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-whitelist')
       .setDescription('Manage whitelists for people to submit addresses for')
+      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.'.substring(0, 100))

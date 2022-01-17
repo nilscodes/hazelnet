@@ -14,14 +14,18 @@ class GlobalSettingsController(
 ) {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun getSettings() = globalCommunityService.getSettings()
+    fun getGlobalSettings() = globalCommunityService.getSettings()
 
     @PutMapping("/{settingName}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateSetting(@PathVariable settingName: String, @RequestBody @Valid globalSetting: GlobalSetting): GlobalSetting {
+    fun updateGlobalSetting(@PathVariable settingName: String, @RequestBody @Valid globalSetting: GlobalSetting): GlobalSetting {
         if (globalSetting.name != settingName) {
             throw IllegalArgumentException("Global setting name in path $settingName did not match setting in request body ${globalSetting.name}.")
         }
         return globalCommunityService.updateSetting(globalSetting)
     }
+
+    @DeleteMapping("/{settingName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteGlobalSetting(@PathVariable settingName: String) = globalCommunityService.deleteSetting(settingName)
 }
