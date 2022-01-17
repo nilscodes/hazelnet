@@ -43,6 +43,7 @@ gradle-build:
     paths:
       - hazelnet-community/build/libs
       - hazelnet-cardano-connect/build/libs
+      - hazelnet-external/build/libs
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -54,6 +55,7 @@ gradle-build:
         - "hazelnet-community/**/*"
         - "hazelnet-cardano-connect/**/*"
         - "hazelnet-cardano-shared/**/*"
+        - "hazelnet-external/**/*"
 
 community-docker:
   image: docker:latest
