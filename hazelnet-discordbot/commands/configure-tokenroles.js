@@ -12,7 +12,7 @@ module.exports = {
         .setDescription('Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.')
         .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID (Does not need to be an official policy of this server)').setRequired(true))
         .addRoleOption((option) => option.setName('role').setDescription('Role to assign users with the given amount of tokens').setRequired(true))
-        .addIntegerOption((option) => option.setName('count').setDescription('Minimum amount of tokens to qualify for this role').setRequired(true)))
+        .addStringOption((option) => option.setName('count').setDescription('Minimum amount of tokens to qualify for this role').setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription('List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs'))

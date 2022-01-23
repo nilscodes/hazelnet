@@ -4,7 +4,7 @@ const embedBuilder = require('../../utility/embedbuilder');
 module.exports = {
   async execute(interaction) {
     const role = interaction.options.getRole('role');
-    const minimumTokenQuantity = interaction.options.getInteger('count');
+    const minimumTokenQuantity = interaction.options.getString('count');
     const policyId = interaction.options.getString('policy-id');
     try {
       await interaction.deferReply({ ephemeral: true });

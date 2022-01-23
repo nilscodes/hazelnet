@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: '0.0.1'
-  title: 'HazelNet Cardano'
+  title: 'HazelNet Cardano Connect'
 servers:
   - url: 'localhost:8086'
 paths:
@@ -27,6 +27,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddressDetails'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /handles/{handleName}:
+    get:
+      summary: 'Resolve a an ADA handle to an address, if possible'
+      operationId: resolveHandle
+      tags:
+        - handles
+        - addresses
+      parameters:
+        - name: handleName
+          in: path
+          description: The handle name to details retrieve for
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: hazelnet
+      responses:
+        '200':
+          description: 'Handle details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Handle'
         default:
           description: Unexpected error
           content:
@@ -77,12 +106,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /pools:
+  /stakepools:
     get:
-      summary: Get a list of all stakepools
+      summary: Get a list of stakepools, optionally filtered by parameters
       operationId: listStakepools
       tags:
         - stakepools
+      parameters:
+        - name: poolView
+          in: query
+          description: The pool view string to resolve search the pool by
+          required: false
+          schema:
+            $ref: '#/components/schemas/StakepoolView'
+        - name: poolHash
+          in: query
+          description: The pool hash string to resolve search the pool by
+          required: false
+          schema:
+            $ref: '#/components/schemas/StakepoolHash'
       responses:
         '200':
           description: 'A list of pools'
@@ -92,7 +134,71 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StakepoolInfo'
-
+  /stakepools/{poolHash}/delegation:
+    get:
+      summary: Get the active delegation (i.e. current delegation) of a pool for a given epoch
+      operationId: getActiveDelegation
+      tags:
+        - stakepools
+      parameters:
+        - $ref: '#/components/parameters/PoolHashPathParameter'
+      responses:
+        '200':
+          description: 'A list of all active delegations'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DelegationInfo'
+  /stakepools/{poolHash}/delegation/{epochNo}:
+    get:
+      summary: Get the delegation (i.e. delegation snapshot) of a pool for a given epoch
+      operationId: getDelegationInEpoch
+      tags:
+        - stakepools
+      parameters:
+        - $ref: '#/components/parameters/PoolHashPathParameter'
+        - $ref: '#/components/parameters/EpochNumberPathParameter'
+      responses:
+        '200':
+          description: 'A list of delegations at the snapshot time'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DelegationInfo'
+  /token/stake/{stakeAddress}:
+    post:
+      summary: Get the policy IDs and token counts that currently reside in a stake address, filtered by the policy IDs in the body (or all, if empty list)
+      operationId: getMultiAssetsForStakeAddress
+      tags:
+        - token
+      parameters:
+        - $ref: '#/components/parameters/StakeAddressPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TokenPolicyId'
+      responses:
+        '200':
+          description: 'A filtered list of token policies and associated counts currently owned by the stake address'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenOwnershipInfo'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /info/syncstatus:
     get:
       summary: 'Get Synchronization details for Cardano-DB-Sync connected to this HazelNet'
@@ -113,13 +219,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  parameters:
+    PoolHashPathParameter:
+      name: poolHash
+      in: path
+      description: The Stakepool hash
+      required: true
+      style: simple
+      example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
+      schema:
+        $ref: '#/components/schemas/StakepoolHash'
+    StakeAddressPathParameter:
+      name: stakeAddress
+      in: path
+      description: The staking address of a wallet in view format
+      required: true
+      style: simple
+      schema:
+        $ref: '#/components/schemas/StakeAddressView'
+    EpochNumberPathParameter:
+      name: epochNo
+      in: path
+      description: The epoch number
+      required: true
+      style: simple
+      example: 309
+      schema:
+        $ref: '#/components/schemas/EpochNumber'
   schemas:
     AddressDetails:
       type: object
       properties:
         stakeAddress:
-          type: string
-          pattern: '^[_A-Z0-9]{56}$'
+          $ref: '#/components/schemas/StakeAddressView'
+    Handle:
+      type: object
+      properties:
+        handle:
+          $ref: '#/components/schemas/HandleName'
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        resolved:
+          type: boolean
     StakepoolInfo:
       type: object
       required:
@@ -141,18 +282,78 @@ components:
           type: string
         description:
           type: string
+    DelegationInfo:
+      type: object
+      required:
+        - poolHash
+        - amount
+        - stakeAddress
+      properties:
+        poolHash:
+          $ref: '#/components/schemas/StakepoolHash'
+        amount:
+          type: integer
+          format: int64
+        stakeAddress:
+          $ref: '#/components/schemas/StakeAddressView'
+    TokenOwnershipInfo:
+      type: object
+      required:
+        - stakeAddress
+        - policyId
+        - assetCount
+      properties:
+        stakeAddress:
+          $ref: '#/components/schemas/StakeAddressView'
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        assetCount:
+          type: integer
+          format: int64
     SyncStatus:
       type: object
       required:
+        - currentEpoch
         - lastSyncSeconds
         - name
       properties:
+        currentEpoch:
+          type: integer
+          format: int32
         lastSyncSeconds:
           type: integer
           format: int64
         syncPercentage:
           type: number
           format: double
+    HandleName:
+      type: string
+      example: hazelnet
+    WalletAddress:
+      type: string
+    StakepoolHash:
+      type: string
+      description: The Stakepool hash
+      example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
+      pattern: '^[_A-Za-z0-9]{56}$'
+    StakeAddressView:
+      type: string
+      description: The staking address of a wallet, in viewable format
+      example: stake1uyhvepgdsd7s07q5cdx9vdemnar4axpe0e9edw2chyd8dpgqnsffq
+      pattern: '^stake1[a-zA-Z0-9]{53}$'
+    StakepoolView:
+      type: string
+      description: The pool ID, in viewable format
+      example: pool1h5jtxde8j86qrnqzj32ugn480u7gw5xw8wqy5d227rl3vfg58qz
+      pattern: '^pool1[a-zA-Z0-9]{51}$'
+    TokenPolicyId:
+      type: string
+      description: The Policy ID
+      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+      pattern: '^[A-Za-z0-9]{56}$'
+    EpochNumber:
+      type: integer
+      format: int32
     Error:
       type: object
       required:
@@ -164,9 +365,3 @@ components:
           format: int32
         message:
           type: string
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-security:
-  - BasicAuth: []

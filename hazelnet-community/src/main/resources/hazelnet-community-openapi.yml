@@ -6,6 +6,69 @@ servers:
   - url: 'localhost:8085'
 
 paths:
+  /settings:
+    get:
+      summary: List all global settings
+      operationId: getGlobalSettings
+      tags:
+        - global
+      responses:
+        '200':
+          description: 'External Account Info'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /settings/{settingName}:
+    put:
+      summary: Create or update a setting
+      operationId: updateGlobalSetting
+      tags:
+        - global
+      parameters:
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlobalSetting'
+      responses:
+        '200':
+          description: 'Updated setting'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalSetting'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: 'Delete Global Setting by Name'
+      operationId: deleteGlobalSetting
+      tags:
+        - global
+      parameters:
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /accounts:
     post:
       summary: 'Create an Account'
@@ -75,6 +138,83 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /externalaccounts/{externalAccountId}/verifications:
+    get:
+      summary: 'Get Verifications for this specific account'
+      operationId: getExternalAccountVerifications
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of all completed and outstanding verifications for this user'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Verification'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /externalaccounts/discord/{discordUserId}:
+    get:
+      summary: Get external account matching a Discord user ID
+      operationId: getExternalAccountForDiscordUser
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/DiscordUserIdPathParameter'
+      responses:
+        '200':
+          description: 'External Account Info that was created or matching existing external account'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+        '404':
+          description: No external account found for this Discord user ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: 'Create/Retrieve External account for Discord user'
+      operationId: setExternalAccountForDiscordUser
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/DiscordUserIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccount'
+      responses:
+        '200':
+          description: 'External Account Info that was created or matching existing external account'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /verifications:
     post:
       summary: 'Request Verification for an External Account'
@@ -120,7 +260,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    delete:
+      summary: 'Delete Verification Info by ID'
+      operationId: deleteVerification
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/VerificationPathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /discord/servers:
+    get:
+      summary: Get all Discord servers
+      operationId: listDiscordServers
+      tags:
+        - discord
+      responses:
+        '201':
+          description: 'List of Discord servers'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordServer'
+
     post:
       summary: Add Discord Server
       operationId: addDiscordServer
@@ -153,6 +325,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordServer'
+  /discord/servers/{guildId}/roleassignments/delegatorroles:
+    get:
+      summary: Get the current set of delegator role assignments for this server
+      operationId: getCurrentDelegatorRoleAssignments
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Role assignment list for delegation roles'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordRoleAssignment'
+  /discord/servers/{guildId}/roleassignments/tokenroles:
+    get:
+      summary: Get the current set of token role assignments for this server
+      operationId: getCurrentTokenRoleAssignments
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Role assignment list for token roles'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordRoleAssignment'
   /discord/servers/{guildId}/members:
     get:
       summary: Get the list of external accounts that are members of this discord server
@@ -239,7 +445,7 @@ paths:
               $ref: '#/components/schemas/Stakepool'
       responses:
         '201':
-          description: 'Token Policy'
+          description: 'Details of added stakepool'
           content:
             application/json:
               schema:
@@ -329,21 +535,144 @@ paths:
       responses:
         '204':
           description: Successful deletion
+  /discord/servers/{guildId}/whitelists:
+    post:
+      summary: Add a whitelist for owners of a specific role to this server
+      operationId: addWhitelist
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Whitelist'
+      responses:
+        '201':
+          description: 'Whitelist'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Whitelist'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/whitelists/{whitelistId}:
+    delete:
+      summary: Remove a whitelist from this discord server
+      operationId: deleteWhitelist
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/whitelists/{whitelistId}/signups:
+    get:
+      summary: 'Get signups for a whitelist'
+      operationId: getWhitelistSignups
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdOrNamePathParameter'
+      responses:
+        '200':
+          description: 'All signups for this whitelist'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WhitelistSignup'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Sign up for a whitelist
+      operationId: addWhitelistSignup
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhitelistSignup'
+      responses:
+        '201':
+          description: 'Whitelist signup information'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhitelistSignup'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}:
+    get:
+      summary: Get the whitelist signup for a specific external account for this Discord server
+      operationId: getWhitelistSignup
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'Whitelist signup information'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhitelistSignup'
+        '404':
+          description: 'No whitelist signup for this external account present'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Remove a whitelist signup from this discord server
+      operationId: deleteWhitelistSignup
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
   /discord/servers/{guildId}/settings/{settingName}:
     put:
-      summary: Add an auto-assigned role based on token ownership to this discord server
+      summary: Create or update a guild setting with the provided value
       operationId: updateSetting
       tags:
         - discord
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
-        - name: settingName
-          in: path
-          required: true
-          style: simple
-          example: PROTECTION_ADDR_REMOVAL
-          schema:
-            type: string
+        - $ref: '#/components/parameters/SettingNamePathParameter'
       requestBody:
         content:
           application/json:
@@ -356,7 +685,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordServerSetting'
-
+    delete:
+      summary: 'Delete guild setting by Name'
+      operationId: deleteSetting
+      tags:
+        - global
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /discord/servers/{guildId}/accesstoken:
+    post:
+      summary: Generate (or regenerate) the API access token for this Discord server for the external HAZELnet API
+      operationId: regenerateAccessToken
+      tags:
+        - discord
+        - security
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '201':
+          description: 'Access token to use with authorization header in external API'
+          content:
+            application/json:
+              schema:
+                type: string
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+    delete:
+      summary: Delete the currently active access token for this Discord server
+      operationId: deleteAccessToken
+      tags:
+        - discord
+        - security
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
 components:
   parameters:
     GuildIdPathParameter:
@@ -365,29 +740,32 @@ components:
       description: The Discord Server's Guild ID
       required: true
       style: simple
-      example: 717264144759390238
       schema:
-        type: integer
-        format: int64
+        $ref: '#/components/schemas/DiscordGuild'
+    DiscordUserIdPathParameter:
+      name: discordUserId
+      in: path
+      description: The Discord Users's ID
+      required: true
+      style: simple
+      schema:
+        $ref: '#/components/schemas/DiscordUser'
     PolicyIdPathParameter:
       name: policyId
       in: path
       description: The Policy ID
       required: true
       style: simple
-      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
       schema:
-        type: string
+        $ref: '#/components/schemas/TokenPolicyId'
     PoolHashPathParameter:
       name: poolHash
       in: path
       description: The Stakepool hash
       required: true
       style: simple
-      example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
       schema:
-        type: string
-        pattern: '^[a-zA-Z0-9]{56}$'
+        $ref: '#/components/schemas/StakepoolHash'
     DelegatorRoleIdPathParameter:
       name: delegatorRoleId
       in: path
@@ -408,6 +786,39 @@ components:
       schema:
         type: integer
         format: int64
+    WhitelistIdPathParameter:
+      name: whitelistId
+      in: path
+      description: The ID of this whitelist
+      required: true
+      style: simple
+      example: 231
+      schema:
+        type: integer
+        format: int64
+    WhitelistIdOrNamePathParameter:
+      name: whitelistId
+      in: path
+      description: The ID or name of this whitelist
+      required: true
+      style: simple
+      examples:
+        string:
+          summary: Whitelist name as string
+          value: my-list-name
+        number:
+          summary: Whitelist ID
+          value: 231
+      schema:
+        type: string
+    SettingNamePathParameter:
+      name: settingName
+      in: path
+      required: true
+      style: simple
+      example: WHITELISTED_GUILDS
+      schema:
+        type: string
     VerificationPathParameter:
       name: verificationId
       in: path
@@ -427,6 +838,20 @@ components:
         type: integer
         format: int64
   schemas:
+    GlobalSetting:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          pattern: '^[_A-Za-z0-9]+$'
+        value:
+          type: string
+      example:
+        name: WHITELISTED_GUILDS
+        value: '717264144759390238'
     Account:
       type: object
       required:
@@ -555,9 +980,9 @@ components:
           items:
             $ref: '#/components/schemas/DiscordTokenRole'
         settings:
-          type: array
-          items:
-            $ref: '#/components/schemas/DiscordServerSetting'
+          type: object
+          additionalProperties:
+            type: string
     TokenPolicy:
       type: object
       required:
@@ -602,7 +1027,6 @@ components:
       type: object
       required:
         - id
-        - poolHash
         - minimumStake
         - roleId
       properties:
@@ -637,6 +1061,45 @@ components:
           example: 1
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    Whitelist:
+      type: object
+      required:
+        - id
+        - displayName
+        - name
+        - requiredRoleId
+      properties:
+        id:
+          type: integer
+          format: int64
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        name:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        signupUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        requiredRoleId:
+          $ref: '#/components/schemas/DiscordRole'
+    WhitelistSignup:
+      type: object
+      required:
+        - externalAccountId
+        - address
+      properties:
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        externalAccountId:
+          type: integer
+          format: int64
+        signupTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
     DiscordServerSetting:
       type: object
       required:
@@ -659,6 +1122,29 @@ components:
         externalAccountId:
           type: integer
           format: int64
+    DiscordRoleAssignment:
+      type: object
+      required:
+        - guildId
+        - userId
+        - roleId
+      properties:
+        guildId:
+          $ref: '#/components/schemas/DiscordGuild'
+        userId:
+          $ref: '#/components/schemas/DiscordUser'
+        roleId:
+          $ref: '#/components/schemas/DiscordRole'
+    DiscordGuild:
+      description: Snowflake ID matching a Discord guild
+      type: integer
+      format: int64
+      example: 717264144759390238
+    DiscordUser:
+      description: Snowflake ID matching a Discord user
+      type: integer
+      format: int64
+      example: 717264144735590
     DiscordRole:
       description: Snowflake ID matching a Discord role
       type: integer
@@ -668,11 +1154,12 @@ components:
       type: string
       description: The Stakepool hash
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
-      pattern: '^[_A-Za-z0-9]{56}$'
+      pattern: '^[A-Za-z0-9]{56}$'
     TokenPolicyId:
       type: string
       description: The Policy ID
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+      pattern: '^[A-Za-z0-9]{56}$'
     WalletAddress:
       type: string
     ExternalAccountType:
@@ -713,9 +1200,3 @@ components:
           type: string
         sourceField:
           type: string
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-security:
-  - BasicAuth: []

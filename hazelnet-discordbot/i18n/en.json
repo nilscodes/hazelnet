@@ -29,7 +29,13 @@
 	"help": {
 		"messageTitle": "Get help for {{{botName}}}",
 		"generalCommands": {
-			"verify": "The */verify* command and its subcommands *add*, *list* and *remove* let you verify your own Cardano address and will enable features like automatic role-assignments based on delegation and token roles.\n**Important:** 💡 The admins of this Discord will *not* be able to see any of your verified addresses. They can only see addresses that you register for a whitelist! Your security always comes first.",
+			"verify": "The */verify* command and its subcommands let you verify your own Cardano address and will enable features like automatic role-assignments based on delegation and token roles.\n**Important:** 💡 The admins of this Discord will *not* be able to see any of your verified addresses. They can only see addresses that you register for a whitelist! Your security always comes first.",
+			"verify-add": "With */verify add* you can add a new address to your list of verified wallets. Issuing the command will ask you to send a specific amount of ADA to yourself within the next 15 minutes. If the transaction is confirmed this verifies your wallet and allows the system to also verify token and NFT ownership. A wallet can only be registered with one Discord user at one time.\n❕ You can also provide a handle for verification - it will automatically be resolved into an address.\n💡 Verifying a wallet will link the Discord server on which you are performing the verification as part of the process, so no explicit */verify link* is needed.",
+			"verify-help": "This command, which will print out information on how to use the */verify* feature.",
+			"verify-link": "When you first join a server, all your verified addresses will not be linked by default. This means your privacy comes first and you will not be assigned any roles without authorizing it via */verify link*. This command will enable this bot to assign automatic roles and use other features on this specific Discord server for your account.",
+			"verify-list": "When using */verify list*, all your open and confirmed verifications will be listed. If you ever get disconnected during a verification process, you can retrieve the info needed to verify here.",
+			"verify-remove": "If you want to remove a verified address from your account, simply use */verify remove* and the wallet will not be used for any token roles or other features on any of your link Discord servers any more.",
+			"verify-unlink": "If you would like to unlink a wallet from a specific Discord server, because you wish to not receive automatic role-assignments or other treatment that might reveal anything about you, use the */verify unlink* command.",
 			"help": "Shows this help text."
 		},
 		"stakepoolCommands": {
@@ -65,11 +71,18 @@
 		"list": {
 			"messageTitle": "Your verified addresses",
 			"noVerifications": "You have no outstanding or confirmed verifications. If you would like to verify a Cardano address, please use the '/verify add' command.",
-			"listVerifications": "The following addresses are verified or waiting for verification:",
+			"listVerificationsInfo": "View your link status with this specific server and see which addresses are verified or waiting for verification with your account across all Discord server:",
 			"confirmedVerifications": "✅ Confirmed verifications",
 			"confirmedData": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} via transaction https://cardanoscan.io/transaction/{{verification.transactionHash}}, confirmed at *{{verification.confirmedAt}}*.",
 			"outstandingVerifications": "⏳ Outstanding verifications",
-			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification."
+			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification.",
+			"accountIsLinked": "⚡ Linked",
+			"accountIsLinkedInfo": "Your verified wallets are linked with this Discord server and you will be automatically assigned roles and access other features, if configured by the server admin.",
+			"accountIsNotLinked": "🔌 Not Linked",
+			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet."
+		},
+		"help": {
+			"messageTitle": "Help about the /verify command"
 		},
 		"add": {
 			"messageTitle": "Verify a new address",
@@ -78,11 +91,23 @@
 			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next 15 minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
 			"verificationWaiting": "⏳ Still awaiting verification...",
-			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command."
+			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command.",
+			"verificationWalletInUse": "⚠ Verification failed. The stake address that belongs to the address *{{address}}* is already verified with your or another account.",
+			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address. Please supply a valid wallet address."
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",
 			"success": "❗ All verifications with address *{{address}}* for this Discord account have been removed. This affects all Discord servers for which this verification was used!"
+		},
+		"link": {
+			"messageTitle": "Link your wallets to this Discord server",
+			"success": "⚡ Your verified wallets and addresses have been successfully linked to this server. You are now eligible for any automatic role assignments and other features that require verified wallets. Role updates will happen during the next update.",
+			"notLinked": "⚠ Your user is already linked with this Discord server."
+		},
+		"unlink": {
+			"messageTitle": "Unlink your wallets from this specific Discord server",
+			"success": "🔌 Your verified wallets and addresses have been successfully unlinked from this server. You will not receive any further role assignments on this server and all existing automatic role assignments will be removed during the next scheduled update.",
+			"notLinked": "⚠ Your user is currently not linked with this Discord server."
 		}
 	},
 	"whitelist": {

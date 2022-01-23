@@ -104,7 +104,7 @@ CREATE TABLE "discord_token_roles"
     "discord_token_role_id"   bigserial primary key,
     "discord_server_id"      int,
     "policy_id"              varchar(56),
-    "minimum_token_quantity" int,
+    "minimum_token_quantity" bigint,
     "custom_rule"            varchar(26),
     "owned_for_duration"     int,
     "discord_role_id"        bigint,

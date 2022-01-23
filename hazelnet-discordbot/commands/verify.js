@@ -12,12 +12,21 @@ module.exports = {
         .setDescription('Starts a transaction-based verification of a staking address')
         .addStringOption((option) => option.setName('address').setDescription('Enter the Cardano wallet address to verify.').setRequired(true)))
       .addSubcommand((subcommand) => subcommand
+        .setName('help')
+        .setDescription('Get help about the verification features'))
+      .addSubcommand((subcommand) => subcommand
+        .setName('link')
+        .setDescription('Link your verified addresses to this Discord server to enable additional features'))
+      .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all staking addresses associated with this Discord user'))
+        .setDescription('List all staking addresses and link status associated with this Discord user and server'))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription('Removes a verified wallet address')
-        .addStringOption((option) => option.setName('address').setDescription('Enter the Cardano wallet address to remove from the verified address list.').setRequired(true)));
+        .addStringOption((option) => option.setName('address').setDescription('Enter the Cardano wallet address to remove from the verified address list.').setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('unlink')
+        .setDescription('Unlink your verified addresses from this server (verifications will remain)'));
   },
   commandTags: ['token', 'pool'],
   execute: commandbase.executeSubcommand,

@@ -3,15 +3,13 @@ package io.hazelnet.community.services
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfo
+import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.BlockchainType
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.ExternalAccountType
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
-import io.hazelnet.community.data.discord.DelegatorRole
-import io.hazelnet.community.data.discord.DiscordRoleAssignment
-import io.hazelnet.community.data.discord.DiscordServer
-import io.hazelnet.community.data.discord.TokenOwnershipRole
+import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -74,6 +72,7 @@ internal class DiscordServerServiceTest {
                 mockk(),
                 mockk(),
                 mockk(),
+                mockk(),
                 mockk()
         )
 
@@ -110,6 +109,7 @@ internal class DiscordServerServiceTest {
                 mockk(),
                 mockk(),
                 mockk(),
+                mockk(),
                 mockk()
         )
 
@@ -120,6 +120,41 @@ internal class DiscordServerServiceTest {
                 DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 12),
                 DiscordRoleAssignment(testServer.guildId, acc3.referenceId.toLong(), 31),
         ), actual)
+    }
+
+    @Test
+    fun getBotFunding() {
+        val discordServerRepository = getMockDiscordServerRepository()
+        every { discordServerRepository.getDiscordMembersWithStake(testServer.id!!) } returns listOf (
+                DiscordServerMemberStakeImpl(12, 1, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"),
+                DiscordServerMemberStakeImpl(12, 1, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"), // Verify dupes from same user get removed
+                DiscordServerMemberStakeImpl(12, 3, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"), // Verify dupes across different users only get counted once
+                DiscordServerMemberStakeImpl(2, 1, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"), // Verify stake used on other server is divided by servers used
+                DiscordServerMemberStakeImpl(12, 2, "stake1u83symn8huw6s8qldqggdj2rz0n2f72yqxpt8txcya87vcsrlqsmy") // Verify unrelated external account is considered
+        )
+        val connectService = mockk<ConnectService>()
+        every { connectService.getActiveDelegationForPools(listOf("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4")) } returns listOf(
+                DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 7191940752, "stake1u83symn8huw6s8qldqggdj2rz0n2f72yqxpt8txcya87vcsrlqsmy"),
+                DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 167765168318, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"),
+                DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 323824643, "stake1u85p5zmf22334d83yzf76femww5zm6cf2cdzfsceehh3eggzfyypy"),
+        )
+        val mockConfig = mockk<CommunityApplicationConfiguration>()
+        every { mockConfig.fundedpool } returns "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4"
+        val discordServerService = DiscordServerService(
+                getMockStakepoolService(),
+                getMockVerificationService(),
+                connectService,
+                discordServerRepository,
+                mockk(),
+                mockk(),
+                mockk(),
+                mockk(),
+                mockk(),
+                mockConfig
+        )
+
+        Assertions.assertEquals(91074524911L, discordServerService.getBotFunding(testServer.guildId))
+
     }
 
     private fun getMockStakepoolService(): StakepoolService {

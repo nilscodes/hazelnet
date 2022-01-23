@@ -24,6 +24,7 @@ class TokenOwnershipRole @JsonCreator constructor(
         @Column(name = "minimum_token_quantity")
         @field:NonNull
         @field:Min(1)
+        @field:JsonSerialize(using = ToStringSerializer::class)
         var minimumTokenQuantity: Long,
 
         @Column(name = "discord_role_id")
@@ -57,6 +58,4 @@ class TokenOwnershipRole @JsonCreator constructor(
     override fun toString(): String {
         return "TokenOwnershipRole(id=$id, policyId='$policyId', minimumTokenQuantity=$minimumTokenQuantity, roleId=$roleId)"
     }
-
-
 }

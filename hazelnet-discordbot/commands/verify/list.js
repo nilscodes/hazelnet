@@ -9,27 +9,36 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const verifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
+
+      const verificationInfoFields = [];
+      const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild.id);
+      const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);
+      if (currentMemberData) {
+        verificationInfoFields.push({ name: i18n.__({ phrase: 'verify.list.accountIsLinked', locale: useLocale }), value: i18n.__({ phrase: 'verify.list.accountIsLinkedInfo', locale: useLocale }) });
+      } else {
+        verificationInfoFields.push({ name: i18n.__({ phrase: 'verify.list.accountIsNotLinked', locale: useLocale }), value: i18n.__({ phrase: 'verify.list.accountIsNotLinkedInfo', locale: useLocale }) });
+      }
+
       const relevantVerifications = verifications.filter((verification) => verification.confirmed || !verification.obsolete);
       if (relevantVerifications.length) {
-        const verificationFields = [];
         const confirmedVerifications = relevantVerifications.filter((verification) => verification.confirmed);
         if (confirmedVerifications.length) {
-          verificationFields.push({
+          verificationInfoFields.push({
             name: i18n.__({ phrase: 'verify.list.confirmedVerifications', locale: useLocale }),
             value: confirmedVerifications.map((verification) => i18n.__({ phrase: 'verify.list.confirmedData', locale: useLocale }, { verification })).join('\n\n'),
           });
         }
         const outstandingVerifications = relevantVerifications.filter((verification) => !verification.confirmed);
         if (outstandingVerifications.length) {
-          verificationFields.push({
+          verificationInfoFields.push({
             name: i18n.__({ phrase: 'verify.list.outstandingVerifications', locale: useLocale }),
             value: outstandingVerifications.map((verification) => i18n.__({ phrase: 'verify.list.outstandingData', locale: useLocale }, { verification, amount: verification.amount / 1000000 })).join('\n\n'),
           });
         }
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerifications', locale: useLocale }), verificationFields);
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale: useLocale }), verificationInfoFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }));
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }), verificationInfoFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

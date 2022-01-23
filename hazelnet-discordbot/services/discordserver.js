@@ -23,10 +23,18 @@ module.exports = {
     this.cache.set(`${guildId}`, discordServerObject);
     return discordServerObject;
   },
+  async listExternalAccounts(guildId) {
+    const membersPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members`);
+    return membersPromise.data;
+  },
   async connectExternalAccount(guildId, externalAccountId) {
     await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/members`, {
       externalAccountId,
     });
+    this.clearCacheEntry(guildId);
+  },
+  async disconnectExternalAccount(guildId, externalAccountId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`);
     this.clearCacheEntry(guildId);
   },
   async updateDiscordServerSetting(guildId, settingName, settingValue) {

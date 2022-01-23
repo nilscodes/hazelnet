@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties(prefix = "io.hazelnet.community")
 data class CommunityApplicationConfiguration(
-        val connect: ConnectConfiguration
+        val connect: ConnectConfiguration,
+        val fundedpool: String?
 )
 
 data class ConnectConfiguration(

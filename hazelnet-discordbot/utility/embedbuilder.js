@@ -11,22 +11,26 @@ module.exports = {
     return this.build('#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, fields);
   },
   build(color, thumbnail, title, message, fields) {
+    return this.buildFullyCustom(color, thumbnail, title, message, fields, {
+      name: 'HAZELnet.io Bot',
+      iconURL: 'https://www.hazelnet.io/static/media/hazelnet.e5b123ee.png',
+      url: 'https://www.hazelnet.io',
+    });
+  },
+  buildFullyCustom(color, thumbnail, title, message, fields, author, image, footer) {
     const baseEmbed = new MessageEmbed()
       .setColor(color)
       .setTitle(title)
-      .setAuthor({
-        name: 'HAZELnet.io Bot',
-        iconURL: 'https://www.hazelnet.io/static/media/hazelnet.e5b123ee.png',
-        url: 'https://www.hazelnet.io',
-      })
+      .setAuthor(author)
       .setDescription(message)
       .setThumbnail(thumbnail)
       .setTimestamp();
-      /*
-      .setFooter({
-        text: 'Some footer text here',
-        iconURL: 'https://i.imgur.com/AfFp7pu.png',
-      }); */
+    if (image) {
+      baseEmbed.setImage(image);
+    }
+    if (footer) {
+      baseEmbed.setFooter(footer);
+    }
     if (fields) {
       baseEmbed.addFields(fields);
     }

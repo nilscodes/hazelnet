@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  version: '0.0.1'
+  title: 'HazelNet External'
+servers:
+  - url: 'https://api.hazelnet.io'
+
+paths:
+    /community/whitelists/{whitelistName}/signups:
+        get:
+            summary: 'Get signups for a whitelist'
+            operationId: getWhitelistSignups
+            tags:
+                - discord
+                - whitelist
+            parameters:
+                - $ref: '#/components/parameters/WhitelistNamePathParameter'
+            responses:
+                '200':
+                    description: 'All signups for this whitelist'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/WhitelistSignup'
+                default:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    parameters:
+        WhitelistNamePathParameter:
+            name: whitelistName
+            in: path
+            description: The name of this whitelist
+            required: true
+            style: simple
+            example: MyGoodList
+            schema:
+                type: string
+
+    schemas:
+        WhitelistSignup:
+            type: object
+            required:
+                - address
+            properties:
+                address:
+                    $ref: '#/components/schemas/WalletAddress'
+                signupTime:
+                    type: string
+                    format: date-time
+                    example: 2021-11-10T13:20:57Z
+        WalletAddress:
+            type: string
+        BlockchainType:
+            type: string
+            enum:
+                - CARDANO
+                - ETHEREUM
+        CreatedResponseHeader:
+            type: string
+            format: uri
+            description: URL of the newly created resource
+        ErrorResponse:
+            type: object
+            required:
+                - messages
+                - httpStatus
+                - httpStatusCode
+            properties:
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ErrorMessage'
+                httpStatus:
+                    type: string
+                httpStatusCode:
+                    type: integer
+                    format: int32
+        ErrorMessage:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    type: string
+                sourceField:
+                    type: string
+    securitySchemes:
+        BearerAuth:
+            type: http
+            description: You can receive your bearer token for the Authorization header using the Discord command '/configure-api generatetoken'
+            scheme: bearer
+            bearerFormat: '{token68}.???'
+security:
+    - BearerAuth: []

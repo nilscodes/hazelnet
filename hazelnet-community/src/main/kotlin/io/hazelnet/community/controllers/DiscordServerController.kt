@@ -144,6 +144,10 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.CREATED)
     fun connectExternalAccount(@PathVariable guildId: Long, @RequestBody @Valid discordMember: DiscordMember) = discordServerService.addMember(guildId, discordMember)
 
+    @DeleteMapping("/{guildId}/members/{externalAccountId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun disconnectExternalAccount(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.removeMember(guildId, externalAccountId)
+
     @PutMapping("/{guildId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)
     fun updateSetting(@PathVariable guildId: Long, @PathVariable settingName: String, @RequestBody @Valid discordServerSetting: DiscordServerSetting): DiscordServerSetting {
@@ -176,4 +180,8 @@ class DiscordServerController(
     @DeleteMapping("/{guildId}/accesstoken")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAccessToken(@PathVariable guildId: Long) = discordServerService.deleteAccessToken(guildId)
+
+    @GetMapping("/{guildId}/botfunding")
+    @ResponseStatus(HttpStatus.OK)
+    fun getBotFunding(@PathVariable guildId: Long) = discordServerService.getBotFunding(guildId)
 }

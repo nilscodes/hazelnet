@@ -1,16 +1,12 @@
 package io.hazelnet.community.services
 
-import io.hazelnet.community.data.Verification
-import io.hazelnet.community.data.VerificationRequest
+import io.hazelnet.community.data.*
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationRepository
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.time.LocalDateTime
-import java.time.Month
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -20,24 +16,53 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class VerificationService(
-        private val connectService: ConnectService,
-        private val verificationRepository: VerificationRepository,
-        private val externalAccountRepository: ExternalAccountRepository
+    private val connectService: ConnectService,
+    private val verificationRepository: VerificationRepository,
+    private val externalAccountRepository: ExternalAccountRepository
 ) {
     @Transactional
-    fun createVerificationRequest(verificationRequest: VerificationRequest) : Verification {
+    fun createVerificationRequest(verificationRequest: VerificationRequest): Verification {
         val associatedExternalAccount = externalAccountRepository.findById(verificationRequest.externalAccountId)
-        if(associatedExternalAccount.isPresent) {
-            val verificationAmount = getUniqueVerificationAmount()
-            val validAfter = ZonedDateTime.now().toInstant()
-            val validBefore = validAfter.plus(15, ChronoUnit.MINUTES)
-            val newVerification = Verification(null, verificationAmount, verificationRequest.blockchain, verificationRequest.address, null, null, associatedExternalAccount.get(), Date.from(validAfter), Date.from(validBefore), false, null, false)
-            return verificationRepository.save(newVerification)
-        }
-        else
-        {
+        if (associatedExternalAccount.isPresent) {
+            val walletInfo = connectService.getWalletInfo(verificationRequest.address)
+            if (walletInfo.stakeAddress != null) {
+                val verificationsWithSameStakeAddress =
+                    verificationRepository.findAllByCardanoStakeAddress(walletInfo.stakeAddress!!)
+                if (verificationsWithSameStakeAddress.isEmpty()) {
+                    return generateAndSaveVerificationRequest(verificationRequest, associatedExternalAccount.get())
+                } else {
+                    throw StakeAddressInUseException("The stake address ${walletInfo.stakeAddress} that belongs to address ${verificationRequest.address} is already in use.")
+                }
+            } else {
+                throw InvalidAddressException("The address ${verificationRequest.address} does not have a valid stake address associated with it.")
+            }
+        } else {
             throw NoSuchElementException("No external account found matching this external account ID: " + verificationRequest.externalAccountId)
         }
+    }
+
+    private fun generateAndSaveVerificationRequest(
+        verificationRequest: VerificationRequest,
+        associatedExternalAccount: ExternalAccount
+    ): Verification {
+        val verificationAmount = getUniqueVerificationAmount()
+        val validAfter = ZonedDateTime.now().toInstant()
+        val validBefore = validAfter.plus(15, ChronoUnit.MINUTES)
+        val newVerification = Verification(
+            null,
+            verificationAmount,
+            verificationRequest.blockchain,
+            verificationRequest.address,
+            null,
+            null,
+            associatedExternalAccount,
+            Date.from(validAfter),
+            Date.from(validBefore),
+            false,
+            null,
+            false
+        )
+        return verificationRepository.save(newVerification)
     }
 
     private fun getUniqueVerificationAmount(): Long {
@@ -54,8 +79,7 @@ class VerificationService(
         return verificationAmount
     }
 
-    fun getVerificationInfo(verificationId: Long): Verification
-    {
+    fun getVerificationInfo(verificationId: Long): Verification {
         return verificationRepository.findById(verificationId).orElseThrow()
     }
 
@@ -63,7 +87,7 @@ class VerificationService(
     fun runVerifications() {
         verificationRepository.markObsolete(Date())
         val outstandingVerifications = verificationRepository.findAllOutstanding()
-        for(verification in outstandingVerifications) {
+        for (verification in outstandingVerifications) {
             try {
                 val confirmation = connectService.getVerificationStatus(verification)
                 verification.cardanoStakeAddress = confirmation.stakeAddress
@@ -78,10 +102,10 @@ class VerificationService(
     }
 
 
-
     fun deleteVerification(verificationId: Long) {
         verificationRepository.deleteById(verificationId)
     }
 
-    fun getAllCompletedVerificationsForDiscordServer(discordServerId: Int) = verificationRepository.getAllCompletedVerificationsForDiscordServer(discordServerId)
+    fun getAllCompletedVerificationsForDiscordServer(discordServerId: Int) =
+        verificationRepository.getAllCompletedVerificationsForDiscordServer(discordServerId)
 }

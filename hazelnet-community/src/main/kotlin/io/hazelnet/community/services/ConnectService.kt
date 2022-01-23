@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
@@ -17,6 +18,14 @@ import java.util.*
 class ConnectService(
         private val connectClient: WebClient,
 ) {
+    fun getWalletInfo(address: String): AddressDetails {
+        return connectClient.get()
+                .uri("/wallets/$address")
+                .retrieve()
+                .bodyToMono(AddressDetails::class.java)
+                .block()!!
+    }
+
     fun getActiveDelegationForPools(stakepoolHashes: List<String>): List<DelegationInfo> {
         return Flux.fromIterable(stakepoolHashes)
                 .flatMap {

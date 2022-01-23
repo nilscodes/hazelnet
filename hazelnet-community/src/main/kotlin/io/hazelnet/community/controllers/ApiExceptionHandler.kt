@@ -2,6 +2,8 @@ package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.ApiErrorMessage
 import io.hazelnet.community.data.ApiErrorResponse
+import io.hazelnet.community.data.InvalidAddressException
+import io.hazelnet.community.data.StakeAddressInUseException
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -18,6 +20,20 @@ class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun processObjectNotFoundError(ex: NoSuchElementException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(StakeAddressInUseException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun processStakeAddressNotFoundException(ex: StakeAddressInUseException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(InvalidAddressException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun processInvalidAddressException(ex: InvalidAddressException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 

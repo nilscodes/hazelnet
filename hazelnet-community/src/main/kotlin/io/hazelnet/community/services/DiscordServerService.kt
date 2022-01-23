@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServerSetting
 import io.hazelnet.community.data.Verification
@@ -36,7 +37,8 @@ class DiscordServerService(
         private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
         private val discordWhitelistRepository: DiscordWhitelistRepository,
         private val oAuth2AuthorizationService: OAuth2AuthorizationService,
-        private val registeredClientRepository: RegisteredClientRepository
+        private val registeredClientRepository: RegisteredClientRepository,
+        private val config: CommunityApplicationConfiguration
 ) {
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
@@ -112,6 +114,12 @@ class DiscordServerService(
         discordServer.members.add(discordMember)
         discordServerRepository.save(discordServer)
         return discordMember
+    }
+
+    fun removeMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = getDiscordServer(guildId)
+        discordServer.members.removeIf { it.externalAccountId == externalAccountId }
+        discordServerRepository.save(discordServer)
     }
 
     fun getMembers(guildId: Long): Set<DiscordMember> {
@@ -316,5 +324,27 @@ class DiscordServerService(
     fun deleteAccessToken(guildId: Long) {
         val discordServer = getDiscordServer(guildId)
         deleteTokenInternal(discordServer.guildId.toString())
+    }
+
+    fun getBotFunding(guildId: Long): Long {
+        if(config.fundedpool != null) {
+            val discordServer = getDiscordServer(guildId)
+            val discordMemberDelegations = discordServerRepository.getDiscordMembersWithStake(discordServer.id!!)
+            val stakeAddressesOnThisServer = discordMemberDelegations
+                    .filter { it.getDiscordServerId() == discordServer.id }
+                    .map { it.getCardanoStakeAddress() }
+            // Get a map of stake addresses to number of servers each unique stake address is registered on (regardless of how many different users have registered it)
+            val stakeAddressesToServerMembershipCounts = discordMemberDelegations
+                    .groupBy { it.getCardanoStakeAddress() }
+                    .mapValues { it.value.distinctBy { stakeInfo -> "${stakeInfo.getDiscordServerId()}.${stakeInfo.getCardanoStakeAddress()}" }.size }
+            val allDelegationToFundedPool = connectService.getActiveDelegationForPools(listOf(config.fundedpool))
+            // Divide each stake amount by the number of Discord servers the respective stake is verified on
+            return allDelegationToFundedPool
+                    .filter { stakeAddressesOnThisServer.contains(it.stakeAddress) }
+                    .sumOf {
+                        it.amount / (stakeAddressesToServerMembershipCounts[it.stakeAddress] ?: 1)
+                    }
+        }
+        return 0
     }
 }
