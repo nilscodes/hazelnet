@@ -20,4 +20,7 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/settings/${settingName}`);
     this.clearCacheEntry(settingName);
   },
+  clearCacheEntry(settingName) {
+    this.cache.del(settingName);
+  },
 };

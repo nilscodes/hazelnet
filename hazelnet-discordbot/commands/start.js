@@ -3,9 +3,9 @@ const i18n = require('i18n');
 const {
   Permissions, MessageActionRow, MessageSelectMenu, MessageButton,
 } = require('discord.js');
-const embedBuilder = require('../utility/embedbuilder');
-const commandRegistration = require('../utility/commandregistration');
-const commandPermissions = require('../utility/commandpermissions');
+const embedbuilder = require('../utility/embedbuilder');
+const commandregistration = require('../utility/commandregistration');
+const commandpermissions = require('../utility/commandpermissions');
 
 module.exports = {
   getCommandData() {
@@ -129,7 +129,7 @@ module.exports = {
           .setLabel(i18n.__({ phrase: 'start.resetSetupButton', locale: useLocale }))
           .setStyle('SECONDARY'),
       ));
-    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, [
+    const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, [
       { name: i18n.__({ phrase: 'start.configureLanguageTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureLanguageText', locale: useLocale }) + selectedLanguage },
       { name: i18n.__({ phrase: 'start.configureAdminRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureAdminRoleText', locale: useLocale }) + selectedAdminRoles },
       { name: i18n.__({ phrase: 'start.configureUserRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureUserRoleText', locale: useLocale }) + selectedUserRoles },
@@ -152,13 +152,13 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
     if (this.isSetupComplete(discordServer)) {
       const useLocale = discordServer.getBotLanguage();
-      await commandRegistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
-      await commandPermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+      await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
+      await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
       let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
       if (await this.isBotLackingRequiredPermissions(interaction)) {
         successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;
       }
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage);
+      const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } else {
       await this.editReplyWithSetupMessage(interaction);
@@ -188,7 +188,7 @@ module.exports = {
   },
   async editReplyWithNotWhitelistedMessage(interaction, discordServer) {
     const useLocale = discordServer.getBotLanguage();
-    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), i18n.__({ phrase: 'errors.notWhitelisted', locale: useLocale }));
+    const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), i18n.__({ phrase: 'errors.notWhitelisted', locale: useLocale }));
     const components = [new MessageActionRow()
       .addComponents(
         new MessageButton()
