@@ -18,6 +18,8 @@ module.exports = {
       if (adahandle.isHandle(addressOrHandle)) {
         handle = addressOrHandle;
         addressToVerify = await interaction.client.services.cardanoinfo.resolveHandle(handle);
+      } else {
+        addressToVerify = addressOrHandle;
       }
       if (cardanoaddress.isStakedAddress(addressToVerify)) {
         const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
