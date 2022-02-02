@@ -10,7 +10,7 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Starts a transaction-based verification of a staking address')
-        .addStringOption((option) => option.setName('address').setDescription('Enter the Cardano wallet address to verify.').setRequired(true)))
+        .addStringOption((option) => option.setName('address-or-handle').setDescription('Enter the Cardano wallet address or $handle to verify.').setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('help')
         .setDescription('Get help about the verification features'))

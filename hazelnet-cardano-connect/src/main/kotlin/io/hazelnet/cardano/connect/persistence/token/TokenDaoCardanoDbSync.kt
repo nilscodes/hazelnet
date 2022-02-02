@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository
 import java.sql.Types
 import java.util.*
 
-const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_ALL = "SELECT encode(ma.policy, 'hex') AS policy, SUM(ma.quantity) AS number FROM utxo_view u JOIN ma_tx_out ma ON u.id = ma.tx_out_id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? GROUP BY policy;"
-const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES = "SELECT encode(ma.policy, 'hex') AS policy, SUM(ma.quantity) AS number FROM utxo_view u JOIN ma_tx_out ma ON u.id = ma.tx_out_id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) GROUP BY policy;"
+const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_ALL = "SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? GROUP BY policy"
+const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES = "SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) GROUP BY policy"
 
 @Repository
 class TokenDaoCardanoDbSync(

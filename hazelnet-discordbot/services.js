@@ -4,4 +4,5 @@ module.exports = {
   globalsettings: require('./services/globalsettings'),
   externalaccounts: require('./services/externalaccounts'),
   verifications: require('./services/verifications'),
+  cardanoinfo: require('./services/cardanoinfo'),
 };

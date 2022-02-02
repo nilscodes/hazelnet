@@ -30,7 +30,7 @@
 		"messageTitle": "Get help for {{{botName}}}",
 		"generalCommands": {
 			"verify": "The */verify* command and its subcommands let you verify your own Cardano address and will enable features like automatic role-assignments based on delegation and token roles.\n**Important:** 💡 The admins of this Discord will *not* be able to see any of your verified addresses. They can only see addresses that you register for a whitelist! Your security always comes first.",
-			"verify-add": "With */verify add* you can add a new address to your list of verified wallets. Issuing the command will ask you to send a specific amount of ADA to yourself within the next 15 minutes. If the transaction is confirmed this verifies your wallet and allows the system to also verify token and NFT ownership. A wallet can only be registered with one Discord user at one time.\n❕ You can also provide a handle for verification - it will automatically be resolved into an address.\n💡 Verifying a wallet will link the Discord server on which you are performing the verification as part of the process, so no explicit */verify link* is needed.",
+			"verify-add": "With */verify add* you can add a new address to your list of verified wallets. Issuing the command will ask you to send a specific amount of ADA to yourself within a specific amount of time. If the transaction is confirmed this verifies your wallet and allows the system to also verify token and NFT ownership. A wallet can only be registered with one Discord user at one time.\n❕ You can also provide a handle for verification - it will automatically be resolved into an address.\n💡 Verifying a wallet will link the Discord server on which you are performing the verification as part of the process, so no explicit */verify link* is needed.",
 			"verify-help": "This command, which will print out information on how to use the */verify* feature.",
 			"verify-link": "When you first join a server, all your verified addresses will not be linked by default. This means your privacy comes first and you will not be assigned any roles without authorizing it via */verify link*. This command will enable this bot to assign automatic roles and use other features on this specific Discord server for your account.",
 			"verify-list": "When using */verify list*, all your open and confirmed verifications will be listed. If you ever get disconnected during a verification process, you can retrieve the info needed to verify here.",
@@ -88,12 +88,15 @@
 			"messageTitle": "Verify a new address",
 			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{verification.address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
 			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first.",
-			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next 15 minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.",
+			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
 			"verificationWaiting": "⏳ Still awaiting verification...",
 			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command.",
 			"verificationWalletInUse": "⚠ Verification failed. The stake address that belongs to the address *{{address}}* is already verified with your or another account.",
-			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address. Please supply a valid wallet address."
+			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
+			"verificationInvalidHandle": "⚠ The submitted handle *{{handle}}* is not associated with a stake address. {{{resolveText}}}. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
+			"resolveFailure": "The handle did not resolve to any address",
+			"resolveSuccess": "The handle resolved to {{resolvedAddress}}"
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",

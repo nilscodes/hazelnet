@@ -18,7 +18,8 @@ private val logger = KotlinLogging.logger {}
 class VerificationService(
     private val connectService: ConnectService,
     private val verificationRepository: VerificationRepository,
-    private val externalAccountRepository: ExternalAccountRepository
+    private val externalAccountRepository: ExternalAccountRepository,
+    private val globalCommunityService: GlobalCommunityService
 ) {
     @Transactional
     fun createVerificationRequest(verificationRequest: VerificationRequest): Verification {
@@ -45,9 +46,10 @@ class VerificationService(
         verificationRequest: VerificationRequest,
         associatedExternalAccount: ExternalAccount
     ): Verification {
+        val maxVerificationWaitTimeInMinutes = getMaxVerificationWaitTimeInMinutes();
         val verificationAmount = getUniqueVerificationAmount()
         val validAfter = ZonedDateTime.now().toInstant()
-        val validBefore = validAfter.plus(15, ChronoUnit.MINUTES)
+        val validBefore = validAfter.plus(maxVerificationWaitTimeInMinutes, ChronoUnit.MINUTES)
         val newVerification = Verification(
             null,
             verificationAmount,
@@ -63,6 +65,14 @@ class VerificationService(
             false
         )
         return verificationRepository.save(newVerification)
+    }
+
+    private fun getMaxVerificationWaitTimeInMinutes(): Long {
+        return try {
+            globalCommunityService.getSettings().getOrDefault("VERIFICATION_TIMEOUT_MINUTES", "15").toLong()
+        } catch (e: NumberFormatException) {
+            15
+        }
     }
 
     private fun getUniqueVerificationAmount(): Long {
