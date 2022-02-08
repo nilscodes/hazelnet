@@ -1,5 +1,8 @@
 const i18n = require('i18n');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const {
+  MessageActionRow, MessageButton,
+} = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
 
 module.exports = {
@@ -15,7 +18,7 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const guild = await interaction.client.guilds.fetch(discordServer.guildId);
       const useLocale = discordServer.getBotLanguage();
-      let infoText = i18n.__({ phrase: 'info.infoBaseText', locale: useLocale });
+      let infoText = discordServer.settings?.INFO_CONTENT_TEXT ?? i18n.__({ phrase: 'info.infoBaseText', locale: useLocale });
       let stakepoolFields = [];
       if (discordServer.stakepools?.length) {
         infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale: useLocale }, discordServer.stakepools.length)}`;
@@ -24,13 +27,37 @@ module.exports = {
           value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, stakepool.info),
         }));
       }
-      // TODO exclude info for premium
-      stakepoolFields.push({
-        name: i18n.__({ phrase: 'about.title', locale: useLocale }),
-        value: i18n.__({ phrase: 'about.info', locale: useLocale }),
-      });
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'info.welcomeTitle', locale: useLocale }, { guildName: guild.name }), infoText, stakepoolFields);
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+
+      const infoImage = discordServer.settings?.INFO_CONTENT_IMAGE;
+      const infoTitle = discordServer.settings?.INFO_CONTENT_TITLE ?? i18n.__({ phrase: 'info.welcomeTitle', locale: useLocale }, { guildName: guild.name });
+      let components;
+
+      const isPremium = discordServer.settings?.INFO_CONTENT_TEXT !== undefined;
+      if (!isPremium) {
+        stakepoolFields.push({
+          name: i18n.__({ phrase: 'about.title', locale: useLocale }),
+          value: i18n.__({ phrase: 'about.info', locale: useLocale }),
+        });
+      } else if (discordServer.settings?.INFO_CONTENT_BUTTONS) {
+        try {
+          const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS);
+          if (buttonData.length) {
+            components = [new MessageActionRow()
+              .addComponents(
+                buttonData.map((button) => (
+                  new MessageButton()
+                    .setLabel(button.label)
+                    .setURL(button.url)
+                    .setStyle('LINK')
+                )),
+              )];
+          }
+        } catch (badJson) {
+          interaction.client.logger.warn({ msg: `Problem when parsing JSON for custom buttons for /info command for guild ${guild.id}`, err: badJson });
+        }
+      }
+      const embed = embedBuilder.buildForUser(discordServer, infoTitle, infoText, stakepoolFields, infoImage);
+      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.reply({ content: 'Error while getting server info.', ephemeral: true });
