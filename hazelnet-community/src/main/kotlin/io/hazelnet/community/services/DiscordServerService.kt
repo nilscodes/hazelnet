@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServerSetting
@@ -72,24 +73,41 @@ class DiscordServerService(
     }
 
     private fun confirmValidPoolAndUpdateHashIfNeeded(stakepool: Stakepool) {
-        val validPools = if (stakepool.poolHash.startsWith("pool1")) {
-            connectService.resolvePoolView(stakepool.poolHash)
-        } else {
-            connectService.resolvePoolHash(stakepool.poolHash)
-        }
-        if (!validPools.isEmpty()) {
+        val validPools = getValidPools(stakepool.poolHash)
+        if (validPools.isNotEmpty()) {
             stakepool.poolHash = validPools[0].hash
             return
         }
         throw NoSuchElementException("No stakepool found with pool ID ${stakepool.poolHash}")
     }
 
+    private fun getValidPools(poolHash: String): List<StakepoolInfo> {
+        val validPools = if (poolHash.startsWith("pool1")) {
+            connectService.resolvePoolView(poolHash)
+        } else {
+            connectService.resolvePoolHash(poolHash)
+        }
+        return validPools
+    }
+
     fun addDelegatorRole(guildId: Long, delegatorRole: DelegatorRole): DelegatorRole {
         val discordServer = getDiscordServer(guildId)
+        this.confirmValidPoolAndUpdateHashIfNeeded(delegatorRole)
         discordDelegatorRoleRepository.save(delegatorRole)
         discordServer.delegatorRoles.add(delegatorRole)
         discordServerRepository.save(discordServer)
         return delegatorRole
+    }
+
+    private fun confirmValidPoolAndUpdateHashIfNeeded(delegatorRole: DelegatorRole) {
+        if (delegatorRole.poolHash != null) {
+            val validPools = getValidPools(delegatorRole.poolHash!!)
+            if (validPools.isNotEmpty()) {
+                delegatorRole.poolHash = validPools[0].hash
+                return
+            }
+            throw NoSuchElementException("No stakepool found with pool ID ${delegatorRole.poolHash}")
+        }
     }
 
     fun addTokenOwnershipRole(guildId: Long, tokenOwnershipRole: TokenOwnershipRole): TokenOwnershipRole {

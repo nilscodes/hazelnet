@@ -2,7 +2,7 @@
 	"commands": {
 		"descriptions": {
 			"policyid": "Lists all policy IDs and projects associated with this server.",
-			"info": "Shows associated pools and other crypto related info for this server.",
+			"info": "Shows info and stakepools for this server.",
 			"whitelist": "View and register for whitelist events in this Discord.",
 			"whitelist-register": "Register for a whitelist",
 			"whitelist-list": "Show all whitelists and requirements for each whitelist.",
@@ -213,7 +213,8 @@
 				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}} tokens of the policy {{tokenRole.policyId}} will be assigned the role <@&{{tokenRole.roleId}}>."
 			},
 			"add": {
-				"success": "✅ New automatic role-assignment for the following token owners added to this server:"
+				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
+				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following token role auto-assignment from this server:",
@@ -231,7 +232,8 @@
 				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}** to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>."
 			},
 			"add": {
-				"success": "✅ New automatic role-assignment for the following delegators added to this server:"
+				"success": "✅ New automatic role-assignment for the following delegators added to this server:",
+				"errorMinimumStake": "⚠ Automatic delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
