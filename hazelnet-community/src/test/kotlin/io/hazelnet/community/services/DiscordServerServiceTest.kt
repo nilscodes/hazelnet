@@ -47,6 +47,7 @@ internal class DiscordServerServiceTest {
                     TokenOwnershipRole(1, "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 120, 999),
                     TokenOwnershipRole(2, "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", 3, 31),
                     TokenOwnershipRole(3, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 76, 12),
+                    TokenOwnershipRole(4, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 150, 13),
             ),
             mutableSetOf(),
             mutableSetOf()
@@ -87,10 +88,35 @@ internal class DiscordServerServiceTest {
     }
 
     @Test
+    fun tokenRoleAssignmentsDoNotGetCountedTwiceForTwoDifferentTokenRoles()
+    {
+        val connectService = mockk<ConnectService>()
+        every { connectService.getCurrentEpoch() } returns 311
+        every { connectService.getAllTokenOwnership(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
+            TokenOwnershipInfo("acc4_hazel", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 75),
+        )
+        val discordServerService = DiscordServerService(
+            getMockStakepoolService(),
+            getMockVerificationService(),
+            connectService,
+            getMockDiscordServerRepository(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk()
+        )
+
+        val actual = discordServerService.getCurrentTokenRolesAssignments(testServer.guildId)
+        Assertions.assertEquals(emptySet<DiscordRoleAssignment>(), actual)
+    }
+
+    @Test
     fun getCurrentTokenRoleAssignments() {
         val connectService = mockk<ConnectService>()
         every { connectService.getCurrentEpoch() } returns 311
-        every { connectService.getAllTokenOwnership(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }) } returns listOf(
+        every { connectService.getAllTokenOwnership(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
                 TokenOwnershipInfo("acc1_hazel", "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 50),
                 TokenOwnershipInfo("acc1_bloom", "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 70),
                 TokenOwnershipInfo("acc1_hazel", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", 1),
@@ -118,6 +144,7 @@ internal class DiscordServerServiceTest {
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 999),
                 DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 999),
                 DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 12),
+                DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 13),
                 DiscordRoleAssignment(testServer.guildId, acc3.referenceId.toLong(), 31),
         ), actual)
     }

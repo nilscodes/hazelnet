@@ -58,6 +58,8 @@ module.exports = {
             await interaction.followUp({ embeds: [waitEmbed], ephemeral: true });
           }
           if (maxVerificationWaitTimeInMinutes > 15) {
+            // Connect the account so that if the verification goes through later, the account is properly linked
+            await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
             const endEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationMessageChainEnd', locale: useLocale }));
             await interaction.followUp({ embeds: [endEmbed], ephemeral: true });
           } else {

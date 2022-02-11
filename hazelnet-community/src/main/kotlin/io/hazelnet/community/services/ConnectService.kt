@@ -53,7 +53,7 @@ class ConnectService(
                 .block()!!
     }
 
-    fun getAllTokenOwnership(stakeAddresses: List<String>, policyIds: List<String>): List<TokenOwnershipInfo> {
+    fun getAllTokenOwnership(stakeAddresses: List<String>, policyIds: Set<String>): List<TokenOwnershipInfo> {
         return Flux.fromIterable(stakeAddresses)
                 .flatMap {
                     connectClient.post()

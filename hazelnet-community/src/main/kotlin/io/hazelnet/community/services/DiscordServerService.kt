@@ -247,7 +247,7 @@ class DiscordServerService(
         val discordServer = getDiscordServer(guildId)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         val allVerifiedStakeAddresses = allVerificationsOfMembers.mapNotNull { it.cardanoStakeAddress }
-        val relevantPolicyIds   = discordServer.tokenRoles.map { it.policyId }
+        val relevantPolicyIds   = discordServer.tokenRoles.map { it.policyId }.toSet()
         if(relevantPolicyIds.isNotEmpty()) {
             val tokenOwnershipData = connectService.getAllTokenOwnership(allVerifiedStakeAddresses, relevantPolicyIds)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
