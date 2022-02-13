@@ -1,5 +1,4 @@
 const i18n = require('i18n');
-const { executeSelectMenu } = require('../commands/start');
 const commandPermissions = require('./commandpermissions');
 const embedBuilder = require('./embedbuilder');
 
@@ -28,6 +27,19 @@ module.exports = {
         const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
         if (isAdminUser) {
           await this.subcommands[subcommand].executeSelectMenu(interaction);
+        }
+      }
+    }
+  },
+  async executeButtonIfAdmin(interaction) {
+    const customIdParts = interaction.customId.split('/');
+    if (customIdParts.length > 2) {
+      const subcommand = customIdParts.length === 4 ? `${customIdParts[1]}-${customIdParts[2]}` : customIdParts[1];
+      if (this.subcommands[subcommand]) {
+        const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+        const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
+        if (isAdminUser) {
+          await this.subcommands[subcommand].executeButton(interaction);
         }
       }
     }

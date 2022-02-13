@@ -47,7 +47,7 @@ const eventFiles = fs.readdirSync('./events').filter((file) => file.endsWith('.j
 
 eventFiles.forEach((file) => {
   const event = require(`./events/${file}`);
-  
+
   if (event.once) {
     logger.info(`Registering event ${event.name} (once-type)`);
     client.once(event.name, (...args) => event.execute(...args));

@@ -23,10 +23,13 @@ module.exports = {
       if (relevantVerifications.length) {
         const confirmedVerifications = relevantVerifications.filter((verification) => verification.confirmed);
         if (confirmedVerifications.length) {
-          verificationInfoFields.push({
-            name: i18n.__({ phrase: 'verify.list.confirmedVerifications', locale: useLocale }),
-            value: confirmedVerifications.map((verification) => i18n.__({ phrase: 'verify.list.confirmedData', locale: useLocale }, { verification })).join('\n\n'),
-          });
+          verificationInfoFields.push(...confirmedVerifications.map((verification) => {
+            const stakeShort = verification.cardanoStakeAddress.substr(0, 10);
+            return {
+              name: i18n.__({ phrase: 'verify.list.confirmedVerificationFor', locale: useLocale }, { stakeShort }),
+              value: i18n.__({ phrase: 'verify.list.confirmedData', locale: useLocale }, { verification }),
+            };
+          }));
         }
         const outstandingVerifications = relevantVerifications.filter((verification) => !verification.confirmed);
         if (outstandingVerifications.length) {

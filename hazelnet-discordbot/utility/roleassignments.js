@@ -29,11 +29,11 @@ module.exports = {
         const allUsers = await guildForAssignments.members.fetch();
         allUsers.each(async (member) => {
           if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
-            client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} on discord server ${discordServer.guildName}`);
+            client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
             try {
               await member.roles.remove(guildRole);
             } catch (error) {
-              client.logger.error({ msg: `Failed to remove ${roleProperty} ${guildRole.name} from member ${member.user.tag} on discord server ${discordServer.guildName}`, error });
+              client.logger.error({ msg: `Failed to remove ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
             }
           }
         });
@@ -50,11 +50,11 @@ module.exports = {
         roleList.forEach(async (userIdToAssignRole) => {
           const member = await guildForAssignments.members.fetch(userIdToAssignRole);
           if (!member?.roles.cache.some((role) => role.id === roleId)) {
-            client.logger.info(`Adding ${roleProperty} ${guildRole.name} to member ${member.user.tag} on discord server ${discordServer.guildName}`);
+            client.logger.info(`Adding ${roleProperty} ${guildRole.name} to member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
             try {
               await member.roles.add(guildRole);
             } catch (error) {
-              client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} from member ${member.user.tag} on discord server ${discordServer.guildName}`, error });
+              client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
             }
           }
         });

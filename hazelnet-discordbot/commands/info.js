@@ -22,9 +22,10 @@ module.exports = {
       let stakepoolFields = [];
       if (discordServer.stakepools?.length) {
         infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale: useLocale }, discordServer.stakepools.length)}`;
+        const infoMessageType = discordServer.stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
         stakepoolFields = discordServer.stakepools.map((stakepool) => ({
           name: `${stakepool.info?.name} (${stakepool.info?.ticker})`,
-          value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, stakepool.info),
+          value: i18n.__({ phrase: infoMessageType, locale: useLocale }, stakepool.info),
         }));
       }
 
@@ -60,7 +61,7 @@ module.exports = {
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.reply({ content: 'Error while getting server info.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting server info.', ephemeral: true });
     }
   },
 };

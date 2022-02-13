@@ -24,7 +24,8 @@
 			"one": "This server officially supports this Cardano stakepool:",
 			"other": "This server officially supports the following Cardano stakepools:"
 		},
-		"stakepoolDetails": "#️⃣ *Pool hash:*\n{{hash}}\n\nℹ *Description:*\n{{{description}}}\n\n🌍 *Website:*\n{{{website}}}\n\n👁 *Pool.pm:*\nhttps://pool.pm/{{hash}}"
+		"stakepoolDetails": "#️⃣ *Pool hash:*\n{{hash}}\n\nℹ *Description:*\n{{{description}}}\n\n🌍 *Website:*\n{{{website}}}\n\n👁 *Pool.pm:*\nhttps://pool.pm/{{hash}}",
+		"stakepoolDetailsShort": "https://pool.pm/{{hash}}"
 	},
 	"help": {
 		"messageTitle": "Get help for {{{botName}}}",
@@ -72,7 +73,7 @@
 			"messageTitle": "Your verified addresses",
 			"noVerifications": "You have no outstanding or confirmed verifications. If you would like to verify a Cardano address, please use the '/verify add' command.",
 			"listVerificationsInfo": "View your link status with this specific server and see which addresses are verified or waiting for verification with your account across all Discord server:",
-			"confirmedVerifications": "✅ Confirmed verifications",
+			"confirmedVerificationFor": "✅ Confirmed verification for {{stakeShort}}…",
 			"confirmedData": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} via transaction https://cardanoscan.io/transaction/{{verification.transactionHash}}, confirmed at *{{verification.confirmedAt}}*.",
 			"outstandingVerifications": "⏳ Outstanding verifications",
 			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification.",
@@ -214,12 +215,18 @@
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
-				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1."
+				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1.",
+				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
+				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the token ownership requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make token role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
+				"confirmRole": "I understand - continue",
+				"canceled": "ℹ Adding the following token role was cancelled:\n\nRole <@&{{roleId}}>\nPolicy ID: {{policyId}}\nMinimum token amount: {{minimumTokenQuantity}}"
 			},
 			"remove": {
 				"success": "🗑️ Removed the following token role auto-assignment from this server:",
 				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server. Nothing was removed."
-			}
+			},
+			"roleInUseWarning": "configure.tokenroles.roleInUseWarning",
+			"roleInUseDetails": "configure.tokenroles.roleInUseDetails"
 		},
 		"delegatorroles": {
 			"list": {
@@ -233,7 +240,12 @@
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following delegators added to this server:",
-				"errorMinimumStake": "⚠ Automatic delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳."
+				"errorMinimumStake": "⚠ Automatic delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳.",
+				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
+				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
+				"confirmRole": "I understand - continue",
+				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}"
+
 			},
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
@@ -327,6 +339,9 @@
 		"pool": "Stakepool features (official pools, delegator roles)",
 		"token": "Fungible tokens and NFTs (official policies, token roles)",
 		"whitelist": "Self-service address whitelists with requirements"
+	},
+	"generic": {
+		"cancel": "Cancel"
 	},
 	"languages": {
 		"en": "English",

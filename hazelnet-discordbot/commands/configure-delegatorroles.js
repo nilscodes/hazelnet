@@ -23,4 +23,5 @@ module.exports = {
   },
   commandTags: ['pool'],
   execute: commandbase.executeSubcommandIfAdmin,
+  executeButton: commandbase.executeButtonIfAdmin,
 };

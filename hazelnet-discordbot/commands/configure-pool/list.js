@@ -7,9 +7,10 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
+      const infoMessageType = discordServer.stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
       const stakepoolFields = discordServer.stakepools.map((stakepool) => ({
         name: `${stakepool.info?.name} (${stakepool.info?.ticker})`,
-        value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, stakepool.info),
+        value: i18n.__({ phrase: infoMessageType, locale: useLocale }, stakepool.info),
       }));
       if (!stakepoolFields.length) {
         stakepoolFields.push({ name: i18n.__({ phrase: 'configure.pool.list.noPoolName', locale: useLocale }), value: i18n.__({ phrase: 'configure.pool.list.noPools', locale: useLocale }) });

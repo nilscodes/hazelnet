@@ -23,4 +23,5 @@ module.exports = {
   },
   commandTags: ['token'],
   execute: commandbase.executeSubcommandIfAdmin,
+  executeButton: commandbase.executeButtonIfAdmin,
 };
