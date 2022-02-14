@@ -90,7 +90,7 @@
 		"add": {
 			"messageTitle": "Verify a new address",
 			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{verification.address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
-			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first.",
+			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first. You can find your outstanding verification details with the */verify list* command.",
 			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
 			"verificationWaiting": "⏳ Still awaiting verification...",
