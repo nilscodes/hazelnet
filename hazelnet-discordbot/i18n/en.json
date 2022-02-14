@@ -34,7 +34,7 @@
 			"verify-add": "With */verify add* you can add a new address to your list of verified wallets. Issuing the command will ask you to send a specific amount of ADA to yourself within a specific amount of time. If the transaction is confirmed this verifies your wallet and allows the system to also verify token and NFT ownership. A wallet can only be registered with one Discord user at one time.\n❕ You can also provide a handle for verification - it will automatically be resolved into an address.\n💡 Verifying a wallet will link the Discord server on which you are performing the verification as part of the process, so no explicit */verify link* is needed.",
 			"verify-help": "This command, which will print out information on how to use the */verify* feature.",
 			"verify-link": "When you first join a server, all your verified addresses will not be linked by default. This means your privacy comes first and you will not be assigned any roles without authorizing it via */verify link*. This command will enable this bot to assign automatic roles and use other features on this specific Discord server for your account.",
-			"verify-list": "When using */verify list*, all your open and confirmed verifications will be listed. If you ever get disconnected during a verification process, you can retrieve the info needed to verify here.",
+			"verify-list": "When using */verify list*, all your open and confirmed verifications will be listed. If you ever get disconnected during a verification process, you can retrieve the info needed to verify here. This command also lets you cancel your open verification, if needed.",
 			"verify-remove": "If you want to remove a verified address from your account, simply use */verify remove* and the wallet will not be used for any token roles or other features on any of your link Discord servers any more.",
 			"verify-unlink": "If you would like to unlink a wallet from a specific Discord server, because you wish to not receive automatic role-assignments or other treatment that might reveal anything about you, use the */verify unlink* command.",
 			"help": "Shows this help text."
@@ -80,7 +80,9 @@
 			"accountIsLinked": "⚡ Linked",
 			"accountIsLinkedInfo": "Your verified wallets are linked with this Discord server and you will be automatically assigned roles and access other features, if configured by the server admin.",
 			"accountIsNotLinked": "🔌 Not Linked",
-			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet."
+			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet.",
+			"cancelOutstanding": "Cancel open verification",
+			"cancelSuccess": "❌ Outstanding verification for address {{address}} was successfully cancelled. You can now start a new verification process."
 		},
 		"help": {
 			"messageTitle": "Help about the /verify command"
@@ -95,7 +97,7 @@
 			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command.",
 			"verificationMessageChainEnd": "⏳ We are still waiting for your transaction. However, the bot will now stop messaging you. You can check your verification request status any time by using the */verify list* command.",
 			"verificationWalletInUse": "⚠ Verification failed. The stake address that belongs to the address *{{address}}* is already verified with your or another account.",
-			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
+			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address OR the verification process was cancelled. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
 			"verificationInvalidHandle": "⚠ The submitted handle *{{handle}}* is not associated with a stake address. {{{resolveText}}}. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
 			"resolveFailure": "The handle did not resolve to any address",
 			"resolveSuccess": "The handle resolved to {{resolvedAddress}}"
@@ -341,7 +343,8 @@
 		"whitelist": "Self-service address whitelists with requirements"
 	},
 	"generic": {
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"clickhelp": "Click for help"
 	},
 	"languages": {
 		"en": "English",

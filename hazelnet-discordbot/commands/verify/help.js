@@ -23,7 +23,7 @@ module.exports = {
       helpTexts.push('🔌 **/verify unlink**');
       helpTexts.push(`${i18n.__({ phrase: 'help.generalCommands.verify-unlink', locale: useLocale })}\n`);
 
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.help.messageTitle', locale: useLocale }), helpTexts.join('\n'));
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.help.messageTitle', locale: useLocale }), helpTexts.join('\n'), 'verify-help');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

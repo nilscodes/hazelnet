@@ -44,6 +44,19 @@ module.exports = {
       }
     }
   },
+  async executeButtonIfUser(interaction) {
+    const customIdParts = interaction.customId.split('/');
+    if (customIdParts.length > 2) {
+      const subcommand = customIdParts.length === 4 ? `${customIdParts[1]}-${customIdParts[2]}` : customIdParts[1];
+      if (this.subcommands[subcommand]) {
+        const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+        const isBotUser = await commandPermissions.isBotUser(discordServer, interaction.client, interaction.user.id);
+        if (isBotUser) {
+          await this.subcommands[subcommand].executeButton(interaction);
+        }
+      }
+    }
+  },
   async executeSubcommand(interaction) {
     const subcommand = interaction.options.getSubcommand(true);
     if (this.subcommands[subcommand]) {

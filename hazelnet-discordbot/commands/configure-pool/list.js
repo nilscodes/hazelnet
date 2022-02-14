@@ -15,7 +15,7 @@ module.exports = {
       if (!stakepoolFields.length) {
         stakepoolFields.push({ name: i18n.__({ phrase: 'configure.pool.list.noPoolName', locale: useLocale }), value: i18n.__({ phrase: 'configure.pool.list.noPools', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool list', i18n.__({ phrase: 'configure.pool.list.purpose', locale: useLocale }), stakepoolFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool list', i18n.__({ phrase: 'configure.pool.list.purpose', locale: useLocale }), 'configure-pool-list', stakepoolFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

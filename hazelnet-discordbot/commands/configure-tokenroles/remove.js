@@ -12,7 +12,7 @@ module.exports = {
       if (tokenRoleToRemove) {
         await interaction.client.services.discordserver.deleteTokenRole(interaction.guild.id, tokenRoleToRemove.id);
         const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRoleToRemove.policyId);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale: useLocale }), [
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale: useLocale }), 'configure-tokenroles-remove', [
           {
             name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: tokenRoleToRemove, officialProject }),
             value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: tokenRoleToRemove }),
@@ -20,7 +20,7 @@ module.exports = {
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.errorNotFound', locale: useLocale }, { tokenRoleId: tokenRoleIdToRemove }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.errorNotFound', locale: useLocale }, { tokenRoleId: tokenRoleIdToRemove }), 'configure-tokenroles-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

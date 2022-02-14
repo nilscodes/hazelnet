@@ -42,11 +42,11 @@ module.exports = {
                 .setStyle('SECONDARY'),
             )];
 
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }));
+          const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-tokenroles-add');
           await interaction.editReply({ components, embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.errorMinimumTokens', locale: useLocale }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.errorMinimumTokens', locale: useLocale }), 'configure-tokenroles-add');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
@@ -60,7 +60,7 @@ module.exports = {
     const newTokenRole = newTokenRolePromise.data;
 
     const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === newTokenRole.policyId);
-    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale: useLocale }), [
+    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale: useLocale }), 'configure-tokenroles-add', [
       {
         name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: newTokenRole, officialProject }),
         value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: newTokenRole }),
@@ -71,10 +71,14 @@ module.exports = {
   async executeButton(interaction) {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
     const roleToAdd = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-    if (interaction.customId === 'configure-tokenroles/add/confirm') {
-      this.confirm(interaction, discordServer, roleToAdd);
-    } else if (interaction.customId === 'configure-tokenroles/add/cancel') {
-      this.cancel(interaction, discordServer, roleToAdd);
+    if (roleToAdd) {
+      if (interaction.customId === 'configure-tokenroles/add/confirm') {
+        this.confirm(interaction, discordServer, roleToAdd);
+      } else if (interaction.customId === 'configure-tokenroles/add/cancel') {
+        this.cancel(interaction, discordServer, roleToAdd);
+      }
+    } else {
+      interaction.client.logger.warn(`User ${interaction.user.id} tried to add a token role for guild ${interaction.guild.id}, but the role add cache was empty.`);
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {
@@ -83,7 +87,7 @@ module.exports = {
   },
   async cancel(interaction, discordServer, roleToAdd) {
     const useLocale = discordServer.getBotLanguage();
-    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'generic.cancel', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.canceled', locale: useLocale }, roleToAdd));
+    const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'generic.cancel', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.canceled', locale: useLocale }, roleToAdd), 'configure-tokenroles-add');
     await interaction.update({ embeds: [embed], components: [] });
   },
 };

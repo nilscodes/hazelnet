@@ -24,7 +24,7 @@ module.exports = {
       if (!delegatorRoleFields.length) {
         delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale: useLocale }), delegatorRoleFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale: useLocale }), 'configure-delegatorroles-list', delegatorRoleFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

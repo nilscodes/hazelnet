@@ -42,11 +42,11 @@ module.exports = {
                 .setStyle('SECONDARY'),
             )];
 
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }));
+          const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-delegatorroles-add');
           await interaction.editReply({ components, embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.errorMinimumStake', locale: useLocale }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.errorMinimumStake', locale: useLocale }), 'configure-delegatorroles-add');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
@@ -66,7 +66,7 @@ module.exports = {
     } else if (officialStakepool) {
       fieldHeader = 'configure.delegatorroles.list.stakepoolNameOfficial';
     }
-    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.success', locale: useLocale }), [
+    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.success', locale: useLocale }), 'configure-delegatorroles-add', [
       {
         name: i18n.__({ phrase: fieldHeader, locale: useLocale }, { delegatorRole: newDelegatorRole, officialStakepool }),
         value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale: useLocale }, { delegatorRole: newDelegatorRole, minimumStake: newDelegatorRole.minimumStake / 1000000 }),
@@ -77,10 +77,14 @@ module.exports = {
   async executeButton(interaction) {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
     const roleToAdd = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-    if (interaction.customId === 'configure-delegatorroles/add/confirm') {
-      this.confirm(interaction, discordServer, roleToAdd);
-    } else if (interaction.customId === 'configure-delegatorroles/add/cancel') {
-      this.cancel(interaction, discordServer, roleToAdd);
+    if (roleToAdd) {
+      if (interaction.customId === 'configure-delegatorroles/add/confirm') {
+        this.confirm(interaction, discordServer, roleToAdd);
+      } else if (interaction.customId === 'configure-delegatorroles/add/cancel') {
+        this.cancel(interaction, discordServer, roleToAdd);
+      }
+    } else {
+      interaction.client.logger.warn(`User ${interaction.user.id} tried to add a delegator role for guild ${interaction.guild.id}, but the role add cache was empty.`);
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {
@@ -89,7 +93,7 @@ module.exports = {
   },
   async cancel(interaction, discordServer, roleToAdd) {
     const useLocale = discordServer.getBotLanguage();
-    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'generic.cancel', locale: useLocale }), i18n.__({ phrase: 'configure.delegatorroles.add.canceled', locale: useLocale }, roleToAdd));
+    const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'generic.cancel', locale: useLocale }), i18n.__({ phrase: 'configure.delegatorroles.add.canceled', locale: useLocale }, roleToAdd), 'configure-delegatorroles-add');
     await interaction.update({ embeds: [embed], components: [] });
   },
 };

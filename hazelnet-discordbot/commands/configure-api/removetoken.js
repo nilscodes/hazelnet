@@ -8,7 +8,7 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       await interaction.client.services.discordserver.deleteAccessToken(interaction.guild.id);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-api removetoken', i18n.__({ phrase: 'configure.api.removetoken.success', locale: useLocale }));
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-api removetoken', i18n.__({ phrase: 'configure.api.removetoken.success', locale: useLocale }), 'configure-api-removetoken');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

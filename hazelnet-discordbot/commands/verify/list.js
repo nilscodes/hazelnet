@@ -1,4 +1,7 @@
 const i18n = require('i18n');
+const {
+  MessageActionRow, MessageButton,
+} = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 
 module.exports = {
@@ -31,22 +34,43 @@ module.exports = {
             };
           }));
         }
+        const components = [];
         const outstandingVerifications = relevantVerifications.filter((verification) => !verification.confirmed);
         if (outstandingVerifications.length) {
           verificationInfoFields.push({
             name: i18n.__({ phrase: 'verify.list.outstandingVerifications', locale: useLocale }),
             value: outstandingVerifications.map((verification) => i18n.__({ phrase: 'verify.list.outstandingData', locale: useLocale }, { verification, amount: verification.amount / 1000000 })).join('\n\n'),
           });
+          components.push(new MessageActionRow()
+            .addComponents(
+              new MessageButton()
+                .setCustomId('verify/list/canceloutstanding')
+                .setLabel(i18n.__({ phrase: 'verify.list.cancelOutstanding', locale: useLocale }))
+                .setStyle('DANGER'),
+            ));
         }
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale: useLocale }), verificationInfoFields);
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale: useLocale }), 'verify-list', verificationInfoFields);
+        await interaction.editReply({ components, embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }), verificationInfoFields);
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }), 'verify-list', verificationInfoFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting your verification info.', ephemeral: true });
+    }
+  },
+  async executeButton(interaction) {
+    if (interaction.customId === 'verify/list/canceloutstanding') {
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const useLocale = discordServer.getBotLanguage();
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const verifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
+      const outstandingVerifications = verifications.filter((verification) => !verification.confirmed && !verification.obsolete);
+      outstandingVerifications.forEach((outstandingVerification) => interaction.client.services.verifications.removeVerification(outstandingVerification.id));
+      await interaction.update({ components: [] });
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'generic.cancel', locale: useLocale }), i18n.__({ phrase: 'verify.list.cancelSuccess', locale: useLocale }, { address: outstandingVerifications[0].address }), 'verify-list');
+      await interaction.followUp({ embeds: [embed], ephemeral: true });
     }
   },
 };

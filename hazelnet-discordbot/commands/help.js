@@ -64,7 +64,7 @@ module.exports = {
         helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.start', locale: useLocale })}`);
       }
 
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitle', locale: useLocale }, { botName: 'HAZELnet.io Bot' }), helpTexts.join('\n'));
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitle', locale: useLocale }, { botName: 'HAZELnet.io Bot' }), helpTexts.join('\n'), 'help');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

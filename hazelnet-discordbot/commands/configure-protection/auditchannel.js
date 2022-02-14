@@ -11,7 +11,7 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       const changeMessage = i18n.__({ phrase: (newStatus ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale: useLocale }, { auditChannel: auditChannel.id });
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection auditchannel', changeMessage);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection auditchannel', changeMessage, 'configure-protection-auditchannel');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

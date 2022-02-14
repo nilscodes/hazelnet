@@ -18,7 +18,7 @@ module.exports = {
       if (!whitelistFields.length) {
         whitelistFields.push({ name: i18n.__({ phrase: 'whitelist.list.noWhitelistsTitle', locale: useLocale }), value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist list', i18n.__({ phrase: 'configure.whitelist.list.purpose', locale: useLocale }), whitelistFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist list', i18n.__({ phrase: 'configure.whitelist.list.purpose', locale: useLocale }), 'configure-whitelist-list', whitelistFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

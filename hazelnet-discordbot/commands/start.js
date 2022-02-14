@@ -129,7 +129,7 @@ module.exports = {
           .setLabel(i18n.__({ phrase: 'start.resetSetupButton', locale: useLocale }))
           .setStyle('SECONDARY'),
       ));
-    const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, [
+    const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, 'start', [
       { name: i18n.__({ phrase: 'start.configureLanguageTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureLanguageText', locale: useLocale }) + selectedLanguage },
       { name: i18n.__({ phrase: 'start.configureAdminRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureAdminRoleText', locale: useLocale }) + selectedAdminRoles },
       { name: i18n.__({ phrase: 'start.configureUserRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureUserRoleText', locale: useLocale }) + selectedUserRoles },
@@ -158,7 +158,7 @@ module.exports = {
       if (await this.isBotLackingRequiredPermissions(interaction)) {
         successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;
       }
-      const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage);
+      const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage, 'start');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } else {
       await this.editReplyWithSetupMessage(interaction);
@@ -188,7 +188,7 @@ module.exports = {
   },
   async editReplyWithNotWhitelistedMessage(interaction, discordServer) {
     const useLocale = discordServer.getBotLanguage();
-    const embed = embedbuilder.buildForUser(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), i18n.__({ phrase: 'errors.notWhitelisted', locale: useLocale }));
+    const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), i18n.__({ phrase: 'errors.notWhitelisted', locale: useLocale }), 'start');
     const components = [new MessageActionRow()
       .addComponents(
         new MessageButton()

@@ -27,14 +27,14 @@ module.exports = {
             name: i18n.__({ phrase: 'configure.useraccess.list.userTitle', locale: useLocale }),
             value: newUserRoleList.map((roleId) => (i18n.__({ phrase: 'configure.useraccess.list.userEntry', locale: useLocale }, { roleId }))).join('\n'),
           }];
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.success', locale: useLocale }, { roleId: userRoleToRemove.id }), userFields);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.success', locale: useLocale }, { roleId: userRoleToRemove.id }), 'configure-useraccess-remove', userFields);
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.cannotRemoveLastUserRole', locale: useLocale }, { roleId: userRoleToRemove.id }));
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.cannotRemoveLastUserRole', locale: useLocale }, { roleId: userRoleToRemove.id }), 'configure-useraccess-remove');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.notExists', locale: useLocale }, { roleId: userRoleToRemove.id }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess remove', i18n.__({ phrase: 'configure.useraccess.remove.notExists', locale: useLocale }, { roleId: userRoleToRemove.id }), 'configure-useraccess-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

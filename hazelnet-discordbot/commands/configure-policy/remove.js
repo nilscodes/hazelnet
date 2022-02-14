@@ -12,12 +12,12 @@ module.exports = {
       const policyToRemove = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToRemove);
       if (policyToRemove) {
         await interaction.client.services.discordserver.deleteTokenPolicy(interaction.guild.id, policyToRemove.policyId);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.success', locale: useLocale }), [
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.success', locale: useLocale }), 'configure-policy-remove', [
           { name: policyToRemove.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale: useLocale }, { policyId: policyToRemove.policyId }) },
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.errorNotFound', locale: useLocale }, { policyId: policyIdToRemove }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.errorNotFound', locale: useLocale }, { policyId: policyIdToRemove }), 'configure-policy-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

@@ -29,7 +29,7 @@ module.exports = {
       const whitelist = newWhitelistPromise.data;
 
       const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.success', locale: useLocale }), [
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.success', locale: useLocale }), 'configure-whitelist-add', [
         {
           name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist }),
           value: detailsPhrase,

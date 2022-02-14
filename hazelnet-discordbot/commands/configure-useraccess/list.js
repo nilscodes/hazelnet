@@ -13,7 +13,7 @@ module.exports = {
         name: i18n.__({ phrase: 'configure.useraccess.list.userTitle', locale: useLocale }),
         value: userRoleIds.map((roleId) => (i18n.__({ phrase: 'configure.useraccess.list.userEntry', locale: useLocale }, { roleId }))).join('\n'),
       }];
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess list', i18n.__({ phrase: 'configure.useraccess.list.purpose', locale: useLocale }), userFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-useraccess list', i18n.__({ phrase: 'configure.useraccess.list.purpose', locale: useLocale }), 'configure-useraccess-list', userFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

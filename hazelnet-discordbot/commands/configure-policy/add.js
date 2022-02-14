@@ -11,7 +11,7 @@ module.exports = {
       const newPolicyData = newPolicyPromise.data;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.success', locale: useLocale }), [
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.success', locale: useLocale }), 'configure-policy-add', [
         { name: newPolicyData.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale: useLocale }, { policyId: newPolicyData.policyId }) },
       ]);
       await interaction.editReply({ embeds: [embed], ephemeral: true });

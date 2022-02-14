@@ -57,7 +57,7 @@ module.exports = {
           interaction.client.logger.warn({ msg: `Problem when parsing JSON for custom buttons for /info command for guild ${guild.id}`, err: badJson });
         }
       }
-      const embed = embedBuilder.buildForUser(discordServer, infoTitle, infoText, stakepoolFields, infoImage);
+      const embed = embedBuilder.buildForUser(discordServer, infoTitle, infoText, 'info', stakepoolFields, infoImage);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

@@ -11,7 +11,7 @@ module.exports = {
         const useLocale = discordServer.getBotLanguage();
         await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'PROTECTION_ADDR_REMOVAL', newStatus);
         const changeMessage = i18n.__({ phrase: (newStatus ? 'configure.protection.addressremove.protectionOn' : 'configure.protection.addressremove.protectionOff'), locale: useLocale });
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection addressremove', changeMessage);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection addressremove', changeMessage, 'configure-protection-addressremove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } catch (error) {
         interaction.client.logger.error(error);

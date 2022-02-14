@@ -12,7 +12,7 @@ module.exports = {
       const stakepoolToRemove = discordServer.stakepools.find((stakepool) => stakepool.poolHash === stakepoolHash);
       if (stakepoolToRemove) {
         await interaction.client.services.discordserver.deleteStakepool(interaction.guild.id, stakepoolToRemove.poolHash);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool remove', i18n.__({ phrase: 'configure.pool.remove.success', locale: useLocale }), [
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool remove', i18n.__({ phrase: 'configure.pool.remove.success', locale: useLocale }), 'configure-pool-remove', [
           {
             name: `${stakepoolToRemove.info?.name} (${stakepoolToRemove.info?.ticker})`,
             value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, stakepoolToRemove.info),
@@ -20,7 +20,7 @@ module.exports = {
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool remove', i18n.__({ phrase: 'configure.pool.remove.errorNotFound', locale: useLocale }, { stakepoolHash }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool remove', i18n.__({ phrase: 'configure.pool.remove.errorNotFound', locale: useLocale }, { stakepoolHash }), 'configure-pool-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

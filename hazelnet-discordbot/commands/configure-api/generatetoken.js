@@ -11,7 +11,7 @@ module.exports = {
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-api generatetoken', i18n.__({ phrase: 'configure.api.generatetoken.success', locale: useLocale }, {
         accessToken,
         externalDocumentationUrl: 'http://info.hazelpool.com/hazelnet-external-api.yml',
-      }));
+      }), 'configure-api-generatetoken');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

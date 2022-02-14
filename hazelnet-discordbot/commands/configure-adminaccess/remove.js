@@ -29,14 +29,14 @@ module.exports = {
             name: i18n.__({ phrase: 'configure.adminaccess.list.administratorTitle', locale: useLocale }),
             value: newAdminRoleList.map((roleId) => (i18n.__({ phrase: 'configure.adminaccess.list.administratorEntry', locale: useLocale }, { roleId }))).join('\n'),
           }];
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.success', locale: useLocale }, { roleId: adminRoleToRemove.id }), adminFields);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.success', locale: useLocale }, { roleId: adminRoleToRemove.id }), 'configure-adminaccess-remove', adminFields);
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.cannotRemoveLastAdminRole', locale: useLocale }, { roleId: adminRoleToRemove.id }));
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.cannotRemoveLastAdminRole', locale: useLocale }, { roleId: adminRoleToRemove.id }), 'configure-adminaccess-remove');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.notExists', locale: useLocale }, { roleId: adminRoleToRemove.id }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess remove', i18n.__({ phrase: 'configure.adminaccess.remove.notExists', locale: useLocale }, { roleId: adminRoleToRemove.id }), 'configure-adminaccess-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

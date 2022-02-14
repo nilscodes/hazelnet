@@ -36,19 +36,19 @@ module.exports = {
                 .addOptions(whitelistOptions),
             )];
 
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.purpose', locale: useLocale })}`);
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.purpose', locale: useLocale })}`, 'whitelist-register');
           await interaction.editReply({ components, embeds: [embed], ephemeral: true });
         } else {
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.noOpenWhitelists', locale: useLocale })}`);
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.noOpenWhitelists', locale: useLocale })}`, 'whitelist-register');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.invalidAddress', locale: useLocale }, { address: addressToWhitelist, blockchain: 'Cardano' }));
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.invalidAddress', locale: useLocale }, { address: addressToWhitelist, blockchain: 'Cardano' }), 'whitelist-register');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }));
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }), 'whitelist-register');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     }
   },
@@ -65,20 +65,20 @@ module.exports = {
           if (whitelistToRegisterFor) {
             const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
             await interaction.client.services.discordserver.registerForWhitelist(interaction.guild.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
-            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.success', locale: useLocale }, { whitelist: whitelistToRegisterFor, address: addressToWhitelist }));
+            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.success', locale: useLocale }, { whitelist: whitelistToRegisterFor, address: addressToWhitelist }), 'whitelist-register');
             await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
           } else {
-            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.errorNotFound', locale: useLocale }, { whitelistName }));
+            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.errorNotFound', locale: useLocale }, { whitelistName }), 'whitelist-register');
             await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
           }
         } else {
           interaction.client.logger.warn(`Address for user ${interaction.user.id} expired when registering for whitelist ${whitelistName} on Discord server ${discordServer.guildId}`);
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }));
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }), 'whitelist-register');
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         }
       } catch (error) {
         interaction.client.logger.error(error);
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }));
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.otherError', locale: useLocale }), 'whitelist-register');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       }
     }

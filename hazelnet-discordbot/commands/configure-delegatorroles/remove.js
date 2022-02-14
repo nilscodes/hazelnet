@@ -18,7 +18,7 @@ module.exports = {
         } else if (officialStakepool) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameOfficial';
         }
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles remove', i18n.__({ phrase: 'configure.delegatorroles.remove.success', locale: useLocale }), [
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles remove', i18n.__({ phrase: 'configure.delegatorroles.remove.success', locale: useLocale }), 'configure-delegatorroles-remove', [
           {
             name: i18n.__({ phrase: fieldHeader, locale: useLocale }, { delegatorRole: delegatorRoleToRemove, officialStakepool }),
             value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale: useLocale }, { delegatorRole: delegatorRoleToRemove, minimumStake: delegatorRoleToRemove.minimumStake / 1000000 }),
@@ -26,7 +26,7 @@ module.exports = {
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles remove', i18n.__({ phrase: 'configure.delegatorroles.remove.errorNotFound', locale: useLocale }, { delegatorRoleId: delegatorRoleIdToRemove }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles remove', i18n.__({ phrase: 'configure.delegatorroles.remove.errorNotFound', locale: useLocale }, { delegatorRoleId: delegatorRoleIdToRemove }), 'configure-delegatorroles-remove');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

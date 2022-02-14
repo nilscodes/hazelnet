@@ -16,7 +16,7 @@ module.exports = {
         name: i18n.__({ phrase: 'configure.protection.status.auditChannelTitle', locale: useLocale }),
         value: i18n.__({ phrase: (auditChannel?.length ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale: useLocale }, { auditChannel }),
       }];
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection status', i18n.__({ phrase: 'configure.protection.status.purpose', locale: useLocale }), settingFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection status', i18n.__({ phrase: 'configure.protection.status.purpose', locale: useLocale }), 'configure-protection-status', settingFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

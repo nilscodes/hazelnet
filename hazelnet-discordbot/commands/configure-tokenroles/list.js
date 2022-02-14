@@ -17,7 +17,7 @@ module.exports = {
       if (!tokenRoleFields.length) {
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale: useLocale }), tokenRoleFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale: useLocale }), 'configure-tokenroles-list', tokenRoleFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

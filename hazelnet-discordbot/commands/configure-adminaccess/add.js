@@ -23,10 +23,10 @@ module.exports = {
           name: i18n.__({ phrase: 'configure.adminaccess.list.administratorTitle', locale: useLocale }),
           value: newAdminRoleList.map((roleId) => (i18n.__({ phrase: 'configure.adminaccess.list.administratorEntry', locale: useLocale }, { roleId }))).join('\n'),
         }];
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess add', i18n.__({ phrase: 'configure.adminaccess.add.success', locale: useLocale }, { roleId: newAdminRole.id }), adminFields);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess add', i18n.__({ phrase: 'configure.adminaccess.add.success', locale: useLocale }, { roleId: newAdminRole.id }), 'configure-adminaccess-add', adminFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess add', i18n.__({ phrase: 'configure.adminaccess.add.alreadyExists', locale: useLocale }, { roleId: newAdminRole.id }));
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-adminaccess add', i18n.__({ phrase: 'configure.adminaccess.add.alreadyExists', locale: useLocale }, { roleId: newAdminRole.id }), 'configure-adminaccess-add');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

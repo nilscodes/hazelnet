@@ -30,4 +30,5 @@ module.exports = {
   },
   commandTags: ['token', 'pool'],
   execute: commandbase.executeSubcommand,
+  executeButton: commandbase.executeButtonIfUser,
 };

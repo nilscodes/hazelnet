@@ -21,6 +21,7 @@ module.exports = {
                 discordServer,
                 i18n.__({ phrase: 'configure.protection.auditchannel.auditEventTitle', locale: useLocale }),
                 i18n.__({ phrase: 'configure.protection.auditchannel.auditEventDetail', locale: useLocale }, { author: message.author.id, channel: message.channel.id, message: message.content }),
+                'configure-protection-auditchannel',
               );
               await channel.send({ embeds: [embed] });
             }

@@ -14,7 +14,7 @@ module.exports = {
       await verifications.filter((verification) => verification.address === addressToRemove).forEach(async (verification) => {
         await interaction.client.services.verifications.removeVerification(verification.id);
       });
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.remove.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.remove.success', locale: useLocale }, { address: addressToRemove }));
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.remove.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.remove.success', locale: useLocale }, { address: addressToRemove }), 'verify-remove');
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
