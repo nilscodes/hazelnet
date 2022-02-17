@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import org.springframework.lang.NonNull
 import javax.persistence.*
 import javax.validation.constraints.Min
+import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 @Entity
@@ -20,6 +21,11 @@ class TokenOwnershipRole @JsonCreator constructor(
         @field:NonNull
         @field:Size(min = 56, max = 56)
         var policyId: String,
+
+        @Column(name = "asset_fingerprint")
+        @field:Size(min = 44, max = 44)
+        @field:Pattern(regexp = "^asset1[a-zA-Z0-9]{38}$")
+        var assetFingerprint: String?,
 
         @Column(name = "minimum_token_quantity")
         @field:NonNull

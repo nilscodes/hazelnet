@@ -10,7 +10,7 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Add a Cardano policy ID and associated project name to the list of official projects on this server.')
-        .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to add as official token policy on this server').setRequired(true))
+        .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to add as an official token policy on this server').setRequired(true))
         .addStringOption((option) => option.setName('project-name').setDescription('The project name to list this policy ID under').setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')

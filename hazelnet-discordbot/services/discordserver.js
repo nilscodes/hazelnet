@@ -83,11 +83,12 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newPolicyPromise;
   },
-  async createTokenRole(guildId, policyId, minimumTokenQuantity, discordRoleId) {
+  async createTokenRole(guildId, policyId, minimumTokenQuantity, discordRoleId, assetFingerprint) {
     const newTokenRolePromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles`, {
       policyId,
       minimumTokenQuantity,
       roleId: discordRoleId,
+      assetFingerprint,
     });
     this.clearCacheEntry(guildId);
     return newTokenRolePromise;

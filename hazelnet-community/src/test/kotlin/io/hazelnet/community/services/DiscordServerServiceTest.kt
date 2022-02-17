@@ -44,10 +44,10 @@ internal class DiscordServerServiceTest {
                     DelegatorRole(3, "9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 1, 662)
             ),
             mutableSetOf(
-                    TokenOwnershipRole(1, "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 120, 999),
-                    TokenOwnershipRole(2, "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", 3, 31),
-                    TokenOwnershipRole(3, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 76, 12),
-                    TokenOwnershipRole(4, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 150, 13),
+                    TokenOwnershipRole(1, "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", null, 120, 999),
+                    TokenOwnershipRole(2, "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", null, 3, 31),
+                    TokenOwnershipRole(3, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", null, 76, 12),
+                    TokenOwnershipRole(4, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", null, 150, 13),
             ),
             mutableSetOf(),
             mutableSetOf()
@@ -92,7 +92,7 @@ internal class DiscordServerServiceTest {
     {
         val connectService = mockk<ConnectService>()
         every { connectService.getCurrentEpoch() } returns 311
-        every { connectService.getAllTokenOwnership(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
+        every { connectService.getAllTokenOwnershipByPolicyId(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
             TokenOwnershipInfo("acc4_hazel", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 75),
         )
         val discordServerService = DiscordServerService(
@@ -116,7 +116,7 @@ internal class DiscordServerServiceTest {
     fun getCurrentTokenRoleAssignments() {
         val connectService = mockk<ConnectService>()
         every { connectService.getCurrentEpoch() } returns 311
-        every { connectService.getAllTokenOwnership(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
+        every { connectService.getAllTokenOwnershipByPolicyId(listOf("acc1_hazel", "acc1_bloom", "acc2_kaizn", "acc3_kaizn", "acc4_hazel"), testServer.tokenRoles.map { it.policyId }.toSet()) } returns listOf(
                 TokenOwnershipInfo("acc1_hazel", "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 50),
                 TokenOwnershipInfo("acc1_bloom", "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 70),
                 TokenOwnershipInfo("acc1_hazel", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", 1),

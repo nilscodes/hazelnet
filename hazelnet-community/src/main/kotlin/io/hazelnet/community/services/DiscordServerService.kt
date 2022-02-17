@@ -247,18 +247,18 @@ class DiscordServerService(
         val discordServer = getDiscordServer(guildId)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         val allVerifiedStakeAddresses = allVerificationsOfMembers.mapNotNull { it.cardanoStakeAddress }
-        val relevantPolicyIds   = discordServer.tokenRoles.map { it.policyId }.toSet()
+        val relevantPolicyIds = discordServer.tokenRoles.map { it.policyId + (it.assetFingerprint ?: "") }.toSet()
         if(relevantPolicyIds.isNotEmpty()) {
-            val tokenOwnershipData = connectService.getAllTokenOwnership(allVerifiedStakeAddresses, relevantPolicyIds)
+            val tokenOwnershipData = connectService.getAllTokenOwnershipByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
                 val mapOfExternalAccount = prepareExternalAccountMap(verification, externalAccountLookup, memberIdsToTokenPolicyOwnershipCounts)
                 relevantPolicyIds.forEach { policy ->
-                    val tokenCountForStakeAddress = tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyId == policy }
+                    val tokenCountForStakeAddress = tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
                     tokenCountForStakeAddress?.let {
                         val newAmount = tokenCountForStakeAddress.assetCount
-                        mapOfExternalAccount.compute(tokenCountForStakeAddress.policyId) { _, v ->
+                        mapOfExternalAccount.compute(tokenCountForStakeAddress.policyIdWithOptionalAssetFingerprint) { _, v ->
                             (v ?: 0) + newAmount
                         }
                     }
@@ -268,7 +268,8 @@ class DiscordServerService(
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
                 discordServer.tokenRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
-                        if ((tokenOwnershipInfo.value[role.policyId] ?: 0) >= role.minimumTokenQuantity) {
+                        val policyIdWithOptionalAssetFingerprint =  role.policyId + (role.assetFingerprint ?: "")
+                        if ((tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0) >= role.minimumTokenQuantity) {
                             DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
                         } else {
                             null

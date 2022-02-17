@@ -9,9 +9,10 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
       const tokenRoleFields = discordServer.tokenRoles.map((tokenRole) => {
         const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRole.policyId);
+        const fingerprintInfo = tokenRole.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { tokenRole }) : '';
         return {
           name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole, officialProject }),
-          value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole }),
+          value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole, fingerprintInfo }),
         };
       });
       if (!tokenRoleFields.length) {

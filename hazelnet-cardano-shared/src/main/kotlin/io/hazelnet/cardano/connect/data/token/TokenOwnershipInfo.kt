@@ -2,10 +2,10 @@ package io.hazelnet.cardano.connect.data.token
 
 data class TokenOwnershipInfo(
         val stakeAddress: String,
-        val policyId: String,
+        val policyIdWithOptionalAssetFingerprint: String,
         val assetCount: Long
 ) {
     override fun toString(): String {
-        return "TokenOwnershipInfo(stakeAddress='$stakeAddress', policyId='$policyId', assetCount=$assetCount)"
+        return "TokenOwnershipInfo(stakeAddress='$stakeAddress', policyIdWithOptionalAssetFingerprint='$policyIdWithOptionalAssetFingerprint', assetCount=$assetCount)"
     }
 }

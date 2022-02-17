@@ -7,7 +7,9 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const tokenPolicies = discordServer.tokenPolicies.map((tokenPolicy) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale: useLocale }, { policyId: tokenPolicy.policyId }) }));
+      const tokenPolicies = discordServer.tokenPolicies
+        .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
+        .map((tokenPolicy) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale: useLocale }, { policyId: tokenPolicy.policyId }) }));
       if (!tokenPolicies.length) {
         tokenPolicies.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale: useLocale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale: useLocale }) });
       }

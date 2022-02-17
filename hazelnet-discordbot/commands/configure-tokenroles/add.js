@@ -4,6 +4,7 @@ const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
+const cardanotoken = require('../../utility/cardanotoken');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
@@ -11,39 +12,46 @@ module.exports = {
     const role = interaction.options.getRole('role');
     const minimumTokenQuantity = interaction.options.getString('count');
     const policyId = interaction.options.getString('policy-id');
+    const assetFingerprint = interaction.options.getString('asset-fingerprint');
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       if (parseInt(minimumTokenQuantity, 10) > 0) {
-        const guild = await interaction.client.guilds.fetch(interaction.guild.id);
-        const allUsers = await guild.members.fetch();
-        const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
-        if (usersWithRole.size === 0) {
-          const embed = await this.createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, role.id);
-          await interaction.editReply({ embeds: [embed], ephemeral: true });
+        if (assetFingerprint === null || cardanotoken.isValidAssetFingerprint(assetFingerprint)) {
+          const guild = await interaction.client.guilds.fetch(interaction.guild.id);
+          const allUsers = await guild.members.fetch();
+          const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
+          if (usersWithRole.size === 0) {
+            const embed = await this.createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, role.id, assetFingerprint);
+            await interaction.editReply({ embeds: [embed], ephemeral: true });
+          } else {
+            // Register add data in cache, as we cannot send it along with the button data.
+            this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
+              policyId,
+              minimumTokenQuantity,
+              roleId: role.id,
+              assetFingerprint,
+            });
+
+            const components = [new MessageActionRow()
+              .addComponents(
+                new MessageButton()
+                  .setCustomId('configure-tokenroles/add/confirm')
+                  .setLabel(i18n.__({ phrase: 'configure.tokenroles.add.confirmRole', locale: useLocale }))
+                  .setStyle('PRIMARY'),
+                new MessageButton()
+                  .setCustomId('configure-tokenroles/add/cancel')
+                  .setLabel(i18n.__({ phrase: 'generic.cancel', locale: useLocale }))
+                  .setStyle('SECONDARY'),
+              )];
+
+            const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-tokenroles-add');
+            await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+          }
         } else {
-          // Register add data in cache, as we cannot send it along with the button data.
-          this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
-            policyId,
-            minimumTokenQuantity,
-            roleId: role.id,
-          });
-
-          const components = [new MessageActionRow()
-            .addComponents(
-              new MessageButton()
-                .setCustomId('configure-tokenroles/add/confirm')
-                .setLabel(i18n.__({ phrase: 'configure.tokenroles.add.confirmRole', locale: useLocale }))
-                .setStyle('PRIMARY'),
-              new MessageButton()
-                .setCustomId('configure-tokenroles/add/cancel')
-                .setLabel(i18n.__({ phrase: 'generic.cancel', locale: useLocale }))
-                .setStyle('SECONDARY'),
-            )];
-
-          const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale: useLocale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale: useLocale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-tokenroles-add');
-          await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.errorAssetFingerprint', locale: useLocale }), 'configure-tokenroles-add');
+          await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.errorMinimumTokens', locale: useLocale }), 'configure-tokenroles-add');
@@ -54,16 +62,17 @@ module.exports = {
       await interaction.editReply({ content: 'Error while adding automatic token-role assignment to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
-  async createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, roleId) {
+  async createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, roleId, assetFingerprint) {
     const useLocale = discordServer.getBotLanguage();
-    const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild.id, policyId, minimumTokenQuantity, roleId);
+    const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild.id, policyId, minimumTokenQuantity, roleId, assetFingerprint);
     const newTokenRole = newTokenRolePromise.data;
 
     const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === newTokenRole.policyId);
+    const fingerprintInfo = newTokenRole.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { newTokenRole }) : '';
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale: useLocale }), 'configure-tokenroles-add', [
       {
         name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: newTokenRole, officialProject }),
-        value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: newTokenRole }),
+        value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: newTokenRole, fingerprintInfo }),
       },
     ]);
     return embed;
@@ -82,7 +91,7 @@ module.exports = {
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {
-    const embed = await this.createTokenRole(interaction, discordServer, roleToAdd.policyId, roleToAdd.minimumTokenQuantity, roleToAdd.roleId);
+    const embed = await this.createTokenRole(interaction, discordServer, roleToAdd.policyId, roleToAdd.minimumTokenQuantity, roleToAdd.roleId, roleToAdd.assetFingerprint);
     await interaction.update({ embeds: [embed], components: [] });
   },
   async cancel(interaction, discordServer, roleToAdd) {

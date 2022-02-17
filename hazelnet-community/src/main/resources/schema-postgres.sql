@@ -104,11 +104,12 @@ CREATE TABLE "discord_token_roles"
     "discord_token_role_id"   bigserial primary key,
     "discord_server_id"      int,
     "policy_id"              varchar(56),
+    "asset_fingerprint"      varchar,
     "minimum_token_quantity" bigint,
     "custom_rule"            varchar(26),
     "owned_for_duration"     int,
     "discord_role_id"        bigint,
-    UNIQUE ("discord_server_id", "policy_id", "discord_role_id")
+    UNIQUE ("discord_server_id", "policy_id", "asset_fingerprint", "discord_role_id")
 );
 
 CREATE TABLE "discord_policy_ids"

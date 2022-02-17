@@ -213,11 +213,13 @@
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
-				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}} tokens of the policy {{tokenRole.policyId}} will be assigned the role <@&{{tokenRole.roleId}}>."
+				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} "
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
 				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1.",
+				"errorAssetFingerprint": "⚠ Automatic token role-assignment could not be added, since the provided asset fingerprint did not match the required format. Asset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*.",
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the token ownership requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make token role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
@@ -226,9 +228,7 @@
 			"remove": {
 				"success": "🗑️ Removed the following token role auto-assignment from this server:",
 				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server. Nothing was removed."
-			},
-			"roleInUseWarning": "configure.tokenroles.roleInUseWarning",
-			"roleInUseDetails": "configure.tokenroles.roleInUseDetails"
+			}
 		},
 		"delegatorroles": {
 			"list": {
@@ -247,7 +247,6 @@
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
 				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}"
-
 			},
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",

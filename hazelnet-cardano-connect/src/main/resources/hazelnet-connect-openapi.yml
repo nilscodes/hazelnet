@@ -183,7 +183,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/TokenPolicyId'
+                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
       responses:
         '200':
           description: 'A filtered list of token policies and associated counts currently owned by the stake address'
@@ -351,6 +351,11 @@ components:
       description: The Policy ID
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
       pattern: '^[A-Za-z0-9]{56}$'
+    TokenPolicyIdWithOptionalAssetFingerprint:
+      type: string
+      description: The Policy ID with an optional asset fingerprint appended
+      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
+      pattern: '^[A-Za-z0-9]{56}(asset1[A-Za-z-0-9]{38})?$'
     EpochNumber:
       type: integer
       format: int32

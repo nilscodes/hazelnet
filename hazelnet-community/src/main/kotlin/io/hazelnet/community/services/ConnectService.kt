@@ -53,12 +53,12 @@ class ConnectService(
                 .block()!!
     }
 
-    fun getAllTokenOwnership(stakeAddresses: List<String>, policyIds: Set<String>): List<TokenOwnershipInfo> {
+    fun getAllTokenOwnershipByPolicyId(stakeAddresses: List<String>, policyIdsWithOptionalAssetFingerprint: Set<String>): List<TokenOwnershipInfo> {
         return Flux.fromIterable(stakeAddresses)
                 .flatMap {
                     connectClient.post()
                             .uri("/token/stake/{stakeAddress}", it)
-                            .bodyValue(policyIds)
+                            .bodyValue(policyIdsWithOptionalAssetFingerprint)
                             .retrieve()
                             .bodyToFlux(TokenOwnershipInfo::class.java)
                 }.collectList().block()!!

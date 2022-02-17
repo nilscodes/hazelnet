@@ -395,6 +395,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordMember'
+  /discord/servers/{guildId}/members/{externalAccountId}:
+    delete:
+      summary: Unlink an external account from this discord server
+      operationId: disconnectExternalAccount
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
   /discord/servers/{guildId}/tokenpolicies:
     post:
       summary: Add an official token policy to this discord server
@@ -1055,6 +1067,8 @@ components:
           format: int64
         policyId:
           $ref: '#/components/schemas/TokenPolicyId'
+        assetFingerprint:
+          $ref: '#/components/schemas/AssetFingerprint'
         minimumTokenQuantity:
           type: integer
           format: int64
@@ -1160,6 +1174,11 @@ components:
       description: The Policy ID
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
       pattern: '^[A-Za-z0-9]{56}$'
+    AssetFingerprint:
+      type: string
+      description: The fingerprint of an asset
+      example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
+      pattern: '^asset1[A-Za-z-0-9]{38}$'
     WalletAddress:
       type: string
     ExternalAccountType:
