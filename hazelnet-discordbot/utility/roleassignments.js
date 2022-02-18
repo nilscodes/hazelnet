@@ -48,14 +48,18 @@ module.exports = {
       const guildRole = await guildForAssignments.roles.fetch(roleId);
       if (guildRole) {
         roleList.forEach(async (userIdToAssignRole) => {
-          const member = await guildForAssignments.members.fetch(userIdToAssignRole);
-          if (!member?.roles.cache.some((role) => role.id === roleId)) {
-            client.logger.info(`Adding ${roleProperty} ${guildRole.name} to member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
-            try {
-              await member.roles.add(guildRole);
-            } catch (error) {
-              client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+          try {
+            const member = await guildForAssignments.members.fetch(userIdToAssignRole);
+            if (!member?.roles.cache.some((role) => role.id === roleId)) {
+              client.logger.info(`Adding ${roleProperty} ${guildRole.name} to member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
+              try {
+                await member.roles.add(guildRole);
+              } catch (error) {
+                client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+              }
             }
+          } catch (e) {
+            client.logger.info(`No member with ID ${userIdToAssignRole} found on discord server ${discordServer.guildName} (${discordServer.guildId})`);
           }
         });
       } else {
