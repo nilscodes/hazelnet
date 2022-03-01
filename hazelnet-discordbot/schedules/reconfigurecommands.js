@@ -1,8 +1,9 @@
+/* eslint-disable no-await-in-loop */
 const commandregistration = require('../utility/commandregistration');
 const commandPermissions = require('../utility/commandpermissions');
 
 module.exports = {
-  cron: '0 * * * *',
+  cron: '45 * * * *',
   async execute(client) {
     client.logger.info('Checking if all servers need their commands and permissions updated...');
     try {
@@ -10,7 +11,8 @@ module.exports = {
       if (resetAllPermissions) {
         client.logger.info('Command and permissions on all servers need to be reset. Performing task now.');
         const allServers = await client.services.discordserver.getAllDiscordServers();
-        allServers.forEach(async (discordServer) => {
+        for (let i = 0; i < allServers.length; i += 1) {
+          const discordServer = allServers[i];
           try {
             const enabledCommands = discordServer.settings?.ENABLED_COMMAND_TAGS;
             if (enabledCommands?.length) {
@@ -18,9 +20,10 @@ module.exports = {
               await commandPermissions.setSlashCommandPermissions(client, discordServer.guildId, discordServer);
             }
           } catch (error) {
-            client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})`, error });
+            console.log(error);
+            client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})` });
           }
-        });
+        }
         await client.services.globalsettings.deleteGlobalSetting('RESET_ALL_COMMANDS');
       } else {
         client.logger.info('... No command and permission reset required. Phew.');
