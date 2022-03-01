@@ -11,7 +11,11 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
       if (isAdminUser) {
-        await this.subcommands[subommandName].execute(interaction);
+        try {
+          await this.subcommands[subommandName].execute(interaction);
+        } catch (error) {
+          interaction.client.logger.error(error);
+        }
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'errors.permissionDeniedTitle', locale: discordServer.getBotLanguage() }), i18n.__({ phrase: 'errors.permissionDeniedInformation', locale: discordServer.getBotLanguage() }));
         await interaction.reply({ embeds: [embed], ephemeral: true });
@@ -26,7 +30,11 @@ module.exports = {
         const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
         const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
         if (isAdminUser) {
-          await this.subcommands[subcommand].executeSelectMenu(interaction);
+          try {
+            await this.subcommands[subcommand].executeSelectMenu(interaction);
+          } catch (error) {
+            interaction.client.logger.error(error);
+          }
         }
       }
     }
@@ -39,7 +47,11 @@ module.exports = {
         const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
         const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
         if (isAdminUser) {
-          await this.subcommands[subcommand].executeButton(interaction);
+          try {
+            await this.subcommands[subcommand].executeButton(interaction);
+          } catch (error) {
+            interaction.client.logger.error(error);
+          }
         }
       }
     }
@@ -52,7 +64,11 @@ module.exports = {
         const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
         const isBotUser = await commandPermissions.isBotUser(discordServer, interaction.client, interaction.user.id);
         if (isBotUser) {
-          await this.subcommands[subcommand].executeButton(interaction);
+          try {
+            await this.subcommands[subcommand].executeButton(interaction);
+          } catch (error) {
+            interaction.client.logger.error(error);
+          }
         }
       }
     }
@@ -60,7 +76,11 @@ module.exports = {
   async executeSubcommand(interaction) {
     const subcommand = interaction.options.getSubcommand(true);
     if (this.subcommands[subcommand]) {
-      await this.subcommands[subcommand].execute(interaction);
+      try {
+        await this.subcommands[subcommand].execute(interaction);
+      } catch (error) {
+        interaction.client.logger.error(error);
+      }
     }
   },
   async executeSubcommandSelectMenu(interaction) {
@@ -68,7 +88,11 @@ module.exports = {
     if (customIdParts.length > 2) {
       const subcommand = customIdParts[1];
       if (this.subcommands[subcommand]) {
-        await this.subcommands[subcommand].executeSelectMenu(interaction);
+        try {
+          await this.subcommands[subcommand].executeSelectMenu(interaction);
+        } catch (error) {
+          interaction.client.logger.error(error);
+        }
       }
     }
   },

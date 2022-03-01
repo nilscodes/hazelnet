@@ -30,7 +30,7 @@ module.exports = {
         try {
           // TODO - add paging - but how to get the member count to page by?
           const allUsers = await guildForAssignments.members.fetch();
-          for (let i = 0; i < allUsers.size(); i += 1) {
+          for (let i = 0; i < allUsers.size; i += 1) {
             const member = allUsers.at(i);
             if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
               client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);

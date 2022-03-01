@@ -19,7 +19,7 @@ module.exports = {
             if (discordServer?.settings?.PROTECTION_ADDR_REMOVAL === 'true') {
               if (discordServer?.settings?.PROTECTION_AUDIT_CHANNEL !== '') {
                 const channel = await message.guild.channels.fetch(discordServer.settings.PROTECTION_AUDIT_CHANNEL);
-                if (channel) {
+                if (channel && channel.send) {
                   const useLocale = discordServer.getBotLanguage();
 
                   const embed = embedBuilder.buildForAudit(
@@ -29,6 +29,8 @@ module.exports = {
                     'configure-protection-auditchannel',
                   );
                   await channel.send({ embeds: [embed] });
+                } else {
+                  message.client.logger.warn(`Server ${discordServer.guildId} does not have a valid audit channel configured with ${discordServer.settings.PROTECTION_AUDIT_CHANNEL}`);
                 }
               }
               await message.delete();
