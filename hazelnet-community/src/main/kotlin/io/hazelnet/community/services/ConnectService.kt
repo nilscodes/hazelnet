@@ -102,4 +102,14 @@ class ConnectService(
                 .bodyToMono(object : ParameterizedTypeReference<List<StakepoolInfo>>() {})
                 .block()!!
     }
+
+    fun getTokenSnapshotByPolicyId(policyIdsWithOptionalAssetFingerprint: Set<String>): List<TokenOwnershipInfo> {
+        return connectClient.post()
+            .uri("/token/stake")
+            .bodyValue(policyIdsWithOptionalAssetFingerprint)
+            .retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<TokenOwnershipInfo>>() {})
+            .block()!!
+
+    }
 }

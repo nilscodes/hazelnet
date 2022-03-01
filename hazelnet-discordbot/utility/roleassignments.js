@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 module.exports = {
   async ensureRoleAssignments(client, discordServer, roleProperty, expectedRoleAssignments) {
     client.logger.info(`Processing ${roleProperty} for ${discordServer.guildName} (${discordServer.guildId})...`);
@@ -26,17 +27,23 @@ module.exports = {
     discordServer[roleProperty].forEach(async (roleMapping) => {
       const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
       if (guildRole) {
-        const allUsers = await guildForAssignments.members.fetch();
-        allUsers.each(async (member) => {
-          if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
-            client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
-            try {
-              await member.roles.remove(guildRole);
-            } catch (error) {
-              client.logger.error({ msg: `Failed to remove ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+        try {
+          // TODO - add paging - but how to get the member count to page by?
+          const allUsers = await guildForAssignments.members.fetch();
+          for (let i = 0; i < allUsers.size(); i += 1) {
+            const member = allUsers.at(i);
+            if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
+              client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
+              try {
+                await member.roles.remove(guildRole);
+              } catch (error) {
+                client.logger.error({ msg: `Failed to remove ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+              }
             }
           }
-        });
+        } catch (error) {
+          client.logger.error({ msg: `Failed fetching members of ${discordServer.guildName} (${discordServer.guildId})`, error });
+        }
       } else {
         client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
       }

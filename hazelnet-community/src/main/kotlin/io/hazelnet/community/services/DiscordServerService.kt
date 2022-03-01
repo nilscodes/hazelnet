@@ -7,6 +7,10 @@ import io.hazelnet.community.data.discord.DiscordServerSetting
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
+import io.hazelnet.community.data.claim.ClaimList
+import io.hazelnet.community.data.claim.ClaimListsWithProducts
+import io.hazelnet.community.data.claim.PhysicalOrder
+import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordDelegatorRoleRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
@@ -39,7 +43,9 @@ class DiscordServerService(
         private val discordWhitelistRepository: DiscordWhitelistRepository,
         private val oAuth2AuthorizationService: OAuth2AuthorizationService,
         private val registeredClientRepository: RegisteredClientRepository,
-        private val config: CommunityApplicationConfiguration
+        private val config: CommunityApplicationConfiguration,
+        private val externalAccountService: ExternalAccountService,
+        private val claimListService: ClaimListService,
 ) {
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
@@ -120,7 +126,7 @@ class DiscordServerService(
 
     fun addWhitelist(guildId: Long, whitelist: Whitelist): Whitelist {
         val discordServer = getDiscordServer(guildId)
-        discordWhitelistRepository.save(whitelist)
+        whitelist.createTime = Date.from(ZonedDateTime.now().toInstant())
         discordServer.whitelists.add(whitelist)
         discordServerRepository.save(discordServer)
         return whitelist
@@ -343,6 +349,74 @@ class DiscordServerService(
     fun deleteAccessToken(guildId: Long) {
         val discordServer = getDiscordServer(guildId)
         deleteTokenInternal(discordServer.guildId.toString())
+    }
+
+    fun getEligibleClaimListsOfUser(guildId: Long, externalAccountId: Long): ClaimListsWithProducts {
+        val discordServer = getDiscordServer(guildId)
+        val discordMember = discordServer.members.find { it.externalAccountId == externalAccountId }
+        if (discordMember != null) {
+            val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
+            val confirmedStakeAddressesOfUser = externalAccountService.getExternalAccountVerifications(externalAccountId)
+                .filter { it.confirmed }
+                .mapNotNull { it.cardanoStakeAddress }
+            val validClaimListsForMember = claimListsOfDiscord
+                .filter { cl -> cl.claims.any { confirmedStakeAddressesOfUser.contains(it.stakeAddress) } }
+                .map { ClaimList(it, confirmedStakeAddressesOfUser) }
+            val applicableProductIds = validClaimListsForMember.map { cl -> cl.claims.map { it.claimableProduct } }.flatten()
+            val applicableProducts = claimListService.getProducts(applicableProductIds).toList()
+            return ClaimListsWithProducts(validClaimListsForMember, applicableProducts)
+        }
+        throw NoSuchElementException("No member with external account ID $externalAccountId found in guild $guildId")
+    }
+
+    fun getOrderOfUserForClaimList(guildId: Long, externalAccountId: Long, claimListId: Int): PhysicalOrder {
+        getClaimListForDiscordServer(guildId, claimListId)
+        return claimListService.getPhysicalOrderForUser(claimListId, externalAccountId)
+    }
+
+    fun setOrderOfUserForClaimList(guildId: Long, externalAccountId: Long, claimListId: Int, physicalOrder: PhysicalOrder): PhysicalOrder {
+        getClaimListForDiscordServer(guildId, claimListId)
+        return claimListService.addAndVerifyPhysicalOrder(claimListId, physicalOrder)
+    }
+
+    fun getAllOrdersForClaimList(guildId: Long, claimListIdOrName: String): List<PhysicalOrder> {
+        val claimList = getClaimListForDiscordServer(guildId, claimListIdOrName)
+        return claimListService.getPhysicalOrders(claimList.id!!)
+    }
+
+    fun getAllProductsForClaimList(guildId: Long, claimListIdOrName: String): List<PhysicalProduct> {
+        val claimList = getClaimListForDiscordServer(guildId, claimListIdOrName)
+        val availableProducts = claimList.claims.map { it.claimableProduct }
+        return claimListService.getProducts(availableProducts).toList()
+    }
+
+    private fun getClaimListForDiscordServer(
+        guildId: Long,
+        claimListId: Int
+    ): ClaimList {
+        val discordServer = getDiscordServer(guildId)
+        val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
+        val claimListForOrder = claimListsOfDiscord.find { claimListId == it.id }
+        if (claimListForOrder != null) {
+            return claimListForOrder
+        }
+        throw NoSuchElementException("No claim list with ID $claimListId found on Discord server with guild ID $guildId")
+    }
+
+    private fun getClaimListForDiscordServer(
+        guildId: Long,
+        claimListIdOrName: String
+    ): ClaimList {
+        return try {
+            val claimListId = claimListIdOrName.toInt()
+            return getClaimListForDiscordServer(guildId, claimListId)
+        }
+        catch(e: NumberFormatException) {
+            val discordServer = getDiscordServer(guildId)
+            val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
+            val claimListForOrder = claimListsOfDiscord.find { claimListIdOrName == it.name }
+            claimListForOrder ?: throw NoSuchElementException("No claim list with name $claimListIdOrName found on Discord server with guild ID $guildId")
+        }
     }
 
     fun getBotFunding(guildId: Long): Long {

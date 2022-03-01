@@ -28,7 +28,7 @@ module.exports = {
         .setName('unlink')
         .setDescription('Unlink your verified addresses from this server (verifications will remain)'));
   },
-  commandTags: ['token', 'pool'],
+  commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
   execute: commandbase.executeSubcommand,
   executeButton: commandbase.executeButtonIfUser,
 };

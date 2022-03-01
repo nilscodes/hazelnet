@@ -31,7 +31,7 @@ dependencies {
 	implementation("org.hibernate.validator:hibernate-validator")
 	implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
 	implementation(project(":hazelnet-cardano-shared"))
-	runtimeOnly("org.postgresql:postgresql")
+	implementation("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.mockk:mockk:1.12.1")
 

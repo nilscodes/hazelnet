@@ -10,7 +10,7 @@ module.exports = {
       const newPoolData = newPoolPromise.data;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-pool add', i18n.__({ phrase: 'configure.pool.add.success', locale: useLocale }), 'configure-pool-add', [
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool add', i18n.__({ phrase: 'configure.stakepool.add.success', locale: useLocale }), 'configure-stakepool-add', [
         {
           name: `${newPoolData.info?.name} (${newPoolData.info?.ticker})`,
           value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, newPoolData.info),

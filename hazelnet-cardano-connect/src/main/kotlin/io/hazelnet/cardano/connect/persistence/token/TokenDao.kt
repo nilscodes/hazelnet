@@ -8,4 +8,7 @@ interface TokenDao {
     fun getMultiAssetsForStakeAddress(stakeAddress: String): List<TokenOwnershipInfo>
     fun getMultiAssetsWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>): List<TokenOwnershipInfo>
     fun getMultiAssetsWithPolicyIdAndAssetFingerprintForStakeAddress(stakeAddress: String, policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfo>
+
+    fun getMultiAssetSnapshotForPolicyId(policyIds: List<PolicyId>): List<TokenOwnershipInfo>
+    fun getMultiAssetSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfo>
 }

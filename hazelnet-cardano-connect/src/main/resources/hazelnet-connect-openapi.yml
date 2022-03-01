@@ -169,6 +169,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DelegationInfo'
+  /token/stake:
+    post:
+      summary: Get the policy IDs and token counts that currently reside in all stake addresses, for the policy IDs/fingerprint combinations in the body
+      operationId: getMultiAssetsStakeSnapshot
+      tags:
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
+      responses:
+        '200':
+          description: 'A filtered list of token policies and associated counts currently owned by the stake address'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenOwnershipInfo'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /token/stake/{stakeAddress}:
     post:
       summary: Get the policy IDs and token counts that currently reside in a stake address, filtered by the policy IDs in the body (or all, if empty list)

@@ -4,8 +4,8 @@ const commandbase = require('../utility/commandbase');
 module.exports = {
   getCommandData(locale) {
     return new SlashCommandBuilder()
-      .setName('configure-pool')
-      .setDescription('Configure pools')
+      .setName('configure-stakepool')
+      .setDescription('Configure stakepools')
       .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
@@ -26,6 +26,6 @@ module.exports = {
         .addStringOption((option) => option.setName('off').setDescription('Set this parameter to off when disabling the info channel').setRequired(false)));
         */
   },
-  commandTags: ['pool'],
+  commandTags: ['stakepool'],
   execute: commandbase.executeSubcommandIfAdmin,
 };

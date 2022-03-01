@@ -15,6 +15,10 @@ const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES =
 const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT =
     "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint"
 
+const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES =
+    "SELECT encode(ma.policy, 'hex') AS policy, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) GROUP BY policy, sa.view"
+const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES_AND_FINGERPRINT =
+    "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint, sa.view"
 
 @Repository
 class TokenDaoCardanoDbSync(
@@ -55,4 +59,29 @@ class TokenDaoCardanoDbSync(
             TokenOwnershipInfo(stakeAddress, rs.getString("policy") + rs.getString("fingerprint"), rs.getLong("number"))
         }
     }
+
+    override fun getMultiAssetSnapshotForPolicyId(policyIds: List<PolicyId>): List<TokenOwnershipInfo> {
+        val policyIdInClause = Collections.nCopies(policyIds.size, "decode(?, 'hex')").joinToString(",")
+        val sql = String.format(GET_SNAPSHOT_OF_STAKES_BY_POLICIES, policyIdInClause)
+        val sqlParameters = policyIds.map { it.policyId }
+        val sqlParameterTypes = Collections.nCopies(policyIds.size, Types.VARCHAR).toIntArray()
+        return jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
+            TokenOwnershipInfo(rs.getString("stakeview"), rs.getString("policy"), rs.getLong("number"))
+        }
+    }
+
+    override fun getMultiAssetSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfo> {
+        val policyIdInClause = Collections.nCopies(policyIdsWithAssetFingerprint.size, "decode(?, 'hex')").joinToString(",")
+        val fingerprintInClause = Collections.nCopies(policyIdsWithAssetFingerprint.size, "?").joinToString(",")
+        val sql = String.format(GET_SNAPSHOT_OF_STAKES_BY_POLICIES_AND_FINGERPRINT, policyIdInClause, fingerprintInClause)
+        val sqlParameters = mutableListOf<String>()
+        sqlParameters.addAll(policyIdsWithAssetFingerprint.map { it.first.policyId })
+        sqlParameters.addAll(policyIdsWithAssetFingerprint.map { it.second.assetFingerprint })
+        val sqlParameterTypes = Collections.nCopies(policyIdsWithAssetFingerprint.size * 2, Types.VARCHAR).toIntArray()
+        return jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
+            TokenOwnershipInfo(rs.getString("stakeview"), rs.getString("policy") + rs.getString("fingerprint"), rs.getLong("number"))
+        }
+    }
+
+
 }

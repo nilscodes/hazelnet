@@ -4,7 +4,7 @@ const axios = require('axios');
 const hazelCommunityUrl = process.env.HAZELNET_COMMUNITY_URL;
 
 module.exports = {
-  cache: new NodeCache({ stdTTL: 60 }),
+  cache: new NodeCache({ stdTTL: 600 }),
   async getGlobalSetting(settingName) {
     const cachedSetting = this.cache.get(settingName);
     if (cachedSetting !== undefined) {

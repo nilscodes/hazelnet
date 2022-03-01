@@ -1,3 +1,15 @@
+DROP TABLE IF EXISTS "physical_orders_items";
+DROP TABLE IF EXISTS "physical_orders";
+DROP TABLE IF EXISTS "claim_lists_snapshot_cardano";
+DROP TABLE IF EXISTS "discord_claim_lists";
+DROP TABLE IF EXISTS "claim_lists";
+DROP TABLE IF EXISTS "physical_products";
+DROP TABLE IF EXISTS "stake_snapshot_data_cardano";
+DROP TABLE IF EXISTS "discord_poll_votes";
+DROP TABLE IF EXISTS "discord_poll_options";
+DROP TABLE IF EXISTS "discord_poll_required_roles";
+DROP TABLE IF EXISTS "discord_polls";
+DROP TABLE IF EXISTS "stake_snapshot_cardano";
 DROP TABLE IF EXISTS "discord_whitelists_signup";
 DROP TABLE IF EXISTS "discord_whitelists";
 DROP TABLE IF EXISTS "discord_server_members";
@@ -72,7 +84,8 @@ CREATE TABLE "discord_servers"
     "guild_owner"        bigint,
     "join_time"          timestamp,
     "guild_member_count" int,
-    "owner_account_id"   bigint
+    "owner_account_id"   bigint,
+    "premium"            boolean       NOT NULL DEFAULT false
 );
 
 CREATE TABLE "discord_server_members"
@@ -130,15 +143,17 @@ CREATE TABLE "discord_settings"
 
 CREATE TABLE "discord_whitelists"
 (
-    "discord_whitelist_id" BIGSERIAL PRIMARY KEY,
-    "discord_server_id"         int,
-    "whitelist_name"            varchar(30) NOT NULL,
-    "whitelist_displayname"     varchar(256) NOT NULL,
-    "whitelist_signup_after"    timestamp,
-    "whitelist_signup_until"    timestamp,
-    "whitelist_max_users"       int,
-    "required_discord_role_id"  bigint,
-    UNIQUE("discord_server_id", "whitelist_name", "required_discord_role_id")
+    "discord_whitelist_id"     BIGSERIAL PRIMARY KEY,
+    "discord_server_id"        int          NOT NULL,
+    "external_account_id"      bigint       NOT NULL,
+    "whitelist_creation"       timestamp    NOT NULL,
+    "whitelist_name"           varchar(30)  NOT NULL,
+    "whitelist_displayname"    varchar(256) NOT NULL,
+    "whitelist_signup_after"   timestamp,
+    "whitelist_signup_until"   timestamp,
+    "whitelist_max_users"      int,
+    "required_discord_role_id" bigint,
+    UNIQUE ("discord_server_id", "whitelist_name")
 );
 
 CREATE TABLE "discord_whitelists_signup"
@@ -148,6 +163,121 @@ CREATE TABLE "discord_whitelists_signup"
     "address"                   varchar(150),
     "signup_time"               timestamp NOT NULL,
     UNIQUE("discord_whitelist_id", "external_account_id")
+);
+
+CREATE TABLE "discord_polls"
+(
+    "discord_poll_id"      SERIAL PRIMARY KEY,
+    "discord_server_id"    int           NOT NULL,
+    "external_account_id"  bigint        NOT NULL,
+    "discord_channel_id"   bigint        NULL,
+    "discord_message_id"   bigint        NULL,
+    "poll_name"            varchar(30)   NOT NULL,
+    "poll_displayname"     varchar(256)  NOT NULL,
+    "poll_description"     varchar(4096) NOT NULL,
+    "poll_creation"        timestamp     NOT NULL,
+    "poll_open_after"      timestamp     NOT NULL,
+    "poll_open_until"      timestamp     NOT NULL,
+    "poll_results_visible" boolean       NOT NULL DEFAULT true,
+    "poll_weighted"        boolean       NOT NULL DEFAULT false,
+    "poll_multiple_votes"  boolean       NOT NULL DEFAULT false,
+    "poll_snapshot_id"     int,
+    UNIQUE ("discord_server_id", "poll_name")
+);
+
+CREATE TABLE "discord_poll_required_roles"
+(
+    "discord_poll_id" int,
+    "discord_role_id" bigint NOT NULL
+);
+
+CREATE TABLE "discord_poll_options"
+(
+    "discord_poll_option_id" BIGSERIAL PRIMARY KEY,
+    "discord_poll_id"        int,
+    "option_reaction_id"     bigint,
+    "option_reaction_name"   varchar(256),
+    "option_text"            varchar
+);
+
+CREATE TABLE "discord_poll_votes"
+(
+    "external_account_id"    bigint,
+    "discord_poll_option_id" bigint,
+    "vote_weight"            bigint    NOT NULL,
+    "vote_time"              timestamp NOT NULL
+);
+
+CREATE TABLE "stake_snapshot_cardano"
+(
+    "snapshot_id"                SERIAL PRIMARY KEY,
+    "snapshot_created"           timestamp,
+    "snapshot_time"              timestamp   NOT NULL,
+    "snapshot_policy_id"         varchar(56) NOT NULL,
+    "snapshot_asset_fingerprint" varchar,
+    "snapshot_taken"             boolean     NOT NULL DEFAULT false
+);
+
+CREATE TABLE "stake_snapshot_data_cardano"
+(
+    "snapshot_id"    int,
+    "stake_address"  varchar(60) NOT NULL,
+    "token_quantity" bigint      NOT NULL,
+    UNIQUE("snapshot_id", "stake_address")
+);
+
+CREATE TABLE "discord_claim_lists"
+(
+    "discord_server_id" int,
+    "claim_list_id"     int
+);
+
+CREATE TABLE "claim_lists"
+(
+    "claim_list_id"          SERIAL PRIMARY KEY,
+    "claim_list_name"        varchar(30)  NOT NULL,
+    "claim_list_displayname" varchar(256) NOT NULL,
+    "claim_list_description" varchar(2000) NULL,
+    "claim_list_creation"    timestamp    NOT NULL
+);
+
+CREATE TABLE "physical_orders"
+(
+    "order_id"            SERIAL PRIMARY KEY,
+    "external_account_id" bigint,
+    "claim_list_id"       int,
+    "order_creation"      timestamp    NOT NULL,
+    "ship_to_name"        varchar(200) NOT NULL,
+    "country"             char(3)      NOT NULL,
+    "phone"               varchar(30)  NULL,
+    "zip"                 varchar(30)  NOT NULL,
+    "city"                varchar(200) NOT NULL,
+    "street"              varchar(500) NOT NULL,
+    "processed"           boolean      NOT NULL DEFAULT false
+);
+
+CREATE TABLE "physical_orders_items"
+(
+    "order_id"          int,
+    "product_id"        int,
+    "product_count"     int NOT NULL DEFAULT 1,
+    "product_variation" jsonb
+);
+
+CREATE TABLE "claim_lists_snapshot_cardano"
+(
+    "claim_list_id"           int,
+    "stake_address"           varchar(60) NOT NULL,
+    "claimable_product_id"    int,
+    "claimable_product_count" int,
+    "claimed_in_order"        int NULL
+);
+
+CREATE TABLE "physical_products"
+(
+    "product_id"         SERIAL PRIMARY KEY,
+    "product_name"       varchar(200) NOT NULL,
+    "product_variations" jsonb
 );
 
 CREATE TABLE "oauth2_authorization"
@@ -200,6 +330,43 @@ ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("external_account_id") REF
 
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
+ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_polls" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_polls" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_polls" ADD FOREIGN KEY ("poll_snapshot_id") REFERENCES "stake_snapshot_cardano" ("snapshot_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_poll_required_roles" ADD FOREIGN KEY ("discord_poll_id") REFERENCES "discord_polls" ("discord_poll_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_poll_options" ADD FOREIGN KEY ("discord_poll_id") REFERENCES "discord_polls" ("discord_poll_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_poll_votes" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_poll_votes" ADD FOREIGN KEY ("discord_poll_option_id") REFERENCES "discord_poll_options" ("discord_poll_option_id") ON DELETE CASCADE;
+
+ALTER TABLE "stake_snapshot_data_cardano" ADD FOREIGN KEY ("snapshot_id") REFERENCES "stake_snapshot_cardano" ("snapshot_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_claim_lists" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_claim_lists" ADD FOREIGN KEY ("claim_list_id") REFERENCES "claim_lists" ("claim_list_id") ON DELETE CASCADE;
+
+ALTER TABLE "physical_orders" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+ALTER TABLE "physical_orders" ADD FOREIGN KEY ("claim_list_id") REFERENCES "claim_lists" ("claim_list_id") ON DELETE CASCADE;
+
+ALTER TABLE "physical_orders_items" ADD FOREIGN KEY ("order_id") REFERENCES "physical_orders" ("order_id") ON DELETE CASCADE;
+
+ALTER TABLE "physical_orders_items" ADD FOREIGN KEY ("product_id") REFERENCES "physical_products" ("product_id") ON DELETE RESTRICT;
+
+ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claim_list_id") REFERENCES "claim_lists" ("claim_list_id") ON DELETE CASCADE;
+
+ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimable_product_id") REFERENCES "physical_products" ("product_id") ON DELETE RESTRICT;
+
+ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimed_in_order") REFERENCES "physical_orders" ("order_id") ON DELETE SET NULL;
+

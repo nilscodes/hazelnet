@@ -33,7 +33,7 @@
 		"notYetImplemented": "Noch nicht implementiert. Bitte habt Geduld mit uns."
 	},
 	"features": {
-		"pool": "features.pool",
+		"stakepool": "features.pool",
 		"token": "features.token",
 		"whitelist": "features.whitelist"
 	}

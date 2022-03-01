@@ -5,4 +5,5 @@ module.exports = {
   externalaccounts: require('./services/externalaccounts'),
   verifications: require('./services/verifications'),
   cardanoinfo: require('./services/cardanoinfo'),
+  claimlists: require('./services/claimlists'),
 };

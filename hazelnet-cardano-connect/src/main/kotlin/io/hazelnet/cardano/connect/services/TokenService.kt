@@ -18,10 +18,9 @@ class TokenService(
         if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
             return tokenDao.getMultiAssetsForStakeAddress(stakeAddress)
         }
-        val allTokenOwnershipInfo = mutableListOf<TokenOwnershipInfo>()
-        val purePolicyIds = policyIdsWithOptionalAssetFingerprint.filter { PolicyTools.isPolicyId(it) }.map { PolicyId(it) }
-        val policyIdsWithAssetFingerprint =
-            policyIdsWithOptionalAssetFingerprint.filter { !PolicyTools.isPolicyId(it) }.map { Pair(PolicyId(it.substring(0, 56)), AssetFingerprint(it.substring(56))) }
+        val (allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
+            policyIdsWithOptionalAssetFingerprint
+        )
         if (purePolicyIds.isNotEmpty()) {
             allTokenOwnershipInfo.addAll(
                 tokenDao.getMultiAssetsWithPolicyIdForStakeAddress(
@@ -40,5 +39,42 @@ class TokenService(
         }
 
         return allTokenOwnershipInfo
+    }
+
+    fun getMultiAssetSnapshot(
+        policyIdsWithOptionalAssetFingerprint: List<String>
+    ): List<TokenOwnershipInfo> {
+        if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
+            throw IllegalArgumentException("Cannot retrieve a multi asset snapshot without providing at least one policy ID")
+        }
+        val (allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
+            policyIdsWithOptionalAssetFingerprint
+        )
+        if (purePolicyIds.isNotEmpty()) {
+            allTokenOwnershipInfo.addAll(
+                tokenDao.getMultiAssetSnapshotForPolicyId(
+                    purePolicyIds
+                )
+            )
+        }
+        if (policyIdsWithAssetFingerprint.isNotEmpty()) {
+            allTokenOwnershipInfo.addAll(
+                tokenDao.getMultiAssetSnapshotForPolicyIdAndAssetFingerprint(
+                    policyIdsWithAssetFingerprint
+                )
+            )
+        }
+
+        return allTokenOwnershipInfo
+    }
+
+    private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Triple<MutableList<TokenOwnershipInfo>, List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
+        val allTokenOwnershipInfo = mutableListOf<TokenOwnershipInfo>()
+        val purePolicyIds =
+            policyIdsWithOptionalAssetFingerprint.filter { PolicyTools.isPolicyId(it) }.map { PolicyId(it) }
+        val policyIdsWithAssetFingerprint =
+            policyIdsWithOptionalAssetFingerprint.filter { !PolicyTools.isPolicyId(it) }
+                .map { Pair(PolicyId(it.substring(0, 56)), AssetFingerprint(it.substring(56))) }
+        return Triple(allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint)
     }
 }

@@ -6,6 +6,7 @@ const {
 const embedbuilder = require('../utility/embedbuilder');
 const commandregistration = require('../utility/commandregistration');
 const commandpermissions = require('../utility/commandpermissions');
+const botfeatures = require('../utility/botfeatures');
 
 module.exports = {
   getCommandData() {
@@ -102,7 +103,7 @@ module.exports = {
     }
     if (!discordServer.settings?.ENABLED_COMMAND_TAGS || !discordServer.settings?.ENABLED_COMMAND_TAGS.length) {
       disabled = true;
-      const featureOptions = this.getFeatureOptions(discordServer);
+      const featureOptions = botfeatures.getFeatureOptions(discordServer);
       components.push(new MessageActionRow()
         .addComponents(
           new MessageSelectMenu()
@@ -216,22 +217,6 @@ module.exports = {
     }, {
       label: i18n.__({ phrase: 'languages.de', locale: useLocale }),
       value: 'de',
-    }];
-  },
-  getFeatureOptions(discordServer) {
-    const useLocale = discordServer.getBotLanguage();
-    return [{
-      label: i18n.__({ phrase: 'features.pool', locale: useLocale }),
-      value: 'pool',
-      emoji: { id: null, name: '🌊' },
-    }, {
-      label: i18n.__({ phrase: 'features.token', locale: useLocale }),
-      value: 'token',
-      emoji: { id: null, name: '📃' },
-    }, {
-      label: i18n.__({ phrase: 'features.whitelist', locale: useLocale }),
-      value: 'whitelist',
-      emoji: { id: null, name: '🤍' },
     }];
   },
 };

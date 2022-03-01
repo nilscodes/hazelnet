@@ -49,6 +49,9 @@ class DiscordServer @JsonCreator constructor(
         @JsonIdentityReference(alwaysAsId = true)
         var ownerAccount: Account?,
 
+        @Column(name = "premium")
+        var premium: Boolean = false,
+
         @ElementCollection(fetch = FetchType.EAGER)
         @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
         @field:Valid
@@ -69,7 +72,7 @@ class DiscordServer @JsonCreator constructor(
         @field:Valid
         var tokenRoles: MutableSet<TokenOwnershipRole> = mutableSetOf(),
 
-        @OneToMany(fetch = FetchType.EAGER)
+        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
         @JoinColumn(name = "discord_server_id")
         @field:Valid
         var whitelists: MutableSet<Whitelist> = mutableSetOf(),
@@ -99,10 +102,12 @@ class DiscordServer @JsonCreator constructor(
         if (joinTime != other.joinTime) return false
         if (guildMemberCount != other.guildMemberCount) return false
         if (ownerAccount != other.ownerAccount) return false
+        if (premium != other.premium) return false
         if (tokenPolicies != other.tokenPolicies) return false
         if (stakepools != other.stakepools) return false
         if (delegatorRoles != other.delegatorRoles) return false
         if (tokenRoles != other.tokenRoles) return false
+        if (whitelists != other.whitelists) return false
         if (settings != other.settings) return false
         if (members != other.members) return false
 
@@ -114,19 +119,21 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + guildId.hashCode()
         result = 31 * result + guildName.hashCode()
         result = 31 * result + guildOwner.hashCode()
-        result = 31 * result + joinTime.hashCode()
+        result = 31 * result + (joinTime?.hashCode() ?: 0)
         result = 31 * result + guildMemberCount
         result = 31 * result + (ownerAccount?.hashCode() ?: 0)
+        result = 31 * result + premium.hashCode()
         result = 31 * result + tokenPolicies.hashCode()
         result = 31 * result + stakepools.hashCode()
         result = 31 * result + delegatorRoles.hashCode()
         result = 31 * result + tokenRoles.hashCode()
+        result = 31 * result + whitelists.hashCode()
         result = 31 * result + settings.hashCode()
         result = 31 * result + members.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, ownerAccount=$ownerAccount, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, settings=$settings, members=$members)"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, ownerAccount=$ownerAccount, premium=$premium, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members)"
     }
 }

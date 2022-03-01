@@ -12,4 +12,8 @@ class TokenController(
     @PostMapping("/stake/{stakeAddress}")
     @ResponseStatus(HttpStatus.OK)
     fun getMultiAssetsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetsForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
+
+    @PostMapping("/stake")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMultiAssetsStakeSnapshot(@RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetSnapshot(policyIdsWithOptionalAssetFingerprint)
 }

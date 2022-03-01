@@ -105,4 +105,8 @@ module.exports = {
     }
     return '';
   },
+  isValidName(whitelistName) {
+    const whitelistNameRegex = /^[A-Za-z][-A-Za-z0-9]{0,29}$/;
+    return whitelistNameRegex.test(whitelistName);
+  },
 };

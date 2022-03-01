@@ -1,6 +1,8 @@
 package io.hazelnet.community.data.discord
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Embeddable
@@ -10,6 +12,7 @@ import javax.validation.constraints.Min
 class DiscordMember @JsonCreator constructor(
         @Column(name = "external_account_id")
         @field:Min(1)
+        @field:JsonSerialize(using = ToStringSerializer::class)
         var externalAccountId: Long,
 
         @Column(name = "join_time", updatable = false)

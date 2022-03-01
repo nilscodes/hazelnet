@@ -4,8 +4,9 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
   buildForUser(discordServer, title, message, commandId, fields, image) {
     const color = discordServer.settings?.THEME_COLOR_USER ?? '#fece07';
-    const topLogo = discordServer.settings?.THEME_TOP_LOGO ?? 'https://www.hazelnet.io/static/media/hazelnet.e5b123ee.png';
-    return this.build(discordServer, color, topLogo, title, message, commandId, fields, image);
+    const topLogo = discordServer.settings?.THEME_TOP_LOGO ?? discordServer.getBasicEditionThumbnail();
+    const { useImage, useFields } = this.augmentWithAdvertisement(image, fields, discordServer);
+    return this.build(discordServer, color, topLogo, title, message, commandId, useFields, useImage);
   },
   buildForAdmin(discordServer, title, message, commandId, fields) {
     return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields);
@@ -15,7 +16,7 @@ module.exports = {
   },
   build(discordServer, color, thumbnail, title, message, commandId, fields, image) {
     const authorName = discordServer.settings?.THEME_AUTHOR_NAME ?? `HAZELnet.io | ${i18n.__({ phrase: 'generic.clickhelp', locale: discordServer.getBotLanguage() })}`;
-    const authorIcon = discordServer.settings?.THEME_AUTHOR_ICON ?? 'https://www.hazelnet.io/static/media/hazelnet.e5b123ee.png';
+    const authorIcon = discordServer.settings?.THEME_AUTHOR_ICON ?? 'https://www.hazelnet.io/logo192.png';
     let footer;
     if (discordServer.settings?.THEME_FOOTER_TEXT) {
       footer = {
@@ -48,5 +49,26 @@ module.exports = {
       baseEmbed.addFields(fields);
     }
     return baseEmbed;
+  },
+  augmentWithAdvertisement(image, fields, discordServer) {
+    let useImage = image;
+    let useFields = fields;
+    if (!discordServer.premium) {
+      const advertisement = discordServer.getAdvertisement();
+      if (advertisement.text) {
+        useFields = useFields ?? [];
+        useFields.push({
+          name: i18n.__({ phrase: 'generic.advertisement', locale: discordServer.getBotLanguage() }),
+          value: advertisement.text,
+        });
+      }
+      if (advertisement.logo && !useImage) {
+        useImage = advertisement.logo;
+      }
+    }
+    return {
+      useImage,
+      useFields,
+    };
   },
 };

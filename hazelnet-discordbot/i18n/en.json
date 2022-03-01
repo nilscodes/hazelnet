@@ -7,13 +7,29 @@
 			"whitelist-register": "Register for a whitelist",
 			"whitelist-list": "Show all whitelists and requirements for each whitelist.",
 			"whitelist-unregister": "Remove yourself from a whitelist",
-			"help": "Show general help on how to use this bot."
+			"help": "Show general help on how to use this bot.",
+			"vote": "View the list of open polls and vote, if you are eligible.",
+			"claim": "Claim virtual or physical goods you are eligible for.",
+			"configure-settings": "General configuration options for the bot",
+			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
+			"configure-poll": "Manage polls for people to vote on (off-chain)",
+			"configure-poll-list": "List all polls that are set up on this Discord server.",
+			"configure-poll-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
+			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results."
 		},
 		"options": {
 			"whitelist": {
 				"name": "Name of the whitelist",
 				"address": "The Cardano wallet address to add to/remove from the whitelist",
 				"includeaddress": "Use this parameter and pass True if you want your registered address displayed on screen."
+			},
+			"configure-poll": {
+				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
+				"poll-displayname": "The display name for this poll that your users will see",
+				"required-role": "Role that is required for a user to have, to be able to vote in this poll",
+				"publish-channel": "An optional channel where the announcement and results are published",
+				"poll-opentime": "The UTC time after which voting is possible (Format: 2022-01-01T15:00:00Z)",
+				"poll-closetime": "The UTC time until which voting is possible (Format: 2022-01-31T15:00:00Z)"
 			}
 		}
 	},
@@ -51,13 +67,14 @@
 		"adminCommands": {
 			"title": "The following are commands for administrators only (normal users do not get this text when using */help*)",
 			"configure-protection": "With */configure-protection* you can view and set up the scam and fake protection of the bot. It will let you set up automatic removal of messages with **addr1** as content, as well as an optional auditing of such messages to a dedicated channel for moderators.",
-			"configure-pool": "*/configure-pool* provides commands to add, list and remove stakepools for this Discord server. These are needed if you intend to set up delegator roles or if you want your pool information to be listed via the */info* command.",
-			"configure-delegatorroles": "Once you have set up your official stakepool information via */configure-pool* you can assign roles based on delegation to specific pools. You will need the pool hash or you can reference \"all official pools of this Discord\" by leaving the pool hash parameter empty.",
+			"configure-stakepool": "*/configure-stakepool* provides commands to add, list and remove stakepools for this Discord server. These are needed if you intend to set up delegator roles or if you want your pool information to be listed via the */info* command.",
+			"configure-delegatorroles": "Once you have set up your official stakepool information via */configure-stakepool* you can assign roles based on delegation to specific pools. You will need the pool hash or you can reference \"all official pools of this Discord\" by leaving the pool hash parameter empty.",
 			"configure-policy": "With */configure-policy* you can set up official policy IDs that users can inspect and easily find via the public */policyids* command.",
 			"configure-tokenroles": "The */configure-tokenroles* command will allow you to set up automatic role assignments for users that have tokens of specific policies in their verified staking addresses. Users can verify via the public */verify* command.",
 			"configure-whitelist": "With this command you can manage whitelists on this server that people can register for via the public */whitelist* command.",
-			"configure-adminaccess": "The */configure-adminaccess* command allows you to manage which users can access administrative functions of the bot, like all the */configure* commands..",
+			"configure-adminaccess": "The */configure-adminaccess* command allows you to manage which users can access administrative functions of the bot, like all the */configure* commands.",
 			"configure-useraccess": "The */configure-useraccess* command allows you to manage which users on your server are allowed to access this Discord bots basic features.",
+			"configure-poll": "The */configure-poll* command enables the creation and management of polls and helps admins set up votings on their server, open or restricted to token-holders.",
 			"start": "The */start* command is what you use to set the bot up initially, but also what you can use to reset your bot features and what you might be asked to run if new capabilities get added to the bot."
 		}
 	},
@@ -68,19 +85,61 @@
 		"noPolicies": "*Currently, this server has no token policies listed.*",
 		"projectPolicyId": "The policy ID for this project is **{{policyId}}**"
 	},
+	"claim": {
+		"messageTitle": "Claim your physical items",
+		"purpose": "If you've minted a specific NFT or participated in an event or whitelist, you may be eligible to claim physical items. This command will let you pick your items and will then ask you for your shipping address via DM.\n💡 The system is opaque for the Discord operators and while they will receive your shipping address, they will not be provided with the associated stake address, keeping your personal data private.",
+		"availableClaimListsTitle": "Claim lists available!",
+		"availableClaimLists": "The following claim lists are available. Select your list and make sure you can receive direct messages from the bot, so it can ask you for your physical address.",
+		"chooseClaimList": "Choose what you want to claim",
+		"claimProductDetails": "You can claim this item {{available}} times.",
+		"orderStartedTitle": "Order checkout started",
+		"orderStarted": "⏳ Please check your direct messages from <@{{botUser}}> to finalize your order process.",
+		"checkoutTitle": "Choose your items",
+		"checkout": "ℹ Please choose the items you would like to claim. Below is a list of total claimable items - the bot will guide you through selecting the available choices for each of your items.",
+		"existingOrderTitle": "Existing order found",
+		"existingOrder": "💡 We have found an existing order for this claim list and <@{{botUser}}> has sent you the details. You can verify your order in your direct messages. Contact the project team, should you need to change your order.",
+		"noDirectMessageTitle": "No Direct Messaging possible",
+		"shoppingCart": "🛒 Your current cart",
+		"shoppingCartEmpty": "No items in your cart.",
+		"chooseShippingType": "Choose shipping type",
+		"shippingTypeUSA": "Domestic (United States)",
+		"shippingTypeInternational": "International",
+		"enterShippingData": "Enter shipping address",
+		"clearShoppingCart": "Empty shopping cart",
+		"enterShipTo": "✍ Please enter your full name for your ship to address:",
+		"enterCountry": "🏳 Please enter your country:",
+		"enterPhone": "📞 For international orders, we need your phone number, including country code:",
+		"enterCity": "🏙 Please enter your city name (and state, if applicable):",
+		"enterStreet": "🛣 Please enter your full street address, including house number, apartment etc.:",
+		"enterZipCode": "🔢 Please enter your zip code:",
+		"addressEntryComplete": "☑ Address entry complete. Please verify your shopping cart contents and address information.\n💡 Once submitted, your order can only be changed by contacting the project team.",
+		"checkoutComplete": "☑ You have successfully submitted your order. You can see your order details by running the */claim* command again in your respective Discord server. The project team will be in touch with updates on the delivery.",
+		"checkoutError": "⚠ There was an error submitting your order. We apologize for the inconvenience and recommend getting in touch with the project team. Make sure to write down the current time and time zone, so we can find the problem in our log data.",
+		"currentAddress": "📦 Shipping To",
+		"currentAddressData": "{{shipTo}}\n{{street}}\n{{zipCode}} {{city}}\n{{country}}\n{{phone}}",
+		"noCurrentOrderProcessTitle": "No order in process",
+		"noCurrentOrderProcess": "Sorry, there is current order active, so I cannot respond properly. Please start an order in the respective Discord by running */claim*.",
+		"noDirectMessage": "⚠ The bot is not able to send you a direct message, which means it will not be able to collect your shipping address. Please click on the server name, select **Privacy Settings** and enable **Allow direct messages from server members**. You can disable it again after the claim process is complete.",
+		"noClaimListsTitle": "No claim lists available",
+		"noClaimLists": "*Currently, you do not qualify for any claim lists.*\n\nℹ If you think you qualify, make sure your respective staking address is verified and linked via the */verify list*, */verify add* and */verify link* commands.",
+		"submitOrder": "Submit order",
+		"helpChannelTitle": "Help with your order",
+		"helpChannel": "If you need assistance with your order, please get in touch with our team in the channel <#{{helpChannel}}>. We are happy to help you out.",
+		"noDescription": "No Description provided"
+	},
 	"verify": {
 		"list": {
 			"messageTitle": "Your verified addresses",
 			"noVerifications": "You have no outstanding or confirmed verifications. If you would like to verify a Cardano address, please use the '/verify add' command.",
-			"listVerificationsInfo": "View your link status with this specific server and see which addresses are verified or waiting for verification with your account across all Discord server:",
+			"listVerificationsInfo": "View your link status with this specific server and see which addresses are verified or waiting for verification with your account across all your Discord servers:",
 			"confirmedVerificationFor": "✅ Confirmed verification for {{stakeShort}}…",
 			"confirmedData": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} via transaction https://cardanoscan.io/transaction/{{verification.transactionHash}}, confirmed at *{{verification.confirmedAt}}*.",
 			"outstandingVerifications": "⏳ Outstanding verifications",
 			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification.",
 			"accountIsLinked": "⚡ Linked",
-			"accountIsLinkedInfo": "Your verified wallets are linked with this Discord server and you will be automatically assigned roles and access other features, if configured by the server admin.",
+			"accountIsLinkedInfo": "Your verified wallets are linked with this Discord server and you will be automatically assigned roles and access other features, if configured by the server admin.\nℹ To unlink, use */verify unlink*",
 			"accountIsNotLinked": "🔌 Not Linked",
-			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet.",
+			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet.\nℹ To link your already verified wallets to this server, use */verify link*",
 			"cancelOutstanding": "Cancel open verification",
 			"cancelSuccess": "❌ Outstanding verification for address {{address}} was successfully cancelled. You can now start a new verification process."
 		},
@@ -175,7 +234,7 @@
 				"errorNotFound": "⚠ No policy with the ID **{{policyId}}** was found for this server. Nothing was removed."
 			}
 		},
-		"pool": {
+		"stakepool": {
 			"list": {
 				"purpose": "This is the list of official stakepools that this server will present when end users use the /info command.\n\n⚠ Do not add stakepools that are not your own or that you are not officially supporting. Reports of misused stakepools will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage.",
 				"noPoolName": "No official stakepools",
@@ -253,6 +312,62 @@
 				"errorNotFound": "⚠ No delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
 			}
 		},
+		"poll": {
+			"list": {
+				"purpose": "This is the list of all existing whitelists for this Discord server.",
+				"noPollsDetail": "*There are no configured polls on this server.*"
+			},
+			"add": {
+				"previewPhase1": "Welcome to the new poll wizard 🧙‍♂️! We will walk you through creating a new poll for your server.\n⚠ We highly suggest only running this command in a private channel as you will be asked to type messages to populate the description and voting options later on.\n\nYou've configured the following initial settings for your poll:",
+				"previewPhase1Details": "**Internal name**: {{name}}\n**Display name**: {{displayName}}\n**Poll open time**: Users will be able to start voting at {{pollOpenTime}} UTC\n**Poll close time**: Users can vote until {{pollCloseTime}} UTC",
+				"previewPhase1NoChannel": "You have not selected a channel for the bot to post a voting announcement in at poll open time.",
+				"previewPhase1Channel": "The bot will post a voting announcement in <#{{publishChannel}}> once the poll opens.",
+				"previewPhase1NoRequiredRole": "No role requirements are in effect - everybody will be able to see the poll.",
+				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll manage* command later.",
+				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for you poll that you would like to use:",
+				"startPhase3": "Use this description",
+				"redoPhase2": "Change description",
+				"previewPhase2Description": "**Poll Description/Question**:\n{{{description}}}",
+				"previewPhase3NextSteps": "❗ Please send up to ten messages to this current channel (<#{{currentChannel}}>) containing your voting options and add a reaction with your desired emote to each message:",
+				"previewPhase3Options": "**Vote options**:\n{{{options}}}",
+				"startPhase4": "Use these options",
+				"redoPhase3": "Reset all options",
+				"previewPhase4NextSteps": "❗ Please select some final settings for your poll. If you choose token ownership to be required, a final step will ask you for information about the voting snapshot",
+				"isPublicVote": "Are results publicly viewable before the vote ends?",
+				"publicVoteYes": "Public Vote",
+				"publicVoteYesDescription": "Voting results are publicly visible via /vote",
+				"publicVoteNo": "Hidden Results",
+				"publicVoteNoDescription": "Voting results are hidden until manually published",
+				"isMultipleVotes": "Can users vote for more than one option at once?",
+				"multipleVoteYes": "Multiple votes",
+				"multipleVoteYesDescription": "Users can select multiple voting options",
+				"multipleVoteNo": "One Choice",
+				"multipleVoteNoDescription": "Users can only select one choice",
+				"isTokenOwnershipRequired": "Can only token holders vote in this poll?",
+				"tokenTypeNone": "Everyone",
+				"tokenTypeHolderOnly": "Holders",
+				"tokenTypeHolderWeighted": "Weighted",
+				"tokenTypeNoneDescription": "No, anyone can",
+				"tokenTypeHolderOnlyDescription": "Yes, each holder gets one vote",
+				"tokenTypeHolderWeightedDescription": "Yes, holders get votes based on owned number of tokens",
+				"startPhase5": "Provide token details",
+				"previewPhase5NextStepsPolicyIdOnly": "Only people that are verified owners of tokens from the policy *{{policyId}}* can vote.",
+				"previewPhase5NextStepsPolicyIdAndFingerprint": "Only people that are verified owners of tokens from the policy *{{policyId}}* with the asset fingerprint *{{assetFingerprint}}* can vote.\n⚠ The ownership snapshot will be made in the next ten minutes after this poll is created.",
+				"previewPhase5NextStepsWeighted": "The voting power will be based on the amount of tokens. If multiple selections can be made, the total voting power will be evenly distributed across all choices (rounded down).",
+				"previewPhase5NextSteps": "❗ Please enter the policy ID of the token that voters will be voting with. If using fungible tokens, we also recommend to provide the asset fingerprint, separated with a plus from the policy ID, as follows: *489aa3378d13c87ad4e595ab2a9092e9c92bd645b725b853a3cdebf3+asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
+				"redoPhase5": "Change token data",
+				"finish": "Create poll",
+				"success": "✅ New poll with the following settings added to this server:",
+				"errorTimeout": "The poll wizard 🧙‍♂️ timed out waiting for your input, sorry. Please restart the wizard via the */configure-poll add* command.",
+				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
+				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less."
+			},
+			"remove": {
+				"success": "🗑️ Removed the following poll from this server:",
+				"purpose": "Select the poll to remove from your Discord server.\n\n⚠ **ALL REGISTERED VOTES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE POLL**.\n\nOnly do this after you have processed this poll.",
+				"errorNotFound": "⚠ No poll with the name **{{pollName}}** was found for this server. Nothing was removed."
+			}
+		},
 		"whitelist": {
 			"list": {
 				"purpose": "This is the list of all existing whitelists for this Discord server.",
@@ -260,7 +375,8 @@
 				"adminName": "{{{whitelist.displayName}}} ({{whitelist.name}})"
 			},
 			"add": {
-				"success": "✅ New whitelist with the following requirements added to this server:"
+				"success": "✅ New whitelist with the following requirements added to this server:",
+				"invalidName": "⚠ Could not add whitelist because the name \"{{whitelistName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following whitelist from this server:",
@@ -301,6 +417,14 @@
 				"cannotRemoveLastUserRole": "⚠ The role <@&{{roleId}}> is the last user role on this server and cannot be removed."
 			}
 		},
+		"settings": {
+			"features": {
+				"purpose": "Change the currently enabled feature set for the bot on this Discord server.",
+				"chooseFeatures": "Choose all features you want to continue by using the below selection list:",
+				"saveSettings": "Save Settings",
+				"success": "✅ Your feature changes have been successfully applied! It may take a few minutes for the commands to become available."
+			}
+		},
 		"api": {
 			"generatetoken": {
 				"success": "✅ A new access token was generated. Please write down this token to provide to your development team.\n❗ You will not be able to access this token again. The only way to view an access token is by generating a new one.\n\n**Your token:**\n\n*{{accessToken}}*\n\nFind the REST API documentation by downloading the current OpenAPI Swagger Documentation at the following URL: {{{externalDocumentationUrl}}}"
@@ -329,7 +453,7 @@
 		"selectedLanguage": "Your selected language is **{{language}}**.",
 		"selectedAdminRoles": "The users with the following roles will be able to configure the bot:",
 		"selectedUserRoles": "The users with the following roles will be able to verify their wallets and interact with the bot:",
-		"selectedFeatures": "You have selected the following features:\n{{{selectedFeatureList}}}",
+		"selectedFeatures": "You have selected the following features:\n\n{{{selectedFeatureList}}}",
 		"selectedFeatureItem": "• **{{{feature}}}**",
 		"finishSetupButton": "Finish setup",
 		"resetSetupButton": "Reset settings",
@@ -337,13 +461,23 @@
 		"setupCompleteMessage": "Thank you 😻\n\n**Your setup is complete!**\n\n💡 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage."
 	},
 	"features": {
-		"pool": "Stakepool features (official pools, delegator roles)",
+		"stakepoolTitle": "Stakepools",
+		"stakepool": "Stakepool features (official pools, delegator roles)",
+		"tokenTitle": "Tokens",
 		"token": "Fungible tokens and NFTs (official policies, token roles)",
-		"whitelist": "Self-service address whitelists with requirements"
+		"whitelistTitle": "Whitelists",
+		"whitelist": "Self-service address whitelists with requirements",
+		"pollTitle": "Polls",
+		"poll": "Polls and voting system for open and holder-limited polls",
+		"claimphysicalTitle": "Physical Item Claiming",
+		"claimphysical": "Claiming physical items via verified lists"
 	},
 	"generic": {
 		"cancel": "Cancel",
-		"clickhelp": "Click for help"
+		"yes": "Yes",
+		"no": "No",
+		"clickhelp": "Click for help",
+		"advertisement": "Advertisement"
 	},
 	"languages": {
 		"en": "English",
@@ -355,7 +489,7 @@
 		"permissionDeniedInformation": "⛔ You do not have permission to access this information.",
 		"permissionDeniedChanges": "⛔ You do not have permission to make these changes.",
 		"notWhitelisted": "Thank you for your interest in HAZELnet. Unfortunately, your server is not on the early access list. Contact @NilsCodes on Twitter to see if you can participate in the beta program.",
-		"invalidIsoDateFormat": "Invalid date format for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)"
+		"invalidIsoDateFormat": "Invalid date format value \"{{value}}\" for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)"
 	},
 	"about": {
 		"title": "About HAZELnet",

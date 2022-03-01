@@ -3,6 +3,7 @@ package io.hazelnet.community.controllers
 import io.hazelnet.community.data.discord.DiscordServerSetting
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
+import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.services.DiscordServerService
 import org.springframework.http.HttpStatus
@@ -116,9 +117,9 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = discordServerService.deleteWhitelist(guildId, whitelistId)
 
-    @GetMapping("/{guildId}/whitelists/{whitelistId}/signups")
+    @GetMapping("/{guildId}/whitelists/{whitelistIdOrName}/signups")
     @ResponseStatus(HttpStatus.OK)
-    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistId: String) = discordServerService.getWhitelistSignups(guildId, whitelistId)
+    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistIdOrName: String) = discordServerService.getWhitelistSignups(guildId, whitelistIdOrName)
 
     @PostMapping("/{guildId}/whitelists/{whitelistId}/signups")
     @ResponseStatus(HttpStatus.CREATED)
@@ -145,8 +146,28 @@ class DiscordServerController(
     fun connectExternalAccount(@PathVariable guildId: Long, @RequestBody @Valid discordMember: DiscordMember) = discordServerService.addMember(guildId, discordMember)
 
     @DeleteMapping("/{guildId}/members/{externalAccountId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun disconnectExternalAccount(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.removeMember(guildId, externalAccountId)
+
+    @GetMapping("/{guildId}/members/{externalAccountId}/claimlists")
+    @ResponseStatus(HttpStatus.OK)
+    fun getEligibleClaimListsOfUser(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.getEligibleClaimListsOfUser(guildId, externalAccountId)
+
+    @GetMapping("/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders")
+    @ResponseStatus(HttpStatus.OK)
+    fun getOrderOfUserForClaimList(@PathVariable guildId: Long, @PathVariable externalAccountId: Long, @PathVariable claimListId: Int) = discordServerService.getOrderOfUserForClaimList(guildId, externalAccountId, claimListId)
+
+    @PostMapping("/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders")
+    @ResponseStatus(HttpStatus.OK)
+    fun setOrderOfUserForClaimList(@PathVariable guildId: Long, @PathVariable externalAccountId: Long, @PathVariable claimListId: Int, @RequestBody @Valid physicalOrder: PhysicalOrder) = discordServerService.setOrderOfUserForClaimList(guildId, externalAccountId, claimListId, physicalOrder)
+
+    @GetMapping("/{guildId}/claimlists/{claimListIdOrName}/orders")
+    @ResponseStatus(HttpStatus.OK)
+    fun getAllOrdersForClaimList(@PathVariable guildId: Long, @PathVariable claimListIdOrName: String) = discordServerService.getAllOrdersForClaimList(guildId, claimListIdOrName)
+
+    @GetMapping("/{guildId}/claimlists/{claimListIdOrName}/products")
+    @ResponseStatus(HttpStatus.OK)
+    fun getAllProductsForClaimList(@PathVariable guildId: Long, @PathVariable claimListIdOrName: String) = discordServerService.getAllProductsForClaimList(guildId, claimListIdOrName)
 
     @PutMapping("/{guildId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)

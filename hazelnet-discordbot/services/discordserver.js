@@ -1,5 +1,6 @@
 const NodeCache = require('node-cache');
 const axios = require('axios');
+const globalsettings = require('./globalsettings');
 
 const hazelCommunityUrl = process.env.HAZELNET_COMMUNITY_URL;
 
@@ -102,8 +103,14 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newDelegatorRolePromise;
   },
-  async createWhitelist(guildId, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId) {
+  async createPoll(guildId, pollObject) {
+    const newPollPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls`, pollObject);
+    this.clearCacheEntry(guildId);
+    return newPollPromise;
+  },
+  async createWhitelist(guildId, creator, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId) {
     const newWhitelistPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists`, {
+      creator,
       displayName,
       name,
       signupAfter,
@@ -155,11 +162,20 @@ module.exports = {
   clearCacheEntry(guildId) {
     this.cache.del(`${guildId}`);
   },
-  makeDiscordServerObject(discordServer) {
+  async makeDiscordServerObject(discordServer) {
+    const basicThumbnail = await globalsettings.getGlobalSetting('BASIC_EDITION_THUMBNAIL');
+    const adText = await globalsettings.getGlobalSetting('ADVERTISEMENT_TEXT');
+    const adLogo = await globalsettings.getGlobalSetting('ADVERTISEMENT_LOGO');
     const discordServerObject = discordServer;
     discordServerObject.getBotLanguage = function getBotLanguage() {
       const useLocale = this.settings?.BOT_LANGUAGE?.length ? this.settings.BOT_LANGUAGE : 'en';
       return useLocale;
+    };
+    discordServerObject.getBasicEditionThumbnail = function getBasicEditionThumbnail() {
+      return basicThumbnail ?? 'https://www.hazelnet.io/logo192.png';
+    };
+    discordServerObject.getAdvertisement = function getAdvertisement() {
+      return { text: adText, logo: adLogo };
     };
     return discordServerObject;
   },

@@ -40,9 +40,9 @@ module.exports = {
         helpTexts.push(`\n\n${i18n.__({ phrase: 'help.adminCommands.title', locale: useLocale })}\n`);
         helpTexts.push('🔒 **/configure-protection**');
         helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-protection', locale: useLocale })}\n`);
-        if (enabledFeatures.includes('pool')) {
-          helpTexts.push('🌊 **/configure-pool**');
-          helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-pool', locale: useLocale })}\n`);
+        if (enabledFeatures.includes('stakepool')) {
+          helpTexts.push('🌊 **/configure-stakepool**');
+          helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-stakepool', locale: useLocale })}\n`);
           helpTexts.push('🧡 **/configure-delegatorroles**');
           helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-delegatorroles', locale: useLocale })}\n`);
         }
@@ -51,6 +51,10 @@ module.exports = {
           helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-policy', locale: useLocale })}\n`);
           helpTexts.push('🖐 **/configure-tokenroles**');
           helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-tokenroles', locale: useLocale })}\n`);
+        }
+        if (enabledFeatures.includes('poll')) {
+          helpTexts.push('🌊 **/configure-poll**');
+          helpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-poll', locale: useLocale })}\n`);
         }
         if (enabledFeatures.includes('whitelist')) {
           helpTexts.push('🤍 **/configure-whitelist**');

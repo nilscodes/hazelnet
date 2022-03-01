@@ -1,10 +1,10 @@
 module.exports = {
-  userCommands: ['verify', 'info', 'policyid', 'whitelist', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-pool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-api'],
+  userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'help'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-settings', 'configure-api'],
   async setSlashCommandPermissions(client, guildId, discordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {
-      const commands = await this.getCommands(client, guild);
+      const commands = await this.getCommands(guild);
       await commands.forEach(async (command) => {
         const permissions = this.buildPermissionListForCommand(guild, discordServer, command);
         client.logger.info({ msg: `Registering the following command permissions for command ${command.name}`, permissions });
@@ -12,11 +12,7 @@ module.exports = {
       });
     }
   },
-  async getCommands(client, guild) {
-    const globalCommands = false;
-    if (globalCommands) {
-      return client.application?.commands.fetch();
-    }
+  async getCommands(guild) {
     return guild.commands.fetch();
   },
   buildPermissionListForCommand(guild, discordServer, command) {

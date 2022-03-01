@@ -239,6 +239,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /snapshots/stake:
+    post:
+      summary: 'Schedule a token snapshot'
+      operationId: scheduleSnapshot
+      tags:
+        - snapshot
+        - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MultiAssetSnapshot'
+      responses:
+        '201':
+          description: 'Snapshot details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiAssetSnapshot'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /verifications/{verificationId}:
     get:
       summary: 'Get Verification Info'
@@ -276,7 +301,119 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /claimlists:
+    post:
+      summary: Add Claim List
+      operationId: addClaimList
+      tags:
+        - claims
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimList'
+      responses:
+        '201':
+          description: 'Claim List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimList'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /claimlists/{claimListId}:
+    get:
+      summary: Get Claim List
+      operationId: getClaimList
+      tags:
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+      responses:
+        '200':
+          description: 'Claim List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimList'
+  /claimlists/{claimListId}/orders/physical:
+    get:
+      summary: Get physical orders for this claim list
+      operationId: listPhysicalOrders
+      tags:
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+      responses:
+        '200':
+          description: 'P'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhysicalOrder'
+    post:
+      summary: Add a physical order for this claim list
+      operationId: addPhysicalOrder
+      tags:
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhysicalOrder'
+      responses:
+        '201':
+          description: 'Claim List'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalOrder'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /products:
+    post:
+      summary: Add Product
+      operationId: addProduct
+      tags:
+        - claims
+        - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhysicalProduct'
+      responses:
+        '201':
+          description: 'Physical product'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalProduct'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /products/{productId}:
+    get:
+      summary: Get Product Info
+      operationId: getProduct
+      tags:
+        - claims
+        - products
+      parameters:
+        - $ref: '#/components/parameters/ProductIdPathParameter'
+      responses:
+        '200':
+          description: 'Physical Product'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalProduct'
   /discord/servers:
     get:
       summary: Get all Discord servers
@@ -310,6 +447,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordServer'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}:
     get:
       summary: Get Discord Server Details
@@ -413,6 +553,7 @@ paths:
       operationId: addTokenPolicy
       tags:
         - discord
+        - token
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       requestBody:
@@ -436,6 +577,7 @@ paths:
       operationId: deleteTokenPolicy
       tags:
         - discord
+        - token
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/PolicyIdPathParameter'
@@ -448,6 +590,7 @@ paths:
       operationId: addStakepool
       tags:
         - discord
+        - stakepool
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       requestBody:
@@ -471,6 +614,7 @@ paths:
       operationId: deleteStakepool
       tags:
         - discord
+        - stakepool
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/PoolHashPathParameter'
@@ -483,6 +627,7 @@ paths:
       operationId: addDelegatorRole
       tags:
         - discord
+        - stakepool
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       requestBody:
@@ -506,6 +651,7 @@ paths:
       operationId: deleteDelegatorRole
       tags:
         - discord
+        - stakepool
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/DelegatorRoleIdPathParameter'
@@ -518,6 +664,7 @@ paths:
       operationId: addTokenOwnershipRole
       tags:
         - discord
+        - token
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       requestBody:
@@ -541,12 +688,126 @@ paths:
       operationId: deleteTokenOwnershipRole
       tags:
         - discord
+        - token
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/TokenRoleIdPathParameter'
       responses:
         '204':
           description: Successful deletion
+  /discord/servers/{guildId}/polls:
+    get:
+      summary: 'Get polls for this Discord server'
+      operationId: listPolls
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'All polls for this server'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordPoll'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create a poll on this server
+      operationId: addPoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordPoll'
+      responses:
+        '201':
+          description: 'Poll'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordPoll'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/polls/{pollId}:
+    delete:
+      summary: Remove a poll from this Discord server, including all verified votes, options etc.
+      operationId: deletePoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/polls/{pollId}/votes:
+    get:
+      summary: 'Get votes for this poll'
+      operationId: getVotes
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+      responses:
+        '200':
+          description: 'All votes for this poll'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordPollVote'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /discord/servers/{guildId}/polls/{pollId}/votes/{externalAccountId}:
+    put:
+      summary: Vote for a specific option
+      operationId: setVote
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DiscordPollOptionId'
+      responses:
+        '200':
+          description: 'Vote'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordPollVote'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/whitelists:
     post:
       summary: Add a whitelist for owners of a specific role to this server
@@ -701,7 +962,7 @@ paths:
       summary: 'Delete guild setting by Name'
       operationId: deleteSetting
       tags:
-        - global
+        - discord
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/SettingNamePathParameter'
@@ -798,6 +1059,36 @@ components:
       schema:
         type: integer
         format: int64
+    PollIdPathParameter:
+      name: pollId
+      in: path
+      description: The ID of this poll
+      required: true
+      style: simple
+      example: 6121
+      schema:
+        type: integer
+        format: int64
+    ProductIdPathParameter:
+      name: productId
+      in: path
+      description: The ID of this product
+      required: true
+      style: simple
+      example: 62362
+      schema:
+        type: integer
+        format: int64
+    ClaimListIdPathParameter:
+      name: claimListId
+      in: path
+      description: The ID of this claim list
+      required: true
+      style: simple
+      example: 4144
+      schema:
+        type: integer
+        format: int64
     WhitelistIdPathParameter:
       name: whitelistId
       in: path
@@ -870,6 +1161,7 @@ components:
         - id
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
     ExternalAccount:
@@ -879,9 +1171,11 @@ components:
         - referenceId
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
         registrationTime:
+          readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
@@ -920,6 +1214,11 @@ components:
         - confirmed
         - obsolete
       properties:
+        id:
+          readOnly: true
+          type: integer
+          example: 1249010
+          format: int64
         blockchain:
           $ref: '#/components/schemas/BlockchainType'
         address:
@@ -928,20 +1227,143 @@ components:
           type: integer
           format: int64
         amount:
+          readOnly: true
           type: integer
           format: int64
         validAfter:
+          readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
         validBefore:
+          readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
         confirmed:
+          readOnly: true
           type: boolean
         obsolete:
+          readOnly: true
           type: boolean
+    ClaimList:
+      type: object
+      required:
+        - name
+        - displayName
+        - claims
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        name:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        claims:
+          type: array
+          $ref: '#/components/schemas/ClaimListSnapshotEntry'
+    ClaimListSnapshotEntry:
+      type: object
+      required:
+        - stakeAddress
+        - claimableProduct
+        - claimableCount
+      properties:
+        stakeAddress:
+          $ref: '#/components/schemas/StakeAddressView'
+        claimableProduct:
+          type: integer
+          format: int64
+        claimableCount:
+          type: integer
+          format: int64
+    PhysicalOrder:
+      type: object
+      required:
+        - externalAccountId
+        - country
+        - zipCode
+        - city
+        - street
+        - items
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        externalAccountId:
+          type: integer
+          format: int64
+        country:
+          type: string
+          example: DEU
+          pattern: '^[A-Z]{3}$'
+        zipCode:
+          type: string
+          example: 84323-2031
+          minLength: 1
+          maxLength: 30
+        city:
+          type: string
+          example: Junkersdorf
+          minLength: 1
+          maxLength: 200
+        street:
+          type: string
+          example: Burenstrasse 25
+          minLength: 1
+          maxLength: 500
+        items:
+          type: array
+          minItems: 1
+          $ref: '#/components/schemas/PhysicalOrderItem'
+    PhysicalOrderItem:
+      type: object
+      required:
+        - productId
+        - count
+      properties:
+        productId:
+          type: integer
+          format: int64
+        count:
+          type: integer
+          format: int64
+    PhysicalProduct:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: T-Shirt
+        variations:
+          type: object
+          example:
+            colors:
+              - Green
+              - Black
+              - Red
+            sizes:
+              - S
+              - M
+              - L
+              - XL
+              - XXL
     DiscordServer:
       type: object
       required:
@@ -951,6 +1373,7 @@ components:
         - guildMemberCount
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
         guildId:
@@ -965,6 +1388,7 @@ components:
           format: int64
           example: 9358923890
         joinTime:
+          readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
@@ -1028,21 +1452,25 @@ components:
         view:
           type: string
         ticker:
+          readOnly: true
           type: string
         name:
+          readOnly: true
           type: string
         website:
+          readOnly: true
           type: string
         description:
+          readOnly: true
           type: string
     DiscordDelegatorRole:
       type: object
       required:
-        - id
         - minimumStake
         - roleId
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
         poolHash:
@@ -1057,12 +1485,12 @@ components:
     DiscordTokenRole:
       type: object
       required:
-        - id
         - policyId
         - minimumTokenQuantity
         - roleId
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
         policyId:
@@ -1075,15 +1503,127 @@ components:
           example: 1
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    DiscordPoll:
+      type: object
+      required:
+        - creator
+        - name
+        - displayName
+        - description
+        - openAfter
+        - openUntil
+        - options
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        name:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        resultsVisible:
+          type: boolean
+          default: true
+        weighted:
+          type: boolean
+          default: false
+        multipleVotes:
+          type: boolean
+          default: false
+        snapshotId:
+          type: integer
+          format: int64
+        requiredRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordPollRequiredRole'
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordPollOption'
+    DiscordPollRequiredRole:
+      type: object
+      required:
+        - roleId
+      properties:
+        roleId:
+          $ref: '#/components/schemas/DiscordRole'
+    DiscordPollOptionId:
+      type: integer
+      readOnly: true
+      example: 4929
+      format: int64
+    DiscordPollOption:
+      type: object
+      required:
+        - text
+      properties:
+        id:
+          $ref: '#/components/schemas/DiscordPollOptionId'
+        text:
+          type: string
+          example: 'Vote for the better one'
+        reactionId:
+          $ref: '#/components/schemas/DiscordEmoji'
+        reactionName:
+          type: string
+          example: '🔥'
+    DiscordPollVote:
+      type: object
+      required:
+        - externalAccountId
+        - optionId
+      properties:
+        externalAccountId:
+          type: integer
+          format: int64
+        optionId:
+          $ref: '#/components/schemas/DiscordPollOptionId'
+        time:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:10:57Z
+        weight:
+          type: integer
+          format: int64
     Whitelist:
       type: object
       required:
-        - id
         - displayName
         - name
         - requiredRoleId
       properties:
         id:
+          readOnly: true
           type: integer
           format: int64
         displayName:
@@ -1111,9 +1651,36 @@ components:
           type: integer
           format: int64
         signupTime:
+          readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+    MultiAssetSnapshot:
+      type: object
+      required:
+        - snapshotTime
+        - policyId
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        snapshotTime:
+          type: string
+          format: date-time
+          example: 2022-11-10T13:20:57Z
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        assetFingerprint:
+          $ref: '#/components/schemas/AssetFingerprint'
+        taken:
+          readOnly: true
+          type: boolean
     DiscordServerSetting:
       type: object
       required:
@@ -1154,6 +1721,11 @@ components:
       type: integer
       format: int64
       example: 717264144759390238
+    DiscordEmoji:
+      description: Snowflake ID matching a Discord emoji
+      type: integer
+      format: int64
+      example: 817564144253349412
     DiscordUser:
       description: Snowflake ID matching a Discord user
       type: integer
@@ -1164,6 +1736,21 @@ components:
       type: integer
       format: int64
       example: 185829035890290
+    DiscordChannel:
+      description: Snowflake ID matching a Discord channel
+      type: integer
+      format: int64
+      example: 668289032310316
+    DiscordMessage:
+      description: Snowflake ID matching a Discord message
+      type: integer
+      format: int64
+      example: 468589032310412
+    StakeAddressView:
+      type: string
+      description: The staking address of a wallet, in viewable format
+      example: stake1uyhvepgdsd7s07q5cdx9vdemnar4axpe0e9edw2chyd8dpgqnsffq
+      pattern: '^stake1[a-zA-Z0-9]{53}$'
     StakepoolHash:
       type: string
       description: The Stakepool hash

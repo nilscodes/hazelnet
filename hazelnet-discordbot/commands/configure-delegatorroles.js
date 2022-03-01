@@ -21,7 +21,7 @@ module.exports = {
         .setDescription('Remove all auto-assignments (for all stake amounts) for the given role for delegators.')
         .addIntegerOption((option) => option.setName('delegator-role-id').setDescription('Role to remove auto-assignments for (get ID from list command)').setRequired(true)));
   },
-  commandTags: ['pool'],
+  commandTags: ['stakepool'],
   execute: commandbase.executeSubcommandIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,
 };

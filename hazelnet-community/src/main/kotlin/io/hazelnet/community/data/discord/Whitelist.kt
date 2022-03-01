@@ -19,6 +19,14 @@ class Whitelist @JsonCreator constructor(
         @Column(name = "discord_whitelist_id")
         var id: Long?,
 
+        @Column(name = "external_account_id")
+        @field:NonNull
+        @field:Min(1)
+        var creator: Long,
+
+        @Column(name = "whitelist_creation", updatable = false)
+        var createTime: Date?,
+
         @Column(name = "whitelist_name")
         @field:NonNull
         @field:Size(min = 1, max = 30)
