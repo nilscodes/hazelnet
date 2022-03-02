@@ -1,5 +1,7 @@
 package io.hazelnet.community.data
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import javax.persistence.*
 
 @Entity
@@ -8,6 +10,7 @@ class Account(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="account_id")
+    @field:JsonSerialize(using = ToStringSerializer::class)
     var id: Long?,
 
     @OneToMany(fetch = FetchType.EAGER)

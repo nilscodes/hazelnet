@@ -366,7 +366,7 @@ class DiscordServerService(
             val applicableProducts = claimListService.getProducts(applicableProductIds).toList()
             return ClaimListsWithProducts(validClaimListsForMember, applicableProducts)
         }
-        throw NoSuchElementException("No member with external account ID $externalAccountId found in guild $guildId")
+        return ClaimListsWithProducts(emptyList(), emptyList())
     }
 
     fun getOrderOfUserForClaimList(guildId: Long, externalAccountId: Long, claimListId: Int): PhysicalOrder {

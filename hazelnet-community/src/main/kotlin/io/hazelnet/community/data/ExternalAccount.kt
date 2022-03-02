@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIdentityReference
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
@@ -16,6 +18,7 @@ class ExternalAccount @JsonCreator constructor(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "external_account_id")
+        @field:JsonSerialize(using = ToStringSerializer::class)
         var id: Long?,
 
         @Column(name = "external_reference_id")
