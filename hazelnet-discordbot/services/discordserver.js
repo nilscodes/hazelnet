@@ -149,7 +149,12 @@ module.exports = {
     return roleAssignments.data;
   },
   async getAllDiscordServers() {
+    const cachedDiscordServer = this.cache.get('allservers');
+    if (cachedDiscordServer !== undefined) {
+      return cachedDiscordServer;
+    }
     const discordServer = await axios.get(`${hazelCommunityUrl}/discord/servers`);
+    this.cache.set('allservers', discordServer.data);
     return discordServer.data;
   },
   async regenerateAccessToken(guildId) {

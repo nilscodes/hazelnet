@@ -147,7 +147,7 @@ module.exports = {
   async processDirectMessage(message) {
     const userId = message.author.id;
     const currentOrder = this.getCurrentOrder(userId);
-    let discordServer = message.client.services.discordserver.makeDiscordServerObject({});
+    let discordServer = await message.client.services.discordserver.makeDiscordServerObject({});
     if (currentOrder?.guildId) {
       discordServer = await message.client.services.discordserver.getDiscordServer(currentOrder.guildId);
     }

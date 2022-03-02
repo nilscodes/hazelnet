@@ -5,8 +5,8 @@ module.exports = {
     const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
     const guildForAssignments = await client.guilds.fetch(discordServer.guildId);
     if (guildForAssignments) {
-      this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
-      this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+      await this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+      await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
     } else {
       client.logger.warn(`Did not find guild for ${roleProperty} assignments in guild cache for server ${discordServer.guildName} (${discordServer.guildId}).`);
     }

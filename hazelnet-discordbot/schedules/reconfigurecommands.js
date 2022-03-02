@@ -3,7 +3,7 @@ const commandregistration = require('../utility/commandregistration');
 const commandPermissions = require('../utility/commandpermissions');
 
 module.exports = {
-  cron: '45 * * * *',
+  cron: '0 * * * *',
   async execute(client) {
     client.logger.info('Checking if all servers need their commands and permissions updated...');
     try {
