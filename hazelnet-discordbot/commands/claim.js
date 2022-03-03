@@ -55,14 +55,14 @@ module.exports = {
               }))),
           ),
         ];
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.messageTitle', locale: useLocale }), i18n.__({ phrase: 'claim.purpose', locale: useLocale }), 'claim', claimListFields);
+        const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'claim.messageTitle', locale: useLocale }), i18n.__({ phrase: 'claim.purpose', locale: useLocale }), 'claim', claimListFields);
         await interaction.editReply({ embeds: [embed], components, ephemeral: true });
       } else {
         const noClaimListFields = [{
           name: i18n.__({ phrase: 'claim.noClaimListsTitle', locale: useLocale }),
           value: i18n.__({ phrase: 'claim.noClaimLists', locale: useLocale }),
         }];
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.messageTitle', locale: useLocale }), i18n.__({ phrase: 'claim.purpose', locale: useLocale }), 'claim', noClaimListFields);
+        const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'claim.messageTitle', locale: useLocale }), i18n.__({ phrase: 'claim.purpose', locale: useLocale }), 'claim', noClaimListFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

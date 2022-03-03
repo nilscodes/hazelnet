@@ -49,10 +49,10 @@ module.exports = {
                 .setStyle('DANGER'),
             ));
         }
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale: useLocale }), 'verify-list', verificationInfoFields);
+        const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale: useLocale }), 'verify-list', verificationInfoFields);
         await interaction.editReply({ components, embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }), 'verify-list', verificationInfoFields);
+        const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.list.noVerifications', locale: useLocale }), 'verify-list', verificationInfoFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

@@ -21,7 +21,7 @@ module.exports = {
       if (!tokenPolicies.length) {
         tokenPolicies.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale: useLocale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'policyid.messageTitle', locale: useLocale }), i18n.__({ phrase: 'policyid.purpose', locale: useLocale }), 'policyid', tokenPolicies);
+      const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'policyid.messageTitle', locale: useLocale }), i18n.__({ phrase: 'policyid.purpose', locale: useLocale }), 'policyid', tokenPolicies);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

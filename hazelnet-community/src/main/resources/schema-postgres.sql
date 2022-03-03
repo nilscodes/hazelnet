@@ -248,7 +248,7 @@ CREATE TABLE "physical_orders"
     "claim_list_id"       int,
     "order_creation"      timestamp    NOT NULL,
     "ship_to_name"        varchar(200) NOT NULL,
-    "country"             char(3)      NOT NULL,
+    "country"             varchar(100) NOT NULL,
     "phone"               varchar(30)  NULL,
     "zip"                 varchar(30)  NOT NULL,
     "city"                varchar(200) NOT NULL,

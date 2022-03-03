@@ -40,7 +40,7 @@ module.exports = {
         try {
           const verification = await interaction.client.services.verifications.createVerificationRequest(externalAccount.id, addressToVerify);
           const maxVerificationWaitTimeInMinutes = await interaction.client.services.globalsettings.getGlobalSetting('VERIFICATION_TIMEOUT_MINUTES') || 15;
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationRequest', locale: useLocale }, { verification, amount: verification.amount / 1000000, maxTime: maxVerificationWaitTimeInMinutes }), 'verify-add');
+          const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationRequest', locale: useLocale }, { verification, amount: verification.amount / 1000000, maxTime: maxVerificationWaitTimeInMinutes }), 'verify-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
           for (let i = 0; i < 14; i += 1) {
             await wait(60000);

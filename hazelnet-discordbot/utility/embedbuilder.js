@@ -2,10 +2,13 @@ const i18n = require('i18n');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-  buildForUser(discordServer, title, message, commandId, fields, image) {
+  buildForUserWithAd(discordServer, title, message, commandId, fields, image) {
+    return this.buildForUser(discordServer, title, message, commandId, fields, image, true);
+  },
+  buildForUser(discordServer, title, message, commandId, fields, image, allowAdvertisement) {
     const color = discordServer.settings?.THEME_COLOR_USER ?? '#fece07';
     const topLogo = discordServer.settings?.THEME_TOP_LOGO ?? discordServer.getBasicEditionThumbnail();
-    const { useImage, useFields } = this.augmentWithAdvertisement(image, fields, discordServer);
+    const { useImage, useFields } = this.augmentWithAdvertisement(image, fields, discordServer, allowAdvertisement);
     return this.build(discordServer, color, topLogo, title, message, commandId, useFields, useImage);
   },
   buildForAdmin(discordServer, title, message, commandId, fields) {
@@ -50,10 +53,10 @@ module.exports = {
     }
     return baseEmbed;
   },
-  augmentWithAdvertisement(image, fields, discordServer) {
+  augmentWithAdvertisement(image, fields, discordServer, allowAdvertisement) {
     let useImage = image;
     let useFields = fields;
-    if (!discordServer.premium) {
+    if (!discordServer.premium && allowAdvertisement) {
       const advertisement = discordServer.getAdvertisement();
       if (advertisement.text) {
         useFields = useFields ?? [];
