@@ -1,10 +1,10 @@
-package io.hazelnet.community.data
+package io.hazelnet.shared.data
 
 import org.springframework.http.HttpStatus
 
 data class ApiErrorResponse(
-        val messages: List<ApiErrorMessage>,
-        val httpStatus: HttpStatus
+    val messages: List<ApiErrorMessage>,
+    val httpStatus: HttpStatus
 ) {
 
     constructor (message: String, httpStatus: HttpStatus) : this(listOf(ApiErrorMessage(message)), httpStatus)

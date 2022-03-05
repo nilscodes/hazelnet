@@ -15,7 +15,13 @@
 			"configure-poll": "Manage polls for people to vote on (off-chain)",
 			"configure-poll-list": "List all polls that are set up on this Discord server.",
 			"configure-poll-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
-			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results."
+			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
+			"configure-whitelist": "Manage whitelists for people to submit addresses for",
+			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
+			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
+			"configure-whitelist-close": "Temporarily or permanently close a whitelist for registrations.",
+			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
+			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations."
 		},
 		"options": {
 			"whitelist": {
@@ -30,6 +36,14 @@
 				"publish-channel": "An optional channel where the announcement and results are published",
 				"poll-opentime": "The UTC time after which voting is possible (Format: 2022-01-01T15:00:00Z)",
 				"poll-closetime": "The UTC time until which voting is possible (Format: 2022-01-31T15:00:00Z)"
+			},
+			"configure-whitelist": {
+				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
+				"whitelist-displayname": "The display name for this whitelist (for your users)",
+				"required-role": "Role that is required for a user to have, to be able to register for this whitelist.",
+				"max-users": "The maximum number of users that can sign up for this whitelist.",
+				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
+				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)"
 			}
 		}
 	},
@@ -148,7 +162,7 @@
 		},
 		"add": {
 			"messageTitle": "Verify a new address",
-			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{verification.address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
+			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
 			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first. You can find your outstanding verification details with the */verify list* command.",
 			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",

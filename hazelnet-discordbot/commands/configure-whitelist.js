@@ -1,27 +1,35 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('configure-whitelist', locale);
     return new SlashCommandBuilder()
       .setName('configure-whitelist')
-      .setDescription('Manage whitelists for people to submit addresses for')
+      .setDescription(ci18n.description())
       .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.'.substring(0, 100))
-        .addStringOption((option) => option.setName('whitelist-name').setDescription('The registration name for this whitelist (can only be up to 30 alphanumeric characters)').setRequired(true))
-        .addStringOption((option) => option.setName('whitelist-displayname').setDescription('The display name for this whitelist').setRequired(true))
-        .addRoleOption((option) => option.setName('required-role').setDescription('Role that is required for a user to have, to be able to register for this whitelist').setRequired(true))
-        .addIntegerOption((option) => option.setName('max-users').setDescription('The maximum number of users that can sign up for this whitelist.').setRequired(false))
-        .addStringOption((option) => option.setName('signup-start').setDescription('An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)').setRequired(false))
-        .addStringOption((option) => option.setName('signup-end').setDescription('An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)').setRequired(false)))
+        .setDescription(ci18n.subDescription('add'))
+        .addStringOption((option) => option.setName('whitelist-displayname').setDescription(ci18n.option('whitelist-displayname')).setRequired(true))
+        .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
+        .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true))
+        .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
+        .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
+        .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all whitelists that are defined on this Discord server.'))
+        .setDescription(ci18n.subDescription('list')))
+      .addSubcommand((subcommand) => subcommand
+        .setName('close')
+        .setDescription(ci18n.subDescription('close')))
+      .addSubcommand((subcommand) => subcommand
+        .setName('open')
+        .setDescription(ci18n.subDescription('open')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Select and remove an existing whitelist. ⚠ This will also remove all registrations.'));
+        .setDescription(ci18n.subDescription('remove')));
   },
   commandTags: ['whitelist'],
   execute: commandbase.executeSubcommandIfAdmin,

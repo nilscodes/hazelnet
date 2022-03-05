@@ -3,7 +3,7 @@ const commandregistration = require('../utility/commandregistration');
 const commandPermissions = require('../utility/commandpermissions');
 
 module.exports = {
-  cron: '0 * * * *',
+  cron: '25 * * * *',
   async execute(client) {
     client.logger.info('Checking if all servers need their commands and permissions updated...');
     try {
@@ -20,7 +20,6 @@ module.exports = {
               await commandPermissions.setSlashCommandPermissions(client, discordServer.guildId, discordServer);
             }
           } catch (error) {
-            console.log(error);
             client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})` });
           }
         }

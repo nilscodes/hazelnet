@@ -22,11 +22,12 @@ module.exports = {
         addressToVerify = addressOrHandle;
       }
       if (cardanoaddress.isStakedAddress(addressToVerify)) {
+        const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
         const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
-        const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && verification.address === addressToVerify);
+        const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
         if (existingConfirmedVerification) {
           await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.alreadyVerified', locale: useLocale }, { verification: existingConfirmedVerification }), 'verify-add');
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.alreadyVerified', locale: useLocale }, { verification: existingConfirmedVerification, address: addressToVerify }), 'verify-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
           return;
         }
@@ -70,6 +71,7 @@ module.exports = {
           let errorMessage = 'verify.add.verificationFailure';
           switch (verificationError.response?.status) {
             case 404:
+            case 500:
               errorMessage = 'verify.add.verificationInvalidAddress';
               break;
             case 409:

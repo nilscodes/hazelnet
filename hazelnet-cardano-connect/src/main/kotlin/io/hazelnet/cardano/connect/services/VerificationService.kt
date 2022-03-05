@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.transactions.NoTransactionFoundException
 import io.hazelnet.cardano.connect.data.verifications.VerificationConfirmation
 import io.hazelnet.cardano.connect.persistence.verification.VerificationDao
 import org.springframework.stereotype.Service
@@ -19,6 +20,6 @@ class VerificationService(
                 return VerificationConfirmation(associatedStakeAddresses.first(), transaction.hash)
             }
         }
-        throw IllegalArgumentException()
+        throw NoTransactionFoundException("No transaction found for wallet address $walletAddress and verification amount $verificationAmount")
     }
 }

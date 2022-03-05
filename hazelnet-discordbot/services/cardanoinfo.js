@@ -8,4 +8,12 @@ module.exports = {
     const handleAddress = await axios.get(`${hazelCardanoConnectUrl}/handles/${handleToResolve}`);
     return handleAddress.data.address;
   },
+  async walletInfo(address) {
+    try {
+      const walletInfo = await axios.get(`${hazelCardanoConnectUrl}/wallets/${address}`);
+      return walletInfo.data;
+    } catch (error) {
+      return null;
+    }
+  },
 };

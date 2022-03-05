@@ -21,6 +21,21 @@ module.exports = {
       id: guild.ownerId,
       permission: true,
     }];
+    if (command.name === 'somersault' && (discordServer.guildId === '717264144759390238' || discordServer.guildId === '888447259895791667')) {
+      permissions.push(...[{
+        type: 'USER',
+        id: '687870760219574300',
+        permission: true,
+      }, {
+        type: 'USER',
+        id: '890235844840030308',
+        permission: true,
+      }, {
+        type: 'USER',
+        id: '797345338775044096',
+        permission: true,
+      }]);
+    }
     const adminRoleIds = (discordServer?.settings?.ADMIN_ROLES?.split(',')) ?? [];
     if (adminRoleIds.length && (this.adminCommands.includes(command.name) || this.userCommands.includes(command.name))) {
       permissions.push(...adminRoleIds.map((roleId) => ({

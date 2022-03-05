@@ -106,7 +106,7 @@ class VerificationService(
                 verification.confirmedAt = Date.from(ZonedDateTime.now().toInstant())
                 verificationRepository.save(verification)
             } catch (e: WebClientResponseException) {
-                logger.info { "No valid verification found for ${verification.address} for verification with ID ${verification.id}" }
+                logger.debug { "No valid verification found for ${verification.address} for verification with ID ${verification.id}" }
             }
         }
     }

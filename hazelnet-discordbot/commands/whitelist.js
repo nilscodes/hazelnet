@@ -1,24 +1,25 @@
-const i18n = require('i18n');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('whitelist', locale);
     return new SlashCommandBuilder()
       .setName('whitelist')
-      .setDescription(i18n.__({ phrase: 'commands.descriptions.whitelist', locale }))
+      .setDescription(ci18n.description())
       .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('register')
-        .setDescription(i18n.__({ phrase: 'commands.descriptions.whitelist-register', locale }))
-        .addStringOption((option) => option.setName('address').setDescription(i18n.__({ phrase: 'commands.options.whitelist.address', locale })).setRequired(true)))
+        .setDescription(ci18n.subDescription('register'))
+        .addStringOption((option) => option.setName('address').setDescription(ci18n.option('address')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription(i18n.__({ phrase: 'commands.descriptions.whitelist-list', locale }))
-        .addBooleanOption((option) => option.setName('includeaddress').setDescription(i18n.__({ phrase: 'commands.options.whitelist.includeaddress', locale })).setRequired(false)))
+        .setDescription(ci18n.subDescription('list'))
+        .addBooleanOption((option) => option.setName('includeaddress').setDescription(ci18n.option('includeaddress')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('unregister')
-        .setDescription(i18n.__({ phrase: 'commands.descriptions.whitelist-unregister', locale })));
+        .setDescription(ci18n.subDescription('unregister')));
   },
   commandTags: ['whitelist'],
   execute: commandbase.executeSubcommand,

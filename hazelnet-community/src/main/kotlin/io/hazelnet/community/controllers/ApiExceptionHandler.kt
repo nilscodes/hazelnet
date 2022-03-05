@@ -1,7 +1,7 @@
 package io.hazelnet.community.controllers
 
-import io.hazelnet.community.data.ApiErrorMessage
-import io.hazelnet.community.data.ApiErrorResponse
+import io.hazelnet.shared.data.ApiErrorMessage
+import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
 import mu.KotlinLogging

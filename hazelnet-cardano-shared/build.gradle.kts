@@ -16,6 +16,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework:spring-web:5.3.13")
+
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
