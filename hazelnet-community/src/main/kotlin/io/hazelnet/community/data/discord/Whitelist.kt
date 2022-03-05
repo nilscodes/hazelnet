@@ -53,12 +53,19 @@ class Whitelist @JsonCreator constructor(
         @Column(name = "whitelist_max_users")
         var maxUsers: Int?,
 
+        @Column(name = "whitelist_closed")
+        var closed: Boolean = false,
+
         @ElementCollection(fetch = FetchType.EAGER)
         @CollectionTable(name = "discord_whitelists_signup", joinColumns = [JoinColumn(name = "discord_whitelist_id")])
         @field:JsonIgnore
         var signups: MutableSet<WhitelistSignup> = mutableSetOf()
 ) {
     fun getCurrentUsers(): Int = signups.size
+
+    override fun toString(): String {
+        return "Whitelist(id=$id, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups)"
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -67,26 +74,32 @@ class Whitelist @JsonCreator constructor(
         other as Whitelist
 
         if (id != other.id) return false
+        if (creator != other.creator) return false
+        if (createTime != other.createTime) return false
         if (name != other.name) return false
         if (displayName != other.displayName) return false
         if (signupAfter != other.signupAfter) return false
         if (signupUntil != other.signupUntil) return false
         if (requiredRoleId != other.requiredRoleId) return false
+        if (maxUsers != other.maxUsers) return false
+        if (closed != other.closed) return false
+        if (signups != other.signups) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = id?.hashCode() ?: 0
+        result = 31 * result + creator.hashCode()
+        result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + name.hashCode()
         result = 31 * result + displayName.hashCode()
         result = 31 * result + (signupAfter?.hashCode() ?: 0)
         result = 31 * result + (signupUntil?.hashCode() ?: 0)
         result = 31 * result + requiredRoleId.hashCode()
+        result = 31 * result + (maxUsers ?: 0)
+        result = 31 * result + closed.hashCode()
+        result = 31 * result + signups.hashCode()
         return result
-    }
-
-    override fun toString(): String {
-        return "Whitelist(id=$id, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, signups=$signups)"
     }
 }

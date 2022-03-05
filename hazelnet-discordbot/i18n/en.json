@@ -204,6 +204,7 @@
 			"whitelistWithStartDateClosedAndOpenEndDate": "Signup will open at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
 			"whitelistWithStartDateOpenAndOpenEndDate": "Signup opened at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
 			"whitelistWithStartDateOpenAndClosedEndDate": "Signup opened at {{signupAfterFormatted}} UTC and closed at {{signupUntilFormatted}}.",
+			"whitelistManuallyClosed": "\n⏸ The signup for this whitelist is currently paused by an administrator.",
 			"openWhitelist": "There are no start or end dates for this registration.",
 			"whitelistMembersNoLimit": "Any number of users can sign up.",
 			"whitelistMembersLimit": "{{whitelist.currentUsers}} out of {{whitelist.maxUsers}} have already registered.",
@@ -391,7 +392,18 @@
 			},
 			"add": {
 				"success": "✅ New whitelist with the following requirements added to this server:",
+				"alreadyExists": "⚠ A whitelist with the name \"{{whitelistName}}\" already exists. Please choose a different internal name.",
 				"invalidName": "⚠ Could not add whitelist because the name \"{{whitelistName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less."
+			},
+			"close": {
+				"purpose": "Close registrations for this whitelist, either permanently or temporarily. You can close lists before they reach their end times or max user counts with this command. You can reopen it later via */configure-whitelist open*.",
+				"success": "🔒 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully closed! If you want to reopen it later, use */configure-whitelist open*.",
+				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be closed."
+			},
+			"open": {
+				"purpose": "Reopen registrations for this whitelist. Users will be able to register if the signup window has not yet closed and they fulfill all other conditions.",
+				"success": "🔓 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully reopened! If you want to close it again later, use */configure-whitelist close*.",
+				"noWhitelistsDetail": "⚠ There are currently no closed whitelists on this server that can be opened."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following whitelist from this server:",

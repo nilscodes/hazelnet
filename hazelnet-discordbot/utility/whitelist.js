@@ -38,10 +38,12 @@ module.exports = {
         memberPhrase = 'whitelist.list.whitelistMembersLimitReached';
       }
     }
-    const lockIcon = running ? '🔓' : '🔒';
+    const lockIcon = running && !whitelist.closed ? '🔓' : '🔒';
     const memberPart = i18n.__({ phrase: memberPhrase, locale }, { whitelist });
 
-    return `${lockIcon} ${roleAndDatePart} ${memberPart}`;
+    const manualClose = whitelist.closed ? i18n.__({ phrase: 'whitelist.list.whitelistManuallyClosed', locale }) : '';
+
+    return `${lockIcon} ${roleAndDatePart} ${memberPart} ${manualClose}`;
   },
   hasSignupEnded(whitelist) {
     if (whitelist.signupUntil) {
@@ -55,9 +57,12 @@ module.exports = {
     }
     return true;
   },
+  isSignupPaused(whitelist) {
+    return !!whitelist.closed;
+  },
   async userQualifies(interaction, whitelist, existingSignup) {
     if (!existingSignup) {
-      if (!this.hasSignupEnded(whitelist) && this.hasSignupStarted(whitelist) && !(whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
+      if (!this.isSignupPaused(whitelist) && !this.hasSignupEnded(whitelist) && this.hasSignupStarted(whitelist) && !(whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
         const { guild } = interaction;
         const guildRole = await guild.roles.fetch(whitelist.requiredRoleId);
         if (guildRole) {

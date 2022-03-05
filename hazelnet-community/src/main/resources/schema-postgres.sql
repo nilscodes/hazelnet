@@ -152,6 +152,7 @@ CREATE TABLE "discord_whitelists"
     "whitelist_signup_after"   timestamp,
     "whitelist_signup_until"   timestamp,
     "whitelist_max_users"      int,
+    "whitelist_closed"         boolean      NOT NULL DEFAULT false,
     "required_discord_role_id" bigint,
     UNIQUE ("discord_server_id", "whitelist_name")
 );

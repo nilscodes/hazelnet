@@ -15,7 +15,7 @@ class ApiExceptionHandler {
     @ExceptionHandler(NoTransactionFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    fun processInvalidAddressException(ex: NoTransactionFoundException): ApiErrorResponse {
+    fun processNoTransactionFoundException(ex: NoTransactionFoundException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 }

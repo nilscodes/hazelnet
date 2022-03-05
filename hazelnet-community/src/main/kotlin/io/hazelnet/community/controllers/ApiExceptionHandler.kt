@@ -4,6 +4,7 @@ import io.hazelnet.shared.data.ApiErrorMessage
 import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
+import io.hazelnet.community.data.discord.WhitelistRequirementNotMetException
 import mu.KotlinLogging
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -38,6 +39,13 @@ class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun processInvalidAddressException(ex: InvalidAddressException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(WhitelistRequirementNotMetException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    fun processWhitelistRequirementNotMetException(ex: WhitelistRequirementNotMetException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 

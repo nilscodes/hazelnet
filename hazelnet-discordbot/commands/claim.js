@@ -295,18 +295,21 @@ module.exports = {
     await interaction.user.send({ embeds: [embed] });
   },
   async finishOrder(interaction) {
-    const { guildId, ...currentOrder } = this.getCurrentOrder(interaction.user.id);
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
-    const useLocale = discordServer.getBotLanguage();
-    try {
-      await interaction.client.services.claimlists.submitPhysicalOrder(guildId, currentOrder.externalAccountId, currentOrder.claimListId, currentOrder);
-      await interaction.update({ components: [] });
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.checkoutComplete', locale: useLocale }), 'claim');
-      await interaction.user.send({ embeds: [embed] });
-    } catch (error) {
-      interaction.client.logger.error(error);
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.checkoutError', locale: useLocale }), 'claim');
-      await interaction.user.send({ embeds: [embed] });
+    const fullOrder = this.getCurrentOrder(interaction.user.id);
+    if (fullOrder.guildId) {
+      const { guildId, ...currentOrder } = fullOrder;
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
+      const useLocale = discordServer.getBotLanguage();
+      try {
+        await interaction.client.services.claimlists.submitPhysicalOrder(guildId, currentOrder.externalAccountId, currentOrder.claimListId, currentOrder);
+        await interaction.update({ components: [] });
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.checkoutComplete', locale: useLocale }), 'claim');
+        await interaction.user.send({ embeds: [embed] });
+      } catch (error) {
+        interaction.client.logger.error(error);
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.checkoutError', locale: useLocale }), 'claim');
+        await interaction.user.send({ embeds: [embed] });
+      }
     }
   },
   async resetCart(interaction) {

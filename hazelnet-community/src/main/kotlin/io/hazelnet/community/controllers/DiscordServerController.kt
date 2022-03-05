@@ -113,6 +113,10 @@ class DiscordServerController(
                 .body(newWhitelist)
     }
 
+    @PatchMapping("/{guildId}/whitelists/{whitelistId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @RequestBody @Valid whitelistPartial: WhitelistPartial) = discordServerService.updateWhitelist(guildId, whitelistId, whitelistPartial)
+
     @DeleteMapping("/{guildId}/whitelists/{whitelistId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = discordServerService.deleteWhitelist(guildId, whitelistId)

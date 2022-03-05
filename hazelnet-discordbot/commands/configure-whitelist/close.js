@@ -9,48 +9,50 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const whitelistOptions = discordServer.whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
+      const whitelistOptions = discordServer.whitelists
+        .filter((whitelist) => !whitelist.closed)
+        .map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
       if (whitelistOptions.length) {
         const components = [new MessageActionRow()
           .addComponents(
             new MessageSelectMenu()
-              .setCustomId('configure-whitelist/remove/complete')
+              .setCustomId('configure-whitelist/close/complete')
               .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale: useLocale }))
               .addOptions(whitelistOptions),
           )];
 
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.purpose', locale: useLocale }), 'configure-whitelist-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist close', i18n.__({ phrase: 'configure.whitelist.close.purpose', locale: useLocale }), 'configure-whitelist-close');
         await interaction.editReply({ components, embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.list.noWhitelistsDetail', locale: useLocale }), 'configure-whitelist-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist close', i18n.__({ phrase: 'configure.whitelist.close.noWhitelistsDetail', locale: useLocale }), 'configure-whitelist-close');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while removing whitelists from your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while closing whitelists on your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async executeSelectMenu(interaction) {
-    if (interaction.customId === 'configure-whitelist/remove/complete') {
+    if (interaction.customId === 'configure-whitelist/close/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       try {
-        const whitelistNameToRemove = interaction.values[0];
-        const whitelistToRemove = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToRemove);
-        if (whitelistToRemove) {
-          await interaction.client.services.discordserver.deleteWhitelist(interaction.guild.id, whitelistToRemove.id);
+        const whitelistNameToClose = interaction.values[0];
+        const whitelistToClose = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToClose);
+        if (whitelistToClose) {
+          const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild.id, whitelistToClose.id, { closed: true });
 
-          const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelistToRemove);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.success', locale: useLocale }), 'configure-whitelist-remove', [
+          const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist close', i18n.__({ phrase: 'configure.whitelist.close.success', locale: useLocale }, { whitelist }), 'configure-whitelist-close', [
             {
-              name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist: whitelistToRemove }),
+              name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist: whitelistToClose }),
               value: detailsPhrase,
             },
           ]);
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.errorNotFound', locale: useLocale }, { whitelistName: whitelistNameToRemove }), 'configure-whitelist-remove');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.errorNotFound', locale: useLocale }, { whitelistName: whitelistNameToClose }), 'configure-whitelist-remove');
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         }
       } catch (error) {

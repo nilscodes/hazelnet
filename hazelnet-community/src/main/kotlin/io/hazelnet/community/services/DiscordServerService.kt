@@ -185,6 +185,14 @@ class DiscordServerService(
         discordTokenOwnershipRoleRepository.deleteById(tokenRoleId)
     }
 
+    fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {
+        val discordServer = getDiscordServer(guildId)
+        val whitelistToUpdate = getWhitelistById(discordServer, whitelistId)
+        whitelistToUpdate.closed = whitelistPartial.closed
+        discordWhitelistRepository.save(whitelistToUpdate)
+        return whitelistToUpdate
+    }
+
     fun deleteWhitelist(guildId: Long, whitelistId: Long) {
         discordWhitelistRepository.deleteById(whitelistId)
     }
@@ -212,6 +220,9 @@ class DiscordServerService(
     fun addWhitelistSignup(guildId: Long, whitelistId: Long, whitelistSignup: WhitelistSignup): WhitelistSignup {
         val discordServer = getDiscordServer(guildId)
         val whitelist = getWhitelistById(discordServer, whitelistId)
+        if (whitelist.closed) {
+            throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} is currently closed.")
+        }
         if(whitelist.getCurrentUsers() >= (whitelist.maxUsers ?: Int.MAX_VALUE)) {
             throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} has already reached the user limit.")
         }

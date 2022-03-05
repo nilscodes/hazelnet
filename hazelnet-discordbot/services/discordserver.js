@@ -121,6 +121,11 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newWhitelistPromise;
   },
+  async updateWhitelist(guildId, whitelistId, whitelistPartial) {
+    const newWhitelistPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}`, whitelistPartial);
+    this.clearCacheEntry(guildId);
+    return newWhitelistPromise.data;
+  },
   async getWhitelistRegistration(guildId, whitelistId, externalAccountId) {
     const registrationPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups/${externalAccountId}`);
     return {

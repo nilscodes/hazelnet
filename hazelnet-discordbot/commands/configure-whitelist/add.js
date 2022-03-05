@@ -16,33 +16,39 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      if (whitelistUtil.isValidName(whitelistName)) {
-        const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const whitelistWithNameExists = discordServer.whitelists.some((whitelist) => whitelist.name === whitelistName);
+      if (!whitelistWithNameExists) {
+        if (whitelistUtil.isValidName(whitelistName)) {
+          const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
 
-        if (signupAfter && !datetime.isValidISOTimestamp(signupAfter)) {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale: useLocale }, { parameter: 'signup-start', value: signupAfter }), 'configure-whitelist-add');
+          if (signupAfter && !datetime.isValidISOTimestamp(signupAfter)) {
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale: useLocale }, { parameter: 'signup-start', value: signupAfter }), 'configure-whitelist-add');
+            await interaction.editReply({ embeds: [embed], ephemeral: true });
+            return;
+          }
+          if (signupUntil && !datetime.isValidISOTimestamp(signupUntil)) {
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale: useLocale }, { parameter: 'signup-end', value: signupUntil }), 'configure-whitelist-add');
+            await interaction.editReply({ embeds: [embed], ephemeral: true });
+            return;
+          }
+
+          const newWhitelistPromise = await interaction.client.services.discordserver.createWhitelist(interaction.guild.id, externalAccount.id, whitelistName, whitelistDisplayName, signupAfter, signupUntil, maxUsers, requiredRole.id);
+          const whitelist = newWhitelistPromise.data;
+
+          const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.success', locale: useLocale }), 'configure-whitelist-add', [
+            {
+              name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist }),
+              value: detailsPhrase,
+            },
+          ]);
           await interaction.editReply({ embeds: [embed], ephemeral: true });
-          return;
-        }
-        if (signupUntil && !datetime.isValidISOTimestamp(signupUntil)) {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale: useLocale }, { parameter: 'signup-end', value: signupUntil }), 'configure-whitelist-add');
+        } else {
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.invalidName', locale: useLocale }, { whitelistName }), 'configure-whitelist-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
-          return;
         }
-
-        const newWhitelistPromise = await interaction.client.services.discordserver.createWhitelist(interaction.guild.id, externalAccount.id, whitelistName, whitelistDisplayName, signupAfter, signupUntil, maxUsers, requiredRole.id);
-        const whitelist = newWhitelistPromise.data;
-
-        const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.success', locale: useLocale }), 'configure-whitelist-add', [
-          {
-            name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist }),
-            value: detailsPhrase,
-          },
-        ]);
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.invalidName', locale: useLocale }, { whitelistName }), 'configure-whitelist-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.alreadyExists', locale: useLocale }, { whitelistName }), 'configure-whitelist-add');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
