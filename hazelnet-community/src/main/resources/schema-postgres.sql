@@ -182,6 +182,7 @@ CREATE TABLE "discord_polls"
     "poll_results_visible" boolean       NOT NULL DEFAULT true,
     "poll_weighted"        boolean       NOT NULL DEFAULT false,
     "poll_multiple_votes"  boolean       NOT NULL DEFAULT false,
+    "poll_archived"        boolean       NOT NULL DEFAULT false,
     "poll_snapshot_id"     int,
     UNIQUE ("discord_server_id", "poll_name")
 );

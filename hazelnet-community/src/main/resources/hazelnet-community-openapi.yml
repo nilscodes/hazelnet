@@ -26,7 +26,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /settings/{settingName}:
     put:
       summary: Create or update a setting
@@ -52,7 +52,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: 'Delete Global Setting by Name'
       operationId: deleteGlobalSetting
@@ -68,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /accounts:
     post:
       summary: 'Create an Account'
@@ -92,7 +92,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts:
     post:
       summary: 'Create External Account'
@@ -116,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts/{externalAccountId}:
     get:
       summary: 'Get Account'
@@ -137,7 +137,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts/{externalAccountId}/verifications:
     get:
       summary: 'Get Verifications for this specific account'
@@ -161,7 +161,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts/discord/{discordUserId}:
     get:
       summary: Get external account matching a Discord user ID
@@ -182,13 +182,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
 
     put:
       summary: 'Create/Retrieve External account for Discord user'
@@ -214,7 +214,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /verifications:
     post:
       summary: 'Request Verification for an External Account'
@@ -238,7 +238,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /snapshots/stake:
     post:
       summary: 'Schedule a token snapshot'
@@ -263,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /verifications/{verificationId}:
     get:
       summary: 'Get Verification Info'
@@ -284,7 +284,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: 'Delete Verification Info by ID'
       operationId: deleteVerification
@@ -300,7 +300,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /claimlists:
     post:
       summary: Add Claim List
@@ -347,7 +347,7 @@ paths:
         - $ref: '#/components/parameters/ClaimListIdPathParameter'
       responses:
         '200':
-          description: 'P'
+          description: 'Physical order'
           content:
             application/json:
               schema:
@@ -368,7 +368,7 @@ paths:
               $ref: '#/components/schemas/PhysicalOrder'
       responses:
         '201':
-          description: 'Claim List'
+          description: 'Physical order'
           content:
             application/json:
               schema:
@@ -376,6 +376,22 @@ paths:
           headers:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
+  /claimlists/{claimListId}/orders/physical/{orderId}:
+    get:
+      summary: Get physical order by order ID
+      operationId: getPhysicalOrder
+      tags:
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+        - $ref: '#/components/parameters/OrderIdPathParameter'
+      responses:
+        '200':
+          description: 'Physical order'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalOrder'
   /products:
     post:
       summary: Add Product
@@ -547,6 +563,103 @@ paths:
       responses:
         '204':
           description: 'Successful deletion'
+  /discord/servers/{guildId}/members/{externalAccountId}/claimlists:
+    get:
+      summary: Get the claim lists this user is eligible for on this Discord server, and include product information they can claim
+      operationId: getEligibleClaimListsOfUser
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'All claim lists this user is eligible for, including the products associated with their claims'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimListsWithProducts'
+  /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders:
+    get:
+      summary: Get any order this user might have had for the given claim list
+      operationId: getOrderOfUserForClaimList
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+      responses:
+        '200':
+          description: 'This users order for this claim list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalOrder'
+        '404':
+          description: 'No order found for this claim list and user'
+    post:
+      summary: Submit a new order for this claim list
+      description: This will overwrite any existing orders for this claim list/user combination
+      operationId: setOrderOfUserForClaimList
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhysicalOrder'
+      responses:
+        '200':
+          description: 'The created order for this claim list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhysicalOrder'
+  /discord/servers/{guildId}/claimlists/{claimListIdOrName}/orders:
+    get:
+      summary: Get all orders for this claim list
+      operationId: getAllOrdersForClaimList
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ClaimListIdOrNamePathParameter'
+      responses:
+        '200':
+          description: 'List of orders'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhysicalOrder'
+  /discord/servers/{guildId}/claimlists/{claimListIdOrName}/products:
+    get:
+      summary: Get all available products for this claim list
+      operationId: getAllProductsForClaimList
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ClaimListIdOrNamePathParameter'
+      responses:
+        '200':
+          description: 'List of products'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhysicalProduct'
   /discord/servers/{guildId}/tokenpolicies:
     post:
       summary: Add an official token policy to this discord server
@@ -718,7 +831,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Create a poll on this server
       operationId: addPoll
@@ -779,11 +892,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /discord/servers/{guildId}/polls/{pollId}/votes/{externalAccountId}:
-    put:
+    get:
+      summary: Get voting power and votes for this poll for a specific account
+      operationId: getVoteOfUser
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'Vote'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteData'
+    post:
       summary: Vote for a specific option
-      operationId: setVote
+      operationId: setVoteForUser
       tags:
         - discord
         - poll
@@ -804,10 +934,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordPollVote'
-          headers:
-            Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+                $ref: '#/components/schemas/VoteData'
   /discord/servers/{guildId}/whitelists:
     post:
       summary: Add a whitelist for owners of a specific role to this server
@@ -833,6 +960,27 @@ paths:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/whitelists/{whitelistId}:
+    patch:
+      summary: Update a whitelist on this discord server
+      operationId: updateWhitelist
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhitelistPartial'
+      responses:
+        '200':
+          description: Successful update, new whitelist content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Whitelist'
     delete:
       summary: Remove a whitelist from this discord server
       operationId: deleteWhitelist
@@ -869,7 +1017,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       summary: Sign up for a whitelist
       operationId: addWhitelistSignup
@@ -894,6 +1042,12 @@ paths:
           headers:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
+        '400':
+          description: 'Failed signup due to conditions not being met'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}:
     get:
       summary: Get the whitelist signup for a specific external account for this Discord server
@@ -917,13 +1071,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: Remove a whitelist signup from this discord server
       operationId: deleteWhitelistSignup
@@ -974,7 +1128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /discord/servers/{guildId}/accesstoken:
     post:
       summary: Generate (or regenerate) the API access token for this Discord server for the external HAZELnet API
@@ -1086,6 +1240,31 @@ components:
       required: true
       style: simple
       example: 4144
+      schema:
+        type: integer
+        format: int64
+    ClaimListIdOrNamePathParameter:
+      name: claimListIdOrName
+      in: path
+      description: The ID or name of this claim list
+      required: true
+      style: simple
+      examples:
+        string:
+          summary: Claim list name as string
+          value: my-list-name
+        number:
+          summary: Claim list ID
+          value: 231
+      schema:
+        type: string
+    OrderIdPathParameter:
+      name: orderId
+      in: path
+      description: The ID of this order
+      required: true
+      style: simple
+      example: 44
       schema:
         type: integer
         format: int64
@@ -1257,13 +1436,16 @@ components:
           readOnly: true
           type: integer
           format: int64
+        name:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
         displayName:
           type: string
           minLength: 1
           maxLength: 256
-        name:
+        description:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          maxLength: 2000
         createTime:
           readOnly: true
           type: string
@@ -1271,7 +1453,8 @@ components:
           example: 2021-11-10T12:21:43Z
         claims:
           type: array
-          $ref: '#/components/schemas/ClaimListSnapshotEntry'
+          items:
+            $ref: '#/components/schemas/ClaimListSnapshotEntry'
     ClaimListSnapshotEntry:
       type: object
       required:
@@ -1285,6 +1468,11 @@ components:
           type: integer
           format: int64
         claimableCount:
+          type: integer
+          format: int64
+        orderId:
+          description: Order ID this snapshot entry was claimed with
+          readOnly: true
           type: integer
           format: int64
     PhysicalOrder:
@@ -1306,8 +1494,9 @@ components:
           format: int64
         country:
           type: string
-          example: DEU
-          pattern: '^[A-Z]{3}$'
+          example: Germany
+          minLength: 1
+          maxLength: 100
         zipCode:
           type: string
           example: 84323-2031
@@ -1326,7 +1515,11 @@ components:
         items:
           type: array
           minItems: 1
-          $ref: '#/components/schemas/PhysicalOrderItem'
+          items:
+            $ref: '#/components/schemas/PhysicalOrderItem'
+        processed:
+          type: boolean
+          readOnly: true
     PhysicalOrderItem:
       type: object
       required:
@@ -1364,6 +1557,17 @@ components:
               - L
               - XL
               - XXL
+    ClaimListsWithProducts:
+      type: object
+      properties:
+        claimLists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClaimList'
+        claimableProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhysicalProduct'
     DiscordServer:
       type: object
       required:
@@ -1558,6 +1762,9 @@ components:
         multipleVotes:
           type: boolean
           default: false
+        archived:
+          type: boolean
+          default: false
         snapshotId:
           type: integer
           format: int64
@@ -1596,6 +1803,17 @@ components:
         reactionName:
           type: string
           example: '🔥'
+    VoteData:
+      type: object
+      required:
+        - votes
+      properties:
+        votes:
+          type: object
+          description: A map of poll options the user chose (or 0 if not yet voted) and the respective amounts of votes given/available
+          additionalProperties:
+            type: integer
+            format: int64
     DiscordPollVote:
       type: object
       required:
@@ -1620,12 +1838,21 @@ components:
       required:
         - displayName
         - name
+        - creator
         - requiredRoleId
       properties:
         id:
           readOnly: true
           type: integer
           format: int64
+        creator:
+          type: integer
+          format: int64
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         displayName:
           type: string
           minLength: 1
@@ -1633,12 +1860,24 @@ components:
         name:
           type: string
           pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        signupAfter:
+          type: string
+          format: date-time
+          example: 2020-11-10T13:20:57Z
         signupUntil:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+        closed:
+          type: boolean
+          default: false
         requiredRoleId:
           $ref: '#/components/schemas/DiscordRole'
+    WhitelistPartial:
+      type: object
+      properties:
+        closed:
+          type: boolean
     WhitelistSignup:
       type: object
       required:

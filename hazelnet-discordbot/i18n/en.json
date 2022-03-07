@@ -26,7 +26,7 @@
 		"options": {
 			"whitelist": {
 				"name": "Name of the whitelist",
-				"address": "The Cardano wallet address to add to/remove from the whitelist",
+				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist.",
 				"includeaddress": "Use this parameter and pass True if you want your registered address displayed on screen."
 			},
 			"configure-poll": {
@@ -99,6 +99,24 @@
 		"noPolicies": "*Currently, this server has no token policies listed.*",
 		"projectPolicyId": "The policy ID for this project is **{{policyId}}**"
 	},
+	"vote": {
+		"messageTitle": "Current polls and decisions on this Discord",
+		"purpose": "Find ongoing and completed polls on this server and view the results or vote, if you fulfill the required voting conditions.",
+		"pollInfo": "{{{poll.description}}}",
+		"yourVote": "Your current vote",
+		"pollInfoTitle": "Information about this poll",
+		"currentResults": "Current results",
+		"resultsNotVisible": "The results of this poll are hidden until the team publishes them.",
+		"yourVotingPower": "Your voting power",
+		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of {{totalVotingPower}} in your verified wallets.",
+		"votingPowerSingleNoToken": "This poll is not token-based and as such you have a voting power of one.",
+		"votingPowerSingleToken": "Based on the token ownership snapshot you have one vote in this poll.",
+		"votingPowerTokenInfo": "💡 If you feel your voting power is not accurate, ensure all your wallets are linked. The snapshot for this poll may also be different from the current token count in your wallet.",
+		"chooseVoteOption": "Choose what to vote for",
+		"choosePoll": "Pick the poll you'd like to know more about",
+		"noPollsTitle": "No polls",
+		"noPolls": "Currently, no available polls were found for this server."
+	},
 	"claim": {
 		"messageTitle": "Claim your physical items",
 		"purpose": "If you've minted a specific NFT or participated in an event or whitelist, you may be eligible to claim physical items. This command will let you pick your items and will then ask you for your shipping address via DM.\n💡 The system is opaque for the Discord operators and while they will receive your shipping address, they will not be provided with the associated stake address, keeping your personal data private.",
@@ -128,11 +146,11 @@
 		"enterZipCode": "🔢 Please enter your zip code:",
 		"addressEntryComplete": "☑ Address entry complete. Please verify your shopping cart contents and address information.\n💡 Once submitted, your order can only be changed by contacting the project team.",
 		"checkoutComplete": "☑ You have successfully submitted your order. You can see your order details by running the */claim* command again in your respective Discord server. The project team will be in touch with updates on the delivery.",
-		"checkoutError": "⚠ There was an error submitting your order. We apologize for the inconvenience and recommend getting in touch with the project team. Make sure to write down the current time and time zone, so we can find the problem in our log data.",
+		"checkoutError": "⚠ There was an error submitting your order. We apologize for the inconvenience. We suggest to start the process via */claim* once more, as there can be problems if the order entry takes longer than 15 minutes overall from the initial claim to completion. If the error persists on the second attempt we ecommend getting in touch with the project team. Make sure to write down the current time and time zone, so we can find the problem easier.",
 		"currentAddress": "📦 Shipping To",
 		"currentAddressData": "{{shipTo}}\n{{street}}\n{{zipCode}} {{city}}\n{{country}}\n{{phone}}",
 		"noCurrentOrderProcessTitle": "No order in process",
-		"noCurrentOrderProcess": "Sorry, there is current order active, so I cannot respond properly. Please start an order in the respective Discord by running */claim*.",
+		"noCurrentOrderProcess": "⚠ Sorry, there is no current order active, so I cannot respond properly. If you are reacting to an older message please start the order process again in the respective Discord by running */claim*.",
 		"noDirectMessage": "⚠ The bot is not able to send you a direct message, which means it will not be able to collect your shipping address. Please click on the server name, select **Privacy Settings** and enable **Allow direct messages from server members**. You can disable it again after the claim process is complete.",
 		"noClaimListsTitle": "No claim lists available",
 		"noClaimLists": "*Currently, you do not qualify for any claim lists.*\n\nℹ If you think you qualify, make sure your respective staking address is verified and linked via the */verify list*, */verify add* and */verify link* commands.",
@@ -217,12 +235,12 @@
 		"register": {
 			"messageTitle": "Register for a whitelist",
 			"purpose": "Choose the whitelist you would like to register for:",
-			"signedupFor": "You are successfully registered for the following whitelists:",
-			"signedupForEntry": "✅ **{{{whitelist.displayName}}}**",
+			"signedupFor": "You are currently registered for the following whitelists:",
+			"signedupForEntry": "• **{{{whitelist.displayName}}}**",
 			"chooseWhitelist": "Select your whitelist",
-			"noOpenWhitelists": "There are currently no further whitelists that you qualify for.",
-			"success": "✅ Congratulations, you have successfully registered for the whitelist \"**{{{whitelist.displayName}}}**\"!\n\nUsed address: *{{address}}*",
-			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*.\n\nPlease verify you are using a valid {{blockchain}} address to register.",
+			"noOpenWhitelists": "There are currently no further whitelists that you qualify for.\n\n💡 If you verified your wallet within the last few minutes, please wait at least 15 minutes for the automatic role-assignments to take effect. Then try again.",
+			"success": "✅ Congratulations, you have successfully registered for the whitelist \"**{{{whitelist.displayName}}}**\"!\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
+			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist."
 		},
@@ -330,8 +348,25 @@
 		},
 		"poll": {
 			"list": {
-				"purpose": "This is the list of all existing whitelists for this Discord server.",
-				"noPollsDetail": "*There are no configured polls on this server.*"
+				"purpose": "This is the list of all existing polls for this Discord server.",
+				"noPollsDetail": "*There are no configured polls on this server.*",
+				"pollInfo": "Opens on: {{openAfterFormatted}} UTC\nCloses on: {{openUntilFormatted}} UTC",
+				"choosePollDetails": "Choose the poll you want more details on",
+				"details": "Poll Details",
+				"detailsName": "Display name (Internal name)",
+				"detailsDescription": "Description/Question",
+				"detailsCreation": "Created at",
+				"creationDate": "{{createTime}} UTC",
+				"detailsDates": "Opens/Closes",
+				"detailsChoices": "Poll voting choices",
+				"detailsConfiguration": "Poll configuration",
+				"optionList": "Public results: {{resultsVisible}}\nMultiple options allowed: {{multipleVotes}}\nToken-based vote: {{tokenBased}}\nWeighted vote: {{weighted}}",
+				"detailsRoles": "User has to have one of the following roles",
+				"requiredRoleEntry": "• <@&{{role.roleId}}>",
+				"detailsChannel": "Announcement info",
+				"announcementNone": "No voting announcement will be made by the bot and the results will not be automatically published when the vote ends.",
+				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens. When the poll closes, the results will be published in the same channel.",
+				"adminName": "{{poll.displayName}} ({{poll.name}})"
 			},
 			"add": {
 				"previewPhase1": "Welcome to the new poll wizard 🧙‍♂️! We will walk you through creating a new poll for your server.\n⚠ We highly suggest only running this command in a private channel as you will be asked to type messages to populate the description and voting options later on.\n\nYou've configured the following initial settings for your poll:",
@@ -381,7 +416,8 @@
 			"remove": {
 				"success": "🗑️ Removed the following poll from this server:",
 				"purpose": "Select the poll to remove from your Discord server.\n\n⚠ **ALL REGISTERED VOTES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE POLL**.\n\nOnly do this after you have processed this poll.",
-				"errorNotFound": "⚠ No poll with the name **{{pollName}}** was found for this server. Nothing was removed."
+				"errorNotFound": "⚠ No poll with the ID **{{pollId}}** was found for this server. Nothing was removed.",
+				"choosePollDetails": "Choose the poll you want to irrevocably delete"
 			}
 		},
 		"whitelist": {
@@ -497,7 +533,8 @@
 		"pollTitle": "Polls",
 		"poll": "Polls and voting system for open and holder-limited polls",
 		"claimphysicalTitle": "Physical Item Claiming",
-		"claimphysical": "Claiming physical items via verified lists"
+		"claimphysical": "Claiming physical items via verified lists",
+		"cardolphins": "features.cardolphins"
 	},
 	"generic": {
 		"cancel": "Cancel",

@@ -5,13 +5,15 @@ const {
   MessageActionRow, MessageSelectMenu, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('claim', locale);
     return new SlashCommandBuilder()
       .setName('claim')
-      .setDescription(i18n.__({ phrase: 'commands.descriptions.claim', locale }))
+      .setDescription(ci18n.description())
       .setDefaultPermission(false);
   },
   commandTags: ['claimphysical'],
@@ -310,7 +312,15 @@ module.exports = {
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.checkoutError', locale: useLocale }), 'claim');
         await interaction.user.send({ embeds: [embed] });
       }
+    } else {
+      this.messageTimeout(interaction);
     }
+  },
+  async messageTimeout(interaction) {
+    const discordServer = await interaction.client.services.discordserver.makeDiscordServerObject({});
+    const useLocale = discordServer.getBotLanguage();
+    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.submitOrder', locale: useLocale }), i18n.__({ phrase: 'claim.noCurrentOrderProcess', locale: useLocale }), 'claim');
+    await interaction.user.send({ embeds: [embed] });
   },
   async resetCart(interaction) {
     const userId = interaction.user.id;
@@ -335,53 +345,59 @@ module.exports = {
       productFields.push(cartField);
       const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale: useLocale }), i18n.__({ phrase: 'claim.checkout', locale: useLocale }), 'claim', productFields);
       await interaction.update({ embeds: [embed], components: productChoices, ephemeral: true });
+    } else {
+      this.messageTimeout(interaction);
     }
   },
   async addToCart(interaction, itemToAdd) {
     const userId = interaction.user.id;
     const currentOrder = this.getCurrentOrder(userId);
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(currentOrder.guildId);
-    const useLocale = discordServer.getBotLanguage();
-    currentOrder.items = currentOrder.items ?? [];
-    const itemDetails = itemToAdd.substr(1).split('-');
-    const newItem = {
-      productId: +itemDetails[0],
-      count: 1,
-    };
-    if (itemDetails.length > 1) {
-      newItem.variation = {
-        size: itemDetails[1],
+    if (currentOrder && currentOrder.guildId) {
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(currentOrder.guildId);
+      const useLocale = discordServer.getBotLanguage();
+      currentOrder.items = currentOrder.items ?? [];
+      const itemDetails = itemToAdd.substr(1).split('-');
+      const newItem = {
+        productId: +itemDetails[0],
+        count: 1,
       };
-    }
-    currentOrder.items.push(newItem);
-    this.updateOrder(userId, currentOrder);
-    const availableProducts = this.getAvailableProductsForClaimList(userId, currentOrder.claimListId);
+      if (itemDetails.length > 1) {
+        newItem.variation = {
+          size: itemDetails[1],
+        };
+      }
+      currentOrder.items.push(newItem);
+      this.updateOrder(userId, currentOrder);
+      const availableProducts = this.getAvailableProductsForClaimList(userId, currentOrder.claimListId);
 
-    const productFields = availableProducts.map((product) => ({
-      name: product.name,
-      value: i18n.__({ phrase: 'claim.claimProductDetails', locale: useLocale }, product),
-    }));
-    const { cartField, productChoices } = this.getProductChoices(currentOrder, useLocale, availableProducts);
-    productFields.push(cartField);
-    if (productChoices.length) {
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale: useLocale }), i18n.__({ phrase: 'claim.checkout', locale: useLocale }), 'claim', productFields);
-      await interaction.update({ embeds: [embed], components: productChoices, ephemeral: true });
+      const productFields = availableProducts.map((product) => ({
+        name: product.name,
+        value: i18n.__({ phrase: 'claim.claimProductDetails', locale: useLocale }, product),
+      }));
+      const { cartField, productChoices } = this.getProductChoices(currentOrder, useLocale, availableProducts);
+      productFields.push(cartField);
+      if (productChoices.length) {
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale: useLocale }), i18n.__({ phrase: 'claim.checkout', locale: useLocale }), 'claim', productFields);
+        await interaction.update({ embeds: [embed], components: productChoices, ephemeral: true });
+      } else {
+        const finish = [
+          new MessageActionRow()
+            .addComponents(
+              new MessageButton()
+                .setCustomId('claim/enteraddress')
+                .setLabel(i18n.__({ phrase: 'claim.enterShippingData', locale: useLocale }))
+                .setStyle('PRIMARY'),
+              new MessageButton()
+                .setCustomId('claim/reset')
+                .setLabel(i18n.__({ phrase: 'claim.clearShoppingCart', locale: useLocale }))
+                .setStyle('DANGER'),
+            ),
+        ];
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale: useLocale }), i18n.__({ phrase: 'claim.checkout', locale: useLocale }), 'claim', productFields);
+        await interaction.update({ embeds: [embed], components: finish, ephemeral: true });
+      }
     } else {
-      const finish = [
-        new MessageActionRow()
-          .addComponents(
-            new MessageButton()
-              .setCustomId('claim/enteraddress')
-              .setLabel(i18n.__({ phrase: 'claim.enterShippingData', locale: useLocale }))
-              .setStyle('PRIMARY'),
-            new MessageButton()
-              .setCustomId('claim/reset')
-              .setLabel(i18n.__({ phrase: 'claim.clearShoppingCart', locale: useLocale }))
-              .setStyle('DANGER'),
-          ),
-      ];
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale: useLocale }), i18n.__({ phrase: 'claim.checkout', locale: useLocale }), 'claim', productFields);
-      await interaction.update({ embeds: [embed], components: finish, ephemeral: true });
+      this.messageTimeout(interaction);
     }
   },
   getAvailableProductsForClaimList(userId, claimListId) {

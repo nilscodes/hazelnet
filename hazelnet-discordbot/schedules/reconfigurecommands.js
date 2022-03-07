@@ -3,7 +3,7 @@ const commandregistration = require('../utility/commandregistration');
 const commandPermissions = require('../utility/commandpermissions');
 
 module.exports = {
-  cron: '25 * * * *',
+  cron: '*/5 * * * *',
   async execute(client) {
     client.logger.info('Checking if all servers need their commands and permissions updated...');
     try {
@@ -23,9 +23,9 @@ module.exports = {
             client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})` });
           }
         }
-        await client.services.globalsettings.deleteGlobalSetting('RESET_ALL_COMMANDS');
+        await client.services.globalsettings.updateGlobalSetting('RESET_ALL_COMMANDS', 'false');
       } else {
-        client.logger.info('... No command and permission reset required. Phew.');
+        client.logger.info('... No command and permission reset required.');
       }
     } catch (error) {
       client.logger.error({ msg: 'Failed to do command and permission reset check.', error });

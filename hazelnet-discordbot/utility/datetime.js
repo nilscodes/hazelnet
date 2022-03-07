@@ -6,4 +6,10 @@ module.exports = {
       return false;
     }
   },
+  getUTCDateFormatted(objectWithDate, dateProperty) {
+    if (objectWithDate[dateProperty]) {
+      return new Date(objectWithDate[dateProperty]).toISOString().replace(/\.[0-9]{3}Z$/, '').replace('T', ' ');
+    }
+    return '';
+  },
 };

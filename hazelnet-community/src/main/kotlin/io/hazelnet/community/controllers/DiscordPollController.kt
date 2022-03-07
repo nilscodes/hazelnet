@@ -20,9 +20,19 @@ class DiscordPollController(
     @ResponseStatus(HttpStatus.CREATED)
     fun addPoll(@PathVariable guildId: Long, @RequestBody @Valid discordPoll: DiscordPoll) = discordPollService.addPoll(guildId, discordPoll)
 
+    @DeleteMapping("/{guildId}/polls/{pollId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deletePoll(@PathVariable guildId: Long, @PathVariable pollId: Int) = discordPollService.deletePoll(guildId, pollId)
 
-
-    @PutMapping("/{guildId}/polls/{pollId}/votes/{externalAccountId}")
+    @GetMapping("/{guildId}/polls/{pollId}/votes")
     @ResponseStatus(HttpStatus.OK)
-    fun setVote(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long, @RequestBody options: List<Long>) = discordPollService.setVote(guildId, pollId, externalAccountId, options)
+    fun getVotesInPoll(@PathVariable guildId: Long, @PathVariable pollId: Int) = discordPollService.getVotesInPoll(guildId, pollId)
+
+    @GetMapping("/{guildId}/polls/{pollId}/votes/{externalAccountId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getVoteOfUser(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long) = discordPollService.getVoteOfUser(guildId, pollId, externalAccountId)
+
+    @PostMapping("/{guildId}/polls/{pollId}/votes/{externalAccountId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun setVoteForUser(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long, @RequestBody options: List<Long>) = discordPollService.setVote(guildId, pollId, externalAccountId, options)
 }

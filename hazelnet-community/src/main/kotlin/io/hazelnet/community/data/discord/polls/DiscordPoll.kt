@@ -75,6 +75,9 @@ class DiscordPoll @JsonCreator constructor(
     @Column(name = "poll_multiple_votes")
     var multipleVotes: Boolean = false,
 
+    @Column(name = "poll_archived")
+    var archived: Boolean = false,
+
     @Column(name = "poll_snapshot_id")
     var snapshotId: Int?,
 
@@ -107,6 +110,7 @@ class DiscordPoll @JsonCreator constructor(
         if (openAfter != other.openAfter) return false
         if (openUntil != other.openUntil) return false
         if (multipleVotes != other.multipleVotes) return false
+        if (archived != other.archived) return false
         if (snapshotId != other.snapshotId) return false
         if (requiredRoles != other.requiredRoles) return false
         if (options != other.options) return false
@@ -127,6 +131,7 @@ class DiscordPoll @JsonCreator constructor(
         result = 31 * result + openAfter.hashCode()
         result = 31 * result + openUntil.hashCode()
         result = 31 * result + multipleVotes.hashCode()
+        result = 31 * result + archived.hashCode()
         result = 31 * result + (snapshotId ?: 0)
         result = 31 * result + requiredRoles.hashCode()
         result = 31 * result + options.hashCode()
@@ -134,7 +139,7 @@ class DiscordPoll @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordPoll(id=$id, discordServer=${discordServer?.id}, creator=${creator}, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, multipleVotes=$multipleVotes, snapshotId=$snapshotId, requiredRoles=$requiredRoles)"
+        return "DiscordPoll(id=$id, discordServer=${discordServer?.id}, creator=${creator}, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles)"
     }
 
 

@@ -16,6 +16,9 @@ module.exports = {
     });
     return this.cache.get(settingName);
   },
+  async updateGlobalSetting(name, value) {
+    await axios.put(`${hazelCommunityUrl}/settings/${name}`, { name, value });
+  },
   async deleteGlobalSetting(settingName) {
     await axios.delete(`${hazelCommunityUrl}/settings/${settingName}`);
     this.clearCacheEntry(settingName);

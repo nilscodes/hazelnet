@@ -3,6 +3,7 @@ const i18n = require('i18n');
 const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
+const adahandle = require('../../utility/adahandle');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
@@ -11,7 +12,16 @@ module.exports = {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
     const useLocale = discordServer.getBotLanguage();
     try {
-      const addressToWhitelist = interaction.options.getString('address');
+      const addressOrHandle = interaction.options.getString('address-or-handle');
+      let addressToWhitelist = null;
+      let handle = null;
+      if (adahandle.isHandle(addressOrHandle)) {
+        handle = addressOrHandle;
+        addressToWhitelist = await interaction.client.services.cardanoinfo.resolveHandle(handle);
+      } else {
+        addressToWhitelist = addressOrHandle;
+      }
+
       const cardanoAddress = /^addr1[a-zA-Z0-9]{10,100}$/;
       if (cardanoAddress.test(addressToWhitelist)) {
         const externalAccount = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.user.id);
@@ -23,7 +33,7 @@ module.exports = {
           return whitelistUtil.userQualifies(interaction, whitelist, existingSignup);
         });
         const whitelistsAllowed = await Promise.all(whitelistsAllowedPromises);
-        const whitelistOptions = discordServer.whitelists.filter((v, index) => (whitelistsAllowed[index])).map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
+        const whitelistOptions = discordServer.whitelists.filter((_, index) => (whitelistsAllowed[index])).map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
         if (whitelistOptions.length) {
           // Register address in cache, as we cannot send it along with the menu data.
           this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, addressToWhitelist);
@@ -43,7 +53,11 @@ module.exports = {
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.invalidAddress', locale: useLocale }, { address: addressToWhitelist, blockchain: 'Cardano' }), 'whitelist-register');
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.invalidAddress', locale: useLocale }, {
+          address: addressToWhitelist,
+          blockchain: 'Cardano',
+          example: 'addr1qxqhukr5nhsa0qm7uj9zv6h9xvf698m5u9k8gh8wl3mpetsfuzpzq2vy24qehs92d4zlz8af96c8tzcukkzarqfa0q8s7t255v',
+        }), 'whitelist-register');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

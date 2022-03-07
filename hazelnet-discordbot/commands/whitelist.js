@@ -12,7 +12,7 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('register')
         .setDescription(ci18n.subDescription('register'))
-        .addStringOption((option) => option.setName('address').setDescription(ci18n.option('address')).setRequired(true)))
+        .addStringOption((option) => option.setName('address-or-handle').setDescription(ci18n.option('address-or-handle')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list'))

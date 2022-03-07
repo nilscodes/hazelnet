@@ -1,4 +1,5 @@
 const i18n = require('i18n');
+const datetime = require('./datetime');
 
 module.exports = {
   getDetailsText(discordServer, whitelist) {
@@ -26,8 +27,8 @@ module.exports = {
       }
     }
 
-    const signupAfterFormatted = this.getSignupDateFormatted(whitelist, 'signupAfter');
-    const signupUntilFormatted = this.getSignupDateFormatted(whitelist, 'signupUntil');
+    const signupAfterFormatted = datetime.getUTCDateFormatted(whitelist, 'signupAfter');
+    const signupUntilFormatted = datetime.getUTCDateFormatted(whitelist, 'signupUntil');
     const datePart = i18n.__({ phrase: datePhrase, locale }, { signupAfterFormatted, signupUntilFormatted });
     const roleAndDatePart = i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirement', locale }, { whitelist, datePart });
 
@@ -103,12 +104,6 @@ module.exports = {
       return Promise.all(signupsPromise.map((p) => p.catch(() => undefined)));
     }
     return [];
-  },
-  getSignupDateFormatted(whitelist, dateType) {
-    if (whitelist[dateType]) {
-      return new Date(whitelist[dateType]).toISOString().replace('.000Z', '').replace('T', ' ');
-    }
-    return '';
   },
   isValidName(whitelistName) {
     const whitelistNameRegex = /^[A-Za-z][-A-Za-z0-9]{0,29}$/;

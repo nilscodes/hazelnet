@@ -1,10 +1,7 @@
 package io.hazelnet.community.services
 
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfo
 import io.hazelnet.community.data.cardano.MultiAssetSnapshot
 import io.hazelnet.community.data.cardano.MultiAssetSnapshotEntry
-import io.hazelnet.community.data.discord.DiscordServerSetting
-import io.hazelnet.community.data.discord.DiscordSettings
 import io.hazelnet.community.persistence.MultiAssetSnapshotRepository
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
@@ -26,11 +23,14 @@ class MultiAssetSnapshotService(
         return multiAssetSnapshotRepository.save(multiAssetSnapshot)
     }
 
+    fun getSnapshot(snapshotId: Int): MultiAssetSnapshot = multiAssetSnapshotRepository.findById(snapshotId).orElseThrow()
+
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun runSnapshots() {
         val dueSnapshots = multiAssetSnapshotRepository.findAllDueSnapshots(Date())
         dueSnapshots.forEach {
             val policyIdWithOptionalAssetFingerprint =  it.policyId + (it.assetFingerprint ?: "")
+            logger.info { "Taking snapshot with ID ${it.id} scheduled for ${it.createTime}, with policy/asset combination $policyIdWithOptionalAssetFingerprint" }
             try {
                 val snapshotData =
                     connectService.getTokenSnapshotByPolicyId(setOf(policyIdWithOptionalAssetFingerprint))

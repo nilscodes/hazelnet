@@ -369,9 +369,8 @@ module.exports = {
     const pollObject = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
     try {
       if (pollObject.policyId) {
-        console.log('Snappshotting');
-        // Snapshot
-        // pollObject.snapshotId = snapshot.id;
+        const scheduledSnapshot = await interaction.client.services.snapshots.scheduleSnapshot(new Date().toISOString(), pollObject.policyId, pollObject.assetFingerprint);
+        pollObject.snapshotId = scheduledSnapshot.id;
       }
       await interaction.client.services.discordserver.createPoll(interaction.guild.id, pollObject);
       const content = this.buildContent(useLocale, interaction.channel.id, pollObject, 7);

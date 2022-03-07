@@ -153,6 +153,17 @@ module.exports = {
     const roleAssignments = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/roleassignments/tokenroles`);
     return roleAssignments.data;
   },
+  async getPolls(guildId) {
+    const polls = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls`);
+    return polls.data;
+  },
+  async deletePoll(guildId, pollId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
+  },
+  async getVoteOfUser(guildId, pollId, externalAccountId) {
+    const votingData = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`);
+    return votingData.data;
+  },
   async getAllDiscordServers() {
     const cachedDiscordServer = this.cache.get('allservers');
     if (cachedDiscordServer !== undefined) {

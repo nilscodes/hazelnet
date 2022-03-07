@@ -6,4 +6,5 @@ module.exports = {
   verifications: require('./services/verifications'),
   cardanoinfo: require('./services/cardanoinfo'),
   claimlists: require('./services/claimlists'),
+  snapshots: require('./services/snapshots'),
 };
