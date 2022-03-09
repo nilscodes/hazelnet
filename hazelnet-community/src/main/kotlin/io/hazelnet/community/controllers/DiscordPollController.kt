@@ -34,5 +34,5 @@ class DiscordPollController(
 
     @PostMapping("/{guildId}/polls/{pollId}/votes/{externalAccountId}")
     @ResponseStatus(HttpStatus.OK)
-    fun setVoteForUser(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long, @RequestBody options: List<Long>) = discordPollService.setVote(guildId, pollId, externalAccountId, options)
+    fun setVoteForUser(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long, @RequestBody options: List<Long>) = discordPollService.setVoteForUser(guildId, pollId, externalAccountId, options)
 }

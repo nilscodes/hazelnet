@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.polls.DiscordPoll
 import io.hazelnet.community.data.discord.polls.DiscordPollVote
@@ -41,12 +42,16 @@ class DiscordPollService(
     fun getVotesInPoll(guildId: Long, pollId: Int): VoteData {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val poll = getPoll(discordServer, pollId)
+        return getExistingVotesFromPoll(poll)
+    }
+
+    private fun getExistingVotesFromPoll(poll: DiscordPoll): VoteData {
         val existingVotes = poll.options
             .associate { option ->
-               Pair(
-                   option.id!!,
-                   option.votes.sumOf { it.weight }
-               )
+                Pair(
+                    option.id!!,
+                    option.votes.sumOf { it.weight }
+                )
             }
         return VoteData(existingVotes)
     }
@@ -56,11 +61,19 @@ class DiscordPollService(
         val voter = externalAccountService.getExternalAccount(externalAccountId)
         val poll = getPoll(discordServer, pollId)
         val totalVotingPower = this.getVotingPower(poll, externalAccountId)
+        return getExistingVoteOfUserFromPoll(poll, voter, totalVotingPower)
+    }
+
+    private fun getExistingVoteOfUserFromPoll(
+        poll: DiscordPoll,
+        voter: ExternalAccount,
+        totalVotingPower: Long
+    ): VoteData {
         val existingVotes = poll.options
             .associate { option ->
                 Pair(
                     option.id!!,
-                    option.votes.find { it.externalAccountId == voter   .id }?.weight ?: 0
+                    option.votes.find { it.externalAccountId == voter.id }?.weight ?: 0
                 )
             }
             .filter { it.value > 0 }
@@ -81,9 +94,9 @@ class DiscordPollService(
     }
 
     @Transactional
-    fun setVote(guildId: Long, pollId: Int, externalAccountId: Long, options: List<Long>): Set<Long> {
+    fun setVoteForUser(guildId: Long, pollId: Int, externalAccountId: Long, options: List<Long>): Map<String, VoteData> {
         val discordServer = discordServerService.getDiscordServer(guildId)
-        val voter = externalAccountService.getExternalAccount(externalAccountId)
+        val voter = externalAccountService.getExternalAccount(externalAccountId) // Verify the voter exists - throws if not
         val poll = getPoll(discordServer, pollId)
         if (votingIsPossible(poll)) {
             val totalVotingPower = this.getVotingPower(poll, externalAccountId)
@@ -100,8 +113,8 @@ class DiscordPollService(
 
                     val now = Date.from(ZonedDateTime.now().toInstant())
                     if (poll.weighted) {
-                        val restVoteWeight = floor(totalVotingPower.toDouble() / options.size).toLong()
-                        val firstVoteWeight = totalVotingPower - restVoteWeight * options.size
+                        val restVoteWeight = floor(totalVotingPower.toDouble() / optionsToVoteFor.size).toLong()
+                        val firstVoteWeight = totalVotingPower - (restVoteWeight * (optionsToVoteFor.size - 1))
                         for ((voteCount, optionToVoteFor) in optionsToVoteFor.withIndex()) {
                             val weight = if (voteCount == 0) firstVoteWeight else restVoteWeight
                             poll.options.find { option -> option.id == optionToVoteFor }?.votes?.add(DiscordPollVote(externalAccountId, now, weight))
@@ -113,7 +126,10 @@ class DiscordPollService(
                     }
                 }
                 discordPollRepository.save(poll);
-                return optionsToVoteFor
+                return mapOf(
+                    Pair("user", getExistingVoteOfUserFromPoll(poll, voter, totalVotingPower)),
+                    Pair("poll", getExistingVotesFromPoll(poll))
+                )
             }
             throw NoSuchElementException("User $externalAccountId has no voting power in poll $pollId on Discord server with guild ID $guildId")
         }

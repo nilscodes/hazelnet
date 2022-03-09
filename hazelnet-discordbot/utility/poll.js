@@ -4,21 +4,21 @@ module.exports = {
     return pollNameRegex.test(pollName);
   },
   hasVotingEnded(poll) {
-    if (poll.signupUntil) {
-      return new Date(poll.signupUntil) < new Date();
+    if (poll.openUntil) {
+      return new Date(poll.openUntil) < new Date();
     }
     return false;
   },
   hasVotingStarted(poll) {
-    if (poll.signupAfter) {
-      return new Date(poll.signupAfter) < new Date();
+    if (poll.openAfter) {
+      return new Date(poll.openAfter) < new Date();
     }
     return true;
   },
   isPollArchived(poll) {
     return !!poll.closed;
   },
-  async userCanSeePoll(member, poll) {
+  userCanSeePoll(member, poll) {
     if (!this.isPollArchived(poll)) {
       if (poll.requiredRoles?.length) {
         const needsAnyOfRoleIds = poll.requiredRoles.map((role) => role.roleId);
@@ -28,9 +28,10 @@ module.exports = {
     }
     return false;
   },
-  async userCanVoteInPoll(member, poll, votingWeight) {
+  userCanVoteInPoll(member, poll, votingWeight) {
     if (!this.isPollArchived(poll) && !this.hasVotingEnded(poll) && this.hasVotingStarted(poll) && votingWeight > 0) {
-      return member.roles.cache.some((role) => role.id === poll.requiredRoleId);
+      const needsAnyOfRoleIds = poll.requiredRoles.map((role) => role.roleId);
+      return member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
     }
     return false;
   },

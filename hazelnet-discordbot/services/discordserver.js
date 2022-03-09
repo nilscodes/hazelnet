@@ -160,8 +160,16 @@ module.exports = {
   async deletePoll(guildId, pollId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
   },
+  async getPollResults(guildId, pollId) {
+    const pollResults = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes`);
+    return pollResults.data;
+  },
   async getVoteOfUser(guildId, pollId, externalAccountId) {
     const votingData = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`);
+    return votingData.data;
+  },
+  async setVoteForUser(guildId, pollId, externalAccountId, votes) {
+    const votingData = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`, votes);
     return votingData.data;
   },
   async getAllDiscordServers() {
