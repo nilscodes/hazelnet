@@ -24,6 +24,12 @@ module.exports = {
     this.cache.set(`${guildId}`, discordServerObject);
     return discordServerObject;
   },
+  async updateDiscordServer(guildId, discordServerPartial) {
+    const discordServerPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}`, discordServerPartial);
+    const discordServerObject = this.makeDiscordServerObject(discordServerPromise.data);
+    this.cache.set(`${guildId}`, discordServerObject);
+    return discordServerObject;
+  },
   async listExternalAccounts(guildId) {
     const membersPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members`);
     return membersPromise.data;
@@ -33,6 +39,18 @@ module.exports = {
       externalAccountId,
     });
     this.clearCacheEntry(guildId);
+  },
+  async getExternalAccountOnDiscord(guildId, externalAccountId) {
+    try {
+      const memberPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`);
+      return memberPromise.data;
+    } catch (error) {
+      return null;
+    }
+  },
+  async updateExternalAccountOnDiscord(guildId, externalAccountId, discordMemberPartial) {
+    const memberPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`, discordMemberPartial);
+    return memberPromise.data;
   },
   async disconnectExternalAccount(guildId, externalAccountId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`);

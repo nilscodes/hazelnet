@@ -10,18 +10,21 @@
 			"help": "Show general help on how to use this bot.",
 			"vote": "View the list of open polls and vote, if you are eligible.",
 			"claim": "Claim virtual or physical goods you are eligible for.",
+			"premium": "Manage your premium account and check your claimable $HAZEL balance and other perks.",
 			"configure-settings": "General configuration options for the bot",
 			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
 			"configure-poll": "Manage polls for people to vote on (off-chain)",
 			"configure-poll-list": "List all polls that are set up on this Discord server.",
-			"configure-poll-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
+			"configure-poll-add": "Adds a new poll to the server. You will be able to determine voting conditions and visibility.",
 			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
 			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
 			"configure-whitelist-close": "Temporarily or permanently close a whitelist for registrations.",
 			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
-			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations."
+			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
+			"configure-premium": "Set up and get info about your Black Edition Premium status.",
+			"configure-premium-stake": "Configure which wallet should be used as your delegation wallet for Black Edition usage."
 		},
 		"options": {
 			"whitelist": {
@@ -164,6 +167,19 @@
 		"helpChannel": "If you need assistance with your order, please get in touch with our team in the channel <#{{helpChannel}}>. We are happy to help you out.",
 		"noDescription": "No Description provided"
 	},
+	"premium": {
+		"messageTitle": "View your premium status",
+		"purpose": "Here you can see your claimable $HAZEL balance and see if you have pledged your support to this project. You can also check if you're the winner of a recent premium giveaway.",
+		"premiumStatus": "Premium Status",
+		"premiumStatusNo": "You are currently not a premium user. Simply visit https://www.hazelnet.io/stakepool and use the **Stake for Premium** button. Any staking amount on any of your verified wallets will get you premium status.",
+		"premiumStatusYes": "Thanks for supporting HAZELnet with your stake!\n\nClaimable $HAZEL balance: {{balance}}",
+		"serverSupport": "Server Support",
+		"serverSupportYes": "You have pledged your staked ADA to the following Discord servers:",
+		"serverSupportEntry": "• {{serverName}}",
+		"serverSupportNo": "You have not pledged your staked ADA to a Discord server. You can choose to support one or more Discord servers with your stake, without any downsides. Pledging your HAZEL premium account to a server means directly supporting your project.\n\nYou can change this at any time.",
+		"pledgeButtonYes": "Pledge your support to {{{guildName}}}",
+		"pledgeButtonNo": "Revoke your pledge to {{{guildName}}}"
+	},
 	"verify": {
 		"list": {
 			"messageTitle": "Your verified addresses",
@@ -265,10 +281,11 @@
 				"purpose": "This is the list of official policies that this server will present when end users use the /policyid command.\n\n⚠ Do not add policy IDs for projects that are not your own or that you are not officially supporting. Reports of misused policy IDs will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage."
 			},
 			"add": {
-				"success": "✅ New official token policy added for this Discord server!"
+				"success": "✅ New official token policy added for this Discord server!",
+				"errorAlreadyUsed": "⚠ Error while adding your token policy. This policy ID is already added under the name **{{projectName}}**. Each policy ID can only be added once."
 			},
 			"remove": {
-				"success": "🗑️ Removed the following token policy from official token policy list of this server:",
+				"success": "🗑️ Removed the following token policy from the official token policy list of this server:",
 				"errorNotFound": "⚠ No policy with the ID **{{policyId}}** was found for this server. Nothing was removed."
 			}
 		},
@@ -499,6 +516,11 @@
 			},
 			"removetoken": {
 				"success": "🗑️ The API access token for this Discord server was successfully removed.\n❗ Any and all REST API integrations your project is using will currently not be able to retrieve data from HAZELnet."
+			}
+		},
+		"premium": {
+			"stake": {
+				"purpose": "Configure your stake address that will be used to ensure your Discord server has Black Edition enabled. Find out what the current required stake amount based on membership is and update your stake information if needed."
 			}
 		}
 	},

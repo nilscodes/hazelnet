@@ -23,7 +23,7 @@ module.exports = {
       }
       if (cardanoaddress.isStakedAddress(addressToVerify)) {
         const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
-        const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
+        const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
         const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
         if (existingConfirmedVerification) {
           await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);

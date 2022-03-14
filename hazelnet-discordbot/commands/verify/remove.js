@@ -9,7 +9,7 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
       const addressToRemove = interaction.options.getString('address');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const verifications = await interaction.client.services.externalaccounts.getActiveVerificationsForDiscordAccount(externalAccount.id);
+      const verifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
 
       await verifications.filter((verification) => verification.address === addressToRemove).forEach(async (verification) => {
         await interaction.client.services.verifications.removeVerification(verification.id);

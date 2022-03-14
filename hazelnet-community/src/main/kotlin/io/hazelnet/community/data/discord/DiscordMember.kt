@@ -16,7 +16,10 @@ class DiscordMember @JsonCreator constructor(
         var externalAccountId: Long,
 
         @Column(name = "join_time", updatable = false)
-        var joinTime: Date?
+        var joinTime: Date?,
+
+        @Column(name = "premium_support")
+        var premiumSupport: Boolean = false,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,17 +28,20 @@ class DiscordMember @JsonCreator constructor(
         other as DiscordMember
 
         if (externalAccountId != other.externalAccountId) return false
+        if (joinTime != other.joinTime) return false
+        if (premiumSupport != other.premiumSupport) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return externalAccountId.hashCode()
+        var result = externalAccountId.hashCode()
+        result = 31 * result + (joinTime?.hashCode() ?: 0)
+        result = 31 * result + premiumSupport.hashCode()
+        return result
     }
 
     override fun toString(): String {
-        return "DiscordMember(externalAccountId=$externalAccountId, joinTime=$joinTime)"
+        return "DiscordMember(externalAccountId=$externalAccountId, joinTime=$joinTime, premiumSupport=$premiumSupport)"
     }
-
-
 }

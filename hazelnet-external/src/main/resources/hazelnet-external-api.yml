@@ -30,7 +30,54 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
-
+    /community/claimlists/{claimListName}/orders:
+        get:
+            summary: 'Get orders for a claim list'
+            operationId: getClaimListOrders
+            tags:
+                - discord
+                - claims
+            parameters:
+                - $ref: '#/components/parameters/ClaimListNamePathParameter'
+            responses:
+                '200':
+                    description: 'All orders for this claim list'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/AnonymousPhysicalOrder'
+                default:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+    /community/claimlists/{claimListName}/products:
+        get:
+            summary: 'Get products for a claim list'
+            operationId: getClaimListProducts
+            tags:
+                - discord
+                - claims
+            parameters:
+                - $ref: '#/components/parameters/ClaimListNamePathParameter'
+            responses:
+                '200':
+                    description: 'All products available for this claim list'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/PhysicalProduct'
+                default:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
 components:
     parameters:
         WhitelistNamePathParameter:
@@ -40,6 +87,15 @@ components:
             required: true
             style: simple
             example: MyGoodList
+            schema:
+                type: string
+        ClaimListNamePathParameter:
+            name: claimListName
+            in: path
+            description: The name of this claim list
+            required: true
+            style: simple
+            example: HoodieOrder
             schema:
                 type: string
 
@@ -55,6 +111,84 @@ components:
                     type: string
                     format: date-time
                     example: 2021-11-10T13:20:57Z
+        AnonymousPhysicalOrder:
+            type: object
+            required:
+                - country
+                - zipCode
+                - city
+                - street
+                - items
+            properties:
+                id:
+                    readOnly: true
+                    type: integer
+                    format: int64
+                country:
+                    type: string
+                    example: Germany
+                    minLength: 1
+                    maxLength: 100
+                zipCode:
+                    type: string
+                    example: 84323-2031
+                    minLength: 1
+                    maxLength: 30
+                city:
+                    type: string
+                    example: Junkersdorf
+                    minLength: 1
+                    maxLength: 200
+                street:
+                    type: string
+                    example: Burenstrasse 25
+                    minLength: 1
+                    maxLength: 500
+                items:
+                    type: array
+                    minItems: 1
+                    items:
+                        $ref: '#/components/schemas/AnonymousPhysicalOrderItem'
+                processed:
+                    type: boolean
+                    readOnly: true
+        AnonymousPhysicalOrderItem:
+            type: object
+            required:
+                - productId
+                - count
+            properties:
+                productId:
+                    type: integer
+                    format: int64
+                count:
+                    type: integer
+                    format: int64
+        PhysicalProduct:
+            type: object
+            required:
+                - name
+            properties:
+                id:
+                    readOnly: true
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+                    example: T-Shirt
+                variations:
+                    type: object
+                    example:
+                        colors:
+                            - Green
+                            - Black
+                            - Red
+                        sizes:
+                            - S
+                            - M
+                            - L
+                            - XL
+                            - XXL
         WalletAddress:
             type: string
         BlockchainType:

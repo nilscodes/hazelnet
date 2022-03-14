@@ -61,6 +61,14 @@ class DiscordServerService(
         return discordServer
     }
 
+    fun updateDiscordServer(guildId: Long, discordServerPartial: DiscordServerPartial): DiscordServer {
+        val discordServer = getDiscordServer(guildId)
+        discordServer.guildMemberCount = discordServerPartial.guildMemberCount
+        discordServer.guildName = discordServerPartial.guildName
+        discordServer.guildOwner = discordServerPartial.guildOwner
+        return discordServerRepository.save(discordServer)
+    }
+
     fun addTokenPolicy(guildId: Long, tokenPolicy: TokenPolicy): TokenPolicy {
         val discordServer = getDiscordServer(guildId)
         discordServer.tokenPolicies.add(tokenPolicy)
@@ -138,6 +146,20 @@ class DiscordServerService(
         discordServer.members.add(discordMember)
         discordServerRepository.save(discordServer)
         return discordMember
+    }
+
+
+    fun getMember(guildId: Long, externalAccountId: Long): DiscordMember {
+        val discordServer = getDiscordServer(guildId)
+        return discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild $guildId")
+    }
+
+    fun updateMember(guildId: Long, externalAccountId: Long, discordMemberPartial: DiscordMemberPartial): DiscordMember {
+        val discordServer = getDiscordServer(guildId)
+        val member = discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild $guildId")
+        member.premiumSupport = discordMemberPartial.premiumSupport
+        discordServerRepository.save(discordServer)
+        return member
     }
 
     fun removeMember(guildId: Long, externalAccountId: Long) {
@@ -441,7 +463,7 @@ class DiscordServerService(
             val stakeAddressesToServerMembershipCounts = discordMemberDelegations
                     .groupBy { it.getCardanoStakeAddress() }
                     .mapValues { it.value.distinctBy { stakeInfo -> "${stakeInfo.getDiscordServerId()}.${stakeInfo.getCardanoStakeAddress()}" }.size }
-            val allDelegationToFundedPool = connectService.getActiveDelegationForPools(listOf(config.fundedpool))
+            val allDelegationToFundedPool = stakepoolService.getDelegation(config.fundedpool)
             // Divide each stake amount by the number of Discord servers the respective stake is verified on
             return allDelegationToFundedPool
                     .filter { stakeAddressesOnThisServer.contains(it.stakeAddress) }
@@ -451,4 +473,5 @@ class DiscordServerService(
         }
         return 0
     }
+
 }

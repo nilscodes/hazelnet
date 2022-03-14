@@ -14,7 +14,7 @@ paths:
         - global
       responses:
         '200':
-          description: 'External Account Info'
+          description: 'All Global Settings'
           content:
             application/json:
               schema:
@@ -445,7 +445,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscordServer'
-
     post:
       summary: Add Discord Server
       operationId: addDiscordServer
@@ -481,6 +480,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordServer'
+    patch:
+      summary: Update Discord Server
+      operationId: updateDiscordServer
+      tags:
+        - discord
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordServerPartial'
+      responses:
+        '200':
+          description: 'Updated Discord Server'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordServer'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/roleassignments/delegatorroles:
     get:
       summary: Get the current set of delegator role assignments for this server
@@ -521,6 +542,7 @@ paths:
       operationId: getExternalAccounts
       tags:
         - discord
+        - account
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       responses:
@@ -537,6 +559,7 @@ paths:
       operationId: connectExternalAccount
       tags:
         - discord
+        - account
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
       requestBody:
@@ -552,11 +575,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/DiscordMember'
   /discord/servers/{guildId}/members/{externalAccountId}:
+    get:
+      summary: Get your association details for this Discord
+      operationId: getExternalAccountOnDiscord
+      tags:
+        - discord
+        - account
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: Discord member details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordMember'
+    patch:
+      summary: Update your association details for this Discord
+      operationId: updateExternalAccountOnDiscord
+      tags:
+        - discord
+        - account
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordMemberPartial'
+      responses:
+        '200':
+          description: Updated discord member details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordMember'
     delete:
       summary: Unlink an external account from this discord server
       operationId: disconnectExternalAccount
       tags:
         - discord
+        - account
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/ExternalAccountPathParameter'
@@ -871,7 +932,7 @@ paths:
   /discord/servers/{guildId}/polls/{pollId}/votes:
     get:
       summary: 'Get votes for this poll'
-      operationId: getVotes
+      operationId: getVotesInPoll
       tags:
         - discord
         - poll
@@ -886,7 +947,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordPollVote'
+                  $ref: '#/components/schemas/VoteData'
         default:
           description: Unexpected error
           content:
@@ -930,11 +991,16 @@ paths:
                 $ref: '#/components/schemas/DiscordPollOptionId'
       responses:
         '200':
-          description: 'Vote'
+          description: 'Vote data for the user and the poll'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VoteData'
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/VoteData'
+                  poll:
+                    $ref: '#/components/schemas/VoteData'
   /discord/servers/{guildId}/whitelists:
     post:
       summary: Add a whitelist for owners of a specific role to this server
@@ -1367,6 +1433,9 @@ components:
         account:
           type: integer
           format: int64
+        premium:
+          type: boolean
+          default: false
     VerificationRequest:
       type: object
       required:
@@ -1623,6 +1692,20 @@ components:
           type: object
           additionalProperties:
             type: string
+    DiscordServerPartial:
+      type: object
+      properties:
+        guildName:
+          type: string
+          example: Guild Name
+        guildOwner:
+          type: integer
+          format: int64
+          example: 9358923890
+        guildMemberCount:
+          type: integer
+          format: int32
+          example: 150
     TokenPolicy:
       type: object
       required:
@@ -1942,6 +2025,19 @@ components:
         externalAccountId:
           type: integer
           format: int64
+        joinTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+          readOnly: true
+        premiumSupport:
+          type: boolean
+          default: false
+    DiscordMemberPartial:
+      type: object
+      properties:
+        premiumSupport:
+          type: boolean
     DiscordRoleAssignment:
       type: object
       required:

@@ -37,6 +37,10 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.OK)
     fun getDiscordServer(@PathVariable guildId: Long) = discordServerService.getDiscordServer(guildId)
 
+    @PatchMapping("/{guildId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateDiscordServer(@PathVariable guildId: Long, @RequestBody @Valid discordServerPartial: DiscordServerPartial) = discordServerService.updateDiscordServer(guildId, discordServerPartial)
+
     @PostMapping("/{guildId}/tokenpolicies")
     @ResponseStatus(HttpStatus.CREATED)
     fun addTokenPolicy(@PathVariable guildId: Long, @RequestBody @Valid tokenPolicy: TokenPolicy): ResponseEntity<TokenPolicy> {
@@ -148,6 +152,14 @@ class DiscordServerController(
     @PostMapping("/{guildId}/members")
     @ResponseStatus(HttpStatus.CREATED)
     fun connectExternalAccount(@PathVariable guildId: Long, @RequestBody @Valid discordMember: DiscordMember) = discordServerService.addMember(guildId, discordMember)
+
+    @GetMapping("/{guildId}/members/{externalAccountId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getExternalAccountOnDiscord(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.getMember(guildId, externalAccountId)
+
+    @PatchMapping("/{guildId}/members/{externalAccountId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateExternalAccountOnDiscord(@PathVariable guildId: Long, @PathVariable externalAccountId: Long, @RequestBody @Valid discordMemberPartial: DiscordMemberPartial) = discordServerService.updateMember(guildId, externalAccountId, discordMemberPartial)
 
     @DeleteMapping("/{guildId}/members/{externalAccountId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

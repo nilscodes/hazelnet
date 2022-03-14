@@ -52,11 +52,20 @@ CREATE TABLE "global_settings"
 CREATE TABLE "external_accounts"
 (
     "external_account_id"     BIGSERIAL PRIMARY KEY,
-    "external_reference_id"   varchar(200) NOT NULL,
+    "external_reference_id"   varchar(200)           NOT NULL,
     "external_reference_name" varchar(200),
     "registration_time"       timestamp,
     "account_type"            accounts_external_type NOT NULL,
-    "account_id"              bigint
+    "account_id"              bigint,
+    "premium"                 boolean                NOT NULL DEFAULT false
+);
+
+CREATE TABLE "premium_staked"
+(
+    "external_account_id" bigint,
+    "epoch"               int     NOT NULL,
+    "active_stake"        bigint  NOT NULL,
+    "paid_out"            boolean NOT NULL DEFAULT false
 );
 
 
@@ -78,21 +87,23 @@ CREATE TABLE "verifications"
 
 CREATE TABLE "discord_servers"
 (
-    "discord_server_id"  SERIAL PRIMARY KEY,
-    "guild_id"           bigint UNIQUE NOT NULL,
-    "guild_name"         varchar(100),
-    "guild_owner"        bigint,
-    "join_time"          timestamp,
-    "guild_member_count" int,
-    "owner_account_id"   bigint,
-    "premium"            boolean       NOT NULL DEFAULT false
+    "discord_server_id"   SERIAL PRIMARY KEY,
+    "guild_id"            bigint UNIQUE NOT NULL,
+    "guild_name"          varchar(100),
+    "guild_owner"         bigint,
+    "join_time"           timestamp,
+    "guild_member_count"  int,
+    "guild_member_update" timestamp,
+    "owner_account_id"    bigint,
+    "premium"             boolean       NOT NULL DEFAULT false
 );
 
 CREATE TABLE "discord_server_members"
 (
     "discord_server_id"   int,
     "external_account_id" bigint,
-    "join_time"           timestamp
+    "join_time"           timestamp,
+    "premium_support"     boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "discord_spo"
