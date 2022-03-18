@@ -1,26 +1,29 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('configure-tokenroles', locale);
     return new SlashCommandBuilder()
       .setName('configure-tokenroles')
-      .setDescription('Manage auto-role assignments for NFT and other token-holders')
+      .setDescription(ci18n.description())
       .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.')
-        .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID (Does not need to be an official policy of this server)').setRequired(true))
-        .addRoleOption((option) => option.setName('role').setDescription('Role to assign users with the given amount of tokens').setRequired(true))
-        .addStringOption((option) => option.setName('count').setDescription('Minimum amount of tokens to qualify for this role').setRequired(true))
-        .addStringOption((option) => option.setName('asset-fingerprint').setDescription('Asset fingerprint (useful for multiple FTs under one policy)').setRequired(false)))
+        .setDescription(ci18n.subDescription('add'))
+        .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true))
+        .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(true))
+        .addStringOption((option) => option.setName('count').setDescription(ci18n.option('count')).setRequired(true))
+        .addStringOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false))
+        .addStringOption((option) => option.setName('asset-fingerprint').setDescription(ci18n.option('asset-fingerprint')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs'))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Remove the auto-assignment for the given role for NFT and FT holders.')
-        .addIntegerOption((option) => option.setName('token-role-id').setDescription('Role to remove auto-assignments for (get ID from list command)').setRequired(true)));
+        .setDescription(ci18n.subDescription('remove'))
+        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)));
   },
   commandTags: ['token'],
   execute: commandbase.executeSubcommandIfAdmin,

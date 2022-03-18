@@ -308,7 +308,11 @@ class DiscordServerService(
                 discordServer.tokenRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
                         val policyIdWithOptionalAssetFingerprint =  role.policyId + (role.assetFingerprint ?: "")
-                        if ((tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0) >= role.minimumTokenQuantity) {
+                        val tokenCount = (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
+                        if (
+                            tokenCount >= role.minimumTokenQuantity
+                            && (role.maximumTokenQuantity == null || tokenCount <= role.maximumTokenQuantity!!)
+                        ) {
                             DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
                         } else {
                             null

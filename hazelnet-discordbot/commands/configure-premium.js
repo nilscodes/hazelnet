@@ -13,5 +13,6 @@ module.exports = {
         .setName('stake')
         .setDescription(ci18n.subDescription('stake')));
   },
+  commandTags: ['premium'],
   execute: commandbase.executeSubcommandIfAdmin,
 };

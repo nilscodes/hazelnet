@@ -12,8 +12,9 @@ module.exports = {
         const minutes = new Date().getMinutes() % 10;
         if (discordServer.guildId % 10 === minutes) {
           try {
+            const removeInvalid = discordServer.settings?.REMOVE_INVALID_DELEGATORROLES !== 'false';
             const expectedRoleAssignments = await client.services.discordserver.getCurrentDelegatorRoleAssignments(discordServer.guildId);
-            await roleassignments.ensureRoleAssignments(client, discordServer, 'delegatorRoles', expectedRoleAssignments);
+            await roleassignments.ensureRoleAssignments(client, discordServer, 'delegatorRoles', expectedRoleAssignments, removeInvalid);
           } catch (error) {
             client.logger.error({ msg: `Failed to update delegator roles for ${discordServer.guildName} (${discordServer.guildId})`, error });
           }

@@ -24,7 +24,11 @@
 			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
 			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
 			"configure-premium": "Set up and get info about your Black Edition Premium status.",
-			"configure-premium-stake": "Configure which wallet should be used as your delegation wallet for Black Edition usage."
+			"configure-premium-stake": "Configure which wallet should be used as your delegation wallet for Black Edition usage.",
+			"configure-tokenroles": "commands.descriptions.configure-tokenroles",
+			"configure-tokenroles-add": "commands.descriptions.configure-tokenroles-add",
+			"configure-tokenroles-list": "commands.descriptions.configure-tokenroles-list",
+			"configure-tokenroles-remove": "commands.descriptions.configure-tokenroles-remove"
 		},
 		"options": {
 			"whitelist": {
@@ -47,6 +51,14 @@
 				"max-users": "The maximum number of users that can sign up for this whitelist.",
 				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
 				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)"
+			},
+			"configure-tokenroles": {
+				"policy-id": "commands.options.configure-tokenroles.policy-id",
+				"role": "commands.options.configure-tokenroles.role",
+				"count": "commands.options.configure-tokenroles.count",
+				"max-count": "commands.options.configure-tokenroles.max-count",
+				"asset-fingerprint": "commands.options.configure-tokenroles.asset-fingerprint",
+				"token-role-id": "commands.options.configure-tokenroles.token-role-id"
 			}
 		}
 	},
@@ -327,12 +339,14 @@
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
-				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
 				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} "
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
 				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1.",
+				"errorMaximumTokens": "⚠ Automatic token role-assignment could not be added, as maximum token count needs to be at least 1 and cannot be less than minimum token count.",
 				"errorAssetFingerprint": "⚠ Automatic token role-assignment could not be added, since the provided asset fingerprint did not match the required format. Asset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*.",
 				"errorPolicyId": "⚠ Automatic token role-assignment could not be added, since the provided policy ID did not match the required format. Policy IDs look as follows: *8f63e08467bfbbc260a382a80f3297f9a569fca0293f296620d72d17*.",
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
@@ -533,8 +547,8 @@
 		"configureUserRoleTitle": "User Role",
 		"configureFeaturesTitle": "Features",
 		"configureLanguageText": "This setting determines the language of all bot commands and interactions. Currently it is not possible to have commands translate on a per-user basis - bot replies will in the future be able to be based on a user-selected language.",
-		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminaccess* command to adjust this later.",
-		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. You can add additional roles using the /configure-command later. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-useraccess* command to adjust this later.",
+		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminaccess* command to adjust this later.",
+		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-useraccess* command to adjust this later.",
 		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available.",
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",

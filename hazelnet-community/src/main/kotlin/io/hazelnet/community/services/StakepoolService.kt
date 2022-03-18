@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class StakepoolService(
         private val connectService: ConnectService
 ) {
-    @Cacheable(key = "all", cacheNames = ["stakepools"])
+    @Cacheable(key = "'all'", cacheNames = ["stakepools"])
     fun getStakepools(): Map<String, StakepoolInfo> {
         return connectService
                 .getStakepools()
@@ -20,7 +20,7 @@ class StakepoolService(
     }
 
     @Scheduled(fixedDelay = 600000)
-    @CacheEvict(key = "all", cacheNames = ["stakepools"])
+    @CacheEvict(key = "'all'", cacheNames = ["stakepools"])
     fun clearStakepoolCache() {
         // Annotation-based cache clearing
     }

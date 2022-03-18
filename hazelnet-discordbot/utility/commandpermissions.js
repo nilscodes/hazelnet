@@ -1,6 +1,6 @@
 module.exports = {
-  userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium'],
+  userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', /*'premium', */'help'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-settings', 'configure-api'/*, 'configure-premium'*/],
   async setSlashCommandPermissions(client, guildId, discordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {

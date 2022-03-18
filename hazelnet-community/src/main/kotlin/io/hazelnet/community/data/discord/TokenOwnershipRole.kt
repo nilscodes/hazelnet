@@ -33,6 +33,11 @@ class TokenOwnershipRole @JsonCreator constructor(
         @field:JsonSerialize(using = ToStringSerializer::class)
         var minimumTokenQuantity: Long,
 
+        @Column(name = "maximum_token_quantity")
+        @field:Min(1)
+        @field:JsonSerialize(using = ToStringSerializer::class)
+        var maximumTokenQuantity: Long?,
+
         @Column(name = "discord_role_id")
         @field:NonNull
         @field:Min(1)
@@ -47,7 +52,9 @@ class TokenOwnershipRole @JsonCreator constructor(
 
         if (id != other.id) return false
         if (policyId != other.policyId) return false
+        if (assetFingerprint != other.assetFingerprint) return false
         if (minimumTokenQuantity != other.minimumTokenQuantity) return false
+        if (maximumTokenQuantity != other.maximumTokenQuantity) return false
         if (roleId != other.roleId) return false
 
         return true
@@ -56,12 +63,15 @@ class TokenOwnershipRole @JsonCreator constructor(
     override fun hashCode(): Int {
         var result = id?.hashCode() ?: 0
         result = 31 * result + policyId.hashCode()
+        result = 31 * result + (assetFingerprint?.hashCode() ?: 0)
         result = 31 * result + minimumTokenQuantity.hashCode()
+        result = 31 * result + (maximumTokenQuantity?.hashCode() ?: 0)
         result = 31 * result + roleId.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "TokenOwnershipRole(id=$id, policyId='$policyId', minimumTokenQuantity=$minimumTokenQuantity, roleId=$roleId)"
+        return "TokenOwnershipRole(id=$id, policyId='$policyId', assetFingerprint=$assetFingerprint, minimumTokenQuantity=$minimumTokenQuantity, maximumTokenQuantity=$maximumTokenQuantity, roleId=$roleId)"
     }
+
 }

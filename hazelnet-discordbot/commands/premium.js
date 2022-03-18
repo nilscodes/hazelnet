@@ -16,6 +16,7 @@ module.exports = {
       .setDescription(ci18n.description())
       .setDefaultPermission(false);
   },
+  commandTags: ['premium'],
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });

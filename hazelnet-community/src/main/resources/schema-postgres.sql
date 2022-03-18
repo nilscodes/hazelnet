@@ -130,6 +130,7 @@ CREATE TABLE "discord_token_roles"
     "policy_id"              varchar(56),
     "asset_fingerprint"      varchar,
     "minimum_token_quantity" bigint,
+    "maximum_token_quantity" bigint,
     "custom_rule"            varchar(26),
     "owned_for_duration"     int,
     "discord_role_id"        bigint,

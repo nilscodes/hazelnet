@@ -1,11 +1,13 @@
 /* eslint-disable no-await-in-loop */
 module.exports = {
-  async ensureRoleAssignments(client, discordServer, roleProperty, expectedRoleAssignments) {
-    client.logger.info(`Processing ${roleProperty} for ${discordServer.guildName} (${discordServer.guildId})...`);
+  async ensureRoleAssignments(client, discordServer, roleProperty, expectedRoleAssignments, removeInvalid) {
+    client.logger.info(`Processing ${roleProperty} for ${discordServer.guildName} (${discordServer.guildId}). ${removeInvalid ? 'R' : 'Not r'}emoving invalid role assignments. Processing a total of ${expectedRoleAssignments.length} roles that should be assigned.`);
     const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
     const guildForAssignments = await client.guilds.fetch(discordServer.guildId);
     if (guildForAssignments) {
-      await this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+      if (removeInvalid) {
+        await this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+      }
       await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
     } else {
       client.logger.warn(`Did not find guild for ${roleProperty} assignments in guild cache for server ${discordServer.guildName} (${discordServer.guildId}).`);
@@ -23,13 +25,14 @@ module.exports = {
     });
     return rolesToUsers;
   },
-  removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
-    discordServer[roleProperty].forEach(async (roleMapping) => {
-      const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
-      if (guildRole) {
-        try {
-          // TODO - add paging - but how to get the member count to page by?
-          const allUsers = await guildForAssignments.members.fetch();
+  async removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
+    try {
+      // TODO - add paging - but how to get the member count to page by?
+      const allUsers = await guildForAssignments.members.fetch();
+      for (let r = 0, len = discordServer[roleProperty].length; r < len; r += 1) {
+        const roleMapping = discordServer[roleProperty][r];
+        const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
+        if (guildRole) {
           for (let i = 0; i < allUsers.size; i += 1) {
             const member = allUsers.at(i);
             if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
@@ -41,20 +44,22 @@ module.exports = {
               }
             }
           }
-        } catch (error) {
-          client.logger.error({ msg: `Failed fetching members of ${discordServer.guildName} (${discordServer.guildId})`, error });
+        } else {
+          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
         }
-      } else {
-        client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
       }
-    });
+    } catch (error) {
+      client.logger.error({ msg: `Failed fetching members of ${discordServer.guildName} (${discordServer.guildId})`, error });
+    }
   },
-  addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
-    Object.entries(rolesToUsers).forEach(async (roleMapping) => {
-      const [roleId, roleList] = roleMapping;
+  async addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
+    const rolesToUsersList = Object.entries(rolesToUsers);
+    for (let i = 0, len = rolesToUsersList.length; i < len; i += 1) {
+      const [roleId, roleList] = rolesToUsersList[i];
       const guildRole = await guildForAssignments.roles.fetch(roleId);
       if (guildRole) {
-        roleList.forEach(async (userIdToAssignRole) => {
+        for (let j = 0, len2 = roleList.length; j < len2; j += 1) {
+          const userIdToAssignRole = roleList[j];
           try {
             const member = await guildForAssignments.members.fetch(userIdToAssignRole);
             if (!member?.roles.cache.some((role) => role.id === roleId)) {
@@ -68,10 +73,10 @@ module.exports = {
           } catch (e) {
             client.logger.info(`No member with ID ${userIdToAssignRole} found on discord server ${discordServer.guildName} (${discordServer.guildId})`);
           }
-        });
+        }
       } else {
         client.logger.info(`No role with ID ${roleId} found on discord server ${discordServer.guildName}`);
       }
-    });
+    }
   },
 };
