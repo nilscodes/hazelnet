@@ -6,10 +6,10 @@ module.exports = {
   async execute(client) {
     client.logger.info('Running token role assignment job');
     try {
+      const minutes = new Date().getMinutes() % 10;
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
-        const minutes = new Date().getMinutes() % 10;
         if (discordServer.guildId % 10 === minutes) {
           try {
             const removeInvalid = discordServer.settings?.REMOVE_INVALID_TOKENROLES !== 'false';
