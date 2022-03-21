@@ -25,7 +25,7 @@ class StakepoolService(
         // Annotation-based cache clearing
     }
 
-    @Scheduled(fixedDelay = 6000000)
+    @Scheduled(fixedDelay = 3600000)
     @CacheEvict(allEntries = true, cacheNames = ["delegation"])
     fun clearDelegationCache() {
         // Annotation-based cache clearing

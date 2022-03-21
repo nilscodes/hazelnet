@@ -3,7 +3,6 @@ package io.hazelnet.community.services
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
-import io.hazelnet.community.data.discord.DiscordServerSetting
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
@@ -22,13 +21,11 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
 import org.springframework.stereotype.Service
-import java.lang.NumberFormatException
 import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
-import kotlin.NoSuchElementException
 
 const val LOOKUP_NAME_ALL_POOLS = "all"
 
@@ -43,7 +40,6 @@ class DiscordServerService(
         private val discordWhitelistRepository: DiscordWhitelistRepository,
         private val oAuth2AuthorizationService: OAuth2AuthorizationService,
         private val registeredClientRepository: RegisteredClientRepository,
-        private val config: CommunityApplicationConfiguration,
         private val externalAccountService: ExternalAccountService,
         private val claimListService: ClaimListService,
 ) {
@@ -66,6 +62,7 @@ class DiscordServerService(
         discordServer.guildMemberCount = discordServerPartial.guildMemberCount
         discordServer.guildName = discordServerPartial.guildName
         discordServer.guildOwner = discordServerPartial.guildOwner
+        discordServer.guildMemberUpdateTime = Date.from(ZonedDateTime.now().toInstant())
         return discordServerRepository.save(discordServer)
     }
 
@@ -454,28 +451,6 @@ class DiscordServerService(
             val claimListForOrder = claimListsOfDiscord.find { claimListIdOrName == it.name }
             claimListForOrder ?: throw NoSuchElementException("No claim list with name $claimListIdOrName found on Discord server with guild ID $guildId")
         }
-    }
-
-    fun getBotFunding(guildId: Long): Long {
-        if(config.fundedpool != null) {
-            val discordServer = getDiscordServer(guildId)
-            val discordMemberDelegations = discordServerRepository.getDiscordMembersWithStake(discordServer.id!!)
-            val stakeAddressesOnThisServer = discordMemberDelegations
-                    .filter { it.getDiscordServerId() == discordServer.id }
-                    .map { it.getCardanoStakeAddress() }
-            // Get a map of stake addresses to number of servers each unique stake address is registered on (regardless of how many different users have registered it)
-            val stakeAddressesToServerMembershipCounts = discordMemberDelegations
-                    .groupBy { it.getCardanoStakeAddress() }
-                    .mapValues { it.value.distinctBy { stakeInfo -> "${stakeInfo.getDiscordServerId()}.${stakeInfo.getCardanoStakeAddress()}" }.size }
-            val allDelegationToFundedPool = stakepoolService.getDelegation(config.fundedpool)
-            // Divide each stake amount by the number of Discord servers the respective stake is verified on
-            return allDelegationToFundedPool
-                    .filter { stakeAddressesOnThisServer.contains(it.stakeAddress) }
-                    .sumOf {
-                        it.amount / (stakeAddressesToServerMembershipCounts[it.stakeAddress] ?: 1)
-                    }
-        }
-        return 0
     }
 
 }

@@ -59,7 +59,7 @@ module.exports = {
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           if (poll.resultsVisible) {
             const results = await interaction.client.services.discordserver.getPollResults(interaction.guild.id, poll.id);
-            resultsText = this.getCurrentResults(poll, results);
+            resultsText = this.getCurrentResults(discordServer, poll, results);
           }
 
           const detailFields = [
@@ -98,7 +98,7 @@ module.exports = {
           const totalVotingPower = currentVote.votes['0'];
           detailFields.push({
             name: i18n.__({ phrase: 'vote.yourVotingPower', locale }),
-            value: this.getVotingPowerText(poll, locale, totalVotingPower),
+            value: this.getVotingPowerText(discordServer, poll, locale, totalVotingPower),
           });
           // If at least two keys are present, that means in addition to the total voting power at key 0, votes have been cast.
           const hasVoted = Object.keys(currentVote.votes).length > 1;
@@ -111,7 +111,10 @@ module.exports = {
               name: i18n.__({ phrase: 'vote.yourVote', locale }),
               value: poll.options
                 .filter((option) => currentVote.votes[option.id] > 0)
-                .map((option) => `${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text} (${currentVote.votes[option.id]})`).join('\n'),
+                .map((option) => {
+                  const formattedVote = discordServer.formatNumber(currentVote.votes[option.id]);
+                  return `${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text} (${formattedVote})`;
+                }).join('\n'),
             });
           }
           const embed = embedBuilder.buildForUser(discordServer, poll.displayName, i18n.__({ phrase: 'vote.pollInfoTitle', locale }), 'configure-poll-list', detailFields);
@@ -122,7 +125,7 @@ module.exports = {
           const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild.id, poll.id, externalAccount.id, votedFor);
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           if (poll.resultsVisible) {
-            resultsText = this.getCurrentResults(poll, currentVoteData.poll);
+            resultsText = this.getCurrentResults(discordServer, poll, currentVoteData.poll);
           }
           const detailFields = [
             {
@@ -159,7 +162,7 @@ module.exports = {
         const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild.id, poll.id, externalAccount.id, []);
         let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
         if (poll.resultsVisible) {
-          resultsText = this.getCurrentResults(poll, currentVoteData.poll);
+          resultsText = this.getCurrentResults(discordServer, poll, currentVoteData.poll);
         }
         const detailFields = [{
           name: i18n.__({ phrase: 'vote.currentResults', locale }),
@@ -173,9 +176,12 @@ module.exports = {
       }
     }
   },
-  getCurrentResults(poll, result) {
+  getCurrentResults(discordServer, poll, result) {
     return poll.options
-      .map((option, idx) => `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${result.votes[option.id]} votes**`).join('\n');
+      .map((option, idx) => {
+        const formattedVotes = discordServer.formatNumber(result.votes[option.id]);
+        return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
+      }).join('\n');
   },
   async getPollVoteOptions(locale, poll, totalVotingPower, hasVoted) {
     if (totalVotingPower > 0) {
@@ -226,10 +232,11 @@ module.exports = {
     }
     return [];
   },
-  getVotingPowerText(poll, locale, totalVotingPower) {
+  getVotingPowerText(discordServer, poll, locale, totalVotingPower) {
     if (poll.snapshotId) {
       if (totalVotingPower > 0) {
-        return `${totalVotingPower > 1 ? i18n.__({ phrase: 'vote.votingPowerMultiple', locale }, { totalVotingPower }) : i18n.__({ phrase: 'vote.votingPowerSingleToken', locale })}\n\n${i18n.__({ phrase: 'vote.votingPowerTokenInfo', locale })}`;
+        const formattedVotingPower = discordServer.formatNumber(totalVotingPower);
+        return `${totalVotingPower > 1 ? i18n.__({ phrase: 'vote.votingPowerMultiple', locale }, { totalVotingPower: formattedVotingPower }) : i18n.__({ phrase: 'vote.votingPowerSingleToken', locale })}\n\n${i18n.__({ phrase: 'vote.votingPowerTokenInfo', locale })}`;
       }
       return `${i18n.__({ phrase: 'vote.votingPowerNone', locale })}\n\n${i18n.__({ phrase: 'vote.votingPowerTokenInfo', locale })}`;
     }

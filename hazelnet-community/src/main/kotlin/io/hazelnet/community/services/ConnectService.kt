@@ -36,6 +36,16 @@ class ConnectService(
                 }.collectList().block()!!
     }
 
+    fun getDelegationSnapshotForPools(stakepoolHashes: List<String>, epoch: Int): List<DelegationInfo> {
+        return Flux.fromIterable(stakepoolHashes)
+            .flatMap {
+                connectClient.get()
+                    .uri("/stakepools/{poolHash}/delegation/{epoch}", it, epoch)
+                    .retrieve()
+                    .bodyToFlux(DelegationInfo::class.java)
+            }.collectList().block()!!
+    }
+
     fun getCurrentEpoch(): Int {
         return connectClient.get()
                 .uri("/info/syncstatus")

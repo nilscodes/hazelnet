@@ -29,4 +29,7 @@ class ExternalAccountController(
 
     @GetMapping("/{externalAccountId}/verifications")
     fun getExternalAccountVerifications(@PathVariable externalAccountId: Long) = externalAccountService.getExternalAccountVerifications(externalAccountId)
+
+    @GetMapping("/{externalAccountId}/premium")
+    fun getPremiumInfo(@PathVariable externalAccountId: Long) = externalAccountService.getPremiumInfo(externalAccountId)
 }

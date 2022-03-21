@@ -18,8 +18,11 @@ DROP TABLE IF EXISTS "discord_policy_ids";
 DROP TABLE IF EXISTS "discord_token_roles";
 DROP TABLE IF EXISTS "discord_spo_roles";
 DROP TABLE IF EXISTS "discord_spo";
+DROP TABLE IF EXISTS "discord_payments";
+DROP TABLE IF EXISTS "discord_billing";
 DROP TABLE IF EXISTS "discord_servers";
 DROP TABLE IF EXISTS "verifications";
+DROP TABLE IF EXISTS "premium_staked";
 DROP TABLE IF EXISTS "external_accounts";
 DROP TABLE IF EXISTS "accounts";
 DROP TABLE IF EXISTS "global_settings";
@@ -62,27 +65,27 @@ CREATE TABLE "external_accounts"
 
 CREATE TABLE "premium_staked"
 (
-    "external_account_id" bigint,
-    "epoch"               int     NOT NULL,
-    "active_stake"        bigint  NOT NULL,
-    "paid_out"            boolean NOT NULL DEFAULT false
+    "external_account_id" bigint    NOT NULL,
+    "snapshot_time"       timestamp NOT NULL,
+    "epoch"               int       NOT NULL,
+    "active_stake"        bigint    NOT NULL,
+    "paid_out"            boolean   NOT NULL DEFAULT false
 );
-
 
 CREATE TABLE "verifications"
 (
-    "verification_id"     BIGSERIAL PRIMARY KEY,
-    "verification_amount" bigint NOT NULL,
-    "blockchain"          blockchain_type,
-    "address"             varchar(150),
-    "cardano_stake_address"       varchar(60),
-    "transaction_hash"    varchar(66),
-    "external_account_id" bigint,
-    "valid_after"         timestamp,
-    "valid_before"        timestamp,
-    "confirmed"           boolean,
-    "confirmed_at"        timestamp,
-    "obsolete"            boolean
+    "verification_id"       BIGSERIAL PRIMARY KEY,
+    "verification_amount"   bigint NOT NULL,
+    "blockchain"            blockchain_type,
+    "address"               varchar(150),
+    "cardano_stake_address" varchar(60),
+    "transaction_hash"      varchar(66),
+    "external_account_id"   bigint,
+    "valid_after"           timestamp,
+    "valid_before"          timestamp,
+    "confirmed"             boolean,
+    "confirmed_at"          timestamp,
+    "obsolete"              boolean
 );
 
 CREATE TABLE "discord_servers"
@@ -95,7 +98,28 @@ CREATE TABLE "discord_servers"
     "guild_member_count"  int,
     "guild_member_update" timestamp,
     "owner_account_id"    bigint,
-    "premium"             boolean       NOT NULL DEFAULT false
+    "premium_until"       timestamp
+);
+
+CREATE TABLE "discord_billing"
+(
+    "billing_id"                SERIAL PRIMARY KEY,
+    "discord_server_id"         int,
+    "billing_time"              timestamp NOT NULL,
+    "billing_amount"            bigint    NOT NULL,
+    "billing_member_count"      int       NOT NULL,
+    "billing_max_delegation"    bigint    NOT NULL,
+    "billing_actual_delegation" bigint    NOT NULL
+);
+
+CREATE TABLE "discord_payments"
+(
+    "payment_id"        SERIAL PRIMARY KEY,
+    "discord_server_id" int,
+    "payment_time"      timestamp NOT NULL,
+    "payment_amount"    bigint    NOT NULL,
+    "transaction_hash"  varchar(66),
+    "billing_id"        int
 );
 
 CREATE TABLE "discord_server_members"
@@ -324,9 +348,17 @@ CREATE TABLE "oauth2_authorization"
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
 
+ALTER TABLE "premium_staked" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
 ALTER TABLE "verifications" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_servers" ADD FOREIGN KEY ("owner_account_id") REFERENCES "accounts" ("account_id");
+
+ALTER TABLE "discord_billing" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_payments" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_payments" ADD FOREIGN KEY ("billing_id") REFERENCES "discord_billing" ("billing_id") ON DELETE SET NULL;
 
 ALTER TABLE "discord_spo" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

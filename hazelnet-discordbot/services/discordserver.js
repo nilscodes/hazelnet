@@ -191,6 +191,10 @@ module.exports = {
     const votingData = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`, votes);
     return votingData.data;
   },
+  async getPremiumInfo(guildId) {
+    const premiumInfo = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/premium`);
+    return premiumInfo.data;
+  },
   async getAllDiscordServers() {
     const cachedDiscordServer = this.cache.get('allservers');
     if (cachedDiscordServer !== undefined) {
@@ -224,6 +228,9 @@ module.exports = {
     };
     discordServerObject.getAdvertisement = function getAdvertisement() {
       return { text: adText, logo: adLogo };
+    };
+    discordServerObject.formatNumber = function formatNumber(number) {
+      return Intl.NumberFormat('en-US').format(number);
     };
     return discordServerObject;
   },

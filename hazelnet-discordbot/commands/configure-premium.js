@@ -10,9 +10,12 @@ module.exports = {
       .setDescription(ci18n.description())
       .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
-        .setName('stake')
-        .setDescription(ci18n.subDescription('stake')));
+        .setName('status')
+        .setDescription(ci18n.subDescription('status')))
+      .addSubcommand((subcommand) => subcommand
+        .setName('pay')
+        .setDescription(ci18n.subDescription('pay'))
+        .addIntegerOption((option) => option.setName('refill-amount').setDescription(ci18n.option('refill-amount')).setRequired(true)));
   },
-  commandTags: ['premium'],
   execute: commandbase.executeSubcommandIfAdmin,
 };

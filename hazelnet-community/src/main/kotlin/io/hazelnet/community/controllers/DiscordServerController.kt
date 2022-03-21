@@ -5,6 +5,7 @@ import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.services.BillingService
 import io.hazelnet.community.services.DiscordServerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,7 +16,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping(("/discord/servers"))
 class DiscordServerController(
-        private val discordServerService: DiscordServerService
+        private val discordServerService: DiscordServerService,
+        private val billingService: BillingService,
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
@@ -218,7 +220,7 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAccessToken(@PathVariable guildId: Long) = discordServerService.deleteAccessToken(guildId)
 
-    @GetMapping("/{guildId}/botfunding")
+    @GetMapping("/{guildId}/premium")
     @ResponseStatus(HttpStatus.OK)
-    fun getBotFunding(@PathVariable guildId: Long) = discordServerService.getBotFunding(guildId)
+    fun getPremiumInfo(@PathVariable guildId: Long) = billingService.getPremiumInfo(guildId)
 }

@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
+import io.hazelnet.community.data.cardano.TokenPolicy
+import io.hazelnet.community.data.premium.PremiumStakedInfo
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
@@ -46,6 +49,10 @@ class ExternalAccount @JsonCreator constructor(
 
     @Column(name = "premium")
     var premium: Boolean = false,
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "premium_staked", joinColumns = [JoinColumn(name = "external_account_id")])
+    var stakeInfo: MutableSet<PremiumStakedInfo> = mutableSetOf(),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -60,6 +67,7 @@ class ExternalAccount @JsonCreator constructor(
         if (type != other.type) return false
         if (account != other.account) return false
         if (premium != other.premium) return false
+        if (stakeInfo != other.stakeInfo) return false
 
         return true
     }
@@ -72,10 +80,12 @@ class ExternalAccount @JsonCreator constructor(
         result = 31 * result + type.hashCode()
         result = 31 * result + (account?.hashCode() ?: 0)
         result = 31 * result + premium.hashCode()
+        result = 31 * result + stakeInfo.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ExternalAccount(id=$id, referenceId='$referenceId', referenceName=$referenceName, registrationTime=$registrationTime, type=$type, account=$account, premium=$premium)"
+        return "ExternalAccount(id=$id, referenceId='$referenceId', referenceName=$referenceName, registrationTime=$registrationTime, type=$type, account=$account, premium=$premium, stakeInfo=$stakeInfo)"
     }
+
 }

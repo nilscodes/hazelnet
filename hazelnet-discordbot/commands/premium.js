@@ -16,7 +16,6 @@ module.exports = {
       .setDescription(ci18n.description())
       .setDefaultPermission(false);
   },
-  commandTags: ['premium'],
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -24,21 +23,43 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild.id, externalAccount.id);
+      const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
+      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
+      const giveawayInfo = await this.getGiveawayInfo(interaction);
 
-      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, useLocale, discordServer);
+      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
-  showPremiumEmbed(externalAccount, discordMemberInfo, locale, discordServer) {
+  async getGiveawayInfo(interaction) {
+    const giveawayImage = await interaction.client.services.globalsettings.getGlobalSetting('PREMIUM_GIVEAWAY_IMAGE');
+    const giveawayText = await interaction.client.services.globalsettings.getGlobalSetting('PREMIUM_GIVEAWAY_TEXT');
+    return {
+      image: giveawayImage,
+      text: giveawayText,
+    };
+  },
+  showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, locale, discordServer, stakeLink, giveawayInfo) {
+    const stakedAda = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / 1000000));
     const premiumFields = [{
       name: i18n.__({ phrase: 'premium.premiumStatus', locale }),
-      value: i18n.__({ phrase: (externalAccount.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }),
+      value: i18n.__({ phrase: (externalAccount.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink }),
     }];
     let components = [];
     if (externalAccount.premium) {
+      let serverSupport = i18n.__({ phrase: 'premium.serverSupportNo', locale });
+      const pledgedServerCount = premiumInfo.discordServers.length;
+      if (pledgedServerCount) {
+        const stakeAmountPerServer = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / pledgedServerCount / 1000000));
+        serverSupport = i18n.__({ phrase: 'premium.serverSupportYes', locale }, { stakeAmountPerServer }) + premiumInfo.discordServers.map((serverName) => i18n.__({ phrase: 'premium.serverSupportEntry', locale }, { serverName })).join('\n');
+      }
+      premiumFields.push({
+        name: i18n.__({ phrase: 'premium.serverSupport', locale }),
+        value: serverSupport,
+      });
       if (discordMemberInfo) {
         components = [new MessageActionRow()
           .addComponents(
@@ -50,7 +71,19 @@ module.exports = {
         ];
       }
     }
-    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'premium.messageTitle', locale }), i18n.__({ phrase: 'premium.purpose', locale }), 'premium', premiumFields);
+    premiumFields.push({
+      name: i18n.__({ phrase: 'premium.benefits', locale }),
+      value: i18n.__({ phrase: 'premium.benefitsDetails', locale }),
+    });
+    let giveawayImage = null;
+    if (giveawayInfo.image && giveawayInfo.text) {
+      giveawayImage = giveawayInfo.image;
+      premiumFields.push({
+        name: i18n.__({ phrase: 'premium.giveaway', locale }),
+        value: giveawayInfo.text,
+      });
+    }
+    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'premium.messageTitle', locale }), i18n.__({ phrase: 'premium.purpose', locale }), 'premium', premiumFields, giveawayImage);
     return { components, embed };
   },
   async executeButton(interaction) {
@@ -61,8 +94,11 @@ module.exports = {
       const premiumSupport = (interaction.customId === 'premium/enable');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild.id, externalAccount.id, { premiumSupport });
+      const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
+      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
+      const giveawayInfo = await this.getGiveawayInfo(interaction);
 
-      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, useLocale, discordServer);
+      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     }
   },

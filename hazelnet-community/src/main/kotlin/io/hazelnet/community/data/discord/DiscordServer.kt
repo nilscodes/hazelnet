@@ -43,14 +43,17 @@ class DiscordServer @JsonCreator constructor(
         @field:Min(1)
         var guildMemberCount: Int,
 
+        @Column(name = "guild_member_update")
+        var guildMemberUpdateTime: Date?,
+
         @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn(name = "owner_account_id")
         @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
         @JsonIdentityReference(alwaysAsId = true)
         var ownerAccount: Account?,
 
-        @Column(name = "premium")
-        var premium: Boolean = false,
+        @Column(name = "premium_until")
+        var premiumUntil: Date?,
 
         @ElementCollection(fetch = FetchType.EAGER)
         @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
@@ -89,6 +92,8 @@ class DiscordServer @JsonCreator constructor(
         @field:JsonIgnore
         var members: MutableSet<DiscordMember> = mutableSetOf()
 ) {
+    fun getPremium(): Boolean = premiumUntil != null && Date().before(premiumUntil)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -101,8 +106,9 @@ class DiscordServer @JsonCreator constructor(
         if (guildOwner != other.guildOwner) return false
         if (joinTime != other.joinTime) return false
         if (guildMemberCount != other.guildMemberCount) return false
+        if (guildMemberUpdateTime != other.guildMemberUpdateTime) return false
         if (ownerAccount != other.ownerAccount) return false
-        if (premium != other.premium) return false
+        if (premiumUntil != other.premiumUntil) return false
         if (tokenPolicies != other.tokenPolicies) return false
         if (stakepools != other.stakepools) return false
         if (delegatorRoles != other.delegatorRoles) return false
@@ -121,8 +127,9 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + guildOwner.hashCode()
         result = 31 * result + (joinTime?.hashCode() ?: 0)
         result = 31 * result + guildMemberCount
+        result = 31 * result + (guildMemberUpdateTime?.hashCode() ?: 0)
         result = 31 * result + (ownerAccount?.hashCode() ?: 0)
-        result = 31 * result + premium.hashCode()
+        result = 31 * result + (premiumUntil?.hashCode() ?: 0)
         result = 31 * result + tokenPolicies.hashCode()
         result = 31 * result + stakepools.hashCode()
         result = 31 * result + delegatorRoles.hashCode()
@@ -134,6 +141,7 @@ class DiscordServer @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, ownerAccount=$ownerAccount, premium=$premium, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members)"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members)"
     }
+
 }
