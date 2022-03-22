@@ -13,4 +13,5 @@ data class DiscordServerPremiumInfo(
     val lastBillingTime: Date?,
     val lastBillingAmount: Long,
     val premiumUntil: Date?,
+    val currentPremium: Boolean,
 )

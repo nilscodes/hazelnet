@@ -80,7 +80,8 @@ class BillingService(
             if (lastBilling.isPresent) lastBilling.get().memberCount else 0,
             if (lastBilling.isPresent) lastBilling.get().billingTime else null,
             if (lastBilling.isPresent) lastBilling.get().amount else 0,
-            discordServer.premiumUntil
+            discordServer.premiumUntil,
+            discordServer.getPremium(),
         )
     }
 
@@ -118,7 +119,7 @@ class BillingService(
     }
 
     fun calculateMaximumDelegationDiscountAmountInLovelace(discordServer: DiscordServer): Long {
-        return discordServer.guildMemberCount * 5000000L
+        return discordServer.guildMemberCount * 10000000L
     }
 
     fun calculateMonthlyTotalCostInLovelace(discordServer: DiscordServer): Long {

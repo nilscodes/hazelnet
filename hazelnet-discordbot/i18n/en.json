@@ -25,11 +25,12 @@
 			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
 			"configure-premium": "Set up and get info about your Black Edition Premium status.",
 			"configure-premium-status": "See your premium status and wallet balance, as well as delegation discounts for Black Edition usage.",
-			"configure-premium-pay": "Start a payment process to refill or top off your balance.",
+			"configure-premium-refill": "Start a payment process to refill or top off your balance.",
 			"configure-tokenroles": "Manage auto-role assignments for NFT and other token-holders",
 			"configure-tokenroles-add": "Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.",
 			"configure-tokenroles-list": "List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs",
-			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders."
+			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
+			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
 		},
 		"options": {
 			"whitelist": {
@@ -531,6 +532,19 @@
 				"success": "✅ Your feature changes have been successfully applied! It may take a few minutes for the commands to become available."
 			}
 		},
+		"healthcheck": {
+			"purpose": "With the **/configure-healthcheck** command you can test if your bot is correctly configured and has the correct permissions and roles to perform its duties as expected.",
+			"success": "Healthy!",
+			"successInfo": "✅ No problems found with your current bot configuration. You are good to go!",
+			"tokenRoles": "Token role health check",
+			"delegatorRoles": "Delegator role health check",
+			"assignmentPermissionDenied": "⚠ The following roles cannot be auto-assigned by the bot because they are higher in the role hierarchy than the highest bot role. Go to your Discord server role list and adjust the order to fix this problem.\n\n{{{roleList}}}",
+			"rolesDeleted": "⚠ You have at least one automatic role assignment set up for a deleted role. Run the respective list command to see which roles no longer exist and remove the role-assignment.",
+			"deniedRoleEntry": "• <@&{{roleId}}>",
+			"auditChannel": "Audit Channel health check",
+			"auditChannelNotWritable": "⚠ The bot does not have permissions to send messages to your currently configured audit channel <#{{auditChannel}}>. Make sure the bot has the *Send Messages* permission on this channel.",
+			"auditChannelDeleted": "⚠ Your currently configured audit channel to receive warnings about suspicious activity has been deleted. Try setting a new channel via the **/configure-protection auditchannel** command."
+		},
 		"api": {
 			"generatetoken": {
 				"success": "✅ A new access token was generated. Please write down this token to provide to your development team.\n❗ You will not be able to access this token again. The only way to view an access token is by generating a new one.\n\n**Your token:**\n\n*{{accessToken}}*\n\nFind the REST API documentation by downloading the current OpenAPI Swagger Documentation at the following URL: {{{externalDocumentationUrl}}}"
@@ -546,7 +560,15 @@
 				"premiumStatusNo": "Your Discord server is currently not running Black Edition.",
 				"premiumStatusYes": "Your Discord server is on **Black Edition**! Thanks for supporting us 😻 Your automatic renewal will run on {{premiumUntilFormatted}} UTC.",
 				"lastBill": "Last Bill",
-				"lastBillInfo": "Your last bill was for {{lastBillingAmount}} ADA which was deducted from your prepaid balance on {{lastBillingTimeFormatted}} UTC."
+				"lastBillInfo": "Your last bill with an amount of **{{lastBillingAmount}} ADA** was for {{lastBillingGuildMemberCountFormatted}} discord members and was deducted from your prepaid balance on {{lastBillingTimeFormatted}} UTC.",
+				"cost": "Current costs",
+				"costInfo": "Based on {{currentGuildMemberCountFormatted}} discord members, your monthly base cost is **{{monthlyCostFormatted}} ADA**. Your community members have currently pledged **{{totalDelegationFormatted}} ADA** out of a maximum **{{maxDelegationFormatted}} ADA**, giving you a {{discount}}% discount. With that, your current expected monthly price for Black Edition is **{{actualMonthlyCostFormatted}} ADA**.\n\n💡 Your community members can pledge support to your server via the **/premium** command, or you can stake and use the same command to pledge your stake to receive a discount or completely free Black Edition.",
+				"balance": "Your balance",
+				"balanceInfo": "Your current prepaid balance is **{{remainingBalanceFormatted}} ADA**.",
+				"balanceInfoNegative": "⚠ Based on your current balance, your Black Edition will not be renewed next month.",
+				"balanceInfoTopOff": "You can refill your balance via the **/configure-premium refill** command.",
+				"benefits": "Black Edition Benefits",
+				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n\u00A0\u00A0\u00A0\u25E6 Custom bot branding\n\u00A0\u00A0\u00A0\u25E6 Whitelists\n\u00A0\u00A0\u00A0\u25E6 Polls and token-based voting\n\u00A0\u00A0\u00A0\u25E6 More than two token/delegator role slots\n\u00A0\u00A0\u00A0\u25E6 ... and much more @ https://www.hazelnet.io/pricing"
 			}
 		}
 	},

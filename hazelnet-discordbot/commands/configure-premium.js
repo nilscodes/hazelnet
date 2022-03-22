@@ -13,8 +13,8 @@ module.exports = {
         .setName('status')
         .setDescription(ci18n.subDescription('status')))
       .addSubcommand((subcommand) => subcommand
-        .setName('pay')
-        .setDescription(ci18n.subDescription('pay'))
+        .setName('refill')
+        .setDescription(ci18n.subDescription('refill'))
         .addIntegerOption((option) => option.setName('refill-amount').setDescription(ci18n.option('refill-amount')).setRequired(true)));
   },
   execute: commandbase.executeSubcommandIfAdmin,
