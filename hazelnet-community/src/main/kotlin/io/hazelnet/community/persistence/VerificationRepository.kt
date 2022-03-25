@@ -26,7 +26,7 @@ interface VerificationRepository : CrudRepository<Verification, Long> {
     fun findAllByExternalAccount(externalAccount: ExternalAccount): List<Verification>
     fun findAllByCardanoStakeAddress(stakeAddress: String): List<Verification>
 
-    @Query(value = "SELECT v.* FROM discord_server_members d JOIN verifications v on d.external_account_id = v.external_account_id WHERE d.discord_server_id=:discordServerId AND confirmed=true", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT v.* FROM discord_server_members d JOIN verifications v on d.external_account_id = v.external_account_id WHERE d.discord_server_id=:discordServerId AND confirmed=true", nativeQuery = true)
     fun getAllCompletedVerificationsForDiscordServer(@Param("discordServerId") discordServerId: Int): List<Verification>
 
 }
