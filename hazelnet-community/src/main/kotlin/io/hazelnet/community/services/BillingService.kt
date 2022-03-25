@@ -16,6 +16,7 @@ import java.util.*
 import javax.transaction.Transactional
 import kotlin.math.ceil
 import kotlin.math.min
+import kotlin.math.round
 
 @Service
 class BillingService(
@@ -42,9 +43,9 @@ class BillingService(
         val discordServers = discordServerService.getDiscordServers()
         discordServers.forEach { discordServer ->
             if (discordServer.premiumUntil == null || Date().after(discordServer.premiumUntil)) {
-                val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer)
+                val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer.guildMemberCount)
                 val currentDelegation = getBotFunding(discordServer.guildId)
-                val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer)
+                val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
                 val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
                 val proratedCost = ((1 - percentageOfMonthCompleted) * actualMonthlyCost).toLong()
                 val currentBalance = getCurrentBalance(discordServer)
@@ -64,9 +65,9 @@ class BillingService(
 
     fun getPremiumInfo(guildId: Long): DiscordServerPremiumInfo {
         val discordServer = discordServerService.getDiscordServer(guildId)
-        val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer)
+        val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer.guildMemberCount)
         val currentDelegation = getBotFunding(discordServer.guildId)
-        val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer)
+        val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
         val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
         val currentBalance = getCurrentBalance(discordServer)
         val lastBilling = billingRepository.findFirstByDiscordServerIdOrderByBillingTimeDesc(discordServer.id!!)
@@ -115,15 +116,28 @@ class BillingService(
         paymentRepository.getCurrentBalance(discordServer.id!!)
 
     fun calculateMonthlyActualCostInLovelace(monthlyCost: Long, currentDelegation: Long, maxDelegation: Long): Long {
-        return (monthlyCost * (1 - min(1.0, currentDelegation.toDouble() / maxDelegation.toDouble()))).toLong()
+        return round(monthlyCost * (1 - min(1.0, currentDelegation.toDouble() / maxDelegation.toDouble()))).toLong()
     }
 
-    fun calculateMaximumDelegationDiscountAmountInLovelace(discordServer: DiscordServer): Long {
-        return discordServer.guildMemberCount * 10000000L
+    fun calculateMaximumDelegationDiscountAmountInLovelace(memberCount: Int): Long {
+        return memberCount * 10000000L
     }
 
-    fun calculateMonthlyTotalCostInLovelace(discordServer: DiscordServer): Long {
-        val memberCount = discordServer.guildMemberCount
-        return ceil(memberCount / 1000.0 * 10000000L).toLong()
+    fun calculateMonthlyTotalCostInLovelace(memberCount: Int): Long {
+        return 1000000L * if (memberCount < 1000) {
+            10
+        } else if(memberCount < 5000) {
+            20
+        } else if(memberCount < 10000) {
+            30
+        } else if(memberCount < 25000) {
+            40
+        } else if(memberCount < 50000) {
+            50
+        } else if(memberCount < 100000) {
+            60
+        } else {
+            70
+        }
     }
 }

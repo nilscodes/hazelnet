@@ -533,7 +533,7 @@
 			}
 		},
 		"healthcheck": {
-			"purpose": "With the **/configure-healthcheck** command you can test if your bot is correctly configured and has the correct permissions and roles to perform its duties as expected.",
+			"purpose": "With the **/configure-healthcheck** command you can test if your bot is correctly configured and has the right permissions and roles to perform its duties as expected.",
 			"success": "Healthy!",
 			"successInfo": "✅ No problems found with your current bot configuration. You are good to go!",
 			"tokenRoles": "Token role health check",
