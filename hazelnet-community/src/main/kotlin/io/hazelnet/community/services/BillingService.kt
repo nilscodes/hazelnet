@@ -1,10 +1,12 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.premium.DiscordBilling
 import io.hazelnet.community.data.premium.DiscordPayment
 import io.hazelnet.community.data.premium.DiscordServerPremiumInfo
+import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import io.hazelnet.community.persistence.DiscordBillingRepository
 import io.hazelnet.community.persistence.DiscordPaymentRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
@@ -14,7 +16,6 @@ import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 import java.util.*
 import javax.transaction.Transactional
-import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.round
 
@@ -139,5 +140,17 @@ class BillingService(
         } else {
             70
         }
+    }
+
+    fun confirmPayment(incomingDiscordPayment: IncomingDiscordPayment, confirmation: PaymentConfirmation): DiscordPayment {
+        val currentTime = ZonedDateTime.now()
+        return paymentRepository.save(DiscordPayment(
+            null,
+            incomingDiscordPayment.discordServer,
+            confirmation.transactionHash,
+            Date.from(currentTime.toInstant()),
+            incomingDiscordPayment.amount,
+            null
+        ))
     }
 }

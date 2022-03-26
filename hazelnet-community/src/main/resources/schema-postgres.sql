@@ -122,6 +122,16 @@ CREATE TABLE "discord_payments"
     "billing_id"        int
 );
 
+CREATE TABLE "discord_incoming_payments"
+(
+    "incoming_payment_id" SERIAL PRIMARY KEY,
+    "receiving_address"   varchar(150) NOT NULL,
+    "payment_amount"      bigint       NOT NULL,
+    "discord_server_id"   int,
+    "valid_after"         timestamp    NOT NULL,
+    "valid_before"        timestamp    NOT NULL
+);
+
 CREATE TABLE "discord_server_members"
 (
     "discord_server_id"   int,
@@ -359,6 +369,8 @@ ALTER TABLE "discord_billing" ADD FOREIGN KEY ("discord_server_id") REFERENCES "
 ALTER TABLE "discord_payments" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE RESTRICT;
 
 ALTER TABLE "discord_payments" ADD FOREIGN KEY ("billing_id") REFERENCES "discord_billing" ("billing_id") ON DELETE SET NULL;
+
+ALTER TABLE "discord_incoming_payments" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_spo" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

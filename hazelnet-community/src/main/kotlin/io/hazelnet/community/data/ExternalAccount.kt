@@ -6,12 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
-import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.premium.PremiumStakedInfo
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
-import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 

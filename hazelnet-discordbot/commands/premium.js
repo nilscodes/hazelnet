@@ -46,10 +46,10 @@ module.exports = {
     const stakedAda = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / 1000000));
     const premiumFields = [{
       name: i18n.__({ phrase: 'premium.premiumStatus', locale }),
-      value: i18n.__({ phrase: (externalAccount.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink }),
+      value: i18n.__({ phrase: (premiumInfo.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink }),
     }];
     let components = [];
-    if (externalAccount.premium) {
+    if (premiumInfo.premium) {
       let serverSupport = i18n.__({ phrase: 'premium.serverSupportNo', locale });
       const pledgedServerCount = premiumInfo.discordServers.length;
       if (pledgedServerCount) {

@@ -5,8 +5,11 @@ import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.data.premium.IncomingDiscordPayment
+import io.hazelnet.community.data.premium.IncomingDiscordPaymentRequest
 import io.hazelnet.community.services.BillingService
 import io.hazelnet.community.services.DiscordServerService
+import io.hazelnet.community.services.IncomingPaymentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -18,6 +21,7 @@ import javax.validation.Valid
 class DiscordServerController(
         private val discordServerService: DiscordServerService,
         private val billingService: BillingService,
+        private val incomingPaymentService: IncomingPaymentService,
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
@@ -223,4 +227,24 @@ class DiscordServerController(
     @GetMapping("/{guildId}/premium")
     @ResponseStatus(HttpStatus.OK)
     fun getPremiumInfo(@PathVariable guildId: Long) = billingService.getPremiumInfo(guildId)
+
+    @GetMapping("/{guildId}/payment")
+    @ResponseStatus(HttpStatus.OK)
+    fun getCurrentPayment(@PathVariable guildId: Long) = incomingPaymentService.getCurrentPayment(guildId)
+
+    @PostMapping("/{guildId}/payment")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun requestIncomingPayment(@PathVariable guildId: Long, @RequestBody @Valid incomingDiscordPaymentRequest: IncomingDiscordPaymentRequest): ResponseEntity<IncomingDiscordPayment> {
+        val newIncomingDiscordPayment = incomingPaymentService.requestIncomingPayment(guildId, incomingDiscordPaymentRequest)
+        return ResponseEntity
+            .created(ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{incomingDiscordPaymentId}")
+                .buildAndExpand(newIncomingDiscordPayment.id)
+                .toUri())
+            .body(newIncomingDiscordPayment)
+    }
+
+    @DeleteMapping("/{guildId}/payment")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun cancelIncomingPayment(@PathVariable guildId: Long) = incomingPaymentService.cancelIncomingPayment(guildId)
 }

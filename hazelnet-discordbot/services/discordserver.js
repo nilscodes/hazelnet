@@ -195,6 +195,23 @@ module.exports = {
     const premiumInfo = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/premium`);
     return premiumInfo.data;
   },
+  async getCurrentPayment(guildId) {
+    try {
+      const paymentInfo = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/payment`);
+      return paymentInfo.data;
+    } catch (error) {
+      return null;
+    }
+  },
+  async requestIncomingPayment(guildId, refillAmount) {
+    const paymentInfo = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/payment`, {
+      refillAmount,
+    });
+    return paymentInfo.data;
+  },
+  async cancelIncomingPayment(guildId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/payment`);
+  },
   async getAllDiscordServers() {
     const cachedDiscordServer = this.cache.get('allservers');
     if (cachedDiscordServer !== undefined) {

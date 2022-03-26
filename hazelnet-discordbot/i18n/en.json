@@ -569,6 +569,13 @@
 				"balanceInfoTopOff": "You can refill your balance via the **/configure-premium refill** command.",
 				"benefits": "Black Edition Benefits",
 				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n\u00A0\u00A0\u00A0\u25E6 Custom bot branding\n\u00A0\u00A0\u00A0\u25E6 Whitelists\n\u00A0\u00A0\u00A0\u25E6 Polls and token-based voting\n\u00A0\u00A0\u00A0\u25E6 More than two token/delegator role slots\n\u00A0\u00A0\u00A0\u25E6 ... and much more @ https://www.hazelnet.io/pricing"
+			},
+			"refill": {
+				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",
+				"cancelOutstanding": "Cancel open payment request",
+				"cancelSuccess": "❌ Your outstanding refill payment was successfully cancelled. You can now start a new refill process.\n\n😻 Thank you for supporting HAZELnet!",
+				"errorAmountToSmall": "⚠ The submitted amount of **{{refillAmount}} ADA** is too small. The minimum refill amount is **{{minimumAmount}} ADA**.\n\n😻 Thank you for supporting HAZELnet!",
+				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{existingIncomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting HAZELnet!"
 			}
 		}
 	},

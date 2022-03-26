@@ -1,5 +1,7 @@
 package io.hazelnet.community.controllers
 
+import io.hazelnet.community.data.HandleNotResolvedException
+import io.hazelnet.community.data.IncomingPaymentAlreadyRequestedException
 import io.hazelnet.shared.data.ApiErrorMessage
 import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
@@ -46,6 +48,20 @@ class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     fun processWhitelistRequirementNotMetException(ex: WhitelistRequirementNotMetException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(IncomingPaymentAlreadyRequestedException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun processIncomingPaymentAlreadyRequestedException(ex: IncomingPaymentAlreadyRequestedException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(HandleNotResolvedException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun processHandleNotResolvedException(ex: HandleNotResolvedException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 

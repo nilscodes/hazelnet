@@ -65,7 +65,7 @@ class ExternalAccountService(
     }
 
     fun getPremiumInfo(externalAccountId: Long): ExternalAccountPremiumInfo {
-        getExternalAccount(externalAccountId) // Ensure account exists
+        val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
         val verifiedStakeAddresses = getVerifiedStakeAddressesForExternalAccount(externalAccountId)
         if (config.fundedpool != null) {
             val premiumDelegationInfo = stakepoolService.getDelegation(config.fundedpool)
@@ -73,7 +73,12 @@ class ExternalAccountService(
                 .filter { verifiedStakeAddresses.contains(it.stakeAddress) }
                 .sumOf { it.amount }
             val discordServers = discordServerRepository.getDiscordServersForPremiumMember(externalAccountId)
-            return ExternalAccountPremiumInfo(discordServers, totalAmountStaked, 0)
+            val premiumInfo = ExternalAccountPremiumInfo(discordServers, totalAmountStaked, 0)
+            if (premiumInfo.isPremium()) {
+                externalAccount.premium = true
+                externalAccountRepository.save(externalAccount)
+            }
+            return premiumInfo
         }
         return ExternalAccountPremiumInfo(emptyList(), 0, 0)
     }
@@ -99,6 +104,33 @@ class ExternalAccountService(
                     it.key.stakeInfo.add(PremiumStakedInfo(currentEpoch, it.value, snapshotTime))
                     externalAccountRepository.save(it.key)
                 }
+            }
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 15 0 * * *", zone = "UTC")
+    fun updatePremiumAccounts() {
+        if (config.fundedpool != null) {
+            val oldPremiums = externalAccountRepository.findByPremium(true).toMutableList()
+            val allDelegationToFundedPool = stakepoolService.getDelegation(config.fundedpool)
+            allDelegationToFundedPool
+                .filter { it.amount > 0 }
+                .forEach { delegation ->
+                    val maybeExternalAccount =
+                        externalAccountRepository.findByVerifiedStakeAddress(delegation.stakeAddress)
+                    maybeExternalAccount.ifPresent { externalAccount ->
+                        if (!externalAccount.premium) {
+                            externalAccount.premium = true
+                            externalAccountRepository.save(externalAccount)
+                        }
+                        oldPremiums.removeIf { it.id == externalAccount.id }
+                    }
+                }
+            // Remove premium for anyone who is not delegating any more
+            oldPremiums.forEach {
+                it.premium = false
+                externalAccountRepository.save(it)
             }
         }
     }

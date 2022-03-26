@@ -10,6 +10,7 @@ import java.util.*
 @Repository
 interface ExternalAccountRepository : CrudRepository<ExternalAccount, Long> {
     fun findByReferenceId(referenceId: String): Optional<ExternalAccount>
+    fun findByPremium(premium: Boolean): List<ExternalAccount>
 
     @Query(value = "SELECT e FROM ExternalAccount e JOIN Verification v ON e=v.externalAccount WHERE v.cardanoStakeAddress=:stakeAddress AND v.confirmed=true")
     fun findByVerifiedStakeAddress(@Param("stakeAddress") stakeAddress: String): Optional<ExternalAccount>
