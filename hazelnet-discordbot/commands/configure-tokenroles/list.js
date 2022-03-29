@@ -19,6 +19,14 @@ module.exports = {
       if (!tokenRoleFields.length) {
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale: useLocale }) });
       }
+      if (!discordServer.premium && discordServer.tokenRoles.length > 1) {
+        const lowestTokenRoleId = Math.min(...discordServer.tokenRoles.map((tokenRole) => +tokenRole.id));
+        const lowestIdTokenRole = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
+        tokenRoleFields.unshift({
+          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale: useLocale }),
+          value: i18n.__({ phrase: 'configure.tokenroles.list.noPremium', locale: useLocale }, { tokenRole: lowestIdTokenRole }),
+        });
+      }
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale: useLocale }), 'configure-tokenroles-list', tokenRoleFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {

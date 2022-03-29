@@ -2,8 +2,8 @@ const i18n = require('i18n');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-  buildForUserWithAd(discordServer, title, message, commandId, fields, image) {
-    return this.buildForUser(discordServer, title, message, commandId, fields, image, true);
+  buildForUserWithAd(externalAccount, discordServer, title, message, commandId, fields, image) {
+    return this.buildForUser(discordServer, title, message, commandId, fields, image, !externalAccount.premium);
   },
   buildForUser(discordServer, title, message, commandId, fields, image, allowAdvertisement) {
     const color = discordServer.settings?.THEME_COLOR_USER ?? '#fece07';

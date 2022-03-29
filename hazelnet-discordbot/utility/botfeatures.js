@@ -13,12 +13,12 @@ module.exports = {
       description: i18n.__({ phrase: 'features.token', locale: useLocale }),
       value: 'token',
       emoji: { id: null, name: '📃' },
-    }/*, {
+    }, {
       label: i18n.__({ phrase: 'features.pollTitle', locale: useLocale }),
       description: i18n.__({ phrase: 'features.poll', locale: useLocale }),
       value: 'poll',
       emoji: { id: null, name: '✏' },
-    }*/, {
+    }, {
       label: i18n.__({ phrase: 'features.whitelistTitle', locale: useLocale }),
       description: i18n.__({ phrase: 'features.whitelist', locale: useLocale }),
       value: 'whitelist',

@@ -22,22 +22,27 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      if (discordServer.premium) {
+        const nonArchivedPolls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id))
+          .filter((poll) => !poll.archived)
+          .sort((pollA, pollB) => pollA.displayName.localeCompare(pollB.displayName));
 
-      const nonArchivedPolls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id))
-        .filter((poll) => !poll.archived)
-        .sort((pollA, pollB) => pollA.displayName.localeCompare(pollB.displayName));
+        const member = await interaction.guild.members.fetch(interaction.user.id);
+        const visiblePolls = nonArchivedPolls.filter((poll) => pollUtil.userCanSeePoll(member, poll));
 
-      const member = await interaction.guild.members.fetch(interaction.user.id);
-      const visiblePolls = nonArchivedPolls.filter((poll) => pollUtil.userCanSeePoll(member, poll));
-
-      const pollFields = visiblePolls.map((poll) => ({ name: poll.displayName, value: i18n.__({ phrase: 'vote.pollInfo', locale: useLocale }, { poll }) }));
-      if (!pollFields.length) {
-        pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale: useLocale }), value: i18n.__({ phrase: 'vote.noPolls', locale: useLocale }) });
+        const pollFields = visiblePolls.map((poll) => ({ name: poll.displayName, value: i18n.__({ phrase: 'vote.pollInfo', locale }, { poll }) }));
+        if (!pollFields.length) {
+          pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
+        }
+        const components = this.getPollChoices(locale, visiblePolls);
+        const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.purpose', locale }), 'vote', pollFields);
+        await interaction.editReply({ embeds: [embed], components, ephemeral: true });
+      } else {
+        const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.noPremium', locale }), 'vote');
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
-      const components = this.getPollChoices(useLocale, visiblePolls);
-      const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'vote.messageTitle', locale: useLocale }), i18n.__({ phrase: 'vote.purpose', locale: useLocale }), 'vote', pollFields);
-      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [], ephemeral: true });

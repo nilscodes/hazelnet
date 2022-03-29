@@ -28,28 +28,33 @@ module.exports = {
         const signups = await whitelistUtil.getExistingSignups(externalAccount, discordServer, interaction);
         const signupsText = this.getSignupsText(signups, discordServer);
 
-        const whitelistsAllowedPromises = discordServer.whitelists.map((whitelist) => {
-          const existingSignup = signups.find((signup) => signup?.whitelistId === whitelist.id);
-          return whitelistUtil.userQualifies(interaction, whitelist, existingSignup);
-        });
-        const whitelistsAllowed = await Promise.all(whitelistsAllowedPromises);
-        const whitelistOptions = discordServer.whitelists.filter((_, index) => (whitelistsAllowed[index])).map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
-        if (whitelistOptions.length) {
-          // Register address in cache, as we cannot send it along with the menu data.
-          this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, addressToWhitelist);
+        if (discordServer.premium) {
+          const whitelistsAllowedPromises = discordServer.whitelists.map((whitelist) => {
+            const existingSignup = signups.find((signup) => signup?.whitelistId === whitelist.id);
+            return whitelistUtil.userQualifies(interaction, whitelist, existingSignup);
+          });
+          const whitelistsAllowed = await Promise.all(whitelistsAllowedPromises);
+          const whitelistOptions = discordServer.whitelists.filter((_, index) => (whitelistsAllowed[index])).map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
+          if (whitelistOptions.length) {
+            // Register address in cache, as we cannot send it along with the menu data.
+            this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, addressToWhitelist);
 
-          const components = [new MessageActionRow()
-            .addComponents(
-              new MessageSelectMenu()
-                .setCustomId('whitelist/register/complete')
-                .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseWhitelist', locale: useLocale }))
-                .addOptions(whitelistOptions),
-            )];
+            const components = [new MessageActionRow()
+              .addComponents(
+                new MessageSelectMenu()
+                  .setCustomId('whitelist/register/complete')
+                  .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseWhitelist', locale: useLocale }))
+                  .addOptions(whitelistOptions),
+              )];
 
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.purpose', locale: useLocale })}`, 'whitelist-register');
-          await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.purpose', locale: useLocale })}`, 'whitelist-register');
+            await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+          } else {
+            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.noOpenWhitelists', locale: useLocale })}`, 'whitelist-register');
+            await interaction.editReply({ embeds: [embed], ephemeral: true });
+          }
         } else {
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), `${signupsText}${i18n.__({ phrase: 'whitelist.register.noOpenWhitelists', locale: useLocale })}`, 'whitelist-register');
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.register.noPremium', locale: useLocale }), 'whitelist-register');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {

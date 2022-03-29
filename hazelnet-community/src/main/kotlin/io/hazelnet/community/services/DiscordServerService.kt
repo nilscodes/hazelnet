@@ -301,8 +301,12 @@ class DiscordServerService(
                 }
             }
 
+            val rolesToAssign =
+                if (discordServer.getPremium()) discordServer.tokenRoles
+                else listOfNotNull(discordServer.tokenRoles.minByOrNull { it.id!! })
+
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
-                discordServer.tokenRoles.mapNotNull { role ->
+                rolesToAssign.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
                         val policyIdWithOptionalAssetFingerprint =  role.policyId + (role.assetFingerprint ?: "")
                         val tokenCount = (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
@@ -337,8 +341,12 @@ class DiscordServerService(
             }
         }
 
+        val rolesToAssign =
+            if (discordServer.getPremium()) discordServer.delegatorRoles
+            else listOfNotNull(discordServer.delegatorRoles.minByOrNull { it.id!! })
+
         return memberIdsToDelegationBuckets.map { delegations ->
-            discordServer.delegatorRoles.mapNotNull { role ->
+            rolesToAssign.mapNotNull { role ->
                 val lookupName = role.poolHash ?: LOOKUP_NAME_ALL_POOLS
                 externalAccountLookup[delegations.key]?.let {
                     if ((delegations.value[lookupName] ?: 0) >= role.minimumStake) {

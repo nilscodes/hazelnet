@@ -1,4 +1,3 @@
-const NodeCache = require('node-cache');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const i18n = require('i18n');
 const {
@@ -8,7 +7,6 @@ const embedBuilder = require('../utility/embedbuilder');
 const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
-  cache: new NodeCache({ stdTTL: 900 }),
   getCommandData(locale) {
     const ci18n = new CommandTranslations('premium', locale);
     return new SlashCommandBuilder()
@@ -26,6 +24,11 @@ module.exports = {
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
+
+      // Running the /premium command can turn on premium mode for a user prior to the daily run. If that happens, we want to clear the local cache in the discord bot
+      if (!externalAccount.premium && premiumInfo.premium) {
+        await interaction.client.services.externalaccounts.clearExternalDiscordAccountCache(interaction.user.id);
+      }
 
       const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });

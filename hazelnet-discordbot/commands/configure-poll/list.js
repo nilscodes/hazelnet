@@ -11,21 +11,27 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const polls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id))
         .sort((pollA, pollB) => pollA.displayName.localeCompare(pollB.displayName));
       const pollFields = polls.map((poll) => ({
-        name: i18n.__({ phrase: 'configure.poll.list.adminName', locale: useLocale }, { poll }),
-        value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale: useLocale }, {
+        name: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
+        value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
           openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
           openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
         }),
       }));
       if (!pollFields.length) {
-        pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale: useLocale }), value: i18n.__({ phrase: 'vote.noPolls', locale: useLocale }) });
+        pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
       }
-      const components = this.getPollChoices(useLocale, polls);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll list', i18n.__({ phrase: 'configure.poll.list.purpose', locale: useLocale }), 'configure-poll-list', pollFields);
+      if (!discordServer.premium && polls.length) {
+        pollFields.unshift({
+          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
+          value: i18n.__({ phrase: 'configure.poll.list.noPremium', locale }),
+        });
+      }
+      const components = this.getPollChoices(locale, polls);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll list', i18n.__({ phrase: 'configure.poll.list.purpose', locale }), 'configure-poll-list', pollFields);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
@@ -91,15 +97,15 @@ module.exports = {
       }
     }
   },
-  getPollChoices(useLocale, polls) {
+  getPollChoices(locale, polls) {
     if (polls.length) {
       return [new MessageActionRow()
         .addComponents(
           new MessageSelectMenu()
             .setCustomId('configure-poll/list/details')
-            .setPlaceholder(i18n.__({ phrase: 'configure.poll.list.choosePollDetails', locale: useLocale }))
+            .setPlaceholder(i18n.__({ phrase: 'configure.poll.list.choosePollDetails', locale }))
             .addOptions(polls.map((poll) => ({
-              label: i18n.__({ phrase: 'configure.poll.list.adminName', locale: useLocale }, { poll }),
+              label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
               description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
               value: `configure-poll-${poll.id}`,
             }))),

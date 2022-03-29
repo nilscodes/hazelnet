@@ -12,6 +12,7 @@ import io.hazelnet.community.persistence.DiscordPaymentRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
 import java.util.*
@@ -32,8 +33,8 @@ class BillingService(
     @Transactional
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun billPremiumStatus() {
-        val currentTime = ZonedDateTime.now()
-        val endOfMonth = ZonedDateTime.now()
+        val currentTime = ZonedDateTime.now(ZoneId.of("UTC"))
+        val endOfMonth = ZonedDateTime.now(ZoneId.of("UTC"))
             .with(TemporalAdjusters.lastDayOfMonth())
             .withHour(23).withMinute(59).withSecond(59)
         billPremiumStatusWithTimes(currentTime, endOfMonth)
@@ -49,15 +50,15 @@ class BillingService(
                 val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
                 val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
                 val proratedCost = ((1 - percentageOfMonthCompleted) * actualMonthlyCost).toLong()
-                val currentBalance = getCurrentBalance(discordServer)
-                if (currentBalance.orElse(0) > 0 || proratedCost == 0L) {
+                val currentBalance = getCurrentBalance(discordServer).orElse(0)
+                if (currentBalance > 0 || (proratedCost == 0L && currentBalance >= 0)) {
                     val bill = billingRepository.save(
                         DiscordBilling(null, discordServer, Date.from(currentTime.toInstant()), proratedCost, discordServer.guildMemberCount, maxDelegation, currentDelegation )
                     )
                     paymentRepository.save(
                         DiscordPayment(null, discordServer, null, Date.from(currentTime.toInstant()), -proratedCost, bill)
                     )
-                    discordServer.premiumUntil = Date.from(endOfMonth.toInstant())
+                    discordServer.premiumUntil = Date.from(endOfMonth.withZoneSameLocal(ZoneId.systemDefault()).toInstant())
                     discordServerRepository.save(discordServer)
                 }
             }

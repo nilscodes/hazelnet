@@ -37,6 +37,9 @@ module.exports = {
       return null;
     }
   },
+  clearExternalDiscordAccountCache(discordUserId) {
+    this.cache.del(`${discordUserId}`);
+  },
   async getActiveVerificationsForExternalAccount(externalAccountId) {
     const verifications = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/verifications`);
     return verifications.data;

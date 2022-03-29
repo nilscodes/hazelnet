@@ -57,7 +57,7 @@ module.exports = {
     const balanceMessages = [
       i18n.__({ phrase: 'configure.premium.status.balanceInfo', locale }, { remainingBalanceFormatted: discordServer.formatNumber(Math.round(premiumInfo.remainingBalance / 1000000)) }),
     ];
-    if (premiumInfo.remainingBalance <= 0 && premiumInfo.currentPremium) {
+    if (premiumInfo.remainingBalance <= 0) {
       balanceMessages.push(i18n.__({ phrase: 'configure.premium.status.balanceInfoNegative', locale }));
     }
     balanceMessages.push(i18n.__({ phrase: 'configure.premium.status.balanceInfoTopOff', locale }));

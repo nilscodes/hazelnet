@@ -16,7 +16,16 @@ module.exports = {
         };
       });
       if (!whitelistFields.length) {
-        whitelistFields.push({ name: i18n.__({ phrase: 'whitelist.list.noWhitelistsTitle', locale: useLocale }), value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale: useLocale }) });
+        whitelistFields.push({
+          name: i18n.__({ phrase: 'whitelist.list.noWhitelistsTitle', locale: useLocale }),
+          value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale: useLocale }),
+        });
+      }
+      if (!discordServer.premium && discordServer.whitelists.length) {
+        whitelistFields.unshift({
+          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale: useLocale }),
+          value: i18n.__({ phrase: 'configure.whitelist.list.noPremium', locale: useLocale }),
+        });
       }
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist list', i18n.__({ phrase: 'configure.whitelist.list.purpose', locale: useLocale }), 'configure-whitelist-list', whitelistFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });

@@ -25,7 +25,8 @@ module.exports = {
         const tokenRoleProblem = await this.healthCheckRoles(discordServer, interaction, healthCheckFields, locale, 'tokenRoles', botObject);
         const delegatorRoleProblem = await this.healthCheckRoles(discordServer, interaction, healthCheckFields, locale, 'delegatorRoles', botObject);
         const auditChannelProblem = await this.healthCheckAuditChannel(discordServer, interaction, healthCheckFields, locale);
-        if (!tokenRoleProblem && !delegatorRoleProblem && !auditChannelProblem) {
+        const blackEditionProblem = await this.healthCheckBlackEdition(discordServer, interaction, healthCheckFields, locale);
+        if (!tokenRoleProblem && !delegatorRoleProblem && !auditChannelProblem && !blackEditionProblem) {
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.success', locale }),
             value: i18n.__({ phrase: 'configure.healthcheck.successInfo', locale }),
@@ -90,6 +91,33 @@ module.exports = {
         healthCheckFields.push({
           name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),
           value: i18n.__({ phrase: 'configure.healthcheck.auditChannelDeleted', locale }),
+        });
+      }
+    }
+    return problems;
+  },
+  async healthCheckBlackEdition(discordServer, interaction, healthCheckFields, locale) {
+    let problems = false;
+    if (!discordServer.premium) {
+      const polls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id));
+      const blackEditionIssues = [];
+      if (polls.length) {
+        blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssuePolls', locale }));
+      }
+      if (discordServer.whitelists.length) {
+        blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueWhitelists', locale }));
+      }
+      if (discordServer.tokenRoles.length > 1) {
+        blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueTokenRoles', locale }));
+      }
+      if (discordServer.delegatorRoles.length > 1) {
+        blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueDelegatorRoles', locale }));
+      }
+      if (blackEditionIssues.length) {
+        problems = true;
+        healthCheckFields.push({
+          name: i18n.__({ phrase: 'configure.healthcheck.blackEdition', locale }),
+          value: i18n.__({ phrase: 'configure.healthcheck.blackEditionNotAvailable', locale }) + blackEditionIssues.map((blackEditionIssue) => i18n.__({ phrase: 'configure.healthcheck.blackEditionEntry', locale }, { blackEditionIssue })).join('\n'),
         });
       }
     }

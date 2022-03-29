@@ -9,7 +9,7 @@ module.exports = {
     try {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.user.id);
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const signups = await whitelistUtil.getExistingSignups(externalAccount, discordServer, interaction);
       const whitelistFieldsPromise = discordServer.whitelists.map(async (whitelist) => {
         const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
@@ -24,7 +24,7 @@ module.exports = {
       if (!whitelistFields.length) {
         whitelistFields.push({ name: i18n.__({ phrase: 'whitelist.list.noWhitelistsTitle', locale: useLocale }), value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale: useLocale }) });
       }
-      const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'whitelist.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.list.purpose', locale: useLocale }), 'whitelist-list', whitelistFields);
+      const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'whitelist.list.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.list.purpose', locale: useLocale }), 'whitelist-list', whitelistFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

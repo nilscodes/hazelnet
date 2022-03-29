@@ -24,6 +24,14 @@ module.exports = {
       if (!delegatorRoleFields.length) {
         delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale: useLocale }) });
       }
+      if (!discordServer.premium && discordServer.delegatorRoles.length > 1) {
+        const lowestDelegatorRoleId = Math.min(...discordServer.delegatorRoles.map((delegatorRole) => +delegatorRole.id));
+        const lowestIdDelegatorRole = discordServer.delegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
+        delegatorRoleFields.unshift({
+          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale: useLocale }),
+          value: i18n.__({ phrase: 'configure.delegatorroles.list.noPremium', locale: useLocale }, { delegatorRole: lowestIdDelegatorRole }),
+        });
+      }
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale: useLocale }), 'configure-delegatorroles-list', delegatorRoleFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {

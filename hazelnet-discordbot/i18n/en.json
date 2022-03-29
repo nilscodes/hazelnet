@@ -140,7 +140,8 @@
 		"abstainVote": "Abstain/remove your vote",
 		"abstainVoteSuccess": "✅ Your vote was successfully removed from the poll! You can revote at any time using the */vote* command.",
 		"noPollsTitle": "No polls",
-		"noPolls": "Currently, no available polls were found for this server."
+		"noPolls": "Currently, no available polls were found for this server.",
+		"noPremium": "🙀 Users currently can not vote in polls as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue."
 	},
 	"claim": {
 		"messageTitle": "Claim your physical items",
@@ -189,13 +190,13 @@
 		"purpose": "Here you can see your claimable **$HAZEL** balance and see if you have pledged your support to this project. You can also check if you're the winner of a recent premium giveaway.",
 		"premiumStatus": "Premium Status",
 		"premiumStatusNo": "You are currently not a premium user. Simply visit {{{stakeLink}}} and use the **Stake for Premium** button. Any staked ADA on any of your verified wallets will get you premium status - no minimum required.\n\nClaimable **$HAZEL** balance: {{tokenBalance}}",
-		"premiumStatusYes": "Thanks for supporting HAZELnet with your stake!\n\nYour current amount staked with us: {{stakeAmount}} ADA\nClaimable **$HAZEL** balance: {{tokenBalance}}",
+		"premiumStatusYes": "Thanks for supporting HAZELnet with your stake! 😻\n\nYour current amount staked with us: {{stakeAmount}} ADA\nClaimable **$HAZEL** balance: {{tokenBalance}}",
 		"serverSupport": "Server Support",
 		"serverSupportYes": "You have pledged ~ {{stakeAmountPerServer}} ADA each to the following Discord servers:\n",
-		"serverSupportEntry": "\u00A0\u00A0\u00A0• {{{serverName}}}",
+		"serverSupportEntry": "   • {{{serverName}}}",
 		"serverSupportNo": "You have not pledged your staked ADA to a Discord server. You can choose to support one or more Discord servers with your stake, without any downsides. Pledging your HAZEL premium account to a server means directly supporting your project.\n\nYou can change this at any time.",
 		"benefits": "Premium Benefits",
-		"benefitsDetails": "• No advertisements\n• Automatic entry into a giveaway every epoch\n• Priority Support\n• Gain **$HAZEL** based on your stake\n\u00A0\u00A0\u00A0\u25E6 Vote on new features and events with your $HAZEL\n\u00A0\u00A0\u00A0\u25E6 Participate in extra giveaways with your $HAZEL\n\u00A0\u00A0\u00A0\u25E6 Gain access to exclusive whitelists\n",
+		"benefitsDetails": "• No advertisements\n• Automatic entry into a giveaway every epoch\n• Priority Support\n• Gain **$HAZEL** based on your stake\n   ◦ Vote on new features and events with your $HAZEL\n   ◦ Participate in extra giveaways with your $HAZEL\n   ◦ Gain access to exclusive whitelists\n",
 		"giveaway": "Current Giveaway",
 		"pledgeButtonYes": "Pledge your support to {{{guildName}}}",
 		"pledgeButtonNo": "Revoke your pledge to {{{guildName}}}"
@@ -283,7 +284,8 @@
 			"success": "✅ Congratulations, you have successfully registered for the whitelist \"**{{{whitelist.displayName}}}**\"!\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
-			"otherError": "⚠ Error while registering for this whitelist."
+			"otherError": "⚠ Error while registering for this whitelist.",
+			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue."
 		},
 		"unregister": {
 			"messageTitle": "Unregister from a whitelist",
@@ -349,7 +351,8 @@
 				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
 				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
-				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} "
+				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} ",
+				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
@@ -360,7 +363,8 @@
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the token ownership requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make token role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
-				"canceled": "ℹ Adding the following token role was cancelled:\n\nRole <@&{{roleId}}>\nPolicy ID: {{policyId}}\nMinimum token amount: {{minimumTokenQuantity}}"
+				"canceled": "ℹ Adding the following token role was cancelled:\n\nRole <@&{{roleId}}>\nPolicy ID: {{policyId}}\nMinimum token amount: {{minimumTokenQuantity}}",
+				"noPremium": "🙀 You currently can not add any additional token roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following token role auto-assignment from this server:",
@@ -375,7 +379,8 @@
 				"stakepoolNameOfficial": "Stakepool {{{officialStakepool.info.ticker}}}, {{officialStakepool.poolHash}} (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameAny": "Any official stakepool of this server (see list via /info) (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameInofficial": "{{delegatorRole.poolHash}} (Role-ID: {{delegatorRole.id}})",
-				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}** to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>."
+				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}** to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>.",
+				"noPremium": "🙀 Users currently only get the delegator role with the lowest ID automatically assigned (Role-ID: {{delegatorRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following delegators added to this server:",
@@ -383,7 +388,8 @@
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
-				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}"
+				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}",
+				"noPremium": "🙀 You currently can not add any additional delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
@@ -410,7 +416,8 @@
 				"detailsChannel": "Announcement info",
 				"announcementNone": "No voting announcement will be made by the bot and the results will not be automatically published when the vote ends.",
 				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens. When the poll closes, the results will be published in the same channel.",
-				"adminName": "{{poll.displayName}} ({{poll.name}})"
+				"adminName": "{{poll.displayName}} ({{poll.name}})",
+				"noPremium": "🙀 Users currently can not vote in or view any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
 				"previewPhase1": "Welcome to the new poll wizard 🧙‍♂️! We will walk you through creating a new poll for your server.\n⚠ We highly suggest only running this command in a private channel as you will be asked to type messages to populate the description and voting options later on.\n\nYou've configured the following initial settings for your poll:",
@@ -455,7 +462,8 @@
 				"success": "✅ New poll with the following settings added to this server:",
 				"errorTimeout": "The poll wizard 🧙‍♂️ timed out waiting for your input, sorry. Please restart the wizard via the */configure-poll add* command.",
 				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
-				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less."
+				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
+				"noPremium": "🙀 You currently can not add any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following poll from this server:",
@@ -468,12 +476,14 @@
 			"list": {
 				"purpose": "This is the list of all existing whitelists for this Discord server.",
 				"noWhitelistsDetail": "*There are no configured whitelists on this server.*",
-				"adminName": "{{{whitelist.displayName}}} ({{whitelist.name}})"
+				"adminName": "{{{whitelist.displayName}}} ({{whitelist.name}})",
+				"noPremium": "🙀 Users currently can not register for any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
 				"success": "✅ New whitelist with the following requirements added to this server:",
 				"alreadyExists": "⚠ A whitelist with the name \"{{whitelistName}}\" already exists. Please choose a different internal name.",
-				"invalidName": "⚠ Could not add whitelist because the name \"{{whitelistName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less."
+				"invalidName": "⚠ Could not add whitelist because the name \"{{whitelistName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
+				"noPremium": "🙀 You currently can not add any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"close": {
 				"purpose": "Close registrations for this whitelist, either permanently or temporarily. You can close lists before they reach their end times or max user counts with this command. You can reopen it later via */configure-whitelist open*.",
@@ -543,7 +553,14 @@
 			"deniedRoleEntry": "• <@&{{roleId}}>",
 			"auditChannel": "Audit Channel health check",
 			"auditChannelNotWritable": "⚠ The bot does not have permissions to send messages to your currently configured audit channel <#{{auditChannel}}>. Make sure the bot has the *Send Messages* permission on this channel.",
-			"auditChannelDeleted": "⚠ Your currently configured audit channel to receive warnings about suspicious activity has been deleted. Try setting a new channel via the **/configure-protection auditchannel** command."
+			"auditChannelDeleted": "⚠ Your currently configured audit channel to receive warnings about suspicious activity has been deleted. Try setting a new channel via the **/configure-protection auditchannel** command.",
+			"blackEdition": "🐱‍👤 Black Edition health check",
+			"blackEditionNotAvailable": "The following features are used beyond their free tier and only function in a limited capacity at the current time:\n\n",
+			"blackEditionIssueWhitelists": "Whitelists (Black Edition required)",
+			"blackEditionIssuePolls": "Polls and voting (Black Edition required)",
+			"blackEditionIssueTokenRoles": "Token Roles (only one available in free edition)",
+			"blackEditionIssueDelegatorRoles": "Delegator Roles (only one available in free edition)",
+			"blackEditionEntry": "• **{{{blackEditionIssue}}}**"
 		},
 		"api": {
 			"generatetoken": {
@@ -565,10 +582,10 @@
 				"costInfo": "Based on {{currentGuildMemberCountFormatted}} discord members, your monthly base cost is **{{monthlyCostFormatted}} ADA**. Your community members have currently pledged **{{totalDelegationFormatted}} ADA** out of a maximum **{{maxDelegationFormatted}} ADA**, giving you a {{discount}}% discount. With that, your current expected monthly price for Black Edition is **{{actualMonthlyCostFormatted}} ADA**.\n\n💡 Your community members can pledge support to your server via the **/premium** command, or you can stake and use the same command to pledge your stake to receive a discount or completely free Black Edition.",
 				"balance": "Your balance",
 				"balanceInfo": "Your current prepaid balance is **{{remainingBalanceFormatted}} ADA**.",
-				"balanceInfoNegative": "⚠ Based on your current balance, your Black Edition will not be renewed next month.",
+				"balanceInfoNegative": "⚠ Based on your current balance, your Black Edition will not be renewed next month. Even a 100% delegation discount will require you to at least get to **0 ADA** before renewals resume.",
 				"balanceInfoTopOff": "You can refill your balance via the **/configure-premium refill** command.",
 				"benefits": "Black Edition Benefits",
-				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n\u00A0\u00A0\u00A0\u25E6 Custom bot branding\n\u00A0\u00A0\u00A0\u25E6 Whitelists\n\u00A0\u00A0\u00A0\u25E6 Polls and token-based voting\n\u00A0\u00A0\u00A0\u25E6 More than two token/delegator role slots\n\u00A0\u00A0\u00A0\u25E6 ... and much more @ https://www.hazelnet.io/pricing"
+				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ ... and much more @ https://www.hazelnet.io/pricing"
 			},
 			"refill": {
 				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",
@@ -590,7 +607,7 @@
 		"configureLanguageText": "This setting determines the language of all bot commands and interactions. Currently it is not possible to have commands translate on a per-user basis - bot replies will in the future be able to be based on a user-selected language.",
 		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminaccess* command to adjust this later.",
 		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-useraccess* command to adjust this later.",
-		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available.",
+		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available. Certain features require a premium subscription called **Black Edition**. See our website for more information.",
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",
 		"chooseUserRole": "Choose your user role",
@@ -610,20 +627,20 @@
 		"stakepool": "Stakepool features (official pools, delegator roles)",
 		"tokenTitle": "Tokens",
 		"token": "Fungible tokens and NFTs (official policies, token roles)",
-		"whitelistTitle": "Whitelists",
+		"whitelistTitle": "Whitelists (Black Edition only)",
 		"whitelist": "Self-service address whitelists with requirements",
-		"pollTitle": "Polls",
+		"pollTitle": "Polls (Black Edition only)",
 		"poll": "Polls and voting system for open and holder-limited polls",
-		"claimphysicalTitle": "Physical Item Claiming",
-		"claimphysical": "Claiming physical items via verified lists",
-		"cardolphins": "features.cardolphins"
+		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
+		"claimphysical": "Claiming physical items via verified lists"
 	},
 	"generic": {
 		"cancel": "Cancel",
 		"yes": "Yes",
 		"no": "No",
 		"clickhelp": "Click for help",
-		"advertisement": "Advertisement"
+		"advertisement": "Advertisement",
+		"blackEditionWarning": "🐱‍👤 Black Edition missing"
 	},
 	"languages": {
 		"en": "English",

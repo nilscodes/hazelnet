@@ -12,7 +12,7 @@ module.exports = {
       const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);
       if (!currentMemberData) {
         await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
-        const embed = embedBuilder.buildForUserWithAd(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.link.success', locale: useLocale }), 'verify-link');
+        const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.link.success', locale: useLocale }), 'verify-link');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.link.notLinked', locale: useLocale }), 'verify-link');
