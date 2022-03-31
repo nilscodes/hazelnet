@@ -22,7 +22,7 @@ module.exports = {
     if (!this.isPollArchived(poll)) {
       if (poll.requiredRoles?.length) {
         const needsAnyOfRoleIds = poll.requiredRoles.map((role) => role.roleId);
-        return member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
+        return needsAnyOfRoleIds.length === 0 || member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
       }
       return true;
     }
@@ -31,7 +31,7 @@ module.exports = {
   userCanVoteInPoll(member, poll, votingWeight) {
     if (!this.isPollArchived(poll) && !this.hasVotingEnded(poll) && this.hasVotingStarted(poll) && votingWeight > 0) {
       const needsAnyOfRoleIds = poll.requiredRoles.map((role) => role.roleId);
-      return member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
+      return needsAnyOfRoleIds.length === 0 || member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
     }
     return false;
   },

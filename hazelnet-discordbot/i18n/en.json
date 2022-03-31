@@ -132,6 +132,7 @@
 		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of {{totalVotingPower}} in your verified wallets.",
 		"votingPowerSingleNoToken": "This poll is not token-based and as such you have a voting power of one.",
 		"votingPowerSingleToken": "Based on the token ownership snapshot you have one vote in this poll.",
+		"votingPowerNone": "You do not have any verified wallets that had contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",
 		"votingPowerTokenInfo": "💡 If you feel your voting power is not accurate, ensure all your wallets are linked. The snapshot for this poll may also be different from the current token count in your wallet.",
 		"chooseVoteOption": "Choose what to vote for",
 		"voteSuccess": "✅ You have successfully cast your vote. You can revote at any time using the */vote* command.",
