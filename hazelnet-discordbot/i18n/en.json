@@ -184,7 +184,9 @@
 		"submitOrder": "Submit order",
 		"helpChannelTitle": "Help with your order",
 		"helpChannel": "If you need assistance with your order, please get in touch with our team in the channel <#{{helpChannel}}>. We are happy to help you out.",
-		"noDescription": "No Description provided"
+		"noDescription": "No Description provided",
+		"trackingNumberTitle": "Tracking Number",
+		"trackingNumberDetails": "Your tracking number is **{{trackingNumber}}** and you can follow it via this [Google Search](https://www.google.com/search?q={{trackingNumber}}). If the search does not yield any results, reach out to the project team to get your shipping provider."
 	},
 	"premium": {
 		"messageTitle": "View your premium status",
@@ -477,7 +479,7 @@
 			"list": {
 				"purpose": "This is the list of all existing whitelists for this Discord server.",
 				"noWhitelistsDetail": "*There are no configured whitelists on this server.*",
-				"adminName": "{{{whitelist.displayName}}} ({{whitelist.name}})",
+				"adminName": "{{{whitelist.displayName}}} (API name: {{whitelist.name}})",
 				"noPremium": "🙀 Users currently can not register for any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {

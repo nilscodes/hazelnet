@@ -71,6 +71,10 @@ class PhysicalOrder @JsonCreator constructor(
 
     @Column(name = "processed")
     var processed: Boolean = false,
+
+    @Column(name = "tracking_number")
+    @field:Size(min = 1, max = 200)
+    var trackingNumber: String?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -90,6 +94,7 @@ class PhysicalOrder @JsonCreator constructor(
         if (street != other.street) return false
         if (items != other.items) return false
         if (processed != other.processed) return false
+        if (trackingNumber != other.trackingNumber) return false
 
         return true
     }
@@ -107,11 +112,12 @@ class PhysicalOrder @JsonCreator constructor(
         result = 31 * result + street.hashCode()
         result = 31 * result + items.hashCode()
         result = 31 * result + processed.hashCode()
+        result = 31 * result + (trackingNumber?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "PhysicalOrder(id=$id, externalAccountId=$externalAccountId, createTime=$createTime, claimListId=$claimListId, shipTo='$shipTo', country='$country', phone='$phone', zipCode='$zipCode', city='$city', street='$street', items=$items, processed=$processed)"
+        return "PhysicalOrder(id=$id, externalAccountId=$externalAccountId, createTime=$createTime, claimListId=$claimListId, shipTo='$shipTo', country='$country', phone='$phone', zipCode='$zipCode', city='$city', street='$street', items=$items, processed=$processed, trackingNumber=$trackingNumber)"
     }
 
 }

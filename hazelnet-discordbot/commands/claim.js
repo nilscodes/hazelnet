@@ -248,6 +248,12 @@ module.exports = {
       cartField,
       this.getCurrentAddressField(existingOrder, locale),
     ];
+    if (existingOrder.trackingNumber) {
+      orderFields.push({
+        name: i18n.__({ phrase: 'claim.trackingNumberTitle', locale }),
+        value: i18n.__({ phrase: 'claim.trackingNumberDetails', locale }, existingOrder),
+      });
+    }
     const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.existingOrderTitle', locale }), i18n.__({ phrase: 'claim.checkoutComplete', locale }), 'claim', orderFields);
     await interaction.user.send({ embeds: [embed], ephemeral: true });
   },

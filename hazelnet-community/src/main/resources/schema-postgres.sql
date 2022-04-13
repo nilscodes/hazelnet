@@ -301,7 +301,8 @@ CREATE TABLE "physical_orders"
     "zip"                 varchar(30)  NOT NULL,
     "city"                varchar(200) NOT NULL,
     "street"              varchar(500) NOT NULL,
-    "processed"           boolean      NOT NULL DEFAULT false
+    "processed"           boolean      NOT NULL DEFAULT false,
+    "tracking_number"     varchar(200) NULL
 );
 
 CREATE TABLE "physical_orders_items"
