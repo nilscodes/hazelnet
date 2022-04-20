@@ -30,7 +30,8 @@
 			"configure-tokenroles-add": "Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.",
 			"configure-tokenroles-list": "List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
-			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
+			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
+			"configure-tokenroles-details": "commands.descriptions.configure-tokenroles-details"
 		},
 		"options": {
 			"whitelist": {
@@ -348,14 +349,19 @@
 		"tokenroles": {
 			"list": {
 				"purpose": "This is the list of Discord roles that will be automatically assigned, based on token (NFT and FT) ownership by verified users.",
+				"detailsPurpose": "Information about the token role you selected:",
 				"noTokenRolesTitle": "No token roles",
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
 				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"tokenRoleDetailsShort": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
 				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} ",
-				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
+				"chooseDetails": "Choose the token role you want to get details on",
+				"chooseText": "Role-ID: {{tokenRole.id}}",
+				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status.",
+				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server."
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
