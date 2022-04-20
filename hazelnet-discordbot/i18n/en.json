@@ -29,9 +29,9 @@
 			"configure-tokenroles": "Manage auto-role assignments for NFT and other token-holders",
 			"configure-tokenroles-add": "Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.",
 			"configure-tokenroles-list": "List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs",
+			"configure-tokenroles-details": "Get details on the specific token role assignment",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
-			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
-			"configure-tokenroles-details": "commands.descriptions.configure-tokenroles-details"
+			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
 		},
 		"options": {
 			"whitelist": {
@@ -353,9 +353,10 @@
 				"noTokenRolesTitle": "No token roles",
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
-				"tokenRoleNameInofficial": "{{tokenRole.policyId}} (Role-ID: {{tokenRole.id}})",
+				"tokenRoleNameInofficial": "{{policyIdShort}} (Role-ID: {{tokenRole.id}})",
 				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
-				"tokenRoleDetailsShort": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
+				"tokenRoleDetailsShortSelect": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
+				"tokenRoleDetailsShortCommand": "Role <@&{{tokenRole.roleId}}> - Run */configure-tokenroles details {{tokenRole.id}}* for more info.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
 				"fingerprintInfo": "with the asset fingerprint {{tokenRole.assetFingerprint}} ",
 				"chooseDetails": "Choose the token role you want to get details on",
@@ -363,12 +364,16 @@
 				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status.",
 				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server."
 			},
+			"details": {
+				"purpose": "Here are the details on the given token role you have requested."
+			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",
 				"errorMinimumTokens": "⚠ Automatic token role-assignment could not be added, as minimum token count needs to be at least 1.",
 				"errorMaximumTokens": "⚠ Automatic token role-assignment could not be added, as maximum token count needs to be at least 1 and cannot be less than minimum token count.",
 				"errorAssetFingerprint": "⚠ Automatic token role-assignment could not be added, since the provided asset fingerprint did not match the required format. Asset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*.",
 				"errorPolicyId": "⚠ Automatic token role-assignment could not be added, since the provided policy ID did not match the required format. Policy IDs look as follows: *8f63e08467bfbbc260a382a80f3297f9a569fca0293f296620d72d17*.",
+				"errorLimitReached": "⚠ You have reached the maximum number of **{{maxTokenRoles}}** allowed token roles for your server. This limit is enforced to prevent extensive resource usage by individual Discord servers. Please get in touch with us if you have special requirements for more token roles.",
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the token ownership requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make token role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
@@ -641,7 +646,8 @@
 		"pollTitle": "Polls (Black Edition only)",
 		"poll": "Polls and voting system for open and holder-limited polls",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
-		"claimphysical": "Claiming physical items via verified lists"
+		"claimphysical": "Claiming physical items via verified lists",
+		"cardolphins": "features.cardolphins"
 	},
 	"generic": {
 		"cancel": "Cancel",

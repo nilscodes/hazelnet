@@ -21,6 +21,10 @@ module.exports = {
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
+        .setName('details')
+        .setDescription(ci18n.subDescription('details'))
+        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))
         .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)));

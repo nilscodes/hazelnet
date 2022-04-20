@@ -12,11 +12,12 @@ module.exports = {
       if (tokenRoleToRemove) {
         await interaction.client.services.discordserver.deleteTokenRole(interaction.guild.id, tokenRoleToRemove.id);
         const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRoleToRemove.policyId);
+        const policyIdShort = `${tokenRoleToRemove.policyId.substr(0, 10)}…`;
         const fingerprintInfo = tokenRoleToRemove.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { tokenRole: tokenRoleToRemove }) : '';
         const maximumInfo = tokenRoleToRemove.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale: useLocale }, { tokenRole: tokenRoleToRemove }) : '';
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale: useLocale }), 'configure-tokenroles-remove', [
           {
-            name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: tokenRoleToRemove, officialProject }),
+            name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: tokenRoleToRemove, officialProject, policyIdShort }),
             value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: tokenRoleToRemove, fingerprintInfo, maximumInfo }),
           },
         ]);
