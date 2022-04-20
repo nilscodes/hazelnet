@@ -30,6 +30,7 @@ dependencies {
 	implementation("javax.validation:validation-api")
 	implementation("org.hibernate.validator:hibernate-validator")
 	implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
+	implementation("com.jayway.jsonpath:json-path:2.7.0")
 	implementation(project(":hazelnet-cardano-shared"))
 	implementation("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -30,6 +30,9 @@
 			"configure-tokenroles-add": "Adds an auto-assignment for the given role based on NFTs and FTs in a users verified wallets.",
 			"configure-tokenroles-list": "List all roles that will auto-assigned to verified holders of NFTs and FTs of configured policy IDs",
 			"configure-tokenroles-details": "Get details on the specific token role assignment",
+			"configure-tokenroles-metadatafilter": "Manage metadata filters on your token roles.",
+			"configure-tokenroles-metadatafilter-add": "Adds a metadata filter to your existing token role.",
+			"configure-tokenroles-metadatafilter-remove": "Remove a metadata filter from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
 		},
@@ -61,7 +64,10 @@
 				"count": "Minimum amount of tokens to qualify for this role",
 				"max-count": "Maximum amount of tokens to qualify for this role",
 				"asset-fingerprint": "Asset fingerprint (useful for multiple FTs under one policy)",
-				"token-role-id": "Role to remove auto-assignments for (get ID from list command)"
+				"token-role-id": "Token role ID to change (get ID from list command)",
+				"attribute-name": "Metadata attribute to check (case sensitive!)",
+				"operator": "Comparison operator to use",
+				"attribute-value": "Value to check for (case sensitive!)"
 			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
@@ -355,6 +361,7 @@
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{policyIdShort}} (Role-ID: {{tokenRole.id}})",
 				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"tokenRoleDetailsWithFilters": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}and match the configured metadata filters will be assigned the role <@&{{tokenRole.roleId}}>.",
 				"tokenRoleDetailsShortSelect": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
 				"tokenRoleDetailsShortCommand": "Role <@&{{tokenRole.roleId}}> - Run */configure-tokenroles details {{tokenRole.id}}* for more info.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
@@ -366,6 +373,29 @@
 			},
 			"details": {
 				"purpose": "Here are the details on the given token role you have requested."
+			},
+			"metadatafilter": {
+				"add": {
+					"metadataFiltersTitle": "**Active Filters**",
+					"metadataFiltersContent": "Metadata attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
+					"metadataOperator-EQUALS": "is",
+					"metadataOperator-NOTEQUALS": "is not",
+					"metadataOperator-CONTAINS": "contains the text",
+					"metadataOperator-NOTCONTAINS": "does not contain the text",
+					"metadataOperator-STARTSWITH": "starts with the text",
+					"metadataOperator-ENDSWITH": "ends with the text",
+					"metadataFilterJoinPhrase": " **AND** ",
+					"errorLimitReached": "⚠ You cannot add more than three metadata filters to any token role.",
+					"errorAttributeValueLength": "⚠ You cannot use attribute values with more than {{maxLength}} characters.",
+					"errorAttributeNameLength": "⚠ You cannot use attribute names with more than {{maxLength}} characters."
+				},
+				"remove": {
+					"purpose": "Choose the metadata filter you want to remove from this role.",
+					"errorNoFiltersTitle": "No filters found",
+					"errorNoFilters": "⚠ No metadata filters are active for this token role - nothing to remove.",
+					"chooseRemove": "Choose the metadata filter to remove",
+					"success": "🗑️ Removed the metadata filter from this token role. The remaining details are as follows:"
+				}
 			},
 			"add": {
 				"success": "✅ New automatic role-assignment for the following token owners added to this server:",

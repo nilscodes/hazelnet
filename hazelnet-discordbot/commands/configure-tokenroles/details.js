@@ -1,5 +1,6 @@
 const i18n = require('i18n');
 const embedBuilder = require('../../utility/embedbuilder');
+const tokenroles = require('../../utility/tokenroles');
 
 module.exports = {
   async execute(interaction) {
@@ -7,28 +8,15 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const { policyId: policyIdOfFirstAsset, assetFingerprint: assetFingerprintOfFirstAsset } = tokenRoleToShow.acceptedAssets[0];
-        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
-        const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
-        const fingerprintInfo = assetFingerprintOfFirstAsset ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { assetFingerprint: assetFingerprintOfFirstAsset }) : '';
-        const maximumInfo = tokenRoleToShow.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale: useLocale }, { tokenRole: tokenRoleToShow }) : '';
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale: useLocale }), 'configure-tokenroles-details', [
-          {
-            name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: tokenRoleToShow, officialProject, policyIdShort }),
-            value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, {
-              tokenRole: tokenRoleToShow,
-              policyId: policyIdOfFirstAsset,
-              fingerprintInfo,
-              maximumInfo,
-            }),
-          },
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }), 'configure-tokenroles-details', [
+          tokenroles.getTokenRoleDetailsText(tokenRoleToShow, discordServer, locale, true),
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.list.errorNotFound', locale: useLocale }, { tokenRoleId }), 'configure-tokenroles-details');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.list.errorNotFound', locale }, { tokenRoleId }), 'configure-tokenroles-details');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {

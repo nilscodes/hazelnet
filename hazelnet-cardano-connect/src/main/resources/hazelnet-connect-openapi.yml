@@ -172,7 +172,7 @@ paths:
   /token/stake:
     post:
       summary: Get the policy IDs and token counts that currently reside in all stake addresses, for the policy IDs/fingerprint combinations in the body
-      operationId: getMultiAssetsStakeSnapshot
+      operationId: getMultiAssetCountStakeSnapshot
       tags:
         - token
       requestBody:
@@ -190,7 +190,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TokenOwnershipInfo'
+                  $ref: '#/components/schemas/TokenOwnershipInfoWithAssetCount'
         default:
           description: Unexpected error
           content:
@@ -200,7 +200,7 @@ paths:
   /token/stake/{stakeAddress}:
     post:
       summary: Get the policy IDs and token counts that currently reside in a stake address, filtered by the policy IDs in the body (or all, if empty list)
-      operationId: getMultiAssetsForStakeAddress
+      operationId: getMultiAssetCountsForStakeAddress
       tags:
         - token
       parameters:
@@ -220,13 +220,59 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TokenOwnershipInfo'
+                  $ref: '#/components/schemas/TokenOwnershipInfoWithAssetCount'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /token/stake/{stakeAddress}/list:
+    post:
+      summary: Get the policy IDs and token names that currently reside in a stake address, filtered by the policy IDs in the body (or all, if empty list)
+      operationId: getMultiAssetListForStakeAddress
+      tags:
+        - token
+      parameters:
+        - $ref: '#/components/parameters/StakeAddressPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
+      responses:
+        '200':
+          description: 'A filtered list of token policies and associated asset names currently owned by the stake address'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenOwnershipInfoWithAssetList'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /token/assets/{policyId}/{assetNameHex}:
+    get:
+      summary: Get the information and metadata for a multi asset
+      operationId: getMultiAssetInfo
+      tags:
+        - token
+      parameters:
+        - $ref: '#/components/parameters/PolicyIdPathParameter'
+        - $ref: '#/components/parameters/AssetNameHexPathParameter'
+      responses:
+        '200':
+          description: 'The data and metadata for this asset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiAssetInfo'
   /info/syncstatus:
     get:
       summary: 'Get Synchronization details for Cardano-DB-Sync connected to this HazelNet'
@@ -257,6 +303,24 @@ components:
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
       schema:
         $ref: '#/components/schemas/StakepoolHash'
+    PolicyIdPathParameter:
+      name: policyId
+      in: path
+      description: The policy ID
+      required: true
+      style: simple
+      example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+      schema:
+        $ref: '#/components/schemas/TokenPolicyId'
+    AssetNameHexPathParameter:
+      name: assetNameHex
+      in: path
+      description: The hex-encoded name of the asset
+      required: true
+      style: simple
+      example: 4d616368696e65486561647a373536
+      schema:
+        $ref: '#/components/schemas/TokenAssetName'
     StakeAddressPathParameter:
       name: stakeAddress
       in: path
@@ -324,7 +388,7 @@ components:
           format: int64
         stakeAddress:
           $ref: '#/components/schemas/StakeAddressView'
-    TokenOwnershipInfo:
+    TokenOwnershipInfoWithAssetCount:
       type: object
       required:
         - stakeAddress
@@ -336,6 +400,44 @@ components:
         policyId:
           $ref: '#/components/schemas/TokenPolicyId'
         assetCount:
+          type: integer
+          format: int64
+    TokenOwnershipInfoWithAssetList:
+      type: object
+      required:
+        - stakeAddress
+        - policyId
+        - assetCount
+      properties:
+        stakeAddress:
+          $ref: '#/components/schemas/StakeAddressView'
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        assetList:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetName'
+    MultiAssetInfo:
+      type: object
+      required:
+        - policyId
+        - assetName
+        - assetFingerprint
+        - metadata
+        - mintTransaction
+        - quantity
+      properties:
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        assetName:
+          type: string
+        assetFingerprint:
+          $ref: '#/components/schemas/AssetFingerprint'
+        metadata:
+          type: object
+        mintTransaction:
+          type: string
+        quantity:
           type: integer
           format: int64
     SyncStatus:
@@ -379,11 +481,25 @@ components:
       description: The Policy ID
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
       pattern: '^[A-Za-z0-9]{56}$'
+    TokenAssetName:
+      type: string
+      description: The hex-encoded asset name
+      example: 4d616368696e65486561647a373536
+      pattern: '^[A-Za-z0-9]*$'
     TokenPolicyIdWithOptionalAssetFingerprint:
       type: string
       description: The Policy ID with an optional asset fingerprint appended
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
       pattern: '^[A-Za-z0-9]{56}(asset1[A-Za-z-0-9]{38})?$'
+    AssetFingerprint:
+      type: string
+      description: The fingerprint of an asset
+      example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
+      pattern: '^asset1[A-Za-z-0-9]{38}$'
+    AssetName:
+      type: string
+      description: The name of an asset
+      example: PXL500
     EpochNumber:
       type: integer
       format: int32

@@ -1,80 +1,137 @@
 package io.hazelnet.cardano.connect.services
 
-import io.hazelnet.cardano.connect.data.token.AssetFingerprint
-import io.hazelnet.cardano.connect.data.token.PolicyId
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfo
+import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.persistence.token.TokenDao
 import io.hazelnet.cardano.connect.util.PolicyTools
+import org.springframework.cache.annotation.CacheConfig
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
+fun String.decodeHex(): String {
+    require(length % 2 == 0) {"Must have an even length"}
+    return String(
+        chunked(2)
+            .map { it.toInt(16).toByte() }
+            .toByteArray()
+    )
+}
+
 @Service
+@CacheConfig(cacheNames = ["tokenmetadata"])
 class TokenService(
     private val tokenDao: TokenDao
 ) {
-    fun getMultiAssetsForStakeAddress(
+    fun getMultiAssetCountsForStakeAddress(
         stakeAddress: String,
         policyIdsWithOptionalAssetFingerprint: List<String>
-    ): List<TokenOwnershipInfo> {
+    ): List<TokenOwnershipInfoWithAssetCount> {
         if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
-            return tokenDao.getMultiAssetsForStakeAddress(stakeAddress)
+            return tokenDao.getMultiAssetCountsForStakeAddress(stakeAddress)
         }
-        val (allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
+        val allTokenOwnershipInfoWithAssetCount = mutableListOf<TokenOwnershipInfoWithAssetCount>()
+        val (purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
             policyIdsWithOptionalAssetFingerprint
         )
         if (purePolicyIds.isNotEmpty()) {
-            allTokenOwnershipInfo.addAll(
-                tokenDao.getMultiAssetsWithPolicyIdForStakeAddress(
+            allTokenOwnershipInfoWithAssetCount.addAll(
+                tokenDao.getMultiAssetCountsWithPolicyIdForStakeAddress(
                     stakeAddress,
                     purePolicyIds
                 )
             )
         }
         if (policyIdsWithAssetFingerprint.isNotEmpty()) {
-            allTokenOwnershipInfo.addAll(
-                tokenDao.getMultiAssetsWithPolicyIdAndAssetFingerprintForStakeAddress(
+            allTokenOwnershipInfoWithAssetCount.addAll(
+                tokenDao.getMultiAssetCountsWithPolicyIdAndAssetFingerprintForStakeAddress(
                     stakeAddress,
                     policyIdsWithAssetFingerprint
                 )
             )
         }
 
-        return allTokenOwnershipInfo
+        return allTokenOwnershipInfoWithAssetCount
     }
 
-    fun getMultiAssetSnapshot(
+    // TODO Think about how to reuse the same method above
+    fun getMultiAssetListForStakeAddress(
+        stakeAddress: String,
         policyIdsWithOptionalAssetFingerprint: List<String>
-    ): List<TokenOwnershipInfo> {
+    ): List<TokenOwnershipInfoWithAssetList> {
+        if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
+            return tokenDao.getMultiAssetListForStakeAddress(stakeAddress)
+        }
+        val allTokenOwnershipInfoWithAssetList = mutableListOf<TokenOwnershipInfoWithAssetList>()
+        val (purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
+            policyIdsWithOptionalAssetFingerprint
+        )
+        if (purePolicyIds.isNotEmpty()) {
+            allTokenOwnershipInfoWithAssetList.addAll(
+                tokenDao.getMultiAssetListWithPolicyIdForStakeAddress(
+                    stakeAddress,
+                    purePolicyIds
+                )
+            )
+        }
+        if (policyIdsWithAssetFingerprint.isNotEmpty()) {
+            allTokenOwnershipInfoWithAssetList.addAll(
+                tokenDao.getMultiAssetListWithPolicyIdAndAssetFingerprintForStakeAddress(
+                    stakeAddress,
+                    policyIdsWithAssetFingerprint
+                )
+            )
+        }
+
+        return allTokenOwnershipInfoWithAssetList
+    }
+
+    fun getMultiAssetCountStakeSnapshot(
+        policyIdsWithOptionalAssetFingerprint: List<String>
+    ): List<TokenOwnershipInfoWithAssetCount> {
         if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
             throw IllegalArgumentException("Cannot retrieve a multi asset snapshot without providing at least one policy ID")
         }
-        val (allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
+        val allTokenOwnershipInfoWithAssetCount = mutableListOf<TokenOwnershipInfoWithAssetCount>()
+        val (purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
             policyIdsWithOptionalAssetFingerprint
         )
         if (purePolicyIds.isNotEmpty()) {
-            allTokenOwnershipInfo.addAll(
-                tokenDao.getMultiAssetSnapshotForPolicyId(
+            allTokenOwnershipInfoWithAssetCount.addAll(
+                tokenDao.getMultiAssetCountSnapshotForPolicyId(
                     purePolicyIds
                 )
             )
         }
         if (policyIdsWithAssetFingerprint.isNotEmpty()) {
-            allTokenOwnershipInfo.addAll(
-                tokenDao.getMultiAssetSnapshotForPolicyIdAndAssetFingerprint(
+            allTokenOwnershipInfoWithAssetCount.addAll(
+                tokenDao.getMultiAssetCountSnapshotForPolicyIdAndAssetFingerprint(
                     policyIdsWithAssetFingerprint
                 )
             )
         }
 
-        return allTokenOwnershipInfo
+        return allTokenOwnershipInfoWithAssetCount
     }
 
-    private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Triple<MutableList<TokenOwnershipInfo>, List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
-        val allTokenOwnershipInfo = mutableListOf<TokenOwnershipInfo>()
+    private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Pair<List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
         val purePolicyIds =
             policyIdsWithOptionalAssetFingerprint.filter { PolicyTools.isPolicyId(it) }.map { PolicyId(it) }
         val policyIdsWithAssetFingerprint =
             policyIdsWithOptionalAssetFingerprint.filter { !PolicyTools.isPolicyId(it) }
                 .map { Pair(PolicyId(it.substring(0, 56)), AssetFingerprint(it.substring(56))) }
-        return Triple(allTokenOwnershipInfo, purePolicyIds, policyIdsWithAssetFingerprint)
+        return Pair(purePolicyIds, policyIdsWithAssetFingerprint)
     }
+
+    @Cacheable(cacheNames = ["tokenmetadata"], unless = "#result == null")
+    fun getMultiAssetInfo(policyId: String, assetNameHex: String): MultiAssetInfo {
+        return tokenDao.getMultiAssetInfo(policyId, assetNameHex.decodeHex());
+    }
+
+    @Scheduled(fixedDelay = 6 * 60 * 60 * 1000)
+    @CacheEvict(allEntries = true, cacheNames = ["tokenmetadata"], )
+    fun clearMultiAssetInfoCache() {
+        // Annotation-based cache clearing of asset info every 6 hours in case metadata changes
+    }
+
 }

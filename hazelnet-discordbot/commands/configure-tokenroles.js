@@ -23,6 +23,29 @@ module.exports = {
         .setName('details')
         .setDescription(ci18n.subDescription('details'))
         .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)))
+      .addSubcommandGroup((group) => group
+        .setName('metadatafilter')
+        .setDescription(ci18n.subDescription('metadatafilter'))
+        .addSubcommand((subcommand) => subcommand
+          .setName('add')
+          .setDescription(ci18n.subDescription('metadatafilter-add'))
+          .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))
+          .addStringOption((option) => option.setName('attribute-name').setDescription(ci18n.option('attribute-name')).setRequired(true))
+          .addStringOption((option) => option.setName('operator').setDescription(ci18n.option('operator'))
+            .addChoices(
+              { name: 'equals', value: 'EQUALS' },
+              { name: 'does not equal', value: 'NOTEQUALS' },
+              { name: 'contains', value: 'CONTAINS' },
+              { name: 'does not contain', value: 'NOTCONTAINS' },
+              { name: 'starts with', value: 'STARTSWITH' },
+              { name: 'ends with', value: 'ENDSWITH' },
+            )
+            .setRequired(true))
+          .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('remove')
+          .setDescription(ci18n.subDescription('metadatafilter-remove'))
+          .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))

@@ -162,6 +162,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /externalaccounts/{externalAccountId}/premium:
+    get:
+      summary: 'Get Premium data for this specific account'
+      operationId: getPremiumInfo
+      tags:
+        - account
+        - premium
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of premium status, total delegation etc.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalAccountPremiumInfo'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts/discord/{discordUserId}:
     get:
       summary: Get external account matching a Discord user ID
@@ -683,6 +707,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhysicalOrder'
+  /discord/servers/{guildId}/premium:
+    get:
+      summary: Get the information about the premium status of this server
+      operationId: getPremiumInfo
+      tags:
+        - discord
+        - premium
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Premium Info'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordServerPremiumInfo'
+  /discord/servers/{guildId}/payment:
+    get:
+      summary: Get the current outstanding payment request, if any
+      operationId: getCurrentPayment
+      tags:
+        - discord
+        - premium
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'Incoming payment info'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncomingDiscordPayment'
+    post:
+      summary: Submit a new incoming payment request
+      operationId: requestIncomingPayment
+      tags:
+        - discord
+        - premium
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncomingDiscordPaymentRequest'
+      responses:
+        '200':
+          description: 'The created incoming payment'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomingDiscordPayment'
+    delete:
+      summary: Cancel an outstanding payment request
+      operationId: cancelIncomingPayment
+      tags:
+        - discord
+        - premium
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
   /discord/servers/{guildId}/claimlists/{claimListIdOrName}/orders:
     get:
       summary: Get all orders for this claim list
@@ -866,6 +957,45 @@ paths:
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters:
+    post:
+      summary: Add a metadata filter to the designated token role
+      operationId: addMetadataFilter
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetadataFilter'
+      responses:
+        '201':
+          description: 'Token Policy'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFilter'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}:
+    delete:
+      summary: Remove a metadata filter from the designated token role
+      operationId: deleteMetadataFilter
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+        - $ref: '#/components/parameters/TokenRoleFilterIdPathParameter'
       responses:
         '204':
           description: Successful deletion
@@ -1279,6 +1409,16 @@ components:
       schema:
         type: integer
         format: int64
+    TokenRoleFilterIdPathParameter:
+      name: filterId
+      in: path
+      description: The ID of this token role assignments filter
+      required: true
+      style: simple
+      example: 2
+      schema:
+        type: integer
+        format: int64
     PollIdPathParameter:
       name: pollId
       in: path
@@ -1436,6 +1576,22 @@ components:
         premium:
           type: boolean
           default: false
+    ExternalAccountPremiumInfo:
+      type: object
+      properties:
+        discordServers:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        stakeAmount:
+          type: integer
+          format: int64
+          readOnly: true
+        tokenBalance:
+          type: integer
+          format: int64
+          readOnly: true
     VerificationRequest:
       type: object
       required:
@@ -1491,9 +1647,54 @@ components:
         confirmed:
           readOnly: true
           type: boolean
+        confirmedAt:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         obsolete:
           readOnly: true
           type: boolean
+    IncomingDiscordPaymentRequest:
+      type: object
+      required:
+        - refillAmount
+      properties:
+        refillAmount:
+          type: integer
+          format: int64
+          example: 10000000
+    IncomingDiscordPayment:
+      type: object
+      required:
+        - discordServerId
+        - receivingAddress
+        - amount
+        - validAfter
+        - validBefore
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          example: 1249010
+          format: int64
+        receivingAddress:
+          readOnly: true
+          $ref: '#/components/schemas/WalletAddress'
+        amount:
+          readOnly: true
+          type: integer
+          format: int64
+        validAfter:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        validBefore:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
     ClaimList:
       type: object
       required:
@@ -1669,9 +1870,24 @@ components:
           type: integer
           format: int32
           example: 150
+        guildMemberUpdateTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         ownerAccount:
           type: integer
           format: int64
+        premiumUntil:
+          description: The latest time until this server will retain premium status
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        premium:
+          description: Does the discord server currently have an active premium subscription?
+          readOnly: true
+          type: boolean
         tokenPolicies:
           type: array
           items:
@@ -1706,6 +1922,55 @@ components:
           type: integer
           format: int32
           example: 150
+    DiscordServerPremiumInfo:
+      type: object
+      readOnly: true
+      properties:
+        totalDelegation:
+          description: The total delegation amount from pledged members of this Discord server (in Lovelace)
+          type: integer
+          format: int64
+        maxDelegation:
+          description: The delegation amount needed to get the bot for free (in Lovelace)
+          type: integer
+          format: int64
+        monthlyCost:
+          description: The monthly subscription cost for this server, based on server member count without delegation discount (in Lovelace)
+          type: integer
+          format: int64
+        actualMonthlyCost:
+          description: The monthly subscription cost for this server, based on server member count with delegation discount (in Lovelace)
+          type: integer
+          format: int64
+        guildMemberCount:
+          description: The current member count (updated daily)
+          type: integer
+          format: int32
+        remainingBalance:
+          description: The current available balance for this Discord server (in Lovelace)
+          type: integer
+          format: int64
+        lastBillingGuildMemberCount:
+          description: The member count during the last billing
+          type: integer
+          format: int32
+        lastBillingTime:
+          description: The last time this account was billed
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        lastBillingAmount:
+          description: The amount that was deducted from your balance in the last billing cycle (in Lovelace)
+          type: integer
+          format: int64
+        premiumUntil:
+          description: The expiration date of the premium account for this Discord server
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        currentPremium:
+          description: Is the server currently a premium server?
+          type: boolean
     TokenPolicy:
       type: object
       required:
@@ -1788,8 +2053,45 @@ components:
           type: integer
           format: int64
           example: 1
+        maximumTokenQuantity:
+          type: integer
+          format: int64
+          example: 10
+        filters:
+          readOnly: TRUE
+          type: array
+          items:
+            $ref: '#/components/schemas/MetadataFilter'
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    MetadataFilter:
+      type: object
+      required:
+        - attributeName
+        - operator
+        - attributeValue
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        attributeName:
+          type: string
+          minLength: 1
+          maxLength: 64
+        operator:
+          type: string
+          enum:
+            - EQUALS
+            - NOTEQUALS
+            - CONTAINS
+            - NOTCONTAINS
+            - STARTSWITH
+            - ENDSWITH
+        attributeValue:
+          type: string
+          minLength: 1
+          maxLength: 128
     DiscordPoll:
       type: object
       required:

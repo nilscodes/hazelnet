@@ -32,6 +32,11 @@ class TokenOwnershipRole @JsonCreator constructor(
         @field:JsonSerialize(using = ToStringSerializer::class)
         var maximumTokenQuantity: Long?,
 
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "discord_token_role_id")
+        @field:Valid
+        var filters: MutableSet<MetadataFilter> = mutableSetOf(),
+
         @Column(name = "discord_role_id")
         @field:NonNull
         @field:Min(1)
@@ -65,5 +70,7 @@ class TokenOwnershipRole @JsonCreator constructor(
     override fun toString(): String {
         return "TokenOwnershipRole(id=$id, acceptedAssets=$acceptedAssets, minimumTokenQuantity=$minimumTokenQuantity, maximumTokenQuantity=$maximumTokenQuantity, roleId=$roleId)"
     }
+
+    fun meetsFilterCriteria(metadata: String) = filters.all { it.apply(metadata) }
 
 }

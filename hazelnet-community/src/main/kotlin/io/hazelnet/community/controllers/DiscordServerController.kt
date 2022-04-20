@@ -111,6 +111,22 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTokenOwnershipRole(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long) = discordServerService.deleteTokenOwnershipRole(guildId, tokenRoleId)
 
+    @PostMapping("/{guildId}/tokenroles/{tokenRoleId}/metadatafilters")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addMetadataFilter(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @RequestBody @Valid metadataFilter: MetadataFilter): ResponseEntity<MetadataFilter> {
+        val newMetadataFilter = discordServerService.addMetadataFilter(guildId, tokenRoleId, metadataFilter)
+        return ResponseEntity
+            .created(ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{filterId}")
+                .buildAndExpand(newMetadataFilter.id)
+                .toUri())
+            .body(newMetadataFilter)
+    }
+
+    @DeleteMapping("/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteMetadataFilter(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @PathVariable filterId: Long) = discordServerService.deleteMetadataFilter(guildId, tokenRoleId, filterId)
+
     @PostMapping("/{guildId}/whitelists")
     @ResponseStatus(HttpStatus.CREATED)
     fun addWhitelist(@PathVariable guildId: Long, @RequestBody @Valid whitelist: Whitelist): ResponseEntity<Whitelist> {

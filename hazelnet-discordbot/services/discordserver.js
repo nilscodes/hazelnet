@@ -79,6 +79,10 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleIdToRemove}`);
     this.clearCacheEntry(guildId);
   },
+  async deleteTokenRoleMetadataFilter(guildId, tokenRoleId, filterIdToRemove) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
+    this.clearCacheEntry(guildId);
+  },
   async deleteDelegatorRole(guildId, delegatorRoleIdToRemove) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/delegatorroles/${delegatorRoleIdToRemove}`);
     this.clearCacheEntry(guildId);
@@ -114,6 +118,15 @@ module.exports = {
     });
     this.clearCacheEntry(guildId);
     return newTokenRolePromise;
+  },
+  async addTokenRoleMetadataFilter(guildId, tokenRoleId, attributeName, operator, attributeValue) {
+    const newMetadataFilterPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters`, {
+      attributeName,
+      operator,
+      attributeValue,
+    });
+    this.clearCacheEntry(guildId);
+    return newMetadataFilterPromise.data;
   },
   async createDelegatorRole(guildId, poolHash, minimumStakeAda, discordRoleId) {
     const newDelegatorRolePromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/delegatorroles`, {
