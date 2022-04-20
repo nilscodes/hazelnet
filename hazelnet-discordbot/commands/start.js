@@ -28,25 +28,30 @@ module.exports = {
     }
   },
   async executeSelectMenu(interaction) {
-    if (interaction.customId) {
-      await interaction.deferUpdate();
-      switch (interaction.customId) {
-        case 'start/language':
-          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'BOT_LANGUAGE', interaction.values[0]);
-          break;
-        case 'start/adminRole':
-          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES', interaction.values[0]);
-          break;
-        case 'start/userRole':
-          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'USER_ROLES', interaction.values[0]);
-          break;
-        case 'start/features':
-          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS', interaction.values.join(','));
-          break;
-        default:
-          break;
+    try {
+      if (interaction.customId) {
+        await interaction.deferUpdate();
+        switch (interaction.customId) {
+          case 'start/language':
+            await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'BOT_LANGUAGE', interaction.values[0]);
+            break;
+          case 'start/adminRole':
+            await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES', interaction.values[0]);
+            break;
+          case 'start/userRole':
+            await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'USER_ROLES', interaction.values[0]);
+            break;
+          case 'start/features':
+            await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS', interaction.values.join(','));
+            break;
+          default:
+            break;
+        }
+        await this.editReplyWithSetupMessage(interaction);
       }
-      await this.editReplyWithSetupMessage(interaction);
+    } catch (error) {
+      interaction.client.logger.error(error);
+      await interaction.editReply({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async buildSetupMessage(discordServer, guild) {
@@ -150,19 +155,24 @@ module.exports = {
     }
   },
   async completeSetup(interaction, discordServer) {
-    await interaction.deferReply({ ephemeral: true });
-    if (this.isSetupComplete(discordServer)) {
-      const useLocale = discordServer.getBotLanguage();
-      await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
-      await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
-      let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
-      if (await this.isBotLackingRequiredPermissions(interaction)) {
-        successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;
+    try {
+      await interaction.deferReply({ ephemeral: true });
+      if (this.isSetupComplete(discordServer)) {
+        const useLocale = discordServer.getBotLanguage();
+        await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
+        await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+        let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
+        if (await this.isBotLackingRequiredPermissions(interaction)) {
+          successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;
+        }
+        const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage, 'start');
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
+      } else {
+        await this.editReplyWithSetupMessage(interaction);
       }
-      const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage, 'start');
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
-    } else {
-      await this.editReplyWithSetupMessage(interaction);
+    } catch (error) {
+      interaction.client.logger.error(error);
+      await interaction.editReply({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   isSetupComplete(discordServer) {

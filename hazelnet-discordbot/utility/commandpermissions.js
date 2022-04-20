@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 module.exports = {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],
   adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck'],
@@ -5,11 +6,12 @@ module.exports = {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {
       const commands = await this.getCommands(guild);
-      await commands.forEach(async (command) => {
+      for (let i = 0; i < commands.size; i += 1) {
+        const command = commands.at(i);
         const permissions = this.buildPermissionListForCommand(guild, discordServer, command);
         client.logger.info({ msg: `Registering the following command permissions for command ${command.name}`, permissions });
         await command.permissions.set({ permissions });
-      });
+      }
     }
   },
   async getCommands(guild) {
