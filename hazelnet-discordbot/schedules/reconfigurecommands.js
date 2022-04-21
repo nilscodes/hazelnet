@@ -28,7 +28,7 @@ module.exports = {
               await commandPermissions.setSlashCommandPermissions(client, discordServer.guildId, discordServer);
             }
           } catch (error) {
-            client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})` });
+            client.logger.error({ msg: `Failed to reset commands and permissions for ${discordServer.guildName} (${discordServer.guildId})`, error });
           }
         }
       } else {
