@@ -634,7 +634,7 @@
 		"finishSetupButton": "Finish setup",
 		"resetSetupButton": "Reset settings",
 		"setupRoleWarningMessage": "Thank you 😻\n\n**Your setup is complete with warnings**:\n\n❗ Please be aware the bot did not find all the necessary permissions through roles assigned to it. Make sure the bot has one or multiple roles that grant at least the following permissions: Send Messages, Read Messages, Manage Messages, Manage Roles\n\n💡 Make sure the bot role is high enough in the Discord role list, so it can assign any auto-assign roles it is configured to manage.",
-		"setupCompleteMessage": "Thank you 😻\n\n**Your setup is complete!**\n\n💡 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage."
+		"setupCompleteMessage": "Thank you 😻\n\n**Your setup is complete!**\n\n💡 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage.\n\n⚠ While Discord is improving the slash command permission system, make sure you also disable/enable the correct commands by going to \"Server Settings\" ➡ \"Integrations\", selecting HAZELnet and setting the permissions for **/configure-** commands for your selected admin role, and enable the user-facing commands for your normal users."
 	},
 	"features": {
 		"stakepoolTitle": "Stakepools",

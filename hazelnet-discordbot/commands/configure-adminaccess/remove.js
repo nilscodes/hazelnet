@@ -24,7 +24,7 @@ module.exports = {
         if (currentUserHasAdminRoleAfterRemoval) {
           await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES', newAdminRoleList.join(','));
           discordServer.settings.ADMIN_ROLES = newAdminRoleList.join(',');
-          await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+          // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
           const adminFields = [{
             name: i18n.__({ phrase: 'configure.adminaccess.list.administratorTitle', locale: useLocale }),
             value: newAdminRoleList.map((roleId) => (i18n.__({ phrase: 'configure.adminaccess.list.administratorEntry', locale: useLocale }, { roleId }))).join('\n'),

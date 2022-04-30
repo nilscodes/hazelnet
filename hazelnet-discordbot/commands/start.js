@@ -160,7 +160,7 @@ module.exports = {
       if (this.isSetupComplete(discordServer)) {
         const useLocale = discordServer.getBotLanguage();
         await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
-        await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+        // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
         let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
         if (await this.isBotLackingRequiredPermissions(interaction)) {
           successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;

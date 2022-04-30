@@ -18,7 +18,7 @@ module.exports = {
         const newUserRoleList = userRoleIds.filter((roleId) => (guildRoles.some((guildRole) => (guildRole.id === roleId)))); // Filter out non-existent roles while we're updating anyway
         await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'USER_ROLES', newUserRoleList.join(','));
         discordServer.settings.USER_ROLES = newUserRoleList.join(',');
-        await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+        // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
         const userFields = [{
           name: i18n.__({ phrase: 'configure.useraccess.list.userTitle', locale: useLocale }),
           value: newUserRoleList.map((roleId) => (i18n.__({ phrase: 'configure.useraccess.list.userEntry', locale: useLocale }, { roleId }))).join('\n'),

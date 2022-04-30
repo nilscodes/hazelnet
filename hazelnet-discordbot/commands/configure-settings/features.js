@@ -85,7 +85,7 @@ module.exports = {
       const newFeatures = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
       await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS', newFeatures);
       await commandregistration.registerMainCommands(newFeatures, interaction.client, interaction.guild.id);
-      await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+      // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
       const selectedFeatures = this.buildFeatureList(newFeatures, useLocale);
       const settingFields = [
         {
