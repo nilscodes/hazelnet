@@ -5,6 +5,7 @@ const {
 } = require('discord.js');
 const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 const pollUtil = require('../utility/poll');
 const datetime = require('../utility/datetime');
 const discordemoji = require('../utility/discordemoji');
@@ -14,9 +15,9 @@ module.exports = {
     const ci18n = new CommandTranslations('vote', locale);
     return new SlashCommandBuilder()
       .setName('vote')
-      .setDescription(ci18n.description())
-      .setDefaultPermission(false);
+      .setDescription(ci18n.description());
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['poll'],
   async execute(interaction) {
     try {

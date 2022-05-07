@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-adminaccess')
       .setDescription('Configure roles that can administer the bot')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds a role that is allowed to administer the bot.')
@@ -19,5 +18,6 @@ module.exports = {
         .setDescription('Remove a role that is currently allowed to administer the bot.')
         .addRoleOption((option) => option.setName('admin-role').setDescription('Role to remove as an admin on this Discord server.').setRequired(true)));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
 };

@@ -5,7 +5,7 @@ const {
 } = require('discord.js');
 const embedbuilder = require('../utility/embedbuilder');
 const commandregistration = require('../utility/commandregistration');
-const commandpermissions = require('../utility/commandpermissions');
+const commandbase = require('../utility/commandbase');
 const botfeatures = require('../utility/botfeatures');
 
 module.exports = {
@@ -14,6 +14,7 @@ module.exports = {
       .setName('start')
       .setDescription('Start the setup of your HAZELnet.io bot.');
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);

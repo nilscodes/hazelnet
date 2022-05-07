@@ -8,7 +8,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-premium')
       .setDescription(ci18n.description())
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('status')
         .setDescription(ci18n.subDescription('status')))
@@ -17,6 +16,7 @@ module.exports = {
         .setDescription(ci18n.subDescription('refill'))
         .addIntegerOption((option) => option.setName('refill-amount').setDescription(ci18n.option('refill-amount')).setRequired(true)));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,
 };

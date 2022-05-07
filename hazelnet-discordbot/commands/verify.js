@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('verify')
       .setDescription('Starts a verification process or let\'s you manage your current verifications on this server.')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Starts a transaction-based verification of a staking address')
@@ -28,6 +27,7 @@ module.exports = {
         .setName('unlink')
         .setDescription('Unlink your verified addresses from this server (verifications will remain)'));
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
   execute: commandbase.executeSubcommand,
   executeButton: commandbase.executeButtonIfUser,

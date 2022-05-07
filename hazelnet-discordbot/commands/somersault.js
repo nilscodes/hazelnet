@@ -1,13 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 
 module.exports = {
   getCommandData() {
     return new SlashCommandBuilder()
       .setName('somersault')
-      .setDescription('Do a somersault')
-      .setDefaultPermission(false);
+      .setDescription('Do a somersault');
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['cardolphins'],
   async execute(interaction) {
     try {

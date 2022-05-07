@@ -2,15 +2,16 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const i18n = require('i18n');
 const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 
 module.exports = {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('policyid', locale);
     return new SlashCommandBuilder()
       .setName('policyid')
-      .setDescription(ci18n.description())
-      .setDefaultPermission(false);
+      .setDescription(ci18n.description());
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['token'],
   async execute(interaction) {
     try {

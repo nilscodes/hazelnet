@@ -5,6 +5,7 @@ const {
   MessageActionRow, MessageSelectMenu, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
@@ -13,9 +14,9 @@ module.exports = {
     const ci18n = new CommandTranslations('claim', locale);
     return new SlashCommandBuilder()
       .setName('claim')
-      .setDescription(ci18n.description())
-      .setDefaultPermission(false);
+      .setDescription(ci18n.description());
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['claimphysical'],
   async execute(interaction) {
     try {

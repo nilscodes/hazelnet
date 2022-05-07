@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-stakepool')
       .setDescription('Configure stakepools')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.')
@@ -26,6 +25,7 @@ module.exports = {
         .addStringOption((option) => option.setName('off').setDescription('Set this parameter to off when disabling the info channel').setRequired(false)));
         */
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['stakepool'],
   execute: commandbase.executeSubcommandIfAdmin,
 };

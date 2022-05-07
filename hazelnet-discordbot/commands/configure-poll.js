@@ -8,7 +8,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-poll')
       .setDescription(ci18n.description())
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription(ci18n.subDescription('add'))
@@ -26,6 +25,7 @@ module.exports = {
         .setDescription(ci18n.subDescription('remove')));
   },
   commandTags: ['poll'],
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
   executeSelectMenu: commandbase.executeSelectMenuIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,

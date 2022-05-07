@@ -1,15 +1,16 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const i18n = require('i18n');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 const commandPermissions = require('../utility/commandpermissions');
 
 module.exports = {
   getCommandData(locale) {
     return new SlashCommandBuilder()
       .setName('help')
-      .setDescription(i18n.__({ phrase: 'commands.descriptions.help', locale }))
-      .setDefaultPermission(false);
+      .setDescription(i18n.__({ phrase: 'commands.descriptions.help', locale }));
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });

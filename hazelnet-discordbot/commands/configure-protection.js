@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-protection')
       .setDescription('Configuration options around scammer protection')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('status')
         .setDescription('Show the status of all protection-related mechanisms.'))
@@ -20,5 +19,6 @@ module.exports = {
         .addChannelOption((option) => option.setName('auditchannel').setDescription('The channel to send audit/warning messages to.').setRequired(true))
         .addBooleanOption((option) => option.setName('status').setDescription('Set this parameter to False when disabling the audit channel').setRequired(false)));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
 };
