@@ -43,7 +43,7 @@ module.exports = {
         client.logger.info(`No guild with ID ${guildToFix} found`);
       }
     } catch (error) {
-      client.logger.error({ msg: 'Failed to do command and permission reset check.', error });
+      client.logger.error({ msg: 'Failed to do restore lost roles.', error });
     }
   },
 };

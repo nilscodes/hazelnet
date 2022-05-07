@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-api')
       .setDescription('Generate an access token to connect to the public API of HAZELnet')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('generatetoken')
         .setDescription('Generates a new token to access the API. ⚠ This will overwrite any existing token, if present.'))
@@ -14,5 +13,6 @@ module.exports = {
         .setName('removetoken')
         .setDescription('Delete the current access token, revoking all access to the public API of HAZELnet'));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
 };

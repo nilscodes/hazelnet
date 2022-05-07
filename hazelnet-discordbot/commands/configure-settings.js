@@ -7,11 +7,11 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-settings')
       .setDescription(i18n.__({ phrase: 'commands.descriptions.configure-settings', locale }))
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('features')
         .setDescription(i18n.__({ phrase: 'commands.descriptions.configure-settings-features', locale })));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
   executeSelectMenu: commandbase.executeSelectMenuIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,

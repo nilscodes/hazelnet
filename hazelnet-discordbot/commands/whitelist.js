@@ -8,7 +8,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('whitelist')
       .setDescription(ci18n.description())
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('register')
         .setDescription(ci18n.subDescription('register'))
@@ -21,6 +20,7 @@ module.exports = {
         .setName('unregister')
         .setDescription(ci18n.subDescription('unregister')));
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['whitelist'],
   execute: commandbase.executeSubcommand,
   executeSelectMenu: commandbase.executeSubcommandSelectMenu,

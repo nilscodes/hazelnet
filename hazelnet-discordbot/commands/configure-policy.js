@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-policy')
       .setDescription('Manage asset policies that are officially represented by this server')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Add a Cardano policy ID and associated project name to the list of official projects on this server.')
@@ -21,5 +20,6 @@ module.exports = {
         .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to remove as official token policy from this server').setRequired(true)));
   },
   commandTags: ['token'],
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
 };

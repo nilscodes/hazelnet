@@ -4,6 +4,7 @@ const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
+const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
@@ -11,9 +12,9 @@ module.exports = {
     const ci18n = new CommandTranslations('premium', locale);
     return new SlashCommandBuilder()
       .setName('premium')
-      .setDescription(ci18n.description())
-      .setDefaultPermission(false);
+      .setDescription(ci18n.description());
   },
+  augmentPermissions: commandbase.augmentPermissionsUser,
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });

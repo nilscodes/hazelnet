@@ -8,7 +8,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-tokenroles')
       .setDescription(ci18n.description())
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription(ci18n.subDescription('add'))
@@ -29,6 +28,7 @@ module.exports = {
         .setDescription(ci18n.subDescription('remove'))
         .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['token'],
   execute: commandbase.executeSubcommandIfAdmin,
   executeSelectMenu: commandbase.executeSelectMenuIfAdmin,

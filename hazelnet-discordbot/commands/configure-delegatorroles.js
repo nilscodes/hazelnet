@@ -6,7 +6,6 @@ module.exports = {
     return new SlashCommandBuilder()
       .setName('configure-delegatorroles')
       .setDescription('Configure delegator-roles')
-      .setDefaultPermission(false)
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription('Adds an auto-assignment for the given role.')
@@ -21,6 +20,7 @@ module.exports = {
         .setDescription('Remove all auto-assignments (for all stake amounts) for the given role for delegators.')
         .addIntegerOption((option) => option.setName('delegator-role-id').setDescription('Role to remove auto-assignments for (get ID from list command)').setRequired(true)));
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['stakepool'],
   execute: commandbase.executeSubcommandIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,

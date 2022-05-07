@@ -1,4 +1,5 @@
 const i18n = require('i18n');
+const { Permissions } = require('discord.js');
 const commandPermissions = require('./commandpermissions');
 const embedBuilder = require('./embedbuilder');
 
@@ -95,5 +96,15 @@ module.exports = {
         }
       }
     }
+  },
+  augmentPermissionsUser(json) {
+    const adjustedJson = json;
+    adjustedJson.default_member_permissions = Permissions.FLAGS.USE_APPLICATION_COMMANDS + '';
+    return adjustedJson;
+  },
+  augmentPermissionsAdmin(json) {
+    const adjustedJson = json;
+    adjustedJson.default_member_permissions = Permissions.FLAGS.MANAGE_GUILD + '';
+    return adjustedJson;
   },
 };

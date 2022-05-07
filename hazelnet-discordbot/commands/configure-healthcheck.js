@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const i18n = require('i18n');
+const commandbase = require('../utility/commandbase');
 const embedBuilder = require('../utility/embedbuilder');
 const commandpermissions = require('../utility/commandpermissions');
 const CommandTranslations = require('../utility/commandtranslations');
@@ -10,9 +11,9 @@ module.exports = {
     const ci18n = new CommandTranslations('configure-healthcheck', locale);
     return new SlashCommandBuilder()
       .setName('configure-healthcheck')
-      .setDescription(ci18n.description())
-      .setDefaultPermission(false);
+      .setDescription(ci18n.description());
   },
+  augmentPermissions: commandbase.augmentPermissionsAdmin,
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);

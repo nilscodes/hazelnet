@@ -23,7 +23,11 @@ module.exports = {
       const command = require(`../commands/${file}`); // require uses relative path
       const commandIsEnabled = !command.commandTags || command.commandTags.filter((tag) => enabledCommandTags.includes(tag)).length;
       if (commandIsEnabled) {
-        commands.push(command.getCommandData(useLocale, enabledCommandTags).toJSON());
+        let commandJson = command.getCommandData(useLocale, enabledCommandTags).toJSON();
+        if (command.augmentPermissions) {
+          commandJson = command.augmentPermissions(commandJson);
+        }
+        commands.push(commandJson);
       }
     });
 
