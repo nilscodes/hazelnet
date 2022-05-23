@@ -10,14 +10,20 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
       const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRoleToShow.policyId);
-        const policyIdShort = `${tokenRoleToShow.policyId.substr(0, 10)}…`;
-        const fingerprintInfo = tokenRoleToShow.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { tokenRole: tokenRoleToShow }) : '';
+        const { policyId: policyIdOfFirstAsset, assetFingerprint: assetFingerprintOfFirstAsset } = tokenRoleToShow.acceptedAssets[0];
+        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
+        const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
+        const fingerprintInfo = assetFingerprintOfFirstAsset ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale: useLocale }, { assetFingerprint: assetFingerprintOfFirstAsset }) : '';
         const maximumInfo = tokenRoleToShow.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale: useLocale }, { tokenRole: tokenRoleToShow }) : '';
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale: useLocale }), 'configure-tokenroles-details', [
           {
             name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale: useLocale }, { tokenRole: tokenRoleToShow, officialProject, policyIdShort }),
-            value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, { tokenRole: tokenRoleToShow, fingerprintInfo, maximumInfo }),
+            value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale: useLocale }, {
+              tokenRole: tokenRoleToShow,
+              policyId: policyIdOfFirstAsset,
+              fingerprintInfo,
+              maximumInfo,
+            }),
           },
         ]);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
