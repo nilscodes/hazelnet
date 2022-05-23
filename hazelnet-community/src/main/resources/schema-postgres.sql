@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS "discord_whitelists";
 DROP TABLE IF EXISTS "discord_server_members";
 DROP TABLE IF EXISTS "discord_settings";
 DROP TABLE IF EXISTS "discord_policy_ids";
+DROP TABLE IF EXISTS "discord_token_role_policies";
 DROP TABLE IF EXISTS "discord_token_roles";
 DROP TABLE IF EXISTS "discord_spo_roles";
 DROP TABLE IF EXISTS "discord_spo";
@@ -169,6 +170,14 @@ CREATE TABLE "discord_token_roles"
     "owned_for_duration"     int,
     "discord_role_id"        bigint,
     UNIQUE ("discord_server_id", "policy_id", "asset_fingerprint", "discord_role_id")
+);
+
+CREATE TABLE "discord_token_role_policies"
+(
+    "discord_token_role_id" bigint,
+    "policy_id"             varchar(56) NOT NULL,
+    "asset_fingerprint"     varchar(44) NULL,
+    UNIQUE ("discord_token_role_id", "policy_id", "asset_fingerprint")
 );
 
 CREATE TABLE "discord_policy_ids"
@@ -378,6 +387,8 @@ ALTER TABLE "discord_spo" ADD FOREIGN KEY ("discord_server_id") REFERENCES "disc
 ALTER TABLE "discord_spo_roles" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_token_roles" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_token_role_policies" ADD FOREIGN KEY ("discord_token_role_id") REFERENCES "discord_token_roles" ("discord_token_role_id");
 
 ALTER TABLE "discord_policy_ids" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

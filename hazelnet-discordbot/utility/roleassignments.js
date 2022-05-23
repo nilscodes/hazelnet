@@ -5,7 +5,7 @@ module.exports = {
     const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
     const guildForAssignments = await client.guilds.fetch(discordServer.guildId);
     if (guildForAssignments) {
-      if (removeInvalid) {
+      if (removeInvalid && (discordServer.premium || discordServer[roleProperty].length <= 1)) {
         await this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
       }
       await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);

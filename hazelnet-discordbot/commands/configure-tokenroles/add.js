@@ -90,14 +90,20 @@ module.exports = {
     const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild.id, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint);
     const tokenRole = newTokenRolePromise.data;
 
-    const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRole.policyId);
-    const policyIdShort = `${tokenRole.policyId.substr(0, 10)}…`;
-    const fingerprintInfo = tokenRole.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { tokenRole }) : '';
+    const { policyId: policyIdOfFirstAsset, assetFingerprint: assetFingerprintOfFirstAsset } = tokenRole.acceptedAssets[0];
+    const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
+    const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
+    const fingerprintInfo = assetFingerprintOfFirstAsset ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { assetFingerprint: assetFingerprintOfFirstAsset }) : '';
     const maximumInfo = tokenRole.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale }, { tokenRole }) : '';
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale }), 'configure-tokenroles-add', [
       {
         name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale }, { tokenRole, officialProject, policyIdShort }),
-        value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale }, { tokenRole, fingerprintInfo, maximumInfo }),
+        value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale }, {
+          tokenRole,
+          policyId: policyIdOfFirstAsset,
+          fingerprintInfo,
+          maximumInfo,
+        }),
       },
     ]);
     return embed;

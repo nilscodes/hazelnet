@@ -1,7 +1,6 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
-import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
@@ -283,7 +282,9 @@ class DiscordServerService(
         val discordServer = getDiscordServer(guildId)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         val allVerifiedStakeAddresses = allVerificationsOfMembers.mapNotNull { it.cardanoStakeAddress }
-        val relevantPolicyIds = discordServer.tokenRoles.map { it.policyId + (it.assetFingerprint ?: "") }.toSet()
+        val relevantPolicyIds = discordServer.tokenRoles.map { role ->
+            role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
+        }.flatten().toSet()
         if(relevantPolicyIds.isNotEmpty()) {
             val tokenOwnershipData = connectService.getAllTokenOwnershipByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
@@ -308,8 +309,11 @@ class DiscordServerService(
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
                 rolesToAssign.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
-                        val policyIdWithOptionalAssetFingerprint =  role.policyId + (role.assetFingerprint ?: "")
-                        val tokenCount = (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
+                        val tokenCount = role.acceptedAssets.sumOf { asset ->
+                            val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                            (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
+                        }
+
                         if (
                             tokenCount >= role.minimumTokenQuantity
                             && (role.maximumTokenQuantity == null || tokenCount <= role.maximumTokenQuantity!!)

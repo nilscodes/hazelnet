@@ -20,13 +20,19 @@ module.exports = {
       }
 
       const tokenRoleFields = discordServer.tokenRoles.map((tokenRole) => {
-        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRole.policyId);
-        const policyIdShort = `${tokenRole.policyId.substr(0, 10)}…`;
-        const fingerprintInfo = tokenRole.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { tokenRole }) : '';
+        const { policyId: policyIdOfFirstAsset, assetFingerprint: assetFingerprintOfFirstAsset } = tokenRole.acceptedAssets[0];
+        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
+        const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
+        const fingerprintInfo = assetFingerprintOfFirstAsset ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { assetFingerprint: assetFingerprintOfFirstAsset }) : '';
         const maximumInfo = tokenRole.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale }, { tokenRole }) : '';
         return {
           name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale }, { tokenRole, officialProject, policyIdShort }),
-          value: i18n.__({ phrase: tokenRoleMessage, locale }, { tokenRole, fingerprintInfo, maximumInfo }),
+          value: i18n.__({ phrase: tokenRoleMessage, locale }, {
+            tokenRole,
+            policyId: policyIdOfFirstAsset,
+            fingerprintInfo,
+            maximumInfo,
+          }),
         };
       });
       if (!tokenRoleFields.length) {
@@ -73,13 +79,19 @@ module.exports = {
       const tokenRoleId = +interaction.values[0].replace('token-role-id-', '');
       const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === tokenRoleToShow.policyId);
-        const policyIdShort = `${tokenRoleToShow.policyId.substr(0, 10)}…`;
-        const fingerprintInfo = tokenRoleToShow.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { tokenRoleToShow }) : '';
+        const { policyId: policyIdOfFirstAsset, assetFingerprint: assetFingerprintOfFirstAsset } = tokenRoleToShow.acceptedAssets[0];
+        const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
+        const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
+        const fingerprintInfo = assetFingerprintOfFirstAsset ? i18n.__({ phrase: 'configure.tokenroles.list.fingerprintInfo', locale }, { assetFingerprint: assetFingerprintOfFirstAsset }) : '';
         const maximumInfo = tokenRoleToShow.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale }, { tokenRoleToShow }) : '';
         const tokenRoleFields = [{
           name: i18n.__({ phrase: (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial'), locale }, { tokenRole: tokenRoleToShow, officialProject, policyIdShort }),
-          value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale }, { tokenRole: tokenRoleToShow, fingerprintInfo, maximumInfo }),
+          value: i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleDetails', locale }, {
+            tokenRole: tokenRoleToShow,
+            policyId: policyIdOfFirstAsset,
+            fingerprintInfo,
+            maximumInfo,
+          }),
         }];
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.detailsPurpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
         await interaction.followUp({ embeds: [embed], ephemeral: true });

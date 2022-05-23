@@ -8,10 +8,7 @@ import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.ExternalAccountType
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
-import io.hazelnet.community.data.discord.DelegatorRole
-import io.hazelnet.community.data.discord.DiscordRoleAssignment
-import io.hazelnet.community.data.discord.DiscordServer
-import io.hazelnet.community.data.discord.TokenOwnershipRole
+import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -35,7 +32,7 @@ internal class DiscordServerServiceTest {
         420,
         null,
         null,
-        null,
+        Date(System.currentTimeMillis() + 60000000L),
         mutableSetOf(),
         mutableSetOf(
             Stakepool("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", null),
@@ -48,10 +45,36 @@ internal class DiscordServerServiceTest {
             DelegatorRole(3, "9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 1, 662)
         ),
         mutableSetOf(
-            TokenOwnershipRole(1, "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", null, 120, null, 999),
-            TokenOwnershipRole(2, "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", null, 3, null, 31),
-            TokenOwnershipRole(3, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", null, 76, null, 12),
-            TokenOwnershipRole(4, "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", null, 150, null, 13),
+            TokenOwnershipRole(
+                1,
+                mutableSetOf(
+                    TokenRoleAssetInfo("ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57"),
+                ),
+                120,
+                null,
+                999
+            ),
+            TokenOwnershipRole(
+                2,
+                mutableSetOf(TokenRoleAssetInfo("1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601")),
+                3,
+                null,
+                31
+            ),
+            TokenOwnershipRole(
+                3,
+                mutableSetOf(TokenRoleAssetInfo("0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04")),
+                76,
+                null,
+                12
+            ),
+            TokenOwnershipRole(
+                4,
+                mutableSetOf(TokenRoleAssetInfo("0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04")),
+                150,
+                null,
+                13
+            ),
         ),
         mutableSetOf(),
         mutableSetOf()
@@ -111,7 +134,7 @@ internal class DiscordServerServiceTest {
                     "acc2_kaizn",
                     "acc3_kaizn",
                     "acc4_hazel"
-                ), testServer.tokenRoles.map { it.policyId }.toSet()
+                ), testServer.tokenRoles.map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
             )
         } returns listOf(
             TokenOwnershipInfo("acc4_hazel", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", 75),
@@ -146,7 +169,7 @@ internal class DiscordServerServiceTest {
                     "acc2_kaizn",
                     "acc3_kaizn",
                     "acc4_hazel"
-                ), testServer.tokenRoles.map { it.policyId }.toSet()
+                ), testServer.tokenRoles.map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
             )
         } returns listOf(
             TokenOwnershipInfo("acc1_hazel", "ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57", 50),
