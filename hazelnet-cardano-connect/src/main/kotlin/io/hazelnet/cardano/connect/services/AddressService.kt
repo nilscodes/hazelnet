@@ -3,7 +3,6 @@ package io.hazelnet.cardano.connect.services
 import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.persistence.address.AddressDaoCardanoDbSync
 import io.hazelnet.cardano.connect.util.Bech32
-import io.hazelnet.cardano.connect.util.toHex
 import org.springframework.stereotype.Service
 
 @Service

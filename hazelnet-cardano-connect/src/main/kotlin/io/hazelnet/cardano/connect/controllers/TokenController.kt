@@ -11,9 +11,17 @@ class TokenController(
 ) {
     @PostMapping("/stake/{stakeAddress}")
     @ResponseStatus(HttpStatus.OK)
-    fun getMultiAssetsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetsForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
+    fun getMultiAssetCountsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetCountsForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
+
+    @PostMapping("/stake/{stakeAddress}/assets")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMultiAssetListForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetListForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
 
     @PostMapping("/stake")
     @ResponseStatus(HttpStatus.OK)
-    fun getMultiAssetsStakeSnapshot(@RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetSnapshot(policyIdsWithOptionalAssetFingerprint)
+    fun getMultiAssetCountStakeSnapshot(@RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetCountStakeSnapshot(policyIdsWithOptionalAssetFingerprint)
+
+    @GetMapping("/assets/{policyId}/{assetNameHex}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMultiAssetInfo(@PathVariable policyId: String, @PathVariable assetNameHex: String) = tokenService.getMultiAssetInfo(policyId, assetNameHex)
 }

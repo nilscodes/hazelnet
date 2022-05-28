@@ -1,6 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
+import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
@@ -10,10 +11,7 @@ import io.hazelnet.community.data.claim.ClaimListsWithProducts
 import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
-import io.hazelnet.community.persistence.DiscordDelegatorRoleRepository
-import io.hazelnet.community.persistence.DiscordServerRepository
-import io.hazelnet.community.persistence.DiscordTokenOwnershipRoleRepository
-import io.hazelnet.community.persistence.DiscordWhitelistRepository
+import io.hazelnet.community.persistence.*
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
@@ -25,6 +23,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
+import kotlin.NoSuchElementException
 
 const val LOOKUP_NAME_ALL_POOLS = "all"
 
@@ -36,6 +35,7 @@ class DiscordServerService(
         private val discordServerRepository: DiscordServerRepository,
         private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
         private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
+        private val discordMetadataFilterRepository: DiscordMetadataFilterRepository,
         private val discordWhitelistRepository: DiscordWhitelistRepository,
         private val oAuth2AuthorizationService: OAuth2AuthorizationService,
         private val registeredClientRepository: RegisteredClientRepository,
@@ -128,6 +128,14 @@ class DiscordServerService(
         return tokenOwnershipRole
     }
 
+    fun addMetadataFilter(guildId: Long, tokenRoleId: Long, metadataFilter: MetadataFilter): MetadataFilter {
+        val tokenRole = getTokenRole(guildId, tokenRoleId)
+        discordMetadataFilterRepository.save(metadataFilter)
+        tokenRole.filters.add(metadataFilter)
+        discordTokenOwnershipRoleRepository.save(tokenRole)
+        return metadataFilter
+    }
+
     fun addWhitelist(guildId: Long, whitelist: Whitelist): Whitelist {
         val discordServer = getDiscordServer(guildId)
         whitelist.createTime = Date.from(ZonedDateTime.now().toInstant())
@@ -201,6 +209,23 @@ class DiscordServerService(
 
     fun deleteTokenOwnershipRole(guildId: Long, tokenRoleId: Long) {
         discordTokenOwnershipRoleRepository.deleteById(tokenRoleId)
+    }
+
+    fun deleteMetadataFilter(guildId: Long, tokenRoleId: Long, filterId: Long) {
+        val tokenRole = getTokenRole(guildId, tokenRoleId)
+        val metadataFilter = tokenRole.filters
+            .find { it.id == filterId } ?: throw NoSuchElementException("No filter with ID $filterId found on token role with ID $tokenRoleId on guild $guildId")
+        discordMetadataFilterRepository.delete(metadataFilter)
+    }
+
+    private fun getTokenRole(
+        guildId: Long,
+        tokenRoleId: Long
+    ): TokenOwnershipRole {
+        val discordServer = getDiscordServer(guildId)
+        return discordServer.tokenRoles
+            .find { it.id == tokenRoleId }
+            ?: throw NoSuchElementException("No token role with ID $tokenRoleId found on guild $guildId")
     }
 
     fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {
@@ -282,17 +307,118 @@ class DiscordServerService(
         val discordServer = getDiscordServer(guildId)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         val allVerifiedStakeAddresses = allVerificationsOfMembers.mapNotNull { it.cardanoStakeAddress }
-        val relevantPolicyIds = discordServer.tokenRoles.map { role ->
+        val rolesToAssign =
+            if (discordServer.getPremium()) discordServer.tokenRoles
+            else listOfNotNull(discordServer.tokenRoles.minByOrNull { it.id!! })
+
+        val roleTypes = rolesToAssign.groupBy { it.filters.size > 0 }
+        val countBasedRoles = roleTypes[false] ?: listOf()
+
+        val countBasedRoleAssignments = getCountBasedTokenRoleAssignments(
+            countBasedRoles,
+            allVerifiedStakeAddresses,
+            allVerificationsOfMembers,
+            discordServer
+        )
+
+        val filterBasedRoles = roleTypes[true] ?: listOf()
+        val filterBasedRoleAssignments = getMetadataBasedTokenRoleAssignments(
+            filterBasedRoles,
+            allVerifiedStakeAddresses,
+            allVerificationsOfMembers,
+            discordServer
+        )
+
+        return countBasedRoleAssignments + filterBasedRoleAssignments
+
+    }
+
+    private fun getMetadataBasedTokenRoleAssignments(
+        filterBasedRoles: List<TokenOwnershipRole>,
+        allVerifiedStakeAddresses: List<String>,
+        allVerificationsOfMembers: List<Verification>,
+        discordServer: DiscordServer
+    ): MutableSet<DiscordRoleAssignment> {
+        val relevantPolicyIds = filterBasedRoles.map { role ->
             role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
         }.flatten().toSet()
-        if(relevantPolicyIds.isNotEmpty()) {
-            val tokenOwnershipData = connectService.getAllTokenOwnershipByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+        val filterBasedRoleAssignments = mutableSetOf<DiscordRoleAssignment>()
+        // TODO We could try to filter out all users that already received a role
+        if (relevantPolicyIds.isNotEmpty()) {
+            val tokenOwnershipData =
+                connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+            val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, Map<String, List<MultiAssetInfo>>>()
+            val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
+            allVerificationsOfMembers.forEach { verification ->
+                val mapOfExternalAccount = prepareExternalAccountMapForAssetBased(
+                    verification,
+                    externalAccountLookup,
+                    memberIdsToTokenPolicyOwnershipAssets
+                )
+                relevantPolicyIds.forEach { policy ->
+                    val tokenListForStakeAddressAndPolicy =
+                        tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
+                    tokenListForStakeAddressAndPolicy?.let {
+                        val metadata =
+                            connectService.getMultiAssetInfo(tokenListForStakeAddressAndPolicy.assetList.map { assetName ->
+                                Pair(
+                                    tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
+                                    assetName
+                                )
+                            })
+                        val existingMetadata =
+                            mapOfExternalAccount.computeIfAbsent(tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint) { mutableListOf() }
+                        existingMetadata.addAll(metadata)
+                    }
+                }
+            }
+            filterBasedRoleAssignments.addAll(memberIdsToTokenPolicyOwnershipAssets.map { tokenOwnershipInfo ->
+                filterBasedRoles.mapNotNull { role ->
+                    externalAccountLookup[tokenOwnershipInfo.key]?.let {
+                        val tokenCount = role.acceptedAssets.sumOf { asset ->
+                            val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                            val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                            ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
+                        }
+
+                        if (
+                            tokenCount >= role.minimumTokenQuantity
+                            && (role.maximumTokenQuantity == null || tokenCount <= role.maximumTokenQuantity!!)
+                        ) {
+                            DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
+                        } else {
+                            null
+                        }
+                    }
+                }
+            }.flatten().toSet())
+        }
+        return filterBasedRoleAssignments
+    }
+
+    private fun getCountBasedTokenRoleAssignments(
+        countBasedRoles: List<TokenOwnershipRole>,
+        allVerifiedStakeAddresses: List<String>,
+        allVerificationsOfMembers: List<Verification>,
+        discordServer: DiscordServer
+    ): Set<DiscordRoleAssignment> {
+        val relevantPolicyIds = countBasedRoles.map { role ->
+            role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
+        }.flatten().toSet()
+        if (relevantPolicyIds.isNotEmpty()) {
+            val tokenOwnershipData =
+                connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
-                val mapOfExternalAccount = prepareExternalAccountMap(verification, externalAccountLookup, memberIdsToTokenPolicyOwnershipCounts)
+                val mapOfExternalAccount = prepareExternalAccountMapForCountBased(
+                    verification,
+                    externalAccountLookup,
+                    memberIdsToTokenPolicyOwnershipCounts
+                )
                 relevantPolicyIds.forEach { policy ->
-                    val tokenCountForStakeAddress = tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
+                    val tokenCountForStakeAddress =
+                        tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
                     tokenCountForStakeAddress?.let {
                         val newAmount = tokenCountForStakeAddress.assetCount
                         mapOfExternalAccount.compute(tokenCountForStakeAddress.policyIdWithOptionalAssetFingerprint) { _, v ->
@@ -302,12 +428,8 @@ class DiscordServerService(
                 }
             }
 
-            val rolesToAssign =
-                if (discordServer.getPremium()) discordServer.tokenRoles
-                else listOfNotNull(discordServer.tokenRoles.minByOrNull { it.id!! })
-
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
-                rolesToAssign.mapNotNull { role ->
+                countBasedRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
                         val tokenCount = role.acceptedAssets.sumOf { asset ->
                             val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
@@ -336,7 +458,7 @@ class DiscordServerService(
         val memberIdsToDelegationBuckets = mutableMapOf<Long, Map<String, Long>>()
         val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
         allVerificationsOfMembers.forEach { verification ->
-            val mapOfExternalAccount = prepareExternalAccountMap(verification, externalAccountLookup, memberIdsToDelegationBuckets)
+            val mapOfExternalAccount = prepareExternalAccountMapForCountBased(verification, externalAccountLookup, memberIdsToDelegationBuckets)
             val delegationForStakeAddress = allDelegationToAllowedPools.find { it.stakeAddress == verification.cardanoStakeAddress }
             delegationForStakeAddress?.let {
                 val newAmount = delegationForStakeAddress.amount
@@ -363,10 +485,16 @@ class DiscordServerService(
         }.flatten().toSet()
     }
 
-    private fun prepareExternalAccountMap(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, Map<String, Long>>): MutableMap<String, Long> {
+    private fun prepareExternalAccountMapForCountBased(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, Map<String, Long>>): MutableMap<String, Long> {
         val externalAccountId = verification.externalAccount.id!!
         externalAccountLookup[externalAccountId] = verification.externalAccount
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() } as MutableMap
+    }
+
+    private fun prepareExternalAccountMapForAssetBased(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, Map<String, List<MultiAssetInfo>>>): MutableMap<String, MutableList<MultiAssetInfo>> {
+        val externalAccountId = verification.externalAccount.id!!
+        externalAccountLookup[externalAccountId] = verification.externalAccount
+        return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() } as MutableMap<String, MutableList<MultiAssetInfo>>
     }
 
     fun regenerateAccessToken(guildId: Long): String {

@@ -1,14 +1,18 @@
 package io.hazelnet.cardano.connect.persistence.token
 
-import io.hazelnet.cardano.connect.data.token.AssetFingerprint
-import io.hazelnet.cardano.connect.data.token.PolicyId
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfo
+import io.hazelnet.cardano.connect.data.token.*
 
 interface TokenDao {
-    fun getMultiAssetsForStakeAddress(stakeAddress: String): List<TokenOwnershipInfo>
-    fun getMultiAssetsWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>): List<TokenOwnershipInfo>
-    fun getMultiAssetsWithPolicyIdAndAssetFingerprintForStakeAddress(stakeAddress: String, policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfo>
+    fun getMultiAssetCountsForStakeAddress(stakeAddress: String): List<TokenOwnershipInfoWithAssetCount>
+    fun getMultiAssetCountsWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>): List<TokenOwnershipInfoWithAssetCount>
+    fun getMultiAssetCountsWithPolicyIdAndAssetFingerprintForStakeAddress(stakeAddress: String, policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetCount>
 
-    fun getMultiAssetSnapshotForPolicyId(policyIds: List<PolicyId>): List<TokenOwnershipInfo>
-    fun getMultiAssetSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfo>
+    fun getMultiAssetListForStakeAddress(stakeAddress: String): List<TokenOwnershipInfoWithAssetList>
+    fun getMultiAssetListWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>): List<TokenOwnershipInfoWithAssetList>
+    fun getMultiAssetListWithPolicyIdAndAssetFingerprintForStakeAddress(stakeAddress: String, policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetList>
+
+    fun getMultiAssetCountSnapshotForPolicyId(policyIds: List<PolicyId>): List<TokenOwnershipInfoWithAssetCount>
+    fun getMultiAssetCountSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetCount>
+
+    fun getMultiAssetInfo(policyId: String, assetName: String): MultiAssetInfo
 }

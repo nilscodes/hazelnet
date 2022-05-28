@@ -6,8 +6,11 @@ import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfo
+import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetCount
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.cardano.connect.data.verifications.VerificationConfirmation
+import io.hazelnet.cardano.connect.util.toHex
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import org.springframework.core.ParameterizedTypeReference
@@ -74,17 +77,31 @@ class ConnectService(
             .block()!!
     }
 
-    fun getAllTokenOwnershipByPolicyId(
+    fun getAllTokenOwnershipCountsByPolicyId(
         stakeAddresses: List<String>,
         policyIdsWithOptionalAssetFingerprint: Set<String>
-    ): List<TokenOwnershipInfo> {
+    ): List<TokenOwnershipInfoWithAssetCount> {
         return Flux.fromIterable(stakeAddresses)
             .flatMap {
                 connectClient.post()
                     .uri("/token/stake/{stakeAddress}", it)
                     .bodyValue(policyIdsWithOptionalAssetFingerprint)
                     .retrieve()
-                    .bodyToFlux(TokenOwnershipInfo::class.java)
+                    .bodyToFlux(TokenOwnershipInfoWithAssetCount::class.java)
+            }.collectList().block()!!
+    }
+
+    fun getAllTokenOwnershipAssetsByPolicyId(
+        stakeAddresses: List<String>,
+        policyIdsWithOptionalAssetFingerprint: Set<String>
+    ): List<TokenOwnershipInfoWithAssetList> {
+        return Flux.fromIterable(stakeAddresses)
+            .flatMap {
+                connectClient.post()
+                    .uri("/token/stake/{stakeAddress}/assets", it)
+                    .bodyValue(policyIdsWithOptionalAssetFingerprint)
+                    .retrieve()
+                    .bodyToFlux(TokenOwnershipInfoWithAssetList::class.java)
             }.collectList().block()!!
     }
 
@@ -142,13 +159,23 @@ class ConnectService(
             .block()!!
     }
 
-    fun getTokenSnapshotByPolicyId(policyIdsWithOptionalAssetFingerprint: Set<String>): List<TokenOwnershipInfo> {
+    fun getTokenSnapshotByPolicyId(policyIdsWithOptionalAssetFingerprint: Set<String>): List<TokenOwnershipInfoWithAssetCount> {
         return connectClient.post()
             .uri("/token/stake")
             .bodyValue(policyIdsWithOptionalAssetFingerprint)
             .retrieve()
-            .bodyToMono(object : ParameterizedTypeReference<List<TokenOwnershipInfo>>() {})
+            .bodyToMono(object : ParameterizedTypeReference<List<TokenOwnershipInfoWithAssetCount>>() {})
             .block()!!
 
+    }
+
+    fun getMultiAssetInfo(assets: List<Pair<String, String>>): List<MultiAssetInfo> {
+        return Flux.fromIterable(assets)
+            .flatMap {
+                connectClient.get()
+                    .uri("/token/assets/{policyId}/{assetNameHex}", it.first, it.second.toByteArray().toHex())
+                    .retrieve()
+                    .bodyToFlux(MultiAssetInfo::class.java)
+            }.collectList().block()!!
     }
 }
