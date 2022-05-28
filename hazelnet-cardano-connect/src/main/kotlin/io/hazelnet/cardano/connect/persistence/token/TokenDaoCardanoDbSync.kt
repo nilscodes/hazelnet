@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.services.decodeHex
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.Types
@@ -181,20 +182,25 @@ class TokenDaoCardanoDbSync(
     }
 
     override fun getMultiAssetInfo(policyId: String, assetName: String): MultiAssetInfo {
-        return jdbcTemplate.queryForObject(GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME, { rs, _ ->
-            val objectMapper = ObjectMapper()
-            val mintMetadata =
-                objectMapper.readValue(rs.getString("json"), object : TypeReference<Map<String, Any>>() {})
-            val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
-            val metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
-            MultiAssetInfo(
-                PolicyId(rs.getString("policy")),
-                rs.getString("name").decodeHex(),
-                AssetFingerprint(rs.getString("fingerprint")),
-                objectMapper.writeValueAsString(metadataOfAsset),
-                rs.getString("hash"),
-                rs.getLong("quantity"),
-            )
-        }, policyId, assetName)!!
+        return try {
+            jdbcTemplate.queryForObject(GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME, { rs, _ ->
+                val objectMapper = ObjectMapper()
+                val mintMetadata =
+                    objectMapper.readValue(rs.getString("json"), object : TypeReference<Map<String, Any>>() {})
+                val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
+                val metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
+                MultiAssetInfo(
+                    PolicyId(rs.getString("policy")),
+                    rs.getString("name").decodeHex(),
+                    AssetFingerprint(rs.getString("fingerprint")),
+                    objectMapper.writeValueAsString(metadataOfAsset),
+                    rs.getString("hash"),
+                    rs.getLong("quantity"),
+                )
+            }, policyId, assetName)!!
+        } catch (erdae: EmptyResultDataAccessException) {
+            // TODO should be changed to return null and a 404 on the controller, but need to adjust connectService on the community end to deal with that in a healthy way
+            MultiAssetInfo(PolicyId(policyId), assetName, AssetFingerprint("asset1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), "", "", 0)
+        }
     }
 }

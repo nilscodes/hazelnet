@@ -347,7 +347,7 @@ class DiscordServerService(
         if (relevantPolicyIds.isNotEmpty()) {
             val tokenOwnershipData =
                 connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
-            val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, Map<String, List<MultiAssetInfo>>>()
+            val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, MutableMap<String, MutableList<MultiAssetInfo>>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
                 val mapOfExternalAccount = prepareExternalAccountMapForAssetBased(
@@ -491,10 +491,10 @@ class DiscordServerService(
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() } as MutableMap
     }
 
-    private fun prepareExternalAccountMapForAssetBased(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, Map<String, List<MultiAssetInfo>>>): MutableMap<String, MutableList<MultiAssetInfo>> {
+    private fun prepareExternalAccountMapForAssetBased(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, MutableMap<String, MutableList<MultiAssetInfo>>>): MutableMap<String, MutableList<MultiAssetInfo>> {
         val externalAccountId = verification.externalAccount.id!!
         externalAccountLookup[externalAccountId] = verification.externalAccount
-        return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() } as MutableMap<String, MutableList<MultiAssetInfo>>
+        return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() }
     }
 
     fun regenerateAccessToken(guildId: Long): String {
