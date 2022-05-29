@@ -23,6 +23,7 @@ DROP TABLE IF EXISTS "discord_spo";
 DROP TABLE IF EXISTS "discord_payments";
 DROP TABLE IF EXISTS "discord_billing";
 DROP TABLE IF EXISTS "discord_servers";
+DROP TABLE IF EXISTS "verification_imports";
 DROP TABLE IF EXISTS "verifications";
 DROP TABLE IF EXISTS "premium_staked";
 DROP TABLE IF EXISTS "external_accounts";
@@ -88,6 +89,15 @@ CREATE TABLE "verifications"
     "confirmed"             boolean,
     "confirmed_at"          timestamp,
     "obsolete"              boolean
+);
+
+CREATE TABLE "verification_imports"
+(
+    "verification_import_id" SERIAL PRIMARY KEY,
+    "external_reference_id"  varchar(200)           NOT NULL,
+    "account_type"           accounts_external_type NOT NULL,
+    "verified_address"       varchar(150)           NOT NULL,
+    "verification_source"    varchar(50)            NOT NULL
 );
 
 CREATE TABLE "discord_servers"
@@ -451,3 +461,4 @@ ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimable_product_i
 
 ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimed_in_order") REFERENCES "physical_orders" ("order_id") ON DELETE SET NULL;
 
+CREATE INDEX ON "verification_imports" ("external_reference_id");

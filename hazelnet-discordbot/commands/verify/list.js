@@ -3,6 +3,7 @@ const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
+const cardanoaddress = require('../../utility/cardanoaddress');
 
 module.exports = {
   async execute(interaction) {
@@ -28,9 +29,13 @@ module.exports = {
         if (confirmedVerifications.length) {
           verificationInfoFields.push(...confirmedVerifications.map((verification) => {
             const stakeShort = verification.cardanoStakeAddress.substr(0, 10);
+            let confirmationText = i18n.__({ phrase: 'verify.list.confirmedData', locale }, { verification });
+            if (!cardanoaddress.isTransactionHash(verification.transactionHash)) {
+              confirmationText = i18n.__({ phrase: 'verify.list.confirmedDataImport', locale }, { verification });
+            }
             return {
               name: i18n.__({ phrase: 'verify.list.confirmedVerificationFor', locale }, { stakeShort }),
-              value: i18n.__({ phrase: 'verify.list.confirmedData', locale }, { verification }),
+              value: confirmationText,
             };
           }));
         }

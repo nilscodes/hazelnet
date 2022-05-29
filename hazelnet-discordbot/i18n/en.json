@@ -218,6 +218,7 @@
 			"listVerificationsInfo": "View your link status with this specific server and see which addresses are verified or waiting for verification with your account across all your Discord servers:",
 			"confirmedVerificationFor": "✅ Confirmed verification for {{stakeShort}}…",
 			"confirmedData": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} via transaction https://cardanoscan.io/transaction/{{verification.transactionHash}}, confirmed at *{{verification.confirmedAt}}*.",
+			"confirmedDataImport": "Address *{{verification.address}}* for stake address https://pool.pm/{{verification.cardanoStakeAddress}} from *{{{verification.transactionHash}}}*, imported at *{{verification.confirmedAt}}*.",
 			"outstandingVerifications": "⏳ Outstanding verifications",
 			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification.",
 			"accountIsLinked": "⚡ Linked",
@@ -252,7 +253,10 @@
 		"link": {
 			"messageTitle": "Link your wallets to this Discord server",
 			"success": "⚡ Your verified wallets and addresses have been successfully linked to this server. You are now eligible for any automatic role assignments and other features that require verified wallets. Role updates will happen during the next update.",
-			"notLinked": "⚠ Your user is already linked with this Discord server."
+			"notLinked": "⚠ Your user is already linked with this Discord server.",
+			"importSuccessTitle": "Imported external verifications",
+			"importSuccess": "🔃 One or more addresses were imported from other verification systems, as listed below. Use **/verify list** to see further details for the imported entries.\n\n{{{importedVerificationsText}}}",
+			"importEntry": "• *{{address}}*… from {{{source}}}"
 		},
 		"unlink": {
 			"messageTitle": "Unlink your wallets from this specific Discord server",

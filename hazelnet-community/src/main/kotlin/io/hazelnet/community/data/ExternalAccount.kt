@@ -24,10 +24,11 @@ class ExternalAccount @JsonCreator constructor(
 
     @Column(name = "external_reference_id")
     @field:NotNull
-    @field:Size(min = 1)
+    @field:Size(min = 1, max = 200)
     var referenceId: String,
 
     @Column(name = "external_reference_name")
+    @field:Size(max = 200)
     var referenceName: String?,
 
     @Temporal(TemporalType.TIMESTAMP)
