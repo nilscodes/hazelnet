@@ -104,6 +104,16 @@ internal class MetadataFilterTest {
     }
 
     @Test
+    fun testEqualsIsCaseSensitive() {
+        val matchingSampleFilterWithSubAttribute =
+            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
+        assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
+        val nonMatchingSampleFilterWithSubAttribute =
+            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "drowsy")
+        assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
+    }
+
+    @Test
     fun testContains() {
         val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.CONTAINS, "text/ht")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))

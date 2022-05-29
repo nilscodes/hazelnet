@@ -256,7 +256,7 @@ module.exports = {
       return useLocale;
     };
     discordServerObject.getBasicEditionThumbnail = function getBasicEditionThumbnail() {
-      return basicThumbnail ?? 'https://www.hazelnet.io/logo192.png';
+      return (basicThumbnail && !this.premium ? basicThumbnail : 'https://www.hazelnet.io/logo192.png');
     };
     discordServerObject.getAdvertisement = function getAdvertisement() {
       return { text: adText, logo: adLogo };
