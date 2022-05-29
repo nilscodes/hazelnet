@@ -1,10 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.CommunityApplicationConfiguration
-import io.hazelnet.community.data.ExternalAccount
-import io.hazelnet.community.data.ExternalAccountPremiumInfo
-import io.hazelnet.community.data.ExternalAccountType
-import io.hazelnet.community.data.Verification
+import io.hazelnet.community.data.*
 import io.hazelnet.community.data.premium.PremiumStakedInfo
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
@@ -14,12 +11,12 @@ import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
-import kotlin.NoSuchElementException
 
 @Service
 class ExternalAccountService(
     private val externalAccountRepository: ExternalAccountRepository,
     private val verificationRepository: VerificationRepository,
+    private val verificationService: VerificationService,
     private val discordServerRepository: DiscordServerRepository,
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
@@ -133,5 +130,10 @@ class ExternalAccountService(
                 externalAccountRepository.save(it)
             }
         }
+    }
+
+    fun importExternalVerifications(externalAccountId: Long): List<VerificationImport> {
+        val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
+        return verificationService.importExternalVerifications(externalAccount)
     }
 }

@@ -2,6 +2,7 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.data.*
 import io.hazelnet.community.persistence.ExternalAccountRepository
+import io.hazelnet.community.persistence.VerificationImportRepository
 import io.hazelnet.community.persistence.VerificationRepository
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
@@ -18,6 +19,7 @@ private val logger = KotlinLogging.logger {}
 class VerificationService(
     private val connectService: ConnectService,
     private val verificationRepository: VerificationRepository,
+    private val verificationImportRepository: VerificationImportRepository,
     private val externalAccountRepository: ExternalAccountRepository,
     private val globalCommunityService: GlobalCommunityService
 ) {
@@ -46,7 +48,7 @@ class VerificationService(
         verificationRequest: VerificationRequest,
         associatedExternalAccount: ExternalAccount
     ): Verification {
-        val maxVerificationWaitTimeInMinutes = getMaxVerificationWaitTimeInMinutes();
+        val maxVerificationWaitTimeInMinutes = getMaxVerificationWaitTimeInMinutes()
         val verificationAmount = getUniqueVerificationAmount()
         val validAfter = ZonedDateTime.now().toInstant()
         val validBefore = validAfter.plus(maxVerificationWaitTimeInMinutes, ChronoUnit.MINUTES)
@@ -111,11 +113,46 @@ class VerificationService(
         }
     }
 
-
     fun deleteVerification(verificationId: Long) {
         verificationRepository.deleteById(verificationId)
     }
 
     fun getAllCompletedVerificationsForDiscordServer(discordServerId: Int) =
         verificationRepository.getAllCompletedVerificationsForDiscordServer(discordServerId)
+
+    @Transactional
+    fun importExternalVerifications(externalAccount: ExternalAccount): List<VerificationImport> {
+        val importableVerifications = verificationImportRepository.findByReferenceIdAndType(externalAccount.referenceId, externalAccount.type)
+        val importedVerifications = mutableListOf<VerificationImport>()
+        importableVerifications.forEach {
+            val walletInfo = connectService.getWalletInfo(it.address)
+            if (walletInfo.stakeAddress != null) {
+                val stakeAddress = walletInfo.stakeAddress!!
+                val verificationsWithSameStakeAddress =
+                    verificationRepository.findAllByCardanoStakeAddress(stakeAddress)
+                if (verificationsWithSameStakeAddress.isEmpty()) {
+                    val now = ZonedDateTime.now().toInstant()
+                    verificationRepository.save(Verification(
+                        id = null,
+                        amount = 0,
+                        blockchain = BlockchainType.CARDANO,
+                        address = it.address,
+                        cardanoStakeAddress = stakeAddress,
+                        transactionHash = it.source,
+                        externalAccount = externalAccount,
+                        validAfter = Date.from(now),
+                        validBefore = Date.from(now),
+                        confirmed = true,
+                        confirmedAt = Date.from(now),
+                        obsolete = false
+                    ))
+                    importedVerifications.add(it)
+                } else {
+                    logger.info { "Tried to import verification for ${externalAccount.type} account with reference ID ${externalAccount.referenceId}, but stake address $stakeAddress is already verified. Deleting entry." }
+                }
+            }
+            verificationImportRepository.delete(it)
+        }
+        return importedVerifications
+    }
 }

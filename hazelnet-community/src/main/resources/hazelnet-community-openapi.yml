@@ -186,6 +186,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /externalaccounts/{externalAccountId}/import:
+    post:
+      summary: 'Import any outstanding verifications from other systems for this user'
+      operationId: importExternalVerifications
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of imported verifications, if any, empty list otherwise.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VerificationImport'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /externalaccounts/discord/{discordUserId}:
     get:
       summary: Get external account matching a Discord user ID
@@ -1568,8 +1592,11 @@ components:
           $ref: '#/components/schemas/ExternalAccountType'
         referenceId:
           type: string
+          minLength: 1
+          maxLength: 200
         referenceName:
           type: string
+          maxLength: 200
         account:
           type: integer
           format: int64
@@ -1592,6 +1619,32 @@ components:
           type: integer
           format: int64
           readOnly: true
+    VerificationImport:
+      type: object
+      required:
+        - id
+        - type
+        - referenceId
+        - address
+        - source
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          example: 162
+          format: int64
+        type:
+          $ref: '#/components/schemas/ExternalAccountType'
+        referenceId:
+          type: string
+          minLength: 1
+          maxLength: 200
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        source:
+          type: string
+          minLength: 1
+          maxLength: 50
     VerificationRequest:
       type: object
       required:
@@ -2037,7 +2090,7 @@ components:
     DiscordTokenRole:
       type: object
       required:
-        - policyId
+        - acceptedAssets
         - minimumTokenQuantity
         - roleId
       properties:
@@ -2045,10 +2098,10 @@ components:
           readOnly: true
           type: integer
           format: int64
-        policyId:
-          $ref: '#/components/schemas/TokenPolicyId'
-        assetFingerprint:
-          $ref: '#/components/schemas/AssetFingerprint'
+        acceptedAssets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenRoleAssetInfo'
         minimumTokenQuantity:
           type: integer
           format: int64
@@ -2064,6 +2117,15 @@ components:
             $ref: '#/components/schemas/MetadataFilter'
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    TokenRoleAssetInfo:
+      type: object
+      required:
+        - policyId
+      properties:
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        assetFingerprint:
+          $ref: '#/components/schemas/AssetFingerprint'
     MetadataFilter:
       type: object
       required:

@@ -48,4 +48,8 @@ module.exports = {
     const premiumInfo = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/premium`);
     return premiumInfo.data;
   },
+  async importVerifications(externalAccountId) {
+    const importedVerifications = await axios.post(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/import`);
+    return importedVerifications.data;
+  },
 };
