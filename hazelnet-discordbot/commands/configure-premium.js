@@ -16,6 +16,7 @@ module.exports = {
         .setDescription(ci18n.subDescription('refill'))
         .addIntegerOption((option) => option.setName('refill-amount').setDescription(ci18n.option('refill-amount')).setRequired(true)));
   },
+  commandTags: ['premium'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,

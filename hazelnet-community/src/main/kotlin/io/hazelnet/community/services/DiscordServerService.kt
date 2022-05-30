@@ -41,11 +41,29 @@ class DiscordServerService(
         private val registeredClientRepository: RegisteredClientRepository,
         private val externalAccountService: ExternalAccountService,
         private val claimListService: ClaimListService,
+        private val globalCommunityService: GlobalCommunityService,
 ) {
+    @Transactional
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
         discordServer.settings.add(DiscordServerSetting(DiscordSettings.PROTECTION_ADDR_REMOVAL.name, true.toString()))
+        augmentWithSponsoredInfo(discordServer)
         return discordServerRepository.save(discordServer)
+    }
+
+    fun augmentWithSponsoredInfo(discordServer: DiscordServer) {
+        val allSettings = globalCommunityService.getSettings()
+        val sponsoredGuild = allSettings
+            .filter { it.key.startsWith("SPONSORED_GUILDS_") }
+            .map { Pair(it.key.substring("SPONSORED_GUILDS_".length).toInt(), it.value.split(",").map { guildId -> guildId.toLong() }.toSet()) }
+            .find { it.second.contains(discordServer.guildId) }
+            ?.first
+        if (sponsoredGuild != null) {
+            discordServer.settings.add(DiscordServerSetting("SPONSORED_BY", sponsoredGuild.toString()))
+            allSettings
+                .filter { it.key.startsWith("SPONSOR_${sponsoredGuild}_") }
+                .forEach { discordServer.settings.add(DiscordServerSetting(it.key.substring("SPONSOR_${sponsoredGuild}_".length), it.value)) }
+        }
     }
 
     fun getDiscordServer(guildId: Long): DiscordServer {

@@ -18,6 +18,10 @@ module.exports = {
       .filter((file) => file.endsWith('.js'));
     //  .filter((file) => !file.startsWith('start'));
 
+    if (!discordServer.settings?.SPONSORED_BY) {
+      enabledCommandTags.push('premium');
+    }
+
     commandFiles.forEach((file) => {
       // eslint-disable-next-line import/no-dynamic-require
       const command = require(`../commands/${file}`); // require uses relative path
