@@ -11,6 +11,7 @@ module.exports = {
     await this.registerCommands(client, guildId, [startCommand.getCommandData('en').toJSON()]);
   },
   async registerMainCommands(enabledCommandTags, client, guildId) {
+    const commandsToEnable = [...enabledCommandTags];
     const discordServer = await client.services.discordserver.getDiscordServer(guildId);
     const useLocale = discordServer.getBotLanguage();
     const commands = [];
@@ -19,15 +20,15 @@ module.exports = {
     //  .filter((file) => !file.startsWith('start'));
 
     if (!discordServer.settings?.SPONSORED_BY) {
-      enabledCommandTags.push('premium');
+      commandsToEnable.push('premium');
     }
 
     commandFiles.forEach((file) => {
       // eslint-disable-next-line import/no-dynamic-require
       const command = require(`../commands/${file}`); // require uses relative path
-      const commandIsEnabled = !command.commandTags || command.commandTags.filter((tag) => enabledCommandTags.includes(tag)).length;
+      const commandIsEnabled = !command.commandTags || command.commandTags.filter((tag) => commandsToEnable.includes(tag)).length;
       if (commandIsEnabled) {
-        let commandJson = command.getCommandData(useLocale, enabledCommandTags).toJSON();
+        let commandJson = command.getCommandData(useLocale).toJSON();
         if (command.augmentPermissions) {
           commandJson = command.augmentPermissions(commandJson);
         }
