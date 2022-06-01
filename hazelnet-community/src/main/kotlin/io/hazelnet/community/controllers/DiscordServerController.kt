@@ -107,6 +107,10 @@ class DiscordServerController(
                 .body(newTokenOwnershipRole)
     }
 
+    @PatchMapping("/{guildId}/tokenroles/{tokenRoleId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateTokenOwnershipRole(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @RequestBody @Valid tokenOwnershipRolePartial: TokenOwnershipRolePartial) = discordServerService.updateTokenOwnershipRole(guildId, tokenRoleId, tokenOwnershipRolePartial)
+
     @DeleteMapping("/{guildId}/tokenroles/{tokenRoleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTokenOwnershipRole(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long) = discordServerService.deleteTokenOwnershipRole(guildId, tokenRoleId)

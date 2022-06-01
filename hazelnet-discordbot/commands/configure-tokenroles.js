@@ -46,6 +46,19 @@ module.exports = {
           .setName('remove')
           .setDescription(ci18n.subDescription('metadatafilter-remove'))
           .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))))
+      .addSubcommandGroup((group) => group
+        .setName('policies')
+        .setDescription(ci18n.subDescription('policies'))
+        .addSubcommand((subcommand) => subcommand
+          .setName('add')
+          .setDescription(ci18n.subDescription('policies-add'))
+          .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))
+          .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true))
+          .addStringOption((option) => option.setName('asset-fingerprint').setDescription(ci18n.option('asset-fingerprint')).setRequired(false)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('remove')
+          .setDescription(ci18n.subDescription('policies-remove'))
+          .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))

@@ -7,6 +7,7 @@ import org.springframework.lang.NonNull
 import javax.persistence.*
 import javax.validation.Valid
 import javax.validation.constraints.Min
+import javax.validation.constraints.Size
 
 @Entity
 @Table(name = "discord_token_roles")
@@ -19,6 +20,7 @@ class TokenOwnershipRole @JsonCreator constructor(
         @ElementCollection(fetch = FetchType.EAGER)
         @CollectionTable(name = "discord_token_role_policies", joinColumns = [JoinColumn(name = "discord_token_role_id")])
         @field:Valid
+        @field:Size(min = 1, max = 50)
         var acceptedAssets: MutableSet<TokenRoleAssetInfo> = mutableSetOf(),
 
         @Column(name = "minimum_token_quantity")

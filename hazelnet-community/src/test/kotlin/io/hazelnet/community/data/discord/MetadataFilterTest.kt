@@ -87,6 +87,24 @@ const val METADATA_TAVERNSQUAD_2 = """{
         "url": "https://tavernsquad.io"
       }"""
 
+const val METADATA_ADAGOTCHI_1 = """{
+        "Collection": "Alpha",
+        "Website": "https://adagotchi.io/",
+        "files": [
+          {
+            "Base": "ElfA",
+            "Body": "Body1Red",
+            "Head": "RedFauxhawk",
+            "mediaType": "image/png",
+            "name": "Adagotchi #0662",
+            "src": "ipfs://QmbicXPPxrrFErrRdYJzH8jnUbAJ9n9x8wMSJWGKd3fM1W"
+          }
+        ],
+        "image": "ipfs://QmbicXPPxrrFErrRdYJzH8jnUbAJ9n9x8wMSJWGKd3fM1W",
+        "mediaType": "image/png",
+        "name": "Adagotchi #0662"
+      }"""
+
 internal class MetadataFilterTest {
     @Test
     fun testEquals() {
@@ -210,5 +228,12 @@ internal class MetadataFilterTest {
     fun testWithInvalidProperty() {
         val matchingSampleFilter = MetadataFilter(0, "NONEXISTENT", AttributeOperatorType.EQUALS, "dead")
         assertFalse(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
+    }
+
+    @Test
+    fun testArrayIndex() {
+        val matchingSampleFilter =
+            MetadataFilter(0, "files[0].Head", AttributeOperatorType.CONTAINS, "Fauxhawk")
+        assertTrue(matchingSampleFilter.apply(METADATA_ADAGOTCHI_1))
     }
 }

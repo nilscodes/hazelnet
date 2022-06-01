@@ -128,6 +128,13 @@ class DiscordServerService(
         return tokenOwnershipRole
     }
 
+    fun updateTokenOwnershipRole(guildId: Long, tokenRoleId: Long, tokenOwnershipRolePartial: TokenOwnershipRolePartial): TokenOwnershipRole {
+        val tokenOwnershipRole = getTokenRole(guildId, tokenRoleId)
+        tokenOwnershipRole.acceptedAssets = tokenOwnershipRolePartial.acceptedAssets
+        discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
+        return tokenOwnershipRole
+    }
+
     fun addMetadataFilter(guildId: Long, tokenRoleId: Long, metadataFilter: MetadataFilter): MetadataFilter {
         val tokenRole = getTokenRole(guildId, tokenRoleId)
         discordMetadataFilterRepository.save(metadataFilter)
@@ -204,10 +211,12 @@ class DiscordServerService(
     }
 
     fun deleteDelegatorRole(guildId: Long, delegatorRoleId: Long) {
+        getDelegatorRole(guildId, delegatorRoleId) // Verify existence
         discordDelegatorRoleRepository.deleteById(delegatorRoleId)
     }
 
     fun deleteTokenOwnershipRole(guildId: Long, tokenRoleId: Long) {
+        getTokenRole(guildId, tokenRoleId) // Verify existence
         discordTokenOwnershipRoleRepository.deleteById(tokenRoleId)
     }
 
@@ -226,6 +235,16 @@ class DiscordServerService(
         return discordServer.tokenRoles
             .find { it.id == tokenRoleId }
             ?: throw NoSuchElementException("No token role with ID $tokenRoleId found on guild $guildId")
+    }
+
+    private fun getDelegatorRole(
+        guildId: Long,
+        delegatorRoleId: Long
+    ): DelegatorRole {
+        val discordServer = getDiscordServer(guildId)
+        return discordServer.delegatorRoles
+            .find { it.id == delegatorRoleId }
+            ?: throw NoSuchElementException("No delegator role with ID $delegatorRoleId found on guild $guildId")
     }
 
     fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {

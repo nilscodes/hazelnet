@@ -547,9 +547,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DiscordServer'
-          headers:
-            Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/roleassignments/delegatorroles:
     get:
       summary: Get the current set of delegator role assignments for this server
@@ -926,7 +923,7 @@ paths:
               $ref: '#/components/schemas/DiscordDelegatorRole'
       responses:
         '201':
-          description: 'Token Policy'
+          description: 'Newly created Delegator Role'
           content:
             application/json:
               schema:
@@ -963,7 +960,7 @@ paths:
               $ref: '#/components/schemas/DiscordTokenRole'
       responses:
         '201':
-          description: 'Token Policy'
+          description: 'Newly created token role'
           content:
             application/json:
               schema:
@@ -972,6 +969,27 @@ paths:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}:
+    patch:
+      summary: Update a token role
+      operationId: updateTokenOwnershipRole
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordTokenRolePartial'
+      responses:
+        '200':
+          description: 'Updated token role'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordTokenRole'
     delete:
       summary: Remove a token role assignment from this discord server
       operationId: deleteTokenOwnershipRole
@@ -2100,6 +2118,7 @@ components:
           format: int64
         acceptedAssets:
           type: array
+          minItems: 1
           items:
             $ref: '#/components/schemas/TokenRoleAssetInfo'
         minimumTokenQuantity:
@@ -2111,12 +2130,20 @@ components:
           format: int64
           example: 10
         filters:
-          readOnly: TRUE
+          readOnly: true
           type: array
           items:
             $ref: '#/components/schemas/MetadataFilter'
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    DiscordTokenRolePartial:
+      type: object
+      properties:
+        acceptedAssets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TokenRoleAssetInfo'
     TokenRoleAssetInfo:
       type: object
       required:

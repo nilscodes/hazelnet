@@ -119,6 +119,11 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newTokenRolePromise;
   },
+  async updateTokenRole(guildId, tokenRoleId, acceptedAssets) {
+    const updatedTokenRolePromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}`, { acceptedAssets });
+    this.clearCacheEntry(guildId);
+    return updatedTokenRolePromise.data;
+  },
   async addTokenRoleMetadataFilter(guildId, tokenRoleId, attributeName, operator, attributeValue) {
     const newMetadataFilterPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters`, {
       attributeName,
