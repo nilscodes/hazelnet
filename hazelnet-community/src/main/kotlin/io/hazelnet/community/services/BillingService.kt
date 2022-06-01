@@ -51,7 +51,8 @@ class BillingService(
                 val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
                 val proratedCost = ((1 - percentageOfMonthCompleted) * actualMonthlyCost).toLong()
                 val currentBalance = getCurrentBalance(discordServer).orElse(0)
-                if (currentBalance > 0 || (proratedCost == 0L && currentBalance >= 0)) {
+                val serverIsSponsored = discordServer.settings.any { it.name == "SPONSORED_BY" }
+                if (serverIsSponsored || currentBalance > 0 || (proratedCost == 0L && currentBalance >= 0)) {
                     val bill = billingRepository.save(
                         DiscordBilling(null, discordServer, Date.from(currentTime.toInstant()), proratedCost, discordServer.guildMemberCount, maxDelegation, currentDelegation )
                     )

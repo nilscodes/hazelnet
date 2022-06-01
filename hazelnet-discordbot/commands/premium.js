@@ -14,6 +14,7 @@ module.exports = {
       .setName('premium')
       .setDescription(ci18n.description());
   },
+  commandTags: ['premium'],
   augmentPermissions: commandbase.augmentPermissionsUser,
   async execute(interaction) {
     try {

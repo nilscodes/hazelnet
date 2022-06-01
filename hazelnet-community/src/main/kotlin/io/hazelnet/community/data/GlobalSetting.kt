@@ -21,7 +21,7 @@ class GlobalSetting(
 
     @Column(name = "setting_value")
     @field:NotNull
-    @field:Size(min = 0, max = 200)
+    @field:Size(min = 0, max = 4096)
     var value: String
 ) {
     override fun equals(other: Any?): Boolean {

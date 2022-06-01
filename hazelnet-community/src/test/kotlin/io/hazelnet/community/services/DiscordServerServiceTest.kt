@@ -127,6 +127,7 @@ internal class DiscordServerServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = discordServerService.getCurrentDelegatorRoleAssignments(testServer.guildId)
@@ -171,6 +172,7 @@ internal class DiscordServerServiceTest {
             getMockVerificationService(),
             connectService,
             getMockDiscordServerRepository(),
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -242,6 +244,7 @@ internal class DiscordServerServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = discordServerService.getCurrentTokenRolesAssignments(testServer.guildId)
@@ -285,6 +288,7 @@ internal class DiscordServerServiceTest {
             getMockVerificationService(),
             connectService,
             getMockDiscordServerRepository(),
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
