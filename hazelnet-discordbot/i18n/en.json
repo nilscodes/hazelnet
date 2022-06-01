@@ -33,6 +33,9 @@
 			"configure-tokenroles-metadatafilter": "Manage metadata filters on your token roles.",
 			"configure-tokenroles-metadatafilter-add": "Adds a metadata filter to your existing token role.",
 			"configure-tokenroles-metadatafilter-remove": "Remove a metadata filter from your existing token role.",
+			"configure-tokenroles-policies": "Manage policies on your token roles.",
+			"configure-tokenroles-policies-add": "Adds an accepted policy to your existing token role.",
+			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
 		},
@@ -364,12 +367,12 @@
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{policyIdShort}} (Role-ID: {{tokenRole.id}})",
-				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{policyId}} {{{fingerprintInfo}}}will be assigned the role <@&{{tokenRole.roleId}}>.",
-				"tokenRoleDetailsWithFilters": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the policy {{tokenRole.policyId}} {{{fingerprintInfo}}}and match the configured metadata filters will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"tokenRoleNameMultiple": "Multiple policies (Role-ID: {{tokenRole.id}})",
+				"tokenRoleDetails": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the accepted policies will be assigned the role <@&{{tokenRole.roleId}}>.",
+				"tokenRoleDetailsWithFilters": "All verified users that own a total of at least {{tokenRole.minimumTokenQuantity}}{{{maximumInfo}}} tokens of the accepted policies and match the configured metadata filters will be assigned the role <@&{{tokenRole.roleId}}>.",
 				"tokenRoleDetailsShortSelect": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
 				"tokenRoleDetailsShortCommand": "Role <@&{{tokenRole.roleId}}> - Run */configure-tokenroles details {{tokenRole.id}}* for more info.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
-				"fingerprintInfo": "with the asset fingerprint {{assetFingerprint}} ",
 				"chooseDetails": "Choose the token role you want to get details on",
 				"chooseText": "Role-ID: {{tokenRole.id}}",
 				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status.",
@@ -399,6 +402,24 @@
 					"errorNoFilters": "⚠ No metadata filters are active for this token role - nothing to remove.",
 					"chooseRemove": "Choose the metadata filter to remove",
 					"success": "🗑️ Removed the metadata filter from this token role. The remaining details are as follows:"
+				}
+			},
+			"policies": {
+				"add": {
+					"policiesTitle": "**Accepted Policies**",
+					"policiesContentEntry": "• {{policyId}} {{{fingerprintInfo}}}",
+					"policiesContent": "{{policyId}} {{{fingerprintInfo}}}",
+					"fingerprintInfo": "with the asset fingerprint *{{assetFingerprint}}* ",
+					"fingerprintInfoShort": " ({{assetFingerprint}})",
+					"errorLimitReached": "⚠ You cannot add more than fifty policies to any token role.",
+					"errorAlreadyUsed": "⚠ The policy ID/asset fingerprint combination {{policyId}} {{{fingerprintInfo}}} is already assigned to the token role with ID {{tokenRole.id}}."
+				},
+				"remove": {
+					"purpose": "Choose the policy/asset you want to remove from this role.",
+					"errorLastPolicyTitle": "One policy required",
+					"errorLastPolicy": "⚠ You cannot remove the last accepted policy/asset combination for this role.",
+					"chooseRemove": "Choose the policy/asset combination to remove",
+					"success": "🗑️ Removed the selected policy/asset combination from this token role. The remaining details are as follows:"
 				}
 			},
 			"add": {

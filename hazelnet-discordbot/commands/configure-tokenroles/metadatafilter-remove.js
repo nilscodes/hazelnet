@@ -32,7 +32,7 @@ module.exports = {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: `Error while adding metadata filter to auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.hazelnet.io.`, ephemeral: true });
+      await interaction.editReply({ content: `Error while removing metadata filter from auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.hazelnet.io.`, ephemeral: true });
     }
   },
   createRemoveDropdown(discordServer, tokenRole) {
