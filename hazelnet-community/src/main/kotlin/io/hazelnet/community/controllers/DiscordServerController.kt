@@ -17,7 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/discord/servers"))
+@RequestMapping("/discord/servers")
 class DiscordServerController(
         private val discordServerService: DiscordServerService,
         private val billingService: BillingService,
@@ -39,9 +39,13 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.OK)
     fun listDiscordServers() = discordServerService.getDiscordServers()
 
-    @GetMapping("/{guildId}")
+    @GetMapping(value = ["/{guildId}"], params = ["!byId"])
     @ResponseStatus(HttpStatus.OK)
     fun getDiscordServer(@PathVariable guildId: Long) = discordServerService.getDiscordServer(guildId)
+
+    @GetMapping(value = ["/{serverId}"], params = ["byId"])
+    @ResponseStatus(HttpStatus.OK)
+    fun getDiscordServerByInternalId(@PathVariable serverId: Int) = discordServerService.getDiscordServerByInternalId(serverId)
 
     @PatchMapping("/{guildId}")
     @ResponseStatus(HttpStatus.OK)
@@ -150,6 +154,10 @@ class DiscordServerController(
     @DeleteMapping("/{guildId}/whitelists/{whitelistId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = discordServerService.deleteWhitelist(guildId, whitelistId)
+
+    @GetMapping("/{guildId}/whitelists/shared")
+    @ResponseStatus(HttpStatus.OK)
+    fun getSharedWhitelists(@PathVariable guildId: Long) = discordServerService.getSharedWhitelists(guildId)
 
     @GetMapping("/{guildId}/whitelists/{whitelistIdOrName}/signups")
     @ResponseStatus(HttpStatus.OK)

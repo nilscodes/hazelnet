@@ -61,7 +61,8 @@
 				"required-role": "Role that is required for a user to have, to be able to register for this whitelist.",
 				"max-users": "The maximum number of users that can sign up for this whitelist.",
 				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
-				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)"
+				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)",
+				"guild-id": "The Discord guild/server ID (Snowflake Format: 717264144759390238)"
 			},
 			"configure-tokenroles": {
 				"policy-id": "Policy ID (Does not need to be an official policy of this server)",
@@ -559,17 +560,35 @@
 			"close": {
 				"purpose": "Close registrations for this whitelist, either permanently or temporarily. You can close lists before they reach their end times or max user counts with this command. You can reopen it later via */configure-whitelist open*.",
 				"success": "🔒 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully closed! If you want to reopen it later, use */configure-whitelist open*.",
-				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be closed."
+				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be closed.",
+				"otherError": "⚠ Error while closing this whitelist."
 			},
 			"open": {
 				"purpose": "Reopen registrations for this whitelist. Users will be able to register if the signup window has not yet closed and they fulfill all other conditions.",
 				"success": "🔓 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully reopened! If you want to close it again later, use */configure-whitelist close*.",
-				"noWhitelistsDetail": "⚠ There are currently no closed whitelists on this server that can be opened."
+				"noWhitelistsDetail": "⚠ There are currently no closed whitelists on this server that can be opened.",
+				"otherError": "⚠ Error while opening this whitelist."
+			},
+			"share": {
+				"purpose": "You are about to share the registrations of a whitelist with another HAZELnet server named **{{discordServerToShareWith.guildName}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
+				"success": "🤝 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully shared with **{{discordServerToShareWith.guildName}}**! If you want to unshare it again later, use */configure-whitelist unshare*.",
+				"noWhitelistsDetail": "⚠ There are currently no whitelists on this server that can be shared.",
+				"errorShareWithSelf": "⚠ You cannot share whitelists with your own Discord server.",
+				"errorGuildNotFound": "⚠ The guild with the ID {{guildToShareWith}} you are trying to share your whitelist with, does not exist or is not using the HAZELnet bot.",
+				"otherError": "⚠ Error while sharing this whitelist."
+			},
+			"unshare": {
+				"purpose": "You are about to disable sharing the registrations of a whitelist with another HAZELnet server. The respective server will no longer be able to collect whitelist registrations made on your server.",
+				"success": "🔌 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully unshared with **{{discordServerToUnshareWith.guildName}}**!",
+				"selectServer": "{{{whitelist.displayName}}} (shared with {{{guildName}}})",
+				"noWhitelistsDetail": "⚠ There are currently no shared whitelists on this server.",
+				"otherError": "⚠ Error while unsharing this whitelist."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following whitelist from this server:",
 				"purpose": "Select the whitelist to remove from your Discord server.\n\n⚠ **ALL REGISTERED ADDRESSES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE WHITELIST**.\n\nOnly do this after you have processed this whitelist for minting/distribution etc.",
-				"errorNotFound": "⚠ No whitelist with the name **{{whitelistName}}** was found for this server. Nothing was removed."
+				"errorNotFound": "⚠ No whitelist with the name **{{whitelistName}}** was found for this server. Nothing was removed.",
+				"otherError": "⚠ Error while removing this whitelist."
 			}
 		},
 		"adminaccess": {
@@ -733,5 +752,7 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	}
+	},
+	"/configure-whitelist share": "/configure-whitelist share",
+	"/configure-whitelist unshare": "/configure-whitelist unshare"
 }

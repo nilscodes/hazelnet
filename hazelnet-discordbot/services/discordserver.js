@@ -24,6 +24,12 @@ module.exports = {
     this.cache.set(`${guildId}`, discordServerObject);
     return discordServerObject;
   },
+  async getDiscordServerByInternalId(serverId) {
+    const discordServer = await axios.get(`${hazelCommunityUrl}/discord/servers/${serverId}?byId=true`);
+    const discordServerObject = this.makeDiscordServerObject(discordServer.data);
+    this.cache.set(`${discordServerObject.id}`, discordServerObject);
+    return discordServerObject;
+  },
   async updateDiscordServer(guildId, discordServerPartial) {
     const discordServerPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}`, discordServerPartial);
     const discordServerObject = this.makeDiscordServerObject(discordServerPromise.data);
