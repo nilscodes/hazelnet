@@ -12,6 +12,7 @@ import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
+import io.hazelnet.shared.data.SharedWhitelist
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
@@ -69,6 +70,14 @@ class DiscordServerService(
     fun getDiscordServer(guildId: Long): DiscordServer {
         val discordServer = discordServerRepository.findByGuildId(guildId)
                 .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        val stakepoolMap = stakepoolService.getStakepools()
+        discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
+        return discordServer
+    }
+
+    fun getDiscordServerByInternalId(serverId: Int): DiscordServer {
+        val discordServer = discordServerRepository.findById(serverId)
+            .orElseThrow { NoSuchElementException("No Discord Server with server ID $serverId found") }
         val stakepoolMap = stakepoolService.getStakepools()
         discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
         return discordServer
@@ -268,7 +277,16 @@ class DiscordServerService(
     fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {
         val discordServer = getDiscordServer(guildId)
         val whitelistToUpdate = getWhitelistById(discordServer, whitelistId)
-        whitelistToUpdate.closed = whitelistPartial.closed
+        if (whitelistPartial.closed != null) {
+            whitelistToUpdate.closed = whitelistPartial.closed
+        }
+        if (whitelistPartial.sharedWithServer != null) {
+            if (whitelistPartial.sharedWithServer == 0) {
+                whitelistToUpdate.sharedWithServer = null
+            } else {
+                whitelistToUpdate.sharedWithServer = whitelistPartial.sharedWithServer
+            }
+        }
         discordWhitelistRepository.save(whitelistToUpdate)
         return whitelistToUpdate
     }
@@ -285,6 +303,21 @@ class DiscordServerService(
         }
         catch(e: NumberFormatException) {
             getWhitelistByName(discordServer, whitelistIdOrName).signups
+        }
+    }
+
+    fun getSharedWhitelists(guildId: Long): List<SharedWhitelist> {
+        val discordServer = getDiscordServer(guildId)
+        val sharedWhitelists = discordWhitelistRepository.findBySharedWithServer(discordServer.id!!)
+        return sharedWhitelists.map {
+            val sharingServer = getDiscordServerByInternalId(it.sharedWithServer!!)
+            SharedWhitelist(
+                sharingServer.guildId,
+                sharingServer.guildName,
+                it.name,
+                it.displayName,
+                it.signups.map { signup -> io.hazelnet.shared.data.WhitelistSignup(signup.address, signup.signupTime!!) }.toSet()
+            )
         }
     }
 

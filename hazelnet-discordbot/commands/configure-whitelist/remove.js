@@ -55,7 +55,7 @@ module.exports = {
         }
       } catch (error) {
         interaction.client.logger.error(error);
-        const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'whitelist.unregister.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.unregister.otherError', locale: useLocale }), 'configure-whitelist-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.otherError', locale: useLocale }), 'configure-whitelist-remove');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       }
     }

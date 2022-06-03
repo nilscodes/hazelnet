@@ -52,12 +52,12 @@ module.exports = {
           ]);
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist remove', i18n.__({ phrase: 'configure.whitelist.remove.errorNotFound', locale: useLocale }, { whitelistName: whitelistNameToClose }), 'configure-whitelist-remove');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist close', i18n.__({ phrase: 'configure.whitelist.remove.errorNotFound', locale: useLocale }, { whitelistName: whitelistNameToClose }), 'configure-whitelist-close');
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         }
       } catch (error) {
         interaction.client.logger.error(error);
-        const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'whitelist.unregister.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.unregister.otherError', locale: useLocale }), 'configure-whitelist-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist close', i18n.__({ phrase: 'configure.whitelist.close.otherError', locale: useLocale }), 'configure-whitelist-close');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       }
     }

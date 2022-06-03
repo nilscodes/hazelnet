@@ -5,4 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface DiscordWhitelistRepository: CrudRepository<Whitelist, Long>
+interface DiscordWhitelistRepository: CrudRepository<Whitelist, Long> {
+    fun findBySharedWithServer(sharedWithServer: Int): List<Whitelist>
+}

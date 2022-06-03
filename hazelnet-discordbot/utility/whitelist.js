@@ -109,4 +109,19 @@ module.exports = {
     const whitelistNameRegex = /^[A-Za-z][-A-Za-z0-9]{0,29}$/;
     return whitelistNameRegex.test(whitelistName);
   },
+  async getGuildNames(discordServer, interaction) {
+    const guildNameMap = {};
+    const sharedServers = discordServer.whitelists
+      .filter((whitelist) => whitelist.sharedWithServer > 0)
+      .map((whitelist) => whitelist.sharedWithServer);
+    for (let i = 0; i < sharedServers.length; i += 1) {
+      const serverId = sharedServers[i];
+      if (!guildNameMap[serverId]) {
+        // eslint-disable-next-line no-await-in-loop
+        const discordServerWithId = await interaction.client.services.discordserver.getDiscordServerByInternalId(serverId);
+        guildNameMap[serverId] = discordServerWithId.guildName;
+      }
+    }
+    return guildNameMap;
+  },
 };

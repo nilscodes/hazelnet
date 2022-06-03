@@ -1,6 +1,7 @@
 package io.hazelnet.external.services
 
-import io.hazelnet.external.data.WhitelistSignup
+import io.hazelnet.shared.data.SharedWhitelist
+import io.hazelnet.shared.data.WhitelistSignup
 import io.hazelnet.external.data.claim.AnonymousPhysicalOrder
 import io.hazelnet.external.data.claim.PhysicalProduct
 import org.springframework.core.ParameterizedTypeReference
@@ -20,6 +21,17 @@ class CommunityService(
                 }.retrieve()
                 .bodyToMono(object : ParameterizedTypeReference<List<WhitelistSignup>>() {})
                 .block()!!
+    }
+
+    fun getSharedWhitelists(guildId: Long): List<SharedWhitelist> {
+        return communityClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/discord/servers/$guildId/whitelists/shared")
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<SharedWhitelist>>() {})
+            .block()!!
     }
 
     fun getClaimListOrders(guildId: Long, claimListName: String): List<AnonymousPhysicalOrder> {

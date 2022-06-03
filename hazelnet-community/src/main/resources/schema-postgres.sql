@@ -228,6 +228,7 @@ CREATE TABLE "discord_whitelists"
     "whitelist_max_users"      int,
     "whitelist_closed"         boolean      NOT NULL DEFAULT false,
     "required_discord_role_id" bigint,
+    "shared_with_discord_server" int,
     UNIQUE ("discord_server_id", "whitelist_name")
 );
 
@@ -422,6 +423,8 @@ ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("external_account_id") REF
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("shared_with_discord_server") REFERENCES "discord_servers" ("discord_server_id");
 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 

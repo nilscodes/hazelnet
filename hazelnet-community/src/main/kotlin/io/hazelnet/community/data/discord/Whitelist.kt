@@ -14,58 +14,60 @@ import javax.validation.constraints.Size
 @Entity
 @Table(name = "discord_whitelists")
 class Whitelist @JsonCreator constructor(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "discord_whitelist_id")
-        var id: Long?,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "discord_whitelist_id")
+    var id: Long?,
 
-        @Column(name = "external_account_id")
-        @field:NonNull
-        @field:Min(1)
-        var creator: Long,
+    @Column(name = "discord_server_id", insertable = false, updatable = false)
+    var discordServerId: Int,
 
-        @Column(name = "whitelist_creation", updatable = false)
-        var createTime: Date?,
+    @Column(name = "external_account_id")
+    @field:NonNull
+    @field:Min(1)
+    var creator: Long,
 
-        @Column(name = "whitelist_name")
-        @field:NonNull
-        @field:Size(min = 1, max = 30)
-        @field:Pattern(regexp = "^[A-Za-z][-A-Za-z0-9]{0,29}$")
-        var name: String,
+    @Column(name = "whitelist_creation", updatable = false)
+    var createTime: Date?,
 
-        @Column(name = "whitelist_displayname")
-        @field:NonNull
-        @field:Size(min = 1, max = 256)
-        var displayName: String,
+    @Column(name = "whitelist_name")
+    @field:NonNull
+    @field:Size(min = 1, max = 30)
+    @field:Pattern(regexp = "^[A-Za-z][-A-Za-z0-9]{0,29}$")
+    var name: String,
 
-        @Column(name = "whitelist_signup_after")
-        var signupAfter: Date?,
+    @Column(name = "whitelist_displayname")
+    @field:NonNull
+    @field:Size(min = 1, max = 256)
+    var displayName: String,
 
-        @Column(name = "whitelist_signup_until")
-        var signupUntil: Date?,
+    @Column(name = "whitelist_signup_after")
+    var signupAfter: Date?,
 
-        @Column(name = "required_discord_role_id")
-        @field:NonNull
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var requiredRoleId: Long,
+    @Column(name = "whitelist_signup_until")
+    var signupUntil: Date?,
 
-        @Column(name = "whitelist_max_users")
-        var maxUsers: Int?,
+    @Column(name = "required_discord_role_id")
+    @field:NonNull
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var requiredRoleId: Long,
 
-        @Column(name = "whitelist_closed")
-        var closed: Boolean = false,
+    @Column(name = "whitelist_max_users")
+    var maxUsers: Int?,
 
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "discord_whitelists_signup", joinColumns = [JoinColumn(name = "discord_whitelist_id")])
-        @field:JsonIgnore
-        var signups: MutableSet<WhitelistSignup> = mutableSetOf()
+    @Column(name = "whitelist_closed")
+    var closed: Boolean = false,
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_whitelists_signup", joinColumns = [JoinColumn(name = "discord_whitelist_id")])
+    @field:JsonIgnore
+    var signups: MutableSet<WhitelistSignup> = mutableSetOf(),
+
+    @Column(name = "shared_with_discord_server")
+    var sharedWithServer: Int? = null,
 ) {
     fun getCurrentUsers(): Int = signups.size
-
-    override fun toString(): String {
-        return "Whitelist(id=$id, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups)"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -84,6 +86,7 @@ class Whitelist @JsonCreator constructor(
         if (maxUsers != other.maxUsers) return false
         if (closed != other.closed) return false
         if (signups != other.signups) return false
+        if (sharedWithServer != other.sharedWithServer) return false
 
         return true
     }
@@ -100,6 +103,12 @@ class Whitelist @JsonCreator constructor(
         result = 31 * result + (maxUsers ?: 0)
         result = 31 * result + closed.hashCode()
         result = 31 * result + signups.hashCode()
+        result = 31 * result + (sharedWithServer?.hashCode() ?: 0)
         return result
     }
+
+    override fun toString(): String {
+        return "Whitelist(id=$id, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithGuild=$sharedWithServer)"
+    }
+
 }
