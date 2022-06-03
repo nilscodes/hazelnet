@@ -16,6 +16,7 @@
 			"configure-poll": "Manage polls for people to vote on (off-chain)",
 			"configure-poll-list": "List all polls that are set up on this Discord server.",
 			"configure-poll-add": "Adds a new poll to the server. You will be able to determine voting conditions and visibility.",
+			"configure-poll-announce": "Announce the current results of a poll to the channel this command is run in.",
 			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
 			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
@@ -533,6 +534,13 @@
 				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
 				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
 				"noPremium": "🙀 You currently can not add any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+			},
+			"announce": {
+				"purpose": "Pick a poll from the list of available polls to publish the results for.",
+				"success": "✅ Results successfully published in <#{{currentChannel}}>.",
+				"publicSuccess": "🚨 An administrator shared the following poll results with you.",
+				"choosePoll": "Pick the poll you'd like to announce the results for",
+				"errorNoSendPermissions": "Failed to announce the results in <#{{currentChannel}}>. It is possible the bot has no rights to send messages to this channel."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following poll from this server:",

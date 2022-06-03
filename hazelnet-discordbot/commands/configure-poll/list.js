@@ -1,10 +1,8 @@
 const i18n = require('i18n');
-const {
-  MessageActionRow, MessageSelectMenu,
-} = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const datetime = require('../../utility/datetime');
 const discordemoji = require('../../utility/discordemoji');
+const pollutil = require('../../utility/poll');
 
 module.exports = {
   async execute(interaction) {
@@ -12,25 +10,8 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const polls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id))
-        .sort((pollA, pollB) => pollA.displayName.localeCompare(pollB.displayName));
-      const pollFields = polls.map((poll) => ({
-        name: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-        value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
-        }),
-      }));
-      if (!pollFields.length) {
-        pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
-      }
-      if (!discordServer.premium && polls.length) {
-        pollFields.unshift({
-          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
-          value: i18n.__({ phrase: 'configure.poll.list.noPremium', locale }),
-        });
-      }
-      const components = this.getPollChoices(locale, polls);
+      const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
+      const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/list/details', 'configure.poll.list.choosePollDetails');
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll list', i18n.__({ phrase: 'configure.poll.list.purpose', locale }), 'configure-poll-list', pollFields);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
@@ -91,27 +72,10 @@ module.exports = {
             value: poll.requiredRoles.map((role) => (i18n.__({ phrase: 'configure.poll.list.requiredRoleEntry', locale }, { role }))).join('\n'),
           });
         }
-        const components = this.getPollChoices(locale, polls);
+        const components = pollutil.getPollChoices(locale, polls, 'configure-poll/list/details', 'configure.poll.list.choosePollDetails');
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll list', i18n.__({ phrase: 'configure.poll.list.details', locale }), 'configure-poll-list', detailFields);
         await interaction.editReply({ embeds: [embed], components, ephemeral: true });
       }
     }
-  },
-  getPollChoices(locale, polls) {
-    if (polls.length) {
-      return [new MessageActionRow()
-        .addComponents(
-          new MessageSelectMenu()
-            .setCustomId('configure-poll/list/details')
-            .setPlaceholder(i18n.__({ phrase: 'configure.poll.list.choosePollDetails', locale }))
-            .addOptions(polls.map((poll) => ({
-              label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-              description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
-              value: `configure-poll-${poll.id}`,
-            }))),
-        ),
-      ];
-    }
-    return [];
   },
 };
