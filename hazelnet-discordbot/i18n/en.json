@@ -22,6 +22,8 @@
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
 			"configure-whitelist-close": "Temporarily or permanently close a whitelist for registrations.",
 			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
+			"configure-whitelist-share": "Share your whitelist data with another HAZELnet Discord.",
+			"configure-whitelist-unshare": "Turn off whitelist sharing for this whitelist.",
 			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
 			"configure-premium": "Set up and get info about your Black Edition Premium status.",
 			"configure-premium-status": "See your premium status and wallet balance, as well as delegation discounts for Black Edition usage.",

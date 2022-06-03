@@ -27,6 +27,13 @@ module.exports = {
         .setName('open')
         .setDescription(ci18n.subDescription('open')))
       .addSubcommand((subcommand) => subcommand
+        .setName('share')
+        .setDescription(ci18n.subDescription('share'))
+        .addStringOption((option) => option.setName('guild-id').setDescription(ci18n.option('guild-id')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('unshare')
+        .setDescription(ci18n.subDescription('unshare')))
+      .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove')));
   },
