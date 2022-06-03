@@ -9,6 +9,7 @@ const commandbase = require('../utility/commandbase');
 const pollUtil = require('../utility/poll');
 const datetime = require('../utility/datetime');
 const discordemoji = require('../utility/discordemoji');
+const pollutil = require('../utility/poll');
 
 module.exports = {
   getCommandData(locale) {
@@ -65,7 +66,7 @@ module.exports = {
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           if (poll.resultsVisible) {
             const results = await interaction.client.services.discordserver.getPollResults(interaction.guild.id, poll.id);
-            resultsText = this.getCurrentResults(discordServer, poll, results);
+            resultsText = pollutil.getCurrentResults(discordServer, poll, results);
           }
 
           const detailFields = [
@@ -131,7 +132,7 @@ module.exports = {
           const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild.id, poll.id, externalAccount.id, votedFor);
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           if (poll.resultsVisible) {
-            resultsText = this.getCurrentResults(discordServer, poll, currentVoteData.poll);
+            resultsText = pollutil.getCurrentResults(discordServer, poll, currentVoteData.poll);
           }
           const detailFields = [
             {
@@ -168,7 +169,7 @@ module.exports = {
         const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild.id, poll.id, externalAccount.id, []);
         let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
         if (poll.resultsVisible) {
-          resultsText = this.getCurrentResults(discordServer, poll, currentVoteData.poll);
+          resultsText = pollutil.getCurrentResults(discordServer, poll, currentVoteData.poll);
         }
         const detailFields = [{
           name: i18n.__({ phrase: 'vote.currentResults', locale }),
@@ -181,13 +182,6 @@ module.exports = {
         await interaction.editReply({ content: 'Error while abstaining from vote. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
       }
     }
-  },
-  getCurrentResults(discordServer, poll, result) {
-    return poll.options
-      .map((option, idx) => {
-        const formattedVotes = discordServer.formatNumber(result.votes[option.id]);
-        return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
-      }).join('\n');
   },
   async getPollVoteOptions(locale, poll, totalVotingPower, hasVoted) {
     if (totalVotingPower > 0) {

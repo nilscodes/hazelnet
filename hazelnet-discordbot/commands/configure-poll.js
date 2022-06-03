@@ -21,6 +21,9 @@ module.exports = {
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
+        .setName('announce')
+        .setDescription(ci18n.subDescription('announce')))
+      .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove')));
   },
