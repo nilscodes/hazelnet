@@ -91,6 +91,11 @@ class VerificationService(
 
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun runVerifications() {
+        val syncStatus = connectService.getSyncInfo()
+        val minutesUntilConsideredDesynchronized = 15 * 60;
+        if (syncStatus.getSecondsSinceLastSync() > minutesUntilConsideredDesynchronized) {
+            verificationRepository.bumpObsoleteTime(Date(), Date(System.currentTimeMillis() + minutesUntilConsideredDesynchronized * 1000L))
+        }
         verificationRepository.markObsolete(Date())
         val outstandingVerifications = verificationRepository.findAllOutstanding()
         for (verification in outstandingVerifications) {

@@ -45,11 +45,17 @@ module.exports = {
       value: i18n.__({ phrase: 'configure.premium.status.costInfo', locale }, {
         ...premiumInfo,
         currentGuildMemberCountFormatted: discordServer.formatNumber(premiumInfo.guildMemberCount),
-        totalDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.totalDelegation / 1000000)),
-        maxDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.maxDelegation / 1000000)),
         monthlyCostFormatted: Math.round(premiumInfo.monthlyCost / 100000) / 10,
         discount: Math.min(100, Math.round(Math.round((premiumInfo.totalDelegation / premiumInfo.maxDelegation) * 100))),
         actualMonthlyCostFormatted: Math.round(premiumInfo.actualMonthlyCost / 100000) / 10,
+      }),
+    });
+    premiumFields.push({
+      name: i18n.__({ phrase: 'configure.premium.status.discount', locale }),
+      value: i18n.__({ phrase: 'configure.premium.status.discountInfo', locale }, {
+        totalDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.totalDelegation / 1000000)),
+        maxDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.maxDelegation / 1000000)),
+        discount: Math.min(100, Math.round(Math.round((premiumInfo.totalDelegation / premiumInfo.maxDelegation) * 100))),
       }),
     });
   },
