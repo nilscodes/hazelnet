@@ -685,7 +685,7 @@
 				"balanceInfoNegative": "⚠ Based on your current balance, your Black Edition will not be renewed next month. Even a 100% delegation discount will require you to at least get to **0 ADA** before renewals resume.",
 				"balanceInfoTopOff": "You can refill your balance via the **/configure-premium refill** command.",
 				"benefits": "Black Edition Benefits",
-				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ ... and much more @ https://www.hazelnet.io/pricing"
+				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ … and much more @ https://www.hazelnet.io/pricing"
 			},
 			"refill": {
 				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",

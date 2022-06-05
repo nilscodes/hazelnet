@@ -10,6 +10,7 @@ const pollUtil = require('../utility/poll');
 const datetime = require('../utility/datetime');
 const discordemoji = require('../utility/discordemoji');
 const pollutil = require('../utility/poll');
+const discordstring = require('../utility/discordstring');
 
 module.exports = {
   getCommandData(locale) {
@@ -186,7 +187,7 @@ module.exports = {
   async getPollVoteOptions(locale, poll, totalVotingPower, hasVoted) {
     if (totalVotingPower > 0) {
       const options = poll.options.map((option, idx) => ({
-        label: `${idx + 1}: ${option.text}`,
+        label: discordstring.ensureLength(`${idx + 1}: ${option.text}`, 100),
         value: `vote-${poll.id}-option-${option.id}`,
         emoji: {
           id: option.reactionId,
@@ -223,8 +224,8 @@ module.exports = {
             .setCustomId('vote/details')
             .setPlaceholder(i18n.__({ phrase: 'vote.choosePoll', locale }))
             .addOptions(polls.map((poll) => ({
-              label: poll.displayName,
-              description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
+              label: discordstring.ensureLength(poll.displayName, 100),
+              description: (poll.description ? discordstring.ensureLength(poll.description, 90) : ''),
               value: `poll-${poll.id}`,
             }))),
         ),
