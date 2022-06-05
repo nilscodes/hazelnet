@@ -29,13 +29,7 @@ class VerificationService(
         if (associatedExternalAccount.isPresent) {
             val walletInfo = connectService.getWalletInfo(verificationRequest.address)
             if (walletInfo.stakeAddress != null) {
-                val verificationsWithSameStakeAddress =
-                    verificationRepository.findAllByCardanoStakeAddress(walletInfo.stakeAddress!!)
-                if (verificationsWithSameStakeAddress.isEmpty()) {
-                    return generateAndSaveVerificationRequest(verificationRequest, associatedExternalAccount.get())
-                } else {
-                    throw StakeAddressInUseException("The stake address ${walletInfo.stakeAddress} that belongs to address ${verificationRequest.address} is already in use.")
-                }
+                return generateAndSaveVerificationRequest(verificationRequest, associatedExternalAccount.get())
             } else {
                 throw InvalidAddressException("The address ${verificationRequest.address} does not have a valid stake address associated with it.")
             }
@@ -107,6 +101,7 @@ class VerificationService(
                 verification.confirmed = true
                 verification.confirmedAt = Date.from(ZonedDateTime.now().toInstant())
                 verificationRepository.save(verification)
+                verificationRepository.invalidateOutdatedVerifications(verification.cardanoStakeAddress!!, verification.id!!)
             } catch (e: WebClientResponseException) {
                 logger.debug { "No valid verification found for ${verification.address} for verification with ID ${verification.id}" }
             }
