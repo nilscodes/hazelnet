@@ -85,7 +85,7 @@ class ExternalAccountService(
     fun storePremiumSnapshot() {
         if (config.fundedpool != null) {
             val lastSnapshottedEpoch = externalAccountRepository.getLastSnapshottedEpoch()
-            val currentEpoch = connectService.getCurrentEpoch()
+            val currentEpoch = connectService.getSyncInfo().currentEpoch
             if (lastSnapshottedEpoch.isEmpty || currentEpoch > lastSnapshottedEpoch.get()) {
                 val snapshotTime = Date.from(ZonedDateTime.now().toInstant())
                 val externalAccountsToDelegationMap = mutableMapOf<ExternalAccount, Long>()

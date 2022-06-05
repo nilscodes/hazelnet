@@ -60,13 +60,12 @@ class ConnectService(
             }.collectList().block()!!
     }
 
-    fun getCurrentEpoch(): Int {
+    fun getSyncInfo(): SyncInfo {
         return connectClient.get()
             .uri("/info/syncstatus")
             .retrieve()
             .bodyToMono(SyncInfo::class.java)
             .block()!!
-            .currentEpoch
     }
 
     fun getStakepools(): List<StakepoolInfo> {

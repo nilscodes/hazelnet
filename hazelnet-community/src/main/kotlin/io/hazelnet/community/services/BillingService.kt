@@ -30,6 +30,10 @@ class BillingService(
     private val paymentRepository: DiscordPaymentRepository
 ) {
 
+    /**
+     * Everything in this and the callee methods works with ZonedDateTime in UTC.
+     * Be careful when mixing this with date comparisons with other tables or Date() objects.
+     */
     @Transactional
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun billPremiumStatus() {
@@ -44,7 +48,7 @@ class BillingService(
         val percentageOfMonthCompleted = (currentTime.dayOfMonth - 1.0) / endOfMonth.dayOfMonth
         val discordServers = discordServerService.getDiscordServers()
         discordServers.forEach { discordServer ->
-            if (discordServer.premiumUntil == null || Date().after(discordServer.premiumUntil)) {
+            if (discordServer.premiumUntil == null || currentTime.isAfter(ZonedDateTime.ofInstant(discordServer.premiumUntil!!.toInstant(), ZoneId.of("UTC")))) {
                 val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer.guildMemberCount)
                 val currentDelegation = getBotFunding(discordServer.guildId)
                 val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
@@ -59,7 +63,7 @@ class BillingService(
                     paymentRepository.save(
                         DiscordPayment(null, discordServer, null, Date.from(currentTime.toInstant()), -proratedCost, bill)
                     )
-                    discordServer.premiumUntil = Date.from(endOfMonth.withZoneSameLocal(ZoneId.systemDefault()).toInstant())
+                    discordServer.premiumUntil = Date.from(endOfMonth.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
                     discordServerRepository.save(discordServer)
                 }
             }
