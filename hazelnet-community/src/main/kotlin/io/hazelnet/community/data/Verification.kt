@@ -60,9 +60,53 @@ class Verification(
         var confirmedAt: Date?,
 
         @Column(name = "obsolete")
-        var obsolete: Boolean
+        var obsolete: Boolean,
+
+        @Column(name = "succeeded_by")
+        var succeededBy: Long? = null,
 ) {
-        override fun toString(): String {
-                return "Verification(id=$id, amount=$amount, blockchain=$blockchain, address='$address', cardanoStakeAddress=$cardanoStakeAddress, transactionHash=$transactionHash, externalAccount=$externalAccount, validAfter=$validAfter, validBefore=$validBefore, confirmed=$confirmed, confirmedAt=$confirmedAt, obsolete=$obsolete)"
+        override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Verification
+
+                if (id != other.id) return false
+                if (amount != other.amount) return false
+                if (blockchain != other.blockchain) return false
+                if (address != other.address) return false
+                if (cardanoStakeAddress != other.cardanoStakeAddress) return false
+                if (transactionHash != other.transactionHash) return false
+                if (externalAccount != other.externalAccount) return false
+                if (validAfter != other.validAfter) return false
+                if (validBefore != other.validBefore) return false
+                if (confirmed != other.confirmed) return false
+                if (confirmedAt != other.confirmedAt) return false
+                if (obsolete != other.obsolete) return false
+                if (succeededBy != other.succeededBy) return false
+
+                return true
         }
+
+        override fun hashCode(): Int {
+                var result = id?.hashCode() ?: 0
+                result = 31 * result + amount.hashCode()
+                result = 31 * result + blockchain.hashCode()
+                result = 31 * result + address.hashCode()
+                result = 31 * result + (cardanoStakeAddress?.hashCode() ?: 0)
+                result = 31 * result + (transactionHash?.hashCode() ?: 0)
+                result = 31 * result + externalAccount.hashCode()
+                result = 31 * result + validAfter.hashCode()
+                result = 31 * result + validBefore.hashCode()
+                result = 31 * result + confirmed.hashCode()
+                result = 31 * result + (confirmedAt?.hashCode() ?: 0)
+                result = 31 * result + obsolete.hashCode()
+                result = 31 * result + (succeededBy?.hashCode() ?: 0)
+                return result
+        }
+
+        override fun toString(): String {
+                return "Verification(id=$id, amount=$amount, blockchain=$blockchain, address='$address', cardanoStakeAddress=$cardanoStakeAddress, transactionHash=$transactionHash, externalAccount=$externalAccount, validAfter=$validAfter, validBefore=$validBefore, confirmed=$confirmed, confirmedAt=$confirmedAt, obsolete=$obsolete, succeededBy=$succeededBy)"
+        }
+
 }

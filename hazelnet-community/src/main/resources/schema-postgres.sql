@@ -88,7 +88,8 @@ CREATE TABLE "verifications"
     "valid_before"          timestamp,
     "confirmed"             boolean,
     "confirmed_at"          timestamp,
-    "obsolete"              boolean
+    "obsolete"              boolean,
+    "succeeded_by"          bigint
 );
 
 CREATE TABLE "verification_imports"
