@@ -16,6 +16,7 @@ module.exports = {
       const useLocale = discordServer.getBotLanguage();
 
       const features = discordServer.settings.ENABLED_COMMAND_TAGS.split(',');
+      this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, features);
       const { components, embed } = this.buildInterface(discordServer, useLocale, features);
       await interaction.editReply({ components, embeds: [embed], ephemeral: true });
     } catch (error) {

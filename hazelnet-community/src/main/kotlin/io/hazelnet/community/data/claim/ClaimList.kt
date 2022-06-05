@@ -33,6 +33,9 @@ class ClaimList (
     @Column(name = "claim_list_creation", updatable = false)
     var createTime: Date?,
 
+    @Column(name = "claim_list_url")
+    var claimUrl: String?,
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "claim_lists_snapshot_cardano", joinColumns = [JoinColumn(name = "claim_list_id")])
     @field:Valid
@@ -47,7 +50,8 @@ class ClaimList (
         original.displayName,
         original.description,
         original.createTime,
-        original.claims.filter { validStakeAddresses.contains(it.stakeAddress) }.toMutableSet()
+        original.claimUrl,
+        original.claims.filter { validStakeAddresses.contains(it.stakeAddress) }.toMutableSet(),
     )
 
     override fun equals(other: Any?): Boolean {
@@ -61,6 +65,7 @@ class ClaimList (
         if (displayName != other.displayName) return false
         if (description != other.description) return false
         if (createTime != other.createTime) return false
+        if (claimUrl != other.claimUrl) return false
         if (claims != other.claims) return false
 
         return true
@@ -72,12 +77,13 @@ class ClaimList (
         result = 31 * result + displayName.hashCode()
         result = 31 * result + (description?.hashCode() ?: 0)
         result = 31 * result + (createTime?.hashCode() ?: 0)
+        result = 31 * result + (claimUrl?.hashCode() ?: 0)
         result = 31 * result + claims.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "ClaimList(id=$id, name='$name', displayName='$displayName', description=$description, createTime=$createTime, claims=${claims.size})"
+        return "ClaimList(id=$id, name='$name', displayName='$displayName', description=$description, createTime=$createTime, claimUrl=$claimUrl, claims=$claims)"
     }
 
 }

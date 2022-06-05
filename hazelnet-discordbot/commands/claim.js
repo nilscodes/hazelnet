@@ -102,25 +102,34 @@ module.exports = {
           try {
             await interaction.update({ components: [] });
             const claimListId = +interaction.values[0].substr(interaction.values[0].lastIndexOf('-') + 1);
-            const existingOrder = await interaction.client.services.claimlists.getExistingOrderForClaimList(interaction.guild.id, this.getCurrentOrder(interaction.user.id).externalAccountId, claimListId);
             const claimList = this.getFromAvailableClaimLists(interaction.user.id, claimListId);
             const description = claimList.description ?? i18n.__({ phrase: 'claim.noDescription', locale });
-            if (existingOrder) {
-              await this.existingOrderDirectMessage(interaction, discordServer, existingOrder);
+            if (claimList.claimUrl) {
               const claimListFields = [{
-                name: i18n.__({ phrase: 'claim.existingOrderTitle', locale }),
-                value: i18n.__({ phrase: 'claim.existingOrder', locale }, { botUser: interaction.client.application.id }),
+                name: i18n.__({ phrase: 'claim.orderOnlineTitle', locale }),
+                value: i18n.__({ phrase: 'claim.orderOnline', locale }) + claimList.claimUrl,
               }];
               const embed = embedBuilder.buildForUser(discordServer, claimList.displayName, description, 'claim', claimListFields);
               await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
             } else {
-              await this.startOrderDirectMessage(interaction, discordServer, claimListId);
-              const claimListFields = [{
-                name: i18n.__({ phrase: 'claim.orderStartedTitle', locale }),
-                value: i18n.__({ phrase: 'claim.orderStarted', locale }, { botUser: interaction.client.application.id }),
-              }];
-              const embed = embedBuilder.buildForUser(discordServer, claimList.displayName, description, 'claim', claimListFields);
-              await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
+              const existingOrder = await interaction.client.services.claimlists.getExistingOrderForClaimList(interaction.guild.id, this.getCurrentOrder(interaction.user.id).externalAccountId, claimListId);
+              if (existingOrder) {
+                await this.existingOrderDirectMessage(interaction, discordServer, existingOrder);
+                const claimListFields = [{
+                  name: i18n.__({ phrase: 'claim.existingOrderTitle', locale }),
+                  value: i18n.__({ phrase: 'claim.existingOrder', locale }, { botUser: interaction.client.application.id }),
+                }];
+                const embed = embedBuilder.buildForUser(discordServer, claimList.displayName, description, 'claim', claimListFields);
+                await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
+              } else {
+                await this.startOrderDirectMessage(interaction, discordServer, claimListId);
+                const claimListFields = [{
+                  name: i18n.__({ phrase: 'claim.orderStartedTitle', locale }),
+                  value: i18n.__({ phrase: 'claim.orderStarted', locale }, { botUser: interaction.client.application.id }),
+                }];
+                const embed = embedBuilder.buildForUser(discordServer, claimList.displayName, description, 'claim', claimListFields);
+                await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
+              }
             }
           } catch (error) {
             if (error.constructor?.name === 'DiscordAPIError') {

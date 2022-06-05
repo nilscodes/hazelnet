@@ -200,7 +200,9 @@
 		"helpChannel": "If you need assistance with your order, please get in touch with our team in the channel <#{{helpChannel}}>. We are happy to help you out.",
 		"noDescription": "No Description provided",
 		"trackingNumberTitle": "Tracking Number",
-		"trackingNumberDetails": "Your tracking number is **{{trackingNumber}}** and you can follow it via this [Google Search](https://www.google.com/search?q={{trackingNumber}}). If the search does not yield any results, reach out to the project team to get your shipping provider."
+		"trackingNumberDetails": "Your tracking number is **{{trackingNumber}}** and you can follow it via this [Google Search](https://www.google.com/search?q={{trackingNumber}}). If the search does not yield any results, reach out to the project team to get your shipping provider.",
+		"orderOnlineTitle": "Claim URL provided",
+		"orderOnline": "The project team has provided the following URL to get your order and shipping details ready. Thanks for supporting this project!:\n\n"
 	},
 	"premium": {
 		"messageTitle": "View your premium status",
@@ -578,8 +580,8 @@
 				"otherError": "⚠ Error while opening this whitelist."
 			},
 			"share": {
-				"purpose": "You are about to share the registrations of a whitelist with another HAZELnet server named **{{discordServerToShareWith.guildName}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
-				"success": "🤝 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully shared with **{{discordServerToShareWith.guildName}}**! If you want to unshare it again later, use */configure-whitelist unshare*.",
+				"purpose": "You are about to share the registrations of a whitelist with another HAZELnet server named **{{{discordServerToShareWith.guildName}}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
+				"success": "🤝 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully shared with **{{{discordServerToShareWith.guildName}}}**! If you want to unshare it again later, use */configure-whitelist unshare*.",
 				"noWhitelistsDetail": "⚠ There are currently no whitelists on this server that can be shared.",
 				"errorShareWithSelf": "⚠ You cannot share whitelists with your own Discord server.",
 				"errorGuildNotFound": "⚠ The guild with the ID {{guildToShareWith}} you are trying to share your whitelist with, does not exist or is not using the HAZELnet bot.",
@@ -731,7 +733,8 @@
 		"poll": "Polls and voting system for open and holder-limited polls",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
-		"cardolphins": "features.cardolphins"
+		"cardolphins": "features.cardolphins",
+		"undefined": "features.undefined"
 	},
 	"generic": {
 		"cancel": "Cancel",
