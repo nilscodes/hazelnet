@@ -162,6 +162,18 @@ module.exports = {
         const useLocale = discordServer.getBotLanguage();
         await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild.id);
         // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
+
+        // Update the bot name if applicable
+        if (discordServer?.settings?.BOT_NAME) {
+          const botObject = await interaction.guild.members.fetch(interaction.client.application.id);
+          await botObject.setNickname(discordServer.settings.BOT_NAME);
+        }
+
+        // Turn the bot back on if it was turned off
+        if (!discordServer.active) {
+          await interaction.client.services.discordserver.updateDiscordServer(interaction.guild.id, { active: true });
+        }
+
         let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
         if (await this.isBotLackingRequiredPermissions(interaction)) {
           successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;

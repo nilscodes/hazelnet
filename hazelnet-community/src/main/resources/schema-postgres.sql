@@ -111,7 +111,8 @@ CREATE TABLE "discord_servers"
     "guild_member_count"  int,
     "guild_member_update" timestamp,
     "owner_account_id"    bigint,
-    "premium_until"       timestamp
+    "premium_until"       timestamp,
+    "active"              boolean       NOT NULL DEFAULT true
 );
 
 CREATE TABLE "discord_billing"

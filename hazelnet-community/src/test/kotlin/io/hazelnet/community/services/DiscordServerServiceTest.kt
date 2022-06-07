@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.data.token.*
@@ -106,7 +107,7 @@ internal class DiscordServerServiceTest {
     @Test
     fun getCurrentDelegatorRoleAssignments() {
         val connectService = mockk<ConnectService>()
-        every { connectService.getCurrentEpoch() } returns 311
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
         every { connectService.getActiveDelegationForPools(testServer.stakepools.map { it.poolHash }) } returns listOf(
             DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 5000, "acc1_hazel"),
             DelegationInfo("9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 55000, "acc1_bloom"),
@@ -150,7 +151,7 @@ internal class DiscordServerServiceTest {
     @Test
     fun tokenRoleAssignmentsDoNotGetCountedTwiceForTwoDifferentTokenRoles() {
         val connectService = mockk<ConnectService>()
-        every { connectService.getCurrentEpoch() } returns 311
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
         every {
             connectService.getAllTokenOwnershipCountsByPolicyId(
                 listOf(
@@ -190,7 +191,7 @@ internal class DiscordServerServiceTest {
     @Test
     fun getCurrentTokenRoleAssignmentsByAssets() {
         val connectService = mockk<ConnectService>()
-        every { connectService.getCurrentEpoch() } returns 311
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
         every {
             connectService.getAllTokenOwnershipAssetsByPolicyId(
                 listOf(
@@ -259,7 +260,7 @@ internal class DiscordServerServiceTest {
     @Test
     fun getCurrentTokenRoleAssignmentsByCounts() {
         val connectService = mockk<ConnectService>()
-        every { connectService.getCurrentEpoch() } returns 311
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
         every {
             connectService.getAllTokenOwnershipCountsByPolicyId(
                 listOf(

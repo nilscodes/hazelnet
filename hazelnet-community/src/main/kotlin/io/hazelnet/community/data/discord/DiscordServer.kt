@@ -90,7 +90,10 @@ class DiscordServer @JsonCreator constructor(
         @CollectionTable(name = "discord_server_members", joinColumns = [JoinColumn(name = "discord_server_id")])
         @field:Valid
         @field:JsonIgnore
-        var members: MutableSet<DiscordMember> = mutableSetOf()
+        var members: MutableSet<DiscordMember> = mutableSetOf(),
+
+        @Column(name = "active")
+        var active: Boolean = true,
 ) {
     fun getPremium(): Boolean = premiumUntil != null && Date().before(premiumUntil)
 
@@ -116,6 +119,7 @@ class DiscordServer @JsonCreator constructor(
         if (whitelists != other.whitelists) return false
         if (settings != other.settings) return false
         if (members != other.members) return false
+        if (active != other.active) return false
 
         return true
     }
@@ -137,11 +141,12 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + whitelists.hashCode()
         result = 31 * result + settings.hashCode()
         result = 31 * result + members.hashCode()
+        result = 31 * result + active.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members)"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active)"
     }
 
 }
