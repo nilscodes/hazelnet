@@ -85,10 +85,19 @@ class DiscordServerService(
 
     fun updateDiscordServer(guildId: Long, discordServerPartial: DiscordServerPartial): DiscordServer {
         val discordServer = getDiscordServer(guildId)
-        discordServer.guildMemberCount = discordServerPartial.guildMemberCount
-        discordServer.guildName = discordServerPartial.guildName
-        discordServer.guildOwner = discordServerPartial.guildOwner
-        discordServer.guildMemberUpdateTime = Date.from(ZonedDateTime.now().toInstant())
+        if (discordServerPartial.guildMemberCount != null) {
+            discordServer.guildMemberCount = discordServerPartial.guildMemberCount
+            discordServer.guildMemberUpdateTime = Date.from(ZonedDateTime.now().toInstant())
+        }
+        if (discordServerPartial.guildName != null) {
+            discordServer.guildName = discordServerPartial.guildName
+        }
+        if (discordServerPartial.guildOwner != null) {
+            discordServer.guildOwner = discordServerPartial.guildOwner
+        }
+        if (discordServerPartial.active != null) {
+            discordServer.active = discordServerPartial.active
+        }
         return discordServerRepository.save(discordServer)
     }
 
