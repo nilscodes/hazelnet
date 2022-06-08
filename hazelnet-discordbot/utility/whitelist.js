@@ -1,44 +1,24 @@
 const i18n = require('i18n');
+const {
+  MessageActionRow, MessageButton,
+} = require('discord.js');
 const datetime = require('./datetime');
+const cardanoaddress = require('./cardanoaddress');
 
 module.exports = {
-  getDetailsText(discordServer, whitelist) {
+  getDetailsText(discordServer, whitelist, noCurrentNumbers) {
     const locale = discordServer.getBotLanguage();
-    let datePhrase = 'whitelist.list.openWhitelist';
     const started = this.hasSignupStarted(whitelist);
     const ended = this.hasSignupEnded(whitelist);
     const running = started && !ended;
-    if (whitelist.signupUntil && !whitelist.signupAfter) {
-      datePhrase = 'whitelist.list.whitelistWithEndDateOpen';
-      if (ended) {
-        datePhrase = 'whitelist.list.whitelistWithEndDateClosed';
-      }
-    } else if (whitelist.signupAfter && !whitelist.signupUntil) {
-      datePhrase = 'whitelist.list.whitelistWithStartDateOpen';
-      if (!started) {
-        datePhrase = 'whitelist.list.whitelistWithStartDateClosed';
-      }
-    } else if (whitelist.signupAfter && whitelist.signupUntil) {
-      datePhrase = 'whitelist.list.whitelistWithStartDateClosedAndOpenEndDate';
-      if (running) {
-        datePhrase = 'whitelist.list.whitelistWithStartDateOpenAndOpenEndDate';
-      } else if (ended) {
-        datePhrase = 'whitelist.list.whitelistWithStartDateOpenAndClosedEndDate';
-      }
-    }
+    const datePhrase = this.getDatePhrase(whitelist, ended, started, running);
 
     const signupAfterFormatted = datetime.getUTCDateFormatted(whitelist, 'signupAfter');
     const signupUntilFormatted = datetime.getUTCDateFormatted(whitelist, 'signupUntil');
     const datePart = i18n.__({ phrase: datePhrase, locale }, { signupAfterFormatted, signupUntilFormatted });
     const roleAndDatePart = i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirement', locale }, { whitelist, datePart });
 
-    let memberPhrase = 'whitelist.list.whitelistMembersNoLimit';
-    if (whitelist.maxUsers > 0) {
-      memberPhrase = 'whitelist.list.whitelistMembersLimit';
-      if (whitelist.currentUsers >= whitelist.maxUsers) {
-        memberPhrase = 'whitelist.list.whitelistMembersLimitReached';
-      }
-    }
+    const memberPhrase = this.getMemberPhrase(whitelist, noCurrentNumbers);
     const lockIcon = running && !whitelist.closed ? '🔓' : '🔒';
     const memberPart = i18n.__({ phrase: memberPhrase, locale }, { whitelist });
 
@@ -61,6 +41,42 @@ module.exports = {
   isSignupPaused(whitelist) {
     return !!whitelist.closed;
   },
+  getDatePhrase(whitelist, ended, started, running) {
+    let datePhrase = 'whitelist.list.openWhitelist';
+    if (whitelist.signupUntil && !whitelist.signupAfter) {
+      datePhrase = 'whitelist.list.whitelistWithEndDateOpen';
+      if (ended) {
+        datePhrase = 'whitelist.list.whitelistWithEndDateClosed';
+      }
+    } else if (whitelist.signupAfter && !whitelist.signupUntil) {
+      datePhrase = 'whitelist.list.whitelistWithStartDateOpen';
+      if (!started) {
+        datePhrase = 'whitelist.list.whitelistWithStartDateClosed';
+      }
+    } else if (whitelist.signupAfter && whitelist.signupUntil) {
+      datePhrase = 'whitelist.list.whitelistWithStartDateClosedAndOpenEndDate';
+      if (running) {
+        datePhrase = 'whitelist.list.whitelistWithStartDateOpenAndOpenEndDate';
+      } else if (ended) {
+        datePhrase = 'whitelist.list.whitelistWithStartDateOpenAndClosedEndDate';
+      }
+    }
+    return datePhrase;
+  },
+  getMemberPhrase(whitelist, noCurrentNumbers) {
+    let memberPhrase = 'whitelist.list.whitelistMembersNoLimit';
+    if (whitelist.maxUsers > 0) {
+      if (noCurrentNumbers) {
+        memberPhrase = 'whitelist.list.whitelistMembersLimitNoCurrent';
+      } else {
+        memberPhrase = 'whitelist.list.whitelistMembersLimit';
+        if (whitelist.currentUsers >= whitelist.maxUsers) {
+          memberPhrase = 'whitelist.list.whitelistMembersLimitReached';
+        }
+      }
+    }
+    return memberPhrase;
+  },
   async userQualifies(interaction, whitelist, existingSignup) {
     if (!existingSignup) {
       if (!this.isSignupPaused(whitelist) && !this.hasSignupEnded(whitelist) && this.hasSignupStarted(whitelist) && !(whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
@@ -75,12 +91,12 @@ module.exports = {
     }
     return false;
   },
-  async getQualifyText(interaction, discordServer, whitelist, existingSignup, includeAddress) {
+  async getQualifyText(interaction, discordServer, whitelist, existingSignup, includeFullAddress) {
     if (existingSignup) {
-      const phrase = includeAddress ? 'whitelist.list.youAreRegisteredWithAddress' : 'whitelist.list.youAreRegistered';
+      const phrase = 'whitelist.list.youAreRegisteredWithAddress';
       return `\n${i18n.__({ phrase, locale: discordServer.getBotLanguage() }, {
         signupTime: new Date(existingSignup.signupTime).toISOString().replace(/\.[0-9]{3}Z/, '').replace('T', ' '),
-        address: existingSignup.address,
+        address: includeFullAddress ? existingSignup.address : cardanoaddress.shorten(existingSignup.address),
       })}`;
     }
     if (this.hasSignupEnded(whitelist) || !this.hasSignupStarted(whitelist) || (whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
@@ -100,7 +116,7 @@ module.exports = {
   },
   async getExistingSignups(externalAccount, discordServer, interaction) {
     if (externalAccount) {
-      const signupsPromise = discordServer.whitelists.map(async (whitelist) => interaction.client.services.discordserver.getWhitelistRegistration(interaction.guild.id, whitelist.id, externalAccount.id));
+      const signupsPromise = discordServer.whitelists.map((whitelist) => interaction.client.services.discordserver.getWhitelistSignupsForExternalAccount(interaction.guild.id, whitelist.id, externalAccount.id));
       return Promise.all(signupsPromise.map((p) => p.catch(() => undefined)));
     }
     return [];
@@ -123,5 +139,20 @@ module.exports = {
       }
     }
     return guildNameMap;
+  },
+  getSignupComponents(discordServer, whitelist) {
+    const locale = discordServer.getBotLanguage();
+    return [new MessageActionRow()
+      .addComponents(
+        new MessageButton()
+          .setCustomId(`whitelist/register/widgetsignup-${whitelist.id}`)
+          .setLabel(i18n.__({ phrase: 'whitelist.register.registerButton', locale }))
+          .setStyle('PRIMARY'),
+        new MessageButton()
+          .setCustomId('verify/add/widgetverify')
+          .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
+          .setStyle('SECONDARY'),
+      ),
+    ];
   },
 };

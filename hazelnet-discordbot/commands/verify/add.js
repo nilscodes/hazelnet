@@ -10,7 +10,7 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const addressOrHandle = interaction.options.getString('address-or-handle');
       let addressToVerify = null;
@@ -24,16 +24,16 @@ module.exports = {
       if (cardanoaddress.isStakedAddress(addressToVerify)) {
         const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
         const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
-        const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
+        const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && !verification.obsolete && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
         if (existingConfirmedVerification) {
           await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.alreadyVerified', locale: useLocale }, { verification: existingConfirmedVerification, address: addressToVerify }), 'verify-add');
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.alreadyVerified', locale }, { verification: existingConfirmedVerification, address: addressToVerify }), 'verify-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
           return;
         }
         const hasOutstandingVerifications = existingVerifications.some((verification) => !verification.confirmed && !verification.obsolete && verification.address === addressToVerify);
         if (hasOutstandingVerifications) {
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.outstandingVerification', locale: useLocale }, { verification: existingConfirmedVerification }), 'verify-add');
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.outstandingVerification', locale }, { verification: existingConfirmedVerification }), 'verify-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
           return;
         }
@@ -41,30 +41,30 @@ module.exports = {
         try {
           const verification = await interaction.client.services.verifications.createVerificationRequest(externalAccount.id, addressToVerify);
           const maxVerificationWaitTimeInMinutes = await interaction.client.services.globalsettings.getGlobalSetting('VERIFICATION_TIMEOUT_MINUTES') || 15;
-          const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationRequest', locale: useLocale }, { verification, amount: verification.amount / 1000000, maxTime: maxVerificationWaitTimeInMinutes }), 'verify-add');
+          const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationRequest', locale }, { verification, amount: verification.amount / 1000000, maxTime: maxVerificationWaitTimeInMinutes }), 'verify-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
           for (let i = 0; i < 14; i += 1) {
             await wait(60000);
             const verificationStatus = await interaction.client.services.verifications.getVerification(verification.id);
             if (verificationStatus.confirmed) {
               await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
-              const successEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationSuccess', locale: useLocale }, { verification: verificationStatus }), 'verify-add');
+              const successEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationSuccess', locale }, { verification: verificationStatus }), 'verify-add');
               await interaction.followUp({ embeds: [successEmbed], ephemeral: true });
               return;
             }
             if (verification.obsolete) {
               break;
             }
-            const waitEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationWaiting', locale: useLocale }), 'verify-add');
+            const waitEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationWaiting', locale }), 'verify-add');
             await interaction.followUp({ embeds: [waitEmbed], ephemeral: true });
           }
           if (maxVerificationWaitTimeInMinutes > 15) {
             // Connect the account so that if the verification goes through later, the account is properly linked
             await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
-            const endEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationMessageChainEnd', locale: useLocale }), 'verify-add');
+            const endEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationMessageChainEnd', locale }), 'verify-add');
             await interaction.followUp({ embeds: [endEmbed], ephemeral: true });
           } else {
-            const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: 'verify.add.verificationFailure', locale: useLocale }), 'verify-add');
+            const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationFailure', locale }), 'verify-add');
             await interaction.followUp({ embeds: [failureEmbed], ephemeral: true });
           }
         } catch (verificationError) {
@@ -80,15 +80,15 @@ module.exports = {
             default:
               break;
           }
-          const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: errorMessage, locale: useLocale }, { address: addressToVerify }), 'verify-add');
+          const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: errorMessage, locale }, { address: addressToVerify }), 'verify-add');
           await interaction.followUp({ embeds: [failureEmbed], ephemeral: true });
         }
       } else {
         const addressError = handle !== null ? 'verify.add.verificationInvalidHandle' : 'verify.add.verificationInvalidAddress';
-        const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale: useLocale }), i18n.__({ phrase: addressError, locale: useLocale }, {
+        const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: addressError, locale }, {
           address: addressOrHandle,
           handle,
-          resolveText: (addressToVerify === null ? i18n.__({ phrase: 'verify.add.resolveFailure', locale: useLocale }) : i18n.__({ phrase: 'verify.add.resolveSuccess', locale: useLocale }, { resolvedAddress: addressToVerify })),
+          resolveText: (addressToVerify === null ? i18n.__({ phrase: 'verify.add.resolveFailure', locale }) : i18n.__({ phrase: 'verify.add.resolveSuccess', locale }, { resolvedAddress: addressToVerify })),
         }), 'verify-add');
         await interaction.editReply({ embeds: [failureEmbed], ephemeral: true });
       }
@@ -99,6 +99,20 @@ module.exports = {
       } else {
         await interaction.followUp({ content: 'Error while verifying your account on this server.', ephemeral: true });
       }
+    }
+  },
+  async executeButton(interaction) {
+    if (interaction.customId === 'verify/add/widgetverify') {
+      await interaction.deferReply({ ephemeral: true });
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const locale = discordServer.getBotLanguage();
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
+      const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
+      const instructions = (existingConfirmedVerifications.length ? `${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length })}\n\n` : '')
+        + i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
+      await interaction.editReply({ embeds: [embed], ephemeral: true });
     }
   },
 };

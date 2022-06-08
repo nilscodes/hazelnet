@@ -24,4 +24,5 @@ module.exports = {
   commandTags: ['whitelist'],
   execute: commandbase.executeSubcommand,
   executeSelectMenu: commandbase.executeSubcommandSelectMenu,
+  executeButton: commandbase.executeButtonIfUser,
 };

@@ -107,15 +107,4 @@ module.exports = {
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     }
   },
-  async executeSelectMenu(interaction) {
-    if (interaction.customId) {
-      switch (interaction.customId) {
-        case 'claim/start': {
-          break;
-        }
-        default:
-          break;
-      }
-    }
-  },
 };

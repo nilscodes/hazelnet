@@ -27,12 +27,19 @@ module.exports = {
         .setName('open')
         .setDescription(ci18n.subDescription('open')))
       .addSubcommand((subcommand) => subcommand
+        .setName('announce')
+        .setDescription(ci18n.subDescription('announce'))
+        .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
         .setName('share')
         .setDescription(ci18n.subDescription('share'))
         .addStringOption((option) => option.setName('guild-id').setDescription(ci18n.option('guild-id')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('unshare')
         .setDescription(ci18n.subDescription('unshare')))
+      .addSubcommand((subcommand) => subcommand
+        .setName('download')
+        .setDescription(ci18n.subDescription('download')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove')));

@@ -23,8 +23,10 @@
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
 			"configure-whitelist-close": "Temporarily or permanently close a whitelist for registrations.",
 			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
+			"configure-whitelist-announce": "Announce your whitelist in a channel and create an interactive signup widget.",
 			"configure-whitelist-share": "Share your whitelist data with another HAZELnet Discord.",
 			"configure-whitelist-unshare": "Turn off whitelist sharing for this whitelist.",
+			"configure-whitelist-download": "Download the signups for a specific whitelist.",
 			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
 			"configure-premium": "Set up and get info about your Black Edition Premium status.",
 			"configure-premium-status": "See your premium status and wallet balance, as well as delegation discounts for Black Edition usage.",
@@ -46,7 +48,7 @@
 			"whitelist": {
 				"name": "Name of the whitelist",
 				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist.",
-				"includeaddress": "Use this parameter and pass True if you want your registered address displayed on screen."
+				"includeaddress": "Use this parameter and pass True if you want your registered address fully displayed on screen."
 			},
 			"configure-poll": {
 				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
@@ -63,7 +65,8 @@
 				"max-users": "The maximum number of users that can sign up for this whitelist.",
 				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
 				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)",
-				"guild-id": "The Discord guild/server ID (Snowflake Format: 717264144759390238)"
+				"guild-id": "The Discord guild/server ID (Snowflake Format: 717264144759390238)",
+				"channel": "The channel to send the announcement and signup widget to."
 			},
 			"configure-tokenroles": {
 				"policy-id": "Policy ID (Does not need to be an official policy of this server)",
@@ -246,14 +249,17 @@
 			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first. You can find your outstanding verification details with the */verify list* command.",
 			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
-			"verificationWaiting": "⏳ Still awaiting verification...\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
+			"verificationWaiting": "⏳ Still awaiting verification…\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
 			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command.",
 			"verificationMessageChainEnd": "⏳ We are still waiting for your transaction. However, the bot will now stop messaging you. You can check your verification request status any time by using the */verify list* command.",
 			"verificationWalletInUse": "⚠ Verification failed. The stake address that belongs to the address *{{address}}* is already verified with your or another account.",
 			"verificationInvalidAddress": "⚠ The submitted address *{{address}}* is not associated with a stake address OR the verification process was cancelled. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
 			"verificationInvalidHandle": "⚠ The submitted handle *{{handle}}* is not associated with a stake address. {{{resolveText}}}. Please supply a valid wallet address (starts with addr1 and has 103 characters total) or $handle.",
 			"resolveFailure": "The handle did not resolve to any address",
-			"resolveSuccess": "The handle resolved to {{resolvedAddress}}"
+			"resolveSuccess": "The handle resolved to {{resolvedAddress}}",
+			"verifyButton": "Verify your wallet",
+			"widgetInstructionsAlreadyVerified": "🚨 You have {{verifiedWallets}} verified wallets. If you would like to see which ones, use **/verify list** in a channel where commands are enabled.",
+			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n⚡ Use **/verify link** instead, if you have already verified a wallet with HAZELnet on another server.\n\n❔ For more information, use **/verify help** and **/help**."
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",
@@ -279,7 +285,7 @@
 			"purpose": "These are all currently active or recently closed whitelists for this Discord server:",
 			"noWhitelistsTitle": "No whitelists",
 			"noWhitelistsDetail": "*Currently, this server has no open or recently closed whitelists.*",
-			"whitelistRoleRequirement": "Requirement for this whitelist is to have the role <@&{{whitelist.requiredRoleId}}>.{{{datePart}}}",
+			"whitelistRoleRequirement": "Requirement for this whitelist is to have the role <@&{{whitelist.requiredRoleId}}>. {{{datePart}}}",
 			"whitelistWithEndDateOpen": "Signup is open until {{signupUntilFormatted}} UTC.",
 			"whitelistWithEndDateClosed": "Signup closed at {{signupUntilFormatted}} UTC.",
 			"whitelistWithStartDateOpen": "Signup opened at {{signupAfterFormatted}} UTC.",
@@ -291,11 +297,12 @@
 			"openWhitelist": "There are no start or end dates for this registration.",
 			"whitelistMembersNoLimit": "Any number of users can sign up.",
 			"whitelistMembersLimit": "{{whitelist.currentUsers}} out of {{whitelist.maxUsers}} have already registered.",
+			"whitelistMembersLimitNoCurrent": "The whitelist is limited to {{whitelist.maxUsers}} users that can register.",
 			"whitelistMembersLimitReached": "All {{whitelist.maxUsers}} users have already registered.",
 			"youQualify": "✅ You qualify for this whitelist. Add your address via '/whitelist register', if you would like to sign up.",
 			"youDontQualify": "⛔ You currently do not qualify for this whitelist.",
 			"youAreRegistered": "♥ You successfully registered for this whitelist at {{signupTime}} UTC.",
-			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC. Your registered address is:\n\n*{{address}}*"
+			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC with the address *{{address}}*"
 		},
 		"register": {
 			"messageTitle": "Register for a whitelist",
@@ -303,12 +310,20 @@
 			"signedupFor": "You are currently registered for the following whitelists:",
 			"signedupForEntry": "• **{{{whitelist.displayName}}}**",
 			"chooseWhitelist": "Select your whitelist",
-			"noOpenWhitelists": "There are currently no further whitelists that you qualify for.\n\n💡 If you verified your wallet within the last few minutes, please wait at least 15 minutes for the automatic role-assignments to take effect. Then try again.",
-			"success": "✅ Congratulations, you have successfully registered for the whitelist \"**{{{whitelist.displayName}}}**\"!\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
+			"noOpenWhitelists": "There are currently no further whitelists that you qualify for.\n\n💡 If you verified your wallet within the last few minutes, please wait at least one hour for the automatic role-assignments to take effect. Then try again.",
+			"registerButton": "Register for this whitelist",
+			"success": "✅ Congratulations, you have successfully registered for the whitelist **{{{whitelist.displayName}}}**!\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
-			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
+			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
-			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue."
+			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
+			"widgetNotVerified": "⚠ You currently have no verified wallets. You can use the command **/whitelist register** in a channel that allows bot commands to register any address (*addr1…*) or *$handle* for this whitelist.\n\n💡 **Better**: We recommend verifying a wallet via **/verify add** and then registering it with the whitelist by clicking the same button again.",
+			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at {{signupTime}} UTC with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
+			"widgetSelectAddress": "Please select which of your verified wallets you would like to register for the whitelist\n\n**{{whitelist.displayName}}**\n\nIf you would like to register a non-verified address or $handle, simply use the **/whitelist register** command.",
+			"widgetSelectAddressAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at {{signupTime}} UTC with the address *{{addressShort}}*. If you would like to change your used address, select the new address below.\n\nIf you would like to register a non-verified address or $handle, simply use the **/whitelist register** command.",
+			"chooseAddressToWhitelist": "Select one of your verified addresses to register",
+			"alreadyRegisteredTitle": "You're good! 👍",
+			"userDoesNotQualify": "💔 Unfortunately, you currently do not qualify for this whitelist or it is already closed/full."
 		},
 		"unregister": {
 			"messageTitle": "Unregister from a whitelist",
@@ -579,6 +594,16 @@
 				"noWhitelistsDetail": "⚠ There are currently no closed whitelists on this server that can be opened.",
 				"otherError": "⚠ Error while opening this whitelist."
 			},
+			"announce": {
+				"purpose": "Select the whitelist you would like to announce. The announcement will include the name of the whitelist and enable users to sign up or see their signup status with buttons directly on the whitelist announcement.",
+				"success": "✅ Whitelist successfully announced in <#{{channel}}>.",
+				"publicSuccessTitle": "📢 Whitelist opportunity!",
+				"publicSuccess": "The following whitelist is available to this community. If you fulfill the conditions, register one of your verified addresses via the button below or verify your wallet first and then register!",
+				"detailsDescription": "Whitelist details",
+				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be announced.",
+				"errorNoSendPermissions": "The bot has no permissions to send message to the channel <#{{channel}}>. Please allow the **Send Messages** permission for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
+			},
 			"share": {
 				"purpose": "You are about to share the registrations of a whitelist with another HAZELnet server named **{{{discordServerToShareWith.guildName}}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
 				"success": "🤝 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully shared with **{{{discordServerToShareWith.guildName}}}**! If you want to unshare it again later, use */configure-whitelist unshare*.",
@@ -593,6 +618,12 @@
 				"selectServer": "{{{whitelist.displayName}}} (shared with {{{guildName}}})",
 				"noWhitelistsDetail": "⚠ There are currently no shared whitelists on this server.",
 				"otherError": "⚠ Error while unsharing this whitelist."
+			},
+			"download": {
+				"purpose": "Select which whitelist you would like to download the address data for",
+				"success": "📂 Here is the download with address data for the whitelist **{{whitelist.displayName}}**. Thank you for using HAZELnet.",
+				"errorSignupsEmpty": "⚠ No download is available for the whitelist **{{whitelist.displayName}}**. No one has signed up, yet.",
+				"otherError": "⚠ Error while downloading this whitelist."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following whitelist from this server:",
@@ -767,5 +798,6 @@
 		}
 	},
 	"/configure-whitelist share": "/configure-whitelist share",
-	"/configure-whitelist unshare": "/configure-whitelist unshare"
+	"/configure-whitelist unshare": "/configure-whitelist unshare",
+	"doink": "doink"
 }
