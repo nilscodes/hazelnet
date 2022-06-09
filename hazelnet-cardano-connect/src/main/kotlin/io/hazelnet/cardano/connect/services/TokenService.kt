@@ -1,8 +1,10 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.persistence.token.TokenDao
 import io.hazelnet.cardano.connect.util.PolicyTools
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -19,9 +21,12 @@ fun String.decodeHex(): String {
 }
 
 @Service
-@CacheConfig(cacheNames = ["tokenmetadata"])
+@CacheConfig(cacheNames = ["tokenmetadata", "handleforstake"])
 class TokenService(
-    private val tokenDao: TokenDao
+    @Value("\${io.hazelnet.connect.cardano.handlepolicy}")
+    private val handlePolicy: String,
+    private val tokenDao: TokenDao,
+    private val handleService: HandleService,
 ) {
     fun getMultiAssetCountsForStakeAddress(
         stakeAddress: String,
@@ -114,6 +119,19 @@ class TokenService(
         return allTokenOwnershipInfoWithAssetCount
     }
 
+
+    @Cacheable(cacheNames = ["handleforstake"])
+    fun findBestHandleForStakeAddress(stakeAddress: String): Handle {
+        val shortestHandle = getMultiAssetListForStakeAddress(stakeAddress, listOf(handlePolicy))
+            .find { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
+            ?.assetList?.minByOrNull { it.length }
+        return if (shortestHandle != null) {
+            handleService.resolveHandle(shortestHandle)
+        } else {
+            Handle(handle = "", resolved = false)
+        }
+    }
+
     private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Pair<List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
         val purePolicyIds =
             policyIdsWithOptionalAssetFingerprint.filter { PolicyTools.isPolicyId(it) }.map { PolicyId(it) }
@@ -132,6 +150,12 @@ class TokenService(
     @CacheEvict(allEntries = true, cacheNames = ["tokenmetadata"], )
     fun clearMultiAssetInfoCache() {
         // Annotation-based cache clearing of asset info every 6 hours in case metadata changes
+    }
+
+    @Scheduled(fixedDelay = 60 * 60 * 1000)
+    @CacheEvict(allEntries = true, cacheNames = ["handleforstake"], )
+    fun clearHandleToStakeAddressCache() {
+        // Annotation-based cache clearing of handle info every hour in case handle moves
     }
 
 }

@@ -358,7 +358,8 @@ class DiscordServerService(
                 throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} already closed its registration.")
             }
         }
-        // TODO might be sensible to verify if external account ID exists
+        // Remove existing signup (currently only one per external account possible)
+        whitelist.signups.removeIf { it.externalAccountId == whitelistSignup.externalAccountId }
         whitelistSignup.signupTime = Date.from(ZonedDateTime.now().toInstant())
         whitelist.signups.add(whitelistSignup)
         discordWhitelistRepository.save(whitelist)

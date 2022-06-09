@@ -12,7 +12,7 @@ interface ExternalAccountRepository : CrudRepository<ExternalAccount, Long> {
     fun findByReferenceId(referenceId: String): Optional<ExternalAccount>
     fun findByPremium(premium: Boolean): List<ExternalAccount>
 
-    @Query(value = "SELECT e FROM ExternalAccount e JOIN Verification v ON e=v.externalAccount WHERE v.cardanoStakeAddress=:stakeAddress AND v.confirmed=true")
+    @Query(value = "SELECT e FROM ExternalAccount e JOIN Verification v ON e=v.externalAccount WHERE v.cardanoStakeAddress=:stakeAddress AND v.confirmed=true AND v.obsolete=false")
     fun findByVerifiedStakeAddress(@Param("stakeAddress") stakeAddress: String): Optional<ExternalAccount>
 
     @Query(value = "SELECT DISTINCT MAX(epoch) FROM premium_staked", nativeQuery = true)

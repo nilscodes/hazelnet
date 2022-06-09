@@ -62,14 +62,11 @@ module.exports = {
     if (customIdParts.length > 2) {
       const subcommand = customIdParts.length === 4 ? `${customIdParts[1]}-${customIdParts[2]}` : customIdParts[1];
       if (this.subcommands[subcommand]) {
-        const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-        const isBotUser = await commandPermissions.isBotUser(discordServer, interaction.client, interaction.user.id);
-        if (isBotUser) {
-          try {
-            await this.subcommands[subcommand].executeButton(interaction);
-          } catch (error) {
-            interaction.client.logger.error(error);
-          }
+        // Checks for user access roles have been removed after the Discord permission system for application commands changed
+        try {
+          await this.subcommands[subcommand].executeButton(interaction);
+        } catch (error) {
+          interaction.client.logger.error(error);
         }
       }
     }
@@ -99,12 +96,12 @@ module.exports = {
   },
   augmentPermissionsUser(json) {
     const adjustedJson = json;
-    adjustedJson.default_member_permissions = Permissions.FLAGS.USE_APPLICATION_COMMANDS + '';
+    adjustedJson.default_member_permissions = `${Permissions.FLAGS.USE_APPLICATION_COMMANDS}`;
     return adjustedJson;
   },
   augmentPermissionsAdmin(json) {
     const adjustedJson = json;
-    adjustedJson.default_member_permissions = Permissions.FLAGS.MANAGE_GUILD + '';
+    adjustedJson.default_member_permissions = `${Permissions.FLAGS.MANAGE_GUILD}`;
     return adjustedJson;
   },
 };

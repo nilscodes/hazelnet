@@ -8,6 +8,10 @@ module.exports = {
     const handleAddress = await axios.get(`${hazelCardanoConnectUrl}/handles/${handleToResolve}`);
     return handleAddress.data.address;
   },
+  async handleForStakeAddress(stakeAddress) {
+    const handle = await axios.get(`${hazelCardanoConnectUrl}/token/stake/${stakeAddress}/handle`);
+    return handle.data;
+  },
   async walletInfo(address) {
     try {
       const walletInfo = await axios.get(`${hazelCardanoConnectUrl}/wallets/${address}`);

@@ -23,7 +23,7 @@ module.exports = {
         verificationInfoFields.push({ name: i18n.__({ phrase: 'verify.list.accountIsNotLinked', locale }), value: i18n.__({ phrase: 'verify.list.accountIsNotLinkedInfo', locale }) });
       }
 
-      const relevantVerifications = verifications.filter((verification) => verification.confirmed || !verification.obsolete);
+      const relevantVerifications = verifications.filter((verification) => !verification.obsolete);
       if (relevantVerifications.length) {
         const confirmedVerifications = relevantVerifications.filter((verification) => verification.confirmed);
         if (confirmedVerifications.length) {
