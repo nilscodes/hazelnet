@@ -1,9 +1,9 @@
 package io.hazelnet.community.data.discord.polls
 
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
-import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
 import org.springframework.lang.NonNull
 import java.util.*
@@ -109,6 +109,8 @@ class DiscordPoll @JsonCreator constructor(
         if (createTime != other.createTime) return false
         if (openAfter != other.openAfter) return false
         if (openUntil != other.openUntil) return false
+        if (resultsVisible != other.resultsVisible) return false
+        if (weighted != other.weighted) return false
         if (multipleVotes != other.multipleVotes) return false
         if (archived != other.archived) return false
         if (snapshotId != other.snapshotId) return false
@@ -130,6 +132,8 @@ class DiscordPoll @JsonCreator constructor(
         result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + openAfter.hashCode()
         result = 31 * result + openUntil.hashCode()
+        result = 31 * result + resultsVisible.hashCode()
+        result = 31 * result + weighted.hashCode()
         result = 31 * result + multipleVotes.hashCode()
         result = 31 * result + archived.hashCode()
         result = 31 * result + (snapshotId ?: 0)
@@ -139,8 +143,7 @@ class DiscordPoll @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordPoll(id=$id, discordServer=${discordServer?.id}, creator=${creator}, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles)"
+        return "DiscordPoll(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, resultsVisible=$resultsVisible, weighted=$weighted, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles, options=$options)"
     }
-
 
 }

@@ -2,15 +2,15 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
-import io.hazelnet.community.data.discord.polls.DiscordPoll
-import io.hazelnet.community.data.discord.polls.DiscordPollVote
-import io.hazelnet.community.data.discord.polls.PollNotOpenException
-import io.hazelnet.community.data.discord.polls.VoteData
+import io.hazelnet.community.data.discord.polls.*
 import io.hazelnet.community.persistence.DiscordPollRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
+import javax.validation.Valid
 import kotlin.NoSuchElementException
 import kotlin.math.floor
 
@@ -31,6 +31,40 @@ class DiscordPollService(
         discordPoll.discordServer = discordServer
         discordPoll.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordPollRepository.save(discordPoll)
+    }
+
+    fun updatePoll(guildId: Long, pollId: Int, discordPollPartial: DiscordPollPartial): DiscordPoll {
+        val discordServer = discordServerService.getDiscordServer(guildId)
+        val poll = getPoll(discordServer, pollId)
+        if (discordPollPartial.channelId != null) {
+            poll.channelId = discordPollPartial.channelId
+        }
+        if (discordPollPartial.messageId != null) {
+            poll.messageId = discordPollPartial.messageId
+        }
+        if (discordPollPartial.displayName != null) {
+            poll.displayName = discordPollPartial.displayName
+        }
+        if (discordPollPartial.description != null) {
+            poll.description = discordPollPartial.description
+        }
+        if (discordPollPartial.openAfter != null) {
+            poll.openAfter = discordPollPartial.openAfter
+        }
+        if (discordPollPartial.openUntil != null) {
+            poll.openUntil = discordPollPartial.openUntil
+        }
+        if (discordPollPartial.resultsVisible != null) {
+            poll.resultsVisible = discordPollPartial.resultsVisible
+        }
+        if (discordPollPartial.archived != null) {
+            poll.archived = discordPollPartial.archived
+        }
+        if (discordPollPartial.requiredRoles != null) {
+            poll.requiredRoles = discordPollPartial.requiredRoles
+        }
+        discordPollRepository.save(poll)
+        return poll
     }
 
     fun deletePoll(guildId: Long, pollId: Int) {
@@ -140,11 +174,38 @@ class DiscordPollService(
         return !poll.archived && Date().after(poll.openAfter) && Date().before(poll.openUntil)
     }
 
+    fun getPoll(guildId: Long, pollId: Int): DiscordPoll {
+        val discordServer = discordServerService.getDiscordServer(guildId)
+        return getPoll(discordServer, pollId)
+    }
+
     private fun getPoll(discordServer: DiscordServer, pollId: Int): DiscordPoll {
         val poll = discordPollRepository.findByDiscordServerId(discordServer.id!!).find { pollId == it.id }
         if (poll != null) {
             return poll
         }
         throw NoSuchElementException("No poll with ID $pollId found on Discord server with guild ID ${discordServer.guildId}")
+    }
+
+    fun listPollsToBeAnnounced(): List<DiscordPollUpdate> {
+        return discordPollRepository.findPollsToBeAnnounced(Date()).map {
+            DiscordPollUpdate(
+                guildId = it.getGuildId(),
+                pollId = it.getPollId(),
+                channelId = it.getChannelId(),
+                messageId = it.getMessageId(),
+            )
+        }
+    }
+
+    fun listPollResultUpdates(): List<DiscordPollUpdate> {
+        return discordPollRepository.listPollResultUpdates(Date()).map {
+            DiscordPollUpdate(
+                guildId = it.getGuildId(),
+                pollId = it.getPollId(),
+                channelId = it.getChannelId(),
+                messageId = it.getMessageId(),
+            )
+        }
     }
 }

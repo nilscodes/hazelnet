@@ -1089,6 +1089,44 @@ paths:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
   /discord/servers/{guildId}/polls/{pollId}:
+    get:
+      summary: 'Get specific poll for this Discord server'
+      operationId: getPoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+      responses:
+        '200':
+          description: 'The poll with the specified ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordPoll'
+    patch:
+      summary: Update the settings and dates for this poll
+      operationId: updatePoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/PollIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordPollPartial'
+      responses:
+        '200':
+          description: 'Poll with updated details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordPoll'
+
     delete:
       summary: Remove a poll from this Discord server, including all verified votes, options etc.
       operationId: deletePoll
@@ -1397,6 +1435,38 @@ paths:
       responses:
         '204':
           description: Successful deletion
+  /discord/polls/announcements:
+    get:
+      summary: Get all polls that have announcements that are due to be posted
+      operationId: listAnnouncablePolls
+      tags:
+        - discord
+        - polls
+      responses:
+        '200':
+          description: 'List of servers and corresponding polls to announce'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordPollUpdate'
+  /discord/polls/resultupdates:
+    get:
+      summary: Get all polls that have result updates to edit existing messages
+      operationId: listPollsToBeAnnounced
+      tags:
+        - discord
+        - polls
+      responses:
+        '200':
+          description: 'List of servers and corresponding polls to update the results for'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordPollUpdate'
 components:
   parameters:
     GuildIdPathParameter:
@@ -1959,6 +2029,9 @@ components:
           description: Does the discord server currently have an active premium subscription?
           readOnly: true
           type: boolean
+        active:
+          type: boolean
+          description: If the bot is on or off. When the bot is removed from the guild or manually turned off by an admin this is false
         tokenPolicies:
           type: array
           items:
@@ -1993,6 +2066,9 @@ components:
           type: integer
           format: int32
           example: 150
+        active:
+          type: boolean
+          description: Toggle the bot on or off - usually when the bot is removed from the guild or manually turned off by an admin
     DiscordServerPremiumInfo:
       type: object
       readOnly: true
@@ -2119,6 +2195,7 @@ components:
         acceptedAssets:
           type: array
           minItems: 1
+          maxItems: 50
           items:
             $ref: '#/components/schemas/TokenRoleAssetInfo'
         minimumTokenQuantity:
@@ -2142,6 +2219,7 @@ components:
         acceptedAssets:
           type: array
           minItems: 1
+          maxItems: 50
           items:
             $ref: '#/components/schemas/TokenRoleAssetInfo'
     TokenRoleAssetInfo:
@@ -2250,6 +2328,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DiscordPollOption'
+    DiscordPollPartial:
+      type: object
+      properties:
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        resultsVisible:
+          type: boolean
+        archived:
+          type: boolean
+        requiredRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordPollRequiredRole'
     DiscordPollRequiredRole:
       type: object
       required:
@@ -2307,6 +2416,25 @@ components:
         weight:
           type: integer
           format: int64
+    DiscordPollUpdate:
+      type: object
+      required:
+        - guildId
+        - pollId
+        - channelId
+      properties:
+        guildId:
+          type: integer
+          format: int64
+          example: 717264144759390238
+        pollId:
+          readOnly: true
+          type: integer
+          format: int64
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
     Whitelist:
       type: object
       required:
@@ -2347,11 +2475,19 @@ components:
           default: false
         requiredRoleId:
           $ref: '#/components/schemas/DiscordRole'
+        sharedWithServer:
+          type: integer
+          format: int64
+          description: The server ID (not guild ID) of another HAZELnet Discord server that you want to share the members of this whitelist with
     WhitelistPartial:
       type: object
       properties:
         closed:
           type: boolean
+        sharedWithServer:
+          type: integer
+          format: int32
+          description: The server ID (not guild ID) of another HAZELnet Discord server that you want to share the members of this whitelist with.
     WhitelistSignup:
       type: object
       required:

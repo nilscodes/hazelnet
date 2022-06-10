@@ -22,7 +22,9 @@ module.exports = {
         .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('announce')
-        .setDescription(ci18n.subDescription('announce')))
+        .setDescription(ci18n.subDescription('announce'))
+        .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+        .addBooleanOption((option) => option.setName('publishresults').setDescription(ci18n.option('publishresults')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove')));

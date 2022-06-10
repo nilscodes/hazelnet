@@ -153,6 +153,10 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newPollPromise;
   },
+  async updatePoll(guildId, pollId, discordPollPartial) {
+    const discordPollPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`, discordPollPartial);
+    return discordPollPromise.data;
+  },
   async createWhitelist(guildId, creator, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId) {
     const newWhitelistPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists`, {
       creator,
@@ -206,6 +210,10 @@ module.exports = {
     const polls = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls`);
     return polls.data;
   },
+  async getPoll(guildId, pollId) {
+    const poll = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
+    return poll.data;
+  },
   async deletePoll(guildId, pollId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
   },
@@ -250,6 +258,14 @@ module.exports = {
     const discordServer = await axios.get(`${hazelCommunityUrl}/discord/servers`);
     this.cache.set('allservers', discordServer.data);
     return discordServer.data;
+  },
+  async listPollsToBeAnnounced() {
+    const pollsToBeAnnouncedPromise = await axios.get(`${hazelCommunityUrl}/discord/polls/announcements`);
+    return pollsToBeAnnouncedPromise.data;
+  },
+  async listPollResultUpdates() {
+    const pollsResultUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/polls/resultupdates`);
+    return pollsResultUpdatesPromise.data;
   },
   async regenerateAccessToken(guildId) {
     const roleAssignments = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);
