@@ -509,7 +509,7 @@
 				"requiredRoleEntry": "• <@&{{role.roleId}}>",
 				"detailsChannel": "Announcement info",
 				"announcementNone": "No voting announcement will be made by the bot and the results will not be automatically published when the vote ends.",
-				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens. When the poll closes, the results will be published in the same channel.",
+				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens.",
 				"adminName": "{{poll.displayName}} ({{poll.name}})",
 				"noPremium": "🙀 Users currently can not vote in or view any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},

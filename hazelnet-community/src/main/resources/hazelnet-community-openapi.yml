@@ -2421,6 +2421,7 @@ components:
       required:
         - guildId
         - pollId
+        - channelId
       properties:
         guildId:
           type: integer
@@ -2430,6 +2431,10 @@ components:
           readOnly: true
           type: integer
           format: int64
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
     Whitelist:
       type: object
       required:
