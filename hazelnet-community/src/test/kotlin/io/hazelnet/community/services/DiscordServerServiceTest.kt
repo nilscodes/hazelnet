@@ -99,6 +99,31 @@ internal class DiscordServerServiceTest {
                 ),
                 17
             ),
+            TokenOwnershipRole(
+                7,
+                mutableSetOf(TokenRoleAssetInfo("1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601")),
+                2,
+                null,
+                mutableSetOf(
+                    MetadataFilter(3, "tags", AttributeOperatorType.CONTAINS, "potatoes"),
+                    MetadataFilter(4, "tags", AttributeOperatorType.CONTAINS, "face mask"),
+                ),
+                18,
+                aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
+            ),
+            TokenOwnershipRole(
+                8,
+                mutableSetOf(TokenRoleAssetInfo("1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601")),
+                3,
+                null,
+                mutableSetOf(
+                    MetadataFilter(5, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "dead"),
+                    MetadataFilter(6, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "vampire"),
+                    MetadataFilter(6, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "alien"),
+                ),
+                19,
+                aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH,
+            ),
         ),
         mutableSetOf(),
         mutableSetOf()
@@ -189,7 +214,7 @@ internal class DiscordServerServiceTest {
     }
 
     @Test
-    fun getCurrentTokenRoleAssignmentsByAssets() {
+    fun getCurrentTokenRoleAssignmentsByAssetsAggregationAnyPolicyFilterAnd() {
         val connectService = mockk<ConnectService>()
         every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
         every {
@@ -253,6 +278,137 @@ internal class DiscordServerServiceTest {
             setOf(
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 16),
                 DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 17),
+            ), actual
+        )
+    }
+
+    @Test
+    fun getCurrentTokenRoleAssignmentsByAssetsAggregationAnyPolicyFilterOr() {
+        val connectService = mockk<ConnectService>()
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+        every {
+            connectService.getAllTokenOwnershipAssetsByPolicyId(
+                listOf(
+                    "acc1_hazel",
+                    "acc1_bloom",
+                    "acc2_kaizn",
+                    "acc3_kaizn",
+                    "acc4_hazel"
+                ), testServer.tokenRoles.filter { it.filters.isNotEmpty() }.map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
+            )
+        } returns listOf(
+            TokenOwnershipInfoWithAssetList("acc2_kaizn", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", setOf("PXL1", "PXL2")),
+            TokenOwnershipInfoWithAssetList("acc1_hazel", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", setOf("PXL3", "PXL4")),
+        )
+        every {
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+        } answers { emptyList() }
+        val metadataMap = mapOf(
+            Pair("PXL1", METADATA_DEADPXLZ_1),
+            Pair("PXL2", METADATA_DEADPXLZ_3),
+            Pair("PXL3", METADATA_DEADPXLZ_3),
+            Pair("PXL4", METADATA_DEADPXLZ_4),
+        )
+        val slot = slot<List<Pair<String, String>>>()
+        every {
+            connectService.getMultiAssetInfo(capture(slot))
+        } answers {
+            slot.captured.map { MultiAssetInfo(
+                PolicyId(it.first),
+                it.second,
+                AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
+                metadataMap[it.second] ?: "",
+                "",
+                1
+            ) }
+        }
+        val discordServerService = DiscordServerService(
+            getMockStakepoolService(),
+            getMockVerificationService(),
+            connectService,
+            getMockDiscordServerRepository(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+        )
+
+        val actual = discordServerService.getCurrentTokenRolesAssignments(testServer.guildId)
+        Assertions.assertEquals(
+            setOf(
+                DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 18),
+            ), actual
+        )
+    }
+
+    @Test
+    fun getCurrentTokenRoleAssignmentsByAssetsAggregationAnyPolicyFilterOneEach() {
+        val connectService = mockk<ConnectService>()
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+        every {
+            connectService.getAllTokenOwnershipAssetsByPolicyId(
+                listOf(
+                    "acc1_hazel",
+                    "acc1_bloom",
+                    "acc2_kaizn",
+                    "acc3_kaizn",
+                    "acc4_hazel"
+                ), testServer.tokenRoles.filter { it.filters.isNotEmpty() }.map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
+            )
+        } returns listOf(
+            TokenOwnershipInfoWithAssetList("acc2_kaizn", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", setOf("PXL1", "PXL2", "PXL3")),
+            TokenOwnershipInfoWithAssetList("acc1_hazel", "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601", setOf("PXL4", "PXL5", "PXL6")),
+        )
+        every {
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+        } answers { emptyList() }
+        val metadataMap = mapOf(
+            Pair("PXL1", METADATA_DEADPXLZ_1),
+            Pair("PXL2", METADATA_DEADPXLZ_2),
+            Pair("PXL3", METADATA_DEADPXLZ_3),
+            Pair("PXL4", METADATA_DEADPXLZ_2),
+            Pair("PXL5", METADATA_DEADPXLZ_3),
+            Pair("PXL6", METADATA_DEADPXLZ_4),
+        )
+        val slot = slot<List<Pair<String, String>>>()
+        every {
+            connectService.getMultiAssetInfo(capture(slot))
+        } answers {
+            slot.captured.map { MultiAssetInfo(
+                PolicyId(it.first),
+                it.second,
+                AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
+                metadataMap[it.second] ?: "",
+                "",
+                1
+            ) }
+        }
+        val discordServerService = DiscordServerService(
+            getMockStakepoolService(),
+            getMockVerificationService(),
+            connectService,
+            getMockDiscordServerRepository(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+        )
+
+        val actual = discordServerService.getCurrentTokenRolesAssignments(testServer.guildId)
+        Assertions.assertEquals(
+            setOf(
+                DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 18),
+                DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 19),
             ), actual
         )
     }

@@ -45,6 +45,46 @@ const val METADATA_DEADPXLZ_2 = """{
         "type": "text/html"
       }"""
 
+const val METADATA_DEADPXLZ_3 = """{
+        "image": "ipfs://ipfs/QmRrFYTD2k8LVLkxdmyyqnuAbKBY664mkisEgMzw7rxZTZ",
+        "name": "PXL#500",
+        "properties": [
+          {
+            "key": "type",
+            "value": "alien"
+          },
+          {
+            "key": "length",
+            "value": "long"
+          }
+        ],
+        "src": "ipfs://ipfs/QmVsmMgvn28UxuPecwKSsd2cTnjgkw9ZKtyNoV566UEUXt",
+        "tags": [
+          "face mask", "not smoking"
+        ],
+        "type": "text/html"
+      }"""
+
+const val METADATA_DEADPXLZ_4 = """{
+        "image": "ipfs://ipfs/QmRrFYTD2k8LVLkxdmyyqnuAbKBY664mkisEgMzw7rxZTZ",
+        "name": "PXL#500",
+        "properties": [
+          {
+            "key": "type",
+            "value": "vampire"
+          },
+          {
+            "key": "length",
+            "value": "long"
+          }
+        ],
+        "src": "ipfs://ipfs/QmVsmMgvn28UxuPecwKSsd2cTnjgkw9ZKtyNoV566UEUXt",
+        "tags": [
+          "noodles", "potatoes"
+        ],
+        "type": "text/html"
+      }"""
+
 const val METADATA_TAVERNSQUAD_1 = """{
         "attributes": {
           "Armor": "Ice",

@@ -24,7 +24,8 @@ module.exports = {
     let metadataFilters = '';
     let acceptedPolicies = '';
     if (includeAllDetails) {
-      const joinPhrase = i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhrase', locale });
+      xxx
+      const joinPhrase = i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseAnd', locale });
       metadataFilters = metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhrase)}` : '';
 
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {

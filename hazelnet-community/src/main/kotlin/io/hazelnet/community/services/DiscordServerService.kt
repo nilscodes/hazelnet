@@ -455,11 +455,7 @@ class DiscordServerService(
             filterBasedRoleAssignments.addAll(memberIdsToTokenPolicyOwnershipAssets.map { tokenOwnershipInfo ->
                 filterBasedRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
-                        val tokenCount = role.acceptedAssets.sumOf { asset ->
-                            val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
-                            val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                            ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
-                        }
+                        val tokenCount = calculateMatchedTokenCount(role, tokenOwnershipInfo)
 
                         if (
                             tokenCount >= role.minimumTokenQuantity
@@ -474,6 +470,27 @@ class DiscordServerService(
             }.flatten().toSet())
         }
         return filterBasedRoleAssignments
+    }
+
+    private fun calculateMatchedTokenCount(
+        role: TokenOwnershipRole,
+        tokenOwnershipInfo: Map.Entry<Long, MutableMap<String, MutableList<MultiAssetInfo>>>
+    ): Int {
+        return if (role.aggregationType != TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH) {
+            role.acceptedAssets.sumOf { asset ->
+                val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
+            }
+        } else {
+            val matchingAssets = role.acceptedAssets.map { asset ->
+                val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } ?: emptyList()
+            }.flatten().toMutableList()
+
+            role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }
+        }
     }
 
     private fun getCountBasedTokenRoleAssignments(

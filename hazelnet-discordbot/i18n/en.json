@@ -416,7 +416,9 @@
 					"metadataOperator-NOTCONTAINS": "does not contain the text",
 					"metadataOperator-STARTSWITH": "starts with the text",
 					"metadataOperator-ENDSWITH": "ends with the text",
-					"metadataFilterJoinPhrase": " **AND** ",
+					"metadataFilterJoinPhraseAnd": " **AND** ",
+					"metadataFilterJoinPhraseOr": " **OR** ",
+					"metadataFilterJoinPhraseOneEach": " **AND ONE WITH** ",
 					"errorLimitReached": "⚠ You cannot add more than three metadata filters to any token role.",
 					"errorAttributeValueLength": "⚠ You cannot use attribute values with more than {{maxLength}} characters.",
 					"errorAttributeNameLength": "⚠ You cannot use attribute names with more than {{maxLength}} characters."
