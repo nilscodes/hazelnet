@@ -2,7 +2,20 @@ const i18n = require('i18n');
 
 module.exports = {
   getTokenRoleDetailsText(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
-    let useTokenRoleMessage = tokenRole.filters?.length ? 'configure.tokenroles.list.tokenRoleDetailsWithFilters' : 'configure.tokenroles.list.tokenRoleDetails';
+    let useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetails';
+    if (tokenRole.filters?.length) {
+      if (tokenRole.aggregationType === 'ANY_POLICY_FILTERED_ONE_EACH') {
+        useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsWithFiltersEachOne';
+      } else {
+        useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsWithFilters';
+      }
+    } else if (tokenRole.aggregationType === 'EVERY_POLICY_FILTERED_OR') {
+      if (tokenRole.filters?.length) {
+        useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsEveryPolicyWithFilters';
+      } else {
+        useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsEveryPolicyNoFilters';
+      }
+    }
     if (customTokenRoleMessage) {
       useTokenRoleMessage = customTokenRoleMessage;
     }
@@ -24,9 +37,22 @@ module.exports = {
     let metadataFilters = '';
     let acceptedPolicies = '';
     if (includeAllDetails) {
-      xxx
-      const joinPhrase = i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseAnd', locale });
-      metadataFilters = metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhrase)}` : '';
+      let joinPhrase;
+      switch (tokenRole.aggregationType) {
+        case 'ANY_POLICY_FILTERED_AND':
+          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseAnd';
+          break;
+        case 'ANY_POLICY_FILTERED_ONE_EACH':
+          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseOneEach';
+          break;
+        case 'EVERY_POLICY_FILTERED_OR':
+        case 'ANY_POLICY_FILTERED_OR':
+        default:
+          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseOr';
+          break;
+      }
+      const joinPhraseText = i18n.__({ phrase: joinPhrase, locale });
+      metadataFilters = metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhraseText)}` : '';
 
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
         const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint: acceptedAsset.assetFingerprint }) : '';

@@ -166,7 +166,12 @@ class DiscordServerService(
 
     fun updateTokenOwnershipRole(guildId: Long, tokenRoleId: Long, tokenOwnershipRolePartial: TokenOwnershipRolePartial): TokenOwnershipRole {
         val tokenOwnershipRole = getTokenRole(guildId, tokenRoleId)
-        tokenOwnershipRole.acceptedAssets = tokenOwnershipRolePartial.acceptedAssets
+        if (tokenOwnershipRolePartial.acceptedAssets != null) {
+            tokenOwnershipRole.acceptedAssets = tokenOwnershipRolePartial.acceptedAssets
+        }
+        if (tokenOwnershipRolePartial.aggregationType != null) {
+            tokenOwnershipRole.aggregationType = tokenOwnershipRolePartial.aggregationType
+        }
         discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
         return tokenOwnershipRole
     }
@@ -455,11 +460,12 @@ class DiscordServerService(
             filterBasedRoleAssignments.addAll(memberIdsToTokenPolicyOwnershipAssets.map { tokenOwnershipInfo ->
                 filterBasedRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
-                        val tokenCount = calculateMatchedTokenCount(role, tokenOwnershipInfo)
+                        val tokenCount = calculateMatchedTokenCountForFiltered(role, tokenOwnershipInfo)
+                        val (minimum, maximum) = getMinimumAndMaximumTokenCounts(role)
 
                         if (
-                            tokenCount >= role.minimumTokenQuantity
-                            && (role.maximumTokenQuantity == null || tokenCount <= role.maximumTokenQuantity!!)
+                            tokenCount >= minimum
+                            && (maximum == null || tokenCount <= maximum)
                         ) {
                             DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
                         } else {
@@ -472,24 +478,55 @@ class DiscordServerService(
         return filterBasedRoleAssignments
     }
 
-    private fun calculateMatchedTokenCount(
+    private fun getMinimumAndMaximumTokenCounts(role: TokenOwnershipRole): Pair<Long, Long?> {
+        val minimum = when (role.aggregationType) {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> role.minimumTokenQuantity
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> role.filters.size.toLong()
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> role.acceptedAssets.size.toLong()
+        }
+        val maximum = when (role.aggregationType) {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> role.maximumTokenQuantity
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> null
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> null
+        }
+        return Pair(minimum, maximum)
+    }
+
+    private fun calculateMatchedTokenCountForFiltered(
         role: TokenOwnershipRole,
         tokenOwnershipInfo: Map.Entry<Long, MutableMap<String, MutableList<MultiAssetInfo>>>
-    ): Int {
-        return if (role.aggregationType != TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH) {
-            role.acceptedAssets.sumOf { asset ->
-                val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
-                val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
+    ): Long {
+        return when (role.aggregationType) {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> {
+                role.acceptedAssets.sumOf { asset ->
+                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                    val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
+                }.toLong()
             }
-        } else {
-            val matchingAssets = role.acceptedAssets.map { asset ->
-                val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
-                val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } ?: emptyList()
-            }.flatten().toMutableList()
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
+                val matchingAssets = role.acceptedAssets.map { asset ->
+                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                    val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } ?: emptyList()
+                }.flatten().toMutableList()
 
-            role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }
+                role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }.toLong()
+            }
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> {
+                role.acceptedAssets.sumOf { asset ->
+                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                    val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                    if (ownedAssets?.any { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } == true) {
+                        1L
+                    } else {
+                        0L
+                    }
+                }
+            }
         }
     }
 
@@ -528,14 +565,12 @@ class DiscordServerService(
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
                 countBasedRoles.mapNotNull { role ->
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
-                        val tokenCount = role.acceptedAssets.sumOf { asset ->
-                            val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
-                            (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
-                        }
+                        val tokenCount = calculateMatchedTokenCountForCountBased(role, tokenOwnershipInfo)
+                        val (minimum, maximum) = getMinimumAndMaximumTokenCounts(role)
 
                         if (
-                            tokenCount >= role.minimumTokenQuantity
-                            && (role.maximumTokenQuantity == null || tokenCount <= role.maximumTokenQuantity!!)
+                            tokenCount >= minimum
+                            && (maximum == null || tokenCount <= maximum)
                         ) {
                             DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
                         } else {
@@ -546,6 +581,33 @@ class DiscordServerService(
             }.flatten().toSet()
         }
         return emptySet()
+    }
+
+    private fun calculateMatchedTokenCountForCountBased(
+        role: TokenOwnershipRole,
+        tokenOwnershipInfo: Map.Entry<Long, Map<String, Long>>
+    ): Long {
+        return when (role.aggregationType) {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
+                role.acceptedAssets.sumOf { asset ->
+                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                    (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
+                }
+            }
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> {
+                role.acceptedAssets.sumOf { asset ->
+                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                    val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                    if (ownedAssets != null && ownedAssets > 0) {
+                        1L
+                    } else {
+                        0L
+                    }
+                }
+            }
+        }
     }
 
     fun getCurrentDelegatorRoleAssignments(guildId: Long): Set<DiscordRoleAssignment> {

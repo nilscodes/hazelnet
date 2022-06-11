@@ -54,8 +54,8 @@ class TokenOwnershipRole @JsonCreator constructor(
         return when (aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> filters.any { it.apply(metadata) }
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.any { it.apply(metadata) }
-            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> filters.any { it.apply(metadata) }
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
         }
     }
 

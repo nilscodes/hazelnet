@@ -2206,6 +2206,8 @@ components:
           type: integer
           format: int64
           example: 10
+        aggregationType:
+          $ref: '#/components/schemas/TokenOwnershipAggregationType'
         filters:
           readOnly: true
           type: array
@@ -2216,12 +2218,22 @@ components:
     DiscordTokenRolePartial:
       type: object
       properties:
+        aggregationType:
+          $ref: '#/components/schemas/TokenOwnershipAggregationType'
         acceptedAssets:
           type: array
           minItems: 1
           maxItems: 50
           items:
             $ref: '#/components/schemas/TokenRoleAssetInfo'
+    TokenOwnershipAggregationType:
+      type: string
+      default: ANY_POLICY_FILTERED_AND
+      enum:
+        - ANY_POLICY_FILTERED_AND
+        - ANY_POLICY_FILTERED_OR
+        - ANY_POLICY_FILTERED_ONE_EACH
+        - EVERY_POLICY_FILTERED_OR
     TokenRoleAssetInfo:
       type: object
       required:
