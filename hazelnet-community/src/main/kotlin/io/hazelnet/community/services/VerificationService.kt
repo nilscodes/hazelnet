@@ -130,6 +130,7 @@ class VerificationService(
                 val stakeAddress = walletInfo.stakeAddress!!
                 val verificationsWithSameStakeAddress =
                     verificationRepository.findAllByCardanoStakeAddress(stakeAddress)
+                        .filter { v -> !v.obsolete }
                 if (verificationsWithSameStakeAddress.isEmpty()) {
                     val now = ZonedDateTime.now().toInstant()
                     verificationRepository.save(Verification(

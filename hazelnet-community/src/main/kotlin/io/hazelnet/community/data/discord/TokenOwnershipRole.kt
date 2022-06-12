@@ -43,8 +43,22 @@ class TokenOwnershipRole @JsonCreator constructor(
         @field:NonNull
         @field:Min(1)
         @field:JsonSerialize(using = ToStringSerializer::class)
-        var roleId: Long
+        var roleId: Long,
+
+        @Column(name = "aggregation_type")
+        @Enumerated(EnumType.ORDINAL)
+        var aggregationType: TokenOwnershipAggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
 ) {
+
+    fun meetsFilterCriteria(metadata: String): Boolean {
+        return when (aggregationType) {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> filters.any { it.apply(metadata) }
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -55,7 +69,9 @@ class TokenOwnershipRole @JsonCreator constructor(
         if (acceptedAssets != other.acceptedAssets) return false
         if (minimumTokenQuantity != other.minimumTokenQuantity) return false
         if (maximumTokenQuantity != other.maximumTokenQuantity) return false
+        if (filters != other.filters) return false
         if (roleId != other.roleId) return false
+        if (aggregationType != other.aggregationType) return false
 
         return true
     }
@@ -65,14 +81,14 @@ class TokenOwnershipRole @JsonCreator constructor(
         result = 31 * result + acceptedAssets.hashCode()
         result = 31 * result + minimumTokenQuantity.hashCode()
         result = 31 * result + (maximumTokenQuantity?.hashCode() ?: 0)
+        result = 31 * result + filters.hashCode()
         result = 31 * result + roleId.hashCode()
+        result = 31 * result + aggregationType.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "TokenOwnershipRole(id=$id, acceptedAssets=$acceptedAssets, minimumTokenQuantity=$minimumTokenQuantity, maximumTokenQuantity=$maximumTokenQuantity, roleId=$roleId)"
+        return "TokenOwnershipRole(id=$id, acceptedAssets=$acceptedAssets, minimumTokenQuantity=$minimumTokenQuantity, maximumTokenQuantity=$maximumTokenQuantity, filters=$filters, roleId=$roleId, aggregationType=$aggregationType)"
     }
-
-    fun meetsFilterCriteria(metadata: String) = filters.all { it.apply(metadata) }
 
 }

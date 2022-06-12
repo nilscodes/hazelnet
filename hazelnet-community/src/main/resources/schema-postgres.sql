@@ -173,7 +173,7 @@ CREATE TABLE "discord_spo_roles"
 
 CREATE TABLE "discord_token_roles"
 (
-    "discord_token_role_id"   bigserial primary key,
+    "discord_token_role_id"  bigserial primary key,
     "discord_server_id"      int,
     "policy_id"              varchar(56),
     "asset_fingerprint"      varchar,
@@ -181,7 +181,8 @@ CREATE TABLE "discord_token_roles"
     "maximum_token_quantity" bigint,
     "custom_rule"            varchar(26),
     "owned_for_duration"     int,
-    "discord_role_id"        bigint
+    "discord_role_id"        bigint,
+    "aggregation_type"       smallint NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "discord_token_role_policies"
