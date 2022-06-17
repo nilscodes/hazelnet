@@ -3,6 +3,7 @@ package io.hazelnet.community.services
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.polls.*
+import io.hazelnet.community.data.external.voteaire.BallotTypePolicyId
 import io.hazelnet.community.persistence.DiscordPollRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,6 +21,7 @@ class DiscordPollService(
     private val discordServerService: DiscordServerService,
     private val externalAccountService: ExternalAccountService,
     private val snapshotService: MultiAssetSnapshotService,
+    private val voteaireService: VoteaireService,
 ) {
     fun listPolls(guildId: Long): List<DiscordPoll> {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -30,6 +32,9 @@ class DiscordPollService(
         val discordServer = discordServerService.getDiscordServer(guildId)
         discordPoll.discordServer = discordServer
         discordPoll.createTime = Date.from(ZonedDateTime.now().toInstant())
+        if (discordPoll.voteaireUUID != null) {
+            augmentWithVoteaireData(discordPoll)
+        }
         return discordPollRepository.save(discordPoll)
     }
 
@@ -206,6 +211,20 @@ class DiscordPollService(
                 channelId = it.getChannelId(),
                 messageId = it.getMessageId(),
             )
+        }
+    }
+
+    fun augmentWithVoteaireData(discordPoll: DiscordPoll) {
+        val proposalInfo = voteaireService.getProposalInfo(discordPoll.voteaireUUID!!)
+        discordPoll.openAfter = proposalInfo.startDate
+        discordPoll.openUntil = proposalInfo.endDate
+        discordPoll.displayName = proposalInfo.title
+        discordPoll.weighted = proposalInfo.ballotType is BallotTypePolicyId
+        discordPoll.resultsVisible = true
+        if (proposalInfo.questions.isNotEmpty()) {
+            discordPoll.description = proposalInfo.questions[0].description + " "
+            discordPoll.options = proposalInfo.questions[0].choices.map { DiscordPollOption(text = it.choice) }.toMutableSet()
+            discordPoll.multipleVotes = proposalInfo.questions[0].choiceLimit > 1
         }
     }
 }

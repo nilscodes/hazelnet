@@ -42,17 +42,28 @@ module.exports = {
     }
     return false;
   },
+  getVoteaireResultsUrl(voteaireUUID) {
+    return `https://testnet.voteaire.io/results/${voteaireUUID}`;
+  },
+  getVoteaireVoteUrl(voteaireUUID) {
+    return `https://testnet.voteaire.io/vote/${voteaireUUID}`;
+  },
   getDiscordPollListParts(discordServer, polls, customId, selectionPhrase) {
     const locale = discordServer.getBotLanguage();
     const sortedPolls = polls.sort((pollA, pollB) => pollA.displayName.localeCompare(pollB.displayName));
-    const pollFields = sortedPolls.map((poll) => ({
-      name: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-      value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-        openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-        openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
-        resultsVisible: i18n.__({ phrase: (poll.resultsVisible ? 'configure.poll.add.publicVoteYes' : 'configure.poll.add.publicVoteNo'), locale }),
-      }),
-    }));
+    const pollFields = sortedPolls.map((poll) => {
+      const pollPhrase = poll.voteaireUUID ? 'configure.poll.list.pollInfoVoteaire' : 'configure.poll.list.pollInfo';
+      return {
+        name: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
+        value: i18n.__({ phrase: pollPhrase, locale }, {
+          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
+          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+          resultsVisible: i18n.__({ phrase: (poll.resultsVisible ? 'configure.poll.add.publicVoteYes' : 'configure.poll.add.publicVoteNo'), locale }),
+          voteaireUUID: poll.voteaireUUID,
+          voteaireLink: this.getVoteaireResultsUrl(poll.voteaireUUID),
+        }),
+      };
+    });
     if (!pollFields.length) {
       pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
     }
@@ -74,7 +85,7 @@ module.exports = {
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(polls.map((poll) => ({
               label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-              description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
+              description: (poll.description.trim().length ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale })),
               value: `configure-poll-${poll.id}`,
             }))),
         ),
@@ -98,11 +109,18 @@ module.exports = {
     const detailFields = [
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
-        value: poll.description,
+        value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
       },
     ];
 
-    if (forcePublishResults || poll.resultsVisible) {
+    if (poll.voteaireUUID) {
+      detailFields.push({
+        name: i18n.__({ phrase: 'configure.poll.list.detailsVoteaireLink', locale }),
+        value: this.getVoteaireResultsUrl(poll.voteaireUUID),
+      });
+    }
+
+    if (forcePublishResults || (poll.resultsVisible && !poll.voteaireUUID)) {
       detailFields.push({
         name: i18n.__({ phrase: 'vote.currentResults', locale }),
         value: this.getCurrentResults(discordServer, poll, results),
@@ -124,10 +142,20 @@ module.exports = {
 
     const components = [];
     if (!this.hasVotingEnded(poll)) {
-      const buttons = [new MessageButton()
-        .setCustomId(`vote/widgetvote/${poll.id}`)
-        .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
-        .setStyle('PRIMARY')];
+      const buttons = [];
+
+      if (!poll.voteaireUUID) {
+        buttons.push(new MessageButton()
+          .setCustomId(`vote/widgetvote/${poll.id}`)
+          .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
+          .setStyle('PRIMARY'));
+      } else {
+        buttons.push(new MessageButton()
+          .setURL(this.getVoteaireVoteUrl(poll.voteaireUUID))
+          .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
+          .setStyle('LINK'));
+      }
+
       if (poll.snapshotId) {
         buttons.push(new MessageButton()
           .setCustomId('verify/add/widgetverify')
@@ -137,5 +165,87 @@ module.exports = {
       components.push(new MessageActionRow().addComponents(buttons));
     }
     return { detailFields, components };
+  },
+  getPollDetails(locale, poll) {
+    if (poll.voteaireUUID) {
+      return [
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsName', locale }),
+          value: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
+          value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsVoteaireLink', locale }),
+          value: this.getVoteaireResultsUrl(poll.voteaireUUID),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
+          value: poll.options.map((option, idx) => `**${idx + 1}:** ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`).join('\n'),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsCreation', locale }),
+          value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: datetime.getUTCDateFormatted(poll, 'createTime') }),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
+          value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
+            openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
+            openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+          }),
+        },
+        {
+          name: i18n.__({ phrase: 'configure.poll.list.detailsChannel', locale }),
+          value: poll.channelId ? i18n.__({ phrase: 'configure.poll.list.announcementChannel', locale }, { poll }) : i18n.__({ phrase: 'configure.poll.list.announcementNone', locale }),
+        },
+      ];
+    }
+    const detailFields = [
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsName', locale }),
+        value: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
+        value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
+        value: poll.options.map((option, idx) => `**${idx + 1}:** ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`).join('\n'),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsCreation', locale }),
+        value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: datetime.getUTCDateFormatted(poll, 'createTime') }),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
+        value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
+          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
+          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+        }),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsConfiguration', locale }),
+        value: i18n.__({ phrase: 'configure.poll.list.optionList', locale }, {
+          resultsVisible: poll.resultsVisible ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
+          multipleVotes: poll.multipleVotes ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
+          tokenBased: poll.snapshotId ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
+          weighted: poll.weighted ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
+        }),
+      },
+      {
+        name: i18n.__({ phrase: 'configure.poll.list.detailsChannel', locale }),
+        value: poll.channelId ? i18n.__({ phrase: 'configure.poll.list.announcementChannel', locale }, { poll }) : i18n.__({ phrase: 'configure.poll.list.announcementNone', locale }),
+      },
+    ];
+    if (poll.requiredRoles?.length) {
+      detailFields.push({
+        name: i18n.__({ phrase: 'configure.poll.list.detailsRoles', locale }),
+        value: poll.requiredRoles.map((role) => (i18n.__({ phrase: 'configure.poll.list.requiredRoleEntry', locale }, { role }))).join('\n'),
+      });
+    }
+    return detailFields;
   },
 };

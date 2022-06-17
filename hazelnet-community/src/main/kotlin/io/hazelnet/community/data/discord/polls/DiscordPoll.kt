@@ -91,7 +91,11 @@ class DiscordPoll @JsonCreator constructor(
     @field:Valid
     var options: MutableSet<DiscordPollOption> = mutableSetOf(),
 
+    @Column(name = "poll_voteaire_id")
+    var voteaireUUID: UUID?,
+
     ) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -116,6 +120,7 @@ class DiscordPoll @JsonCreator constructor(
         if (snapshotId != other.snapshotId) return false
         if (requiredRoles != other.requiredRoles) return false
         if (options != other.options) return false
+        if (voteaireUUID != other.voteaireUUID) return false
 
         return true
     }
@@ -139,11 +144,11 @@ class DiscordPoll @JsonCreator constructor(
         result = 31 * result + (snapshotId ?: 0)
         result = 31 * result + requiredRoles.hashCode()
         result = 31 * result + options.hashCode()
+        result = 31 * result + voteaireUUID.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordPoll(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, resultsVisible=$resultsVisible, weighted=$weighted, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles, options=$options)"
+        return "DiscordPoll(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, resultsVisible=$resultsVisible, weighted=$weighted, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles, options=$options, voteaireUUID=$voteaireUUID)"
     }
-
 }

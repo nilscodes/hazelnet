@@ -151,7 +151,7 @@ module.exports = {
   async createPoll(guildId, pollObject) {
     const newPollPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls`, pollObject);
     this.clearCacheEntry(guildId);
-    return newPollPromise;
+    return newPollPromise.data;
   },
   async updatePoll(guildId, pollId, discordPollPartial) {
     const discordPollPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`, discordPollPartial);

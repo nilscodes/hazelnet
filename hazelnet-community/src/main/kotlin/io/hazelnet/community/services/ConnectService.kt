@@ -13,6 +13,7 @@ import io.hazelnet.cardano.connect.data.verifications.VerificationConfirmation
 import io.hazelnet.cardano.connect.util.toHex
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.premium.IncomingDiscordPayment
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -22,6 +23,7 @@ import java.util.*
 
 @Service
 class ConnectService(
+    @field:Qualifier("connectClient")
     private val connectClient: WebClient,
 ) {
     fun getWalletInfo(address: String): AddressDetails {

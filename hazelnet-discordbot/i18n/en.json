@@ -16,6 +16,7 @@
 			"configure-poll": "Manage polls for people to vote on (off-chain)",
 			"configure-poll-list": "List all polls that are set up on this Discord server.",
 			"configure-poll-add": "Adds a new poll to the server. You will be able to determine voting conditions and visibility.",
+			"configure-poll-add-onchain": "Registers a new Voteaire onchain vote with the bot for users to discover and vote on.",
 			"configure-poll-announce": "Announce the current results of a poll to the channel this command is run in.",
 			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
@@ -58,7 +59,8 @@
 				"poll-opentime": "The UTC time after which voting is possible (Format: 2022-01-01T15:00:00Z)",
 				"poll-closetime": "The UTC time until which voting is possible (Format: 2022-01-31T15:00:00Z)",
 				"channel": "The channel to send the poll announcement and voting widget to.",
-				"publishresults": "If you want to publish the results of a non-public poll, pass True for this parameter"
+				"publishresults": "If you want to publish the results of a non-public poll, pass True for this parameter",
+				"ballot-id": "The Voteaire ballot ID you created, with the pattern of \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"."
 			},
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
@@ -500,14 +502,17 @@
 				"purpose": "This is the list of all existing polls for this Discord server.",
 				"noPollsDetail": "*There are no configured polls on this server.*",
 				"pollInfo": "Opens on: {{openAfterFormatted}} UTC\nCloses on: {{openUntilFormatted}} UTC\n{{{resultsVisible}}}",
+				"pollInfoVoteaire": "Opens on: {{openAfterFormatted}} UTC\nCloses on: {{openUntilFormatted}} UTC\n[Voteaire ID {{voteaireUUID}}]({{{voteaireLink}}})",
 				"choosePollDetails": "Choose the poll you want more details on",
 				"details": "Poll Details",
 				"detailsName": "Display name (Internal name)",
 				"detailsDescription": "Description/Question",
+				"detailsDescriptionEmpty": "N/A",
 				"detailsCreation": "Created at",
 				"creationDate": "{{createTime}} UTC",
 				"detailsDates": "Opens/Closes",
 				"detailsChoices": "Poll voting choices",
+				"detailsVoteaireLink": "Link to on-chain ballot",
 				"detailsConfiguration": "Poll configuration",
 				"optionList": "Public results: {{resultsVisible}}\nMultiple options allowed: {{multipleVotes}}\nToken-based vote: {{tokenBased}}\nWeighted vote: {{weighted}}",
 				"detailsRoles": "User has to have one of the following roles",
@@ -563,6 +568,9 @@
 				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
 				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
 				"noPremium": "🙀 You currently can not add any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+			},
+			"add-onchain": {
+				"success": "✅ Successfully added Voteaire poll with ballot ID **{{poll.voteaireUUID}}**. The following ballot data was retrieved:"
 			},
 			"announce": {
 				"purpose": "👇 Pick a poll from the list of available polls to announce. If the poll is still open, a vote button will also be added to the widget.\n\n{{{resultsPublishingInfo}}}\n\n💡 You can only have one announcement for each poll at a time. The announcement will automatically be updated with the current results every 5 minutes if your poll has public results.",
@@ -776,10 +784,11 @@
 		"whitelist": "Self-service address whitelists with requirements",
 		"pollTitle": "Polls (Black Edition only)",
 		"poll": "Polls and voting system for open and holder-limited polls",
+		"pollVoteaireTitle": "Voteaire Polls (Testnet Beta)",
+		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
-		"cardolphins": "features.cardolphins",
-		"undefined": "features.undefined"
+		"cardolphins": "Cardolphins Special"
 	},
 	"generic": {
 		"cancel": "Cancel",
