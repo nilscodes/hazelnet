@@ -205,14 +205,14 @@ module.exports = {
   },
   async getVoteDetails(locale, poll, interaction, discordServer, member) {
     let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
-    if (poll.resultsVisible) {
+    if (poll.resultsVisible && !poll.voteaireUUID) {
       const results = await interaction.client.services.discordserver.getPollResults(interaction.guild.id, poll.id);
       resultsText = pollutil.getCurrentResults(discordServer, poll, results);
     }
     const detailFields = [
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
-        value: poll.description,
+        value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
       },
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
@@ -221,48 +221,76 @@ module.exports = {
           openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
         }),
       },
-      {
+    ];
+
+    if (!poll.voteaireUUID) {
+      detailFields.push({
         name: i18n.__({ phrase: 'configure.poll.list.detailsConfiguration', locale }),
         value: i18n.__({ phrase: 'vote.optionList', locale }, {
           multipleVotes: poll.multipleVotes ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
           tokenBased: poll.snapshotId ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
           weighted: poll.weighted ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
         }),
-      },
-    ];
+      });
+    }
+
     if (poll.requiredRoles?.length) {
       detailFields.push({
         name: i18n.__({ phrase: 'configure.poll.list.detailsRoles', locale }),
         value: poll.requiredRoles.map((role) => (i18n.__({ phrase: 'configure.poll.list.requiredRoleEntry', locale }, { role }))).join('\n'),
       });
     }
-    detailFields.push({
-      name: i18n.__({ phrase: 'vote.currentResults', locale }),
-      value: resultsText,
-    });
-    const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-    const currentVote = await interaction.client.services.discordserver.getVoteOfUser(interaction.guild.id, poll.id, externalAccount.id);
-    const totalVotingPower = currentVote.votes['0'];
-    detailFields.push({
-      name: i18n.__({ phrase: 'vote.yourVotingPower', locale }),
-      value: this.getVotingPowerText(discordServer, poll, locale, totalVotingPower),
-    });
-    // If at least two keys are present, that means in addition to the total voting power at key 0, votes have been cast.
-    const hasVoted = Object.keys(currentVote.votes).length > 1;
-    let components = [];
-    if (pollUtil.userCanVoteInPoll(member, poll, totalVotingPower)) {
-      components = await this.getPollVoteOptions(locale, poll, totalVotingPower, hasVoted);
-    }
-    if (hasVoted) {
+
+    if (!poll.voteaireUUID) {
       detailFields.push({
-        name: i18n.__({ phrase: 'vote.yourVote', locale }),
-        value: poll.options
-          .filter((option) => currentVote.votes[option.id] > 0)
-          .map((option) => {
-            const formattedVote = discordServer.formatNumber(currentVote.votes[option.id]);
-            return `${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text} (${formattedVote})`;
-          }).join('\n'),
+        name: i18n.__({ phrase: 'vote.currentResults', locale }),
+        value: resultsText,
       });
+    }
+
+    let components = [];
+    if (!poll.voteaireUUID) {
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const currentVote = await interaction.client.services.discordserver.getVoteOfUser(interaction.guild.id, poll.id, externalAccount.id);
+      const totalVotingPower = currentVote.votes['0'];
+      detailFields.push({
+        name: i18n.__({ phrase: 'vote.yourVotingPower', locale }),
+        value: this.getVotingPowerText(discordServer, poll, locale, totalVotingPower),
+      });
+      // If at least two keys are present, that means in addition to the total voting power at key 0, votes have been cast.
+      const hasVoted = Object.keys(currentVote.votes).length > 1;
+      if (pollUtil.userCanVoteInPoll(member, poll, totalVotingPower)) {
+        components = await this.getPollVoteOptions(locale, poll, totalVotingPower, hasVoted);
+      }
+      if (hasVoted) {
+        detailFields.push({
+          name: i18n.__({ phrase: 'vote.yourVote', locale }),
+          value: poll.options
+            .filter((option) => currentVote.votes[option.id] > 0)
+            .map((option) => {
+              const formattedVote = discordServer.formatNumber(currentVote.votes[option.id]);
+              return `${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text} (${formattedVote})`;
+            }).join('\n'),
+        });
+      }
+    } else {
+      detailFields.push({
+        name: i18n.__({ phrase: 'configure.poll.list.detailsVoteaireLink', locale }),
+        value: pollutil.getVoteaireResultsUrl(poll.voteaireUUID),
+      });
+      detailFields.push({
+        name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
+        value: pollutil.getCurrentOptions(discordServer, poll),
+      });
+      if (pollUtil.userCanVoteInPoll(member, poll, 1)) {
+        components.push(new MessageActionRow()
+          .addComponents(
+            new MessageButton()
+              .setURL(pollutil.getVoteaireVoteUrl(poll.voteaireUUID))
+              .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
+              .setStyle('LINK'),
+          ));
+      }
     }
     return { detailFields, components };
   },

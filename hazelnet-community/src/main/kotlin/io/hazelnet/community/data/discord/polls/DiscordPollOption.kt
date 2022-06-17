@@ -15,15 +15,15 @@ class DiscordPollOption @JsonCreator constructor(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "discord_poll_option_id")
     @field:JsonSerialize(using = ToStringSerializer::class)
-    var id: Long?,
+    var id: Long? = null,
 
     @Column(name = "option_reaction_id")
     @field:JsonSerialize(using = ToStringSerializer::class)
-    var reactionId: Long?,
+    var reactionId: Long? = null,
 
     @Column(name = "option_reaction_name")
     @field:Size(min = 1, max = 256)
-    var reactionName: String?,
+    var reactionName: String? = null,
 
     @Column(name = "option_text")
     @field:NonNull
