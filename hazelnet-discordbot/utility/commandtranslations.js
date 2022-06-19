@@ -15,6 +15,9 @@ CommandTranslations.prototype = {
   option(optionName) {
     return i18n.__({ phrase: `commands.options.${this.commandName}.${optionName}`, locale: this.locale }).substring(0, 100);
   },
+  choice(choiceName) {
+    return i18n.__({ phrase: `commands.choices.${this.commandName}.${choiceName}`, locale: this.locale }).substring(0, 100);
+  },
 };
 
 module.exports = CommandTranslations;

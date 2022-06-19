@@ -33,12 +33,12 @@ module.exports = {
           .addStringOption((option) => option.setName('attribute-name').setDescription(ci18n.option('attribute-name')).setRequired(true))
           .addStringOption((option) => option.setName('operator').setDescription(ci18n.option('operator'))
             .addChoices(
-              { name: 'equals', value: 'EQUALS' },
-              { name: 'does not equal', value: 'NOTEQUALS' },
-              { name: 'contains', value: 'CONTAINS' },
-              { name: 'does not contain', value: 'NOTCONTAINS' },
-              { name: 'starts with', value: 'STARTSWITH' },
-              { name: 'ends with', value: 'ENDSWITH' },
+              { name: ci18n.choice('EQUALS'), value: 'EQUALS' },
+              { name: ci18n.choice('NOTEQUALS'), value: 'NOTEQUALS' },
+              { name: ci18n.choice('CONTAINS'), value: 'CONTAINS' },
+              { name: ci18n.choice('NOTCONTAINS'), value: 'NOTCONTAINS' },
+              { name: ci18n.choice('STARTSWITH'), value: 'STARTSWITH' },
+              { name: ci18n.choice('ENDSWITH'), value: 'ENDSWITH' },
             )
             .setRequired(true))
           .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true)))
