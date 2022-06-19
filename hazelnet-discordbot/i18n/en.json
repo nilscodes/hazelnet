@@ -13,6 +13,7 @@
 			"premium": "Manage your premium account and check your claimable **$HAZEL** balance and other perks.",
 			"configure-settings": "General configuration options for the bot",
 			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
+			"configure-settings-customize": "Customize the bot and style it with your own branding.",
 			"configure-poll": "Manage polls for people to vote on (off-chain)",
 			"configure-poll-list": "List all polls that are set up on this Discord server.",
 			"configure-poll-add": "Adds a new poll to the server. You will be able to determine voting conditions and visibility.",
@@ -85,6 +86,32 @@
 			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
+			},
+			"configure-settings": {
+				"element": "The bot UI element to customize",
+				"customization-value": "The new style (color, text or image link, depending on the select element)"
+			}
+		},
+		"choices": {
+			"configure-tokenroles": {
+				"EQUALS": "equals",
+				"NOTEQUALS": "does not equal",
+				"CONTAINS": "contains",
+				"NOTCONTAINS": "does not contain",
+				"STARTSWITH": "starts with",
+				"ENDSWITH": "ends with"
+			},
+			"configure-settings": {
+				"THEME_TOP_LOGO": "Main logo URL",
+				"THEME_COLOR_USER": "Embed color",
+				"THEME_AUTHOR_NAME": "Author name",
+				"THEME_FOOTER_TEXT": "Footer text",
+				"THEME_FOOTER_ICON": "Footer icon",
+				"THEME_AUTHOR_ICON": "Author icon",
+				"INFO_CONTENT_TITLE": "Title for /info command",
+				"INFO_CONTENT_TEXT": "Content for /info command",
+				"INFO_CONTENT_IMAGE": "Image for /info command",
+				"RESET": "Reset all (value must be \"YES\" to confirm)"
 			}
 		}
 	},
@@ -660,8 +687,7 @@
 			},
 			"add": {
 				"success": "✅ The role <@&{{roleId}}> was successfully added as a new administrator role. The users with this role should be able to access the adminstrator commands immediately.",
-				"alreadyExists": "⚠ The role <@&{{roleId}}> is already an administrator and was not added again.",
-				"purpose": "configure.adminaccess.add.purpose"
+				"alreadyExists": "⚠ The role <@&{{roleId}}> is already an administrator and was not added again."
 			},
 			"remove": {
 				"success": "🗑️ Removed the administrative role <@&{{roleId}}> from this Discord server. The following roles remain administrators:",
@@ -691,6 +717,18 @@
 				"chooseFeatures": "Choose all features you want to continue by using the below selection list:",
 				"saveSettings": "Save Settings",
 				"success": "✅ Your feature changes have been successfully applied! It may take a few minutes for the commands to become available."
+			},
+			"customize": {
+				"success": "✅ The customization for your bot was updated. We're sending you a sample message for your users to see what it looks like.\n\n💡 Administrative commands starting with **/configure-** will not use custom colors or the top logo to ensure you can tell administrative commands apart from normal user commands.",
+				"sampleTitle": "Sample Message",
+				"sampleContent": "This is similar to what your users will see when they are running the **/info** or other public commands.",
+				"invalidUrl": "⚠ You must provide a valid http or https URL to a GIF, JPG or PNG image",
+				"invalidColor": "⚠ You must provide a valid RGB hex color in the format #000000 or common HTML color name like *red*, *cornflowerblue* or *greenyellow*.",
+				"textTooLongTitle": "⚠ The text for author, title and footer info cannot be more than 100 characters long.",
+				"textTooLongInfo": "⚠ The text for the **/info** command cannot be more than 4000 characters long.",
+				"unknownElement": "Unknown customization element: {{element}}",
+				"incorrectConfirmation": "⚠ To reset all customization, please type in **YES** as your customization value to confirm you want to proceed.",
+				"noPremium": "🙀 You currently cannot customize your bot as you are not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			}
 		},
 		"healthcheck": {

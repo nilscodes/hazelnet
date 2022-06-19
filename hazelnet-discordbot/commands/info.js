@@ -19,7 +19,10 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const guild = await interaction.client.guilds.fetch(discordServer.guildId);
       const useLocale = discordServer.getBotLanguage();
-      let infoText = discordServer.settings?.INFO_CONTENT_TEXT ?? i18n.__({ phrase: 'info.infoBaseText', locale: useLocale });
+      let infoText = i18n.__({ phrase: 'info.infoBaseText', locale: useLocale });
+      if (discordServer.premium && discordServer.settings?.INFO_CONTENT_TEXT) {
+        infoText = discordServer.settings?.INFO_CONTENT_TEXT;
+      }
       let stakepoolFields = [];
       if (discordServer.stakepools?.length) {
         infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale: useLocale }, discordServer.stakepools.length)}`;
@@ -30,32 +33,37 @@ module.exports = {
         }));
       }
 
-      const infoImage = discordServer.settings?.INFO_CONTENT_IMAGE;
-      const infoTitle = discordServer.settings?.INFO_CONTENT_TITLE ?? i18n.__({ phrase: 'info.welcomeTitle', locale: useLocale }, { guildName: guild.name });
+      let infoImage;
+      let infoTitle = i18n.__({ phrase: 'info.welcomeTitle', locale: useLocale }, { guildName: guild.name });
       let components;
 
-      const isPremium = discordServer.settings?.INFO_CONTENT_TEXT !== undefined;
-      if (!isPremium) {
+      if (!discordServer.premium) {
         stakepoolFields.push({
           name: i18n.__({ phrase: 'about.title', locale: useLocale }),
           value: i18n.__({ phrase: 'about.info', locale: useLocale }),
         });
-      } else if (discordServer.settings?.INFO_CONTENT_BUTTONS) {
-        try {
-          const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS);
-          if (buttonData.length) {
-            components = [new MessageActionRow()
-              .addComponents(
-                buttonData.map((button) => (
-                  new MessageButton()
-                    .setLabel(button.label)
-                    .setURL(button.url)
-                    .setStyle('LINK')
-                )),
-              )];
+      } else {
+        infoImage = discordServer.settings?.INFO_CONTENT_IMAGE;
+        if (discordServer.settings?.INFO_CONTENT_TITLE) {
+          infoTitle = discordServer.settings?.INFO_CONTENT_TITLE;
+        }
+        if (discordServer.settings?.INFO_CONTENT_BUTTONS) {
+          try {
+            const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS);
+            if (buttonData.length) {
+              components = [new MessageActionRow()
+                .addComponents(
+                  buttonData.map((button) => (
+                    new MessageButton()
+                      .setLabel(button.label)
+                      .setURL(button.url)
+                      .setStyle('LINK')
+                  )),
+                )];
+            }
+          } catch (badJson) {
+            interaction.client.logger.warn({ msg: `Problem when parsing JSON for custom buttons for /info command for guild ${guild.id}`, err: badJson });
           }
-        } catch (badJson) {
-          interaction.client.logger.warn({ msg: `Problem when parsing JSON for custom buttons for /info command for guild ${guild.id}`, err: badJson });
         }
       }
       const embed = embedBuilder.buildForUser(discordServer, infoTitle, infoText, 'info', stakepoolFields, infoImage);
