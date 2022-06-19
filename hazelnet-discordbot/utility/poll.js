@@ -120,7 +120,7 @@ module.exports = {
       });
     }
 
-    if (forcePublishResults || (poll.resultsVisible && !poll.voteaireUUID)) {
+    if (forcePublishResults || poll.resultsVisible) {
       detailFields.push({
         name: i18n.__({ phrase: 'vote.currentResults', locale }),
         value: this.getCurrentResults(discordServer, poll, results),

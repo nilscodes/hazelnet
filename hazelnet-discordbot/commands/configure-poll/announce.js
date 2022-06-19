@@ -14,7 +14,7 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-        if (announceChannelPermissions.has('SEND_MESSAGES')) {
+        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
           const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
           const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
           this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, `${announceChannel.id}-${publishResults ? 1 : 0}`);

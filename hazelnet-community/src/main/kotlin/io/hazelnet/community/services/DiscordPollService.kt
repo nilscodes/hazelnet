@@ -85,15 +85,30 @@ class DiscordPollService(
     }
 
     private fun getExistingVotesFromPoll(poll: DiscordPoll): VoteData {
-        val existingVotes = poll.options
-            .associate { option ->
-                Pair(
-                    option.id!!,
-                    option.votes.sumOf { it.weight }
-                )
-            }
+        val existingVotes = if (poll.voteaireUUID != null) {
+            getExistingVotesFromVoteaireBallot(poll)
+        } else {
+            getExistingVotesFromDiscordPoll(poll)
+        }
         return VoteData(existingVotes)
     }
+
+    private fun getExistingVotesFromDiscordPoll(poll: DiscordPoll) = poll.options
+        .associate { option ->
+            Pair(
+                option.id!!,
+                option.votes.sumOf { it.weight }
+            )
+        }
+
+    private fun getExistingVotesFromVoteaireBallot(poll: DiscordPoll) =
+        voteaireService.getProposalResults(poll.voteaireUUID!!)
+            .questions[0].responses.associate { choice ->
+            Pair(
+                poll.options.find { it.text == choice.choice }?.id ?: 0,
+                choice.choiceWeight!!
+            )
+        }
 
     fun getVoteOfUser(guildId: Long, pollId: Int, externalAccountId: Long): VoteData {
         val discordServer = discordServerService.getDiscordServer(guildId)
