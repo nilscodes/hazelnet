@@ -547,7 +547,7 @@
 				"detailsChannel": "Announcement info",
 				"announcementNone": "No voting announcement will be made by the bot and the results will not be automatically published when the vote ends.",
 				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens.",
-				"adminName": "{{poll.displayName}} ({{poll.name}})",
+				"adminName": "{{{poll.displayName}}} ({{poll.name}})",
 				"noPremium": "🙀 Users currently can not vote in or view any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
@@ -606,7 +606,7 @@
 				"success": "✅ Results successfully published in <#{{currentChannel}}>.",
 				"publicSuccess": "🗳 The team shared the following poll with you.",
 				"choosePoll": "Pick the poll you'd like to announce the results for",
-				"errorNoSendPermissions": "The bot has no permissions to send message to the channel <#{{channel}}>. Please allow the **Send Messages** permission for the bot to allow announcing in it.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
 			},
 			"remove": {
@@ -648,7 +648,7 @@
 				"publicSuccess": "The following whitelist is available to this community. If you fulfill the conditions, register one of your verified addresses via the button below or verify your wallet first and then register!",
 				"detailsDescription": "Whitelist details",
 				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be announced.",
-				"errorNoSendPermissions": "The bot has no permissions to send message to the channel <#{{channel}}>. Please allow the **Send Messages** permission for the bot to allow announcing in it.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
 			},
 			"share": {

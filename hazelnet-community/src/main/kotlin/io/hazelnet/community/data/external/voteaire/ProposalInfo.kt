@@ -146,7 +146,7 @@ class BallotTypeDelegated(
 
 class BallotTypePolicyId(
     @JsonProperty("policy_id")
-    val policyId: PolicyId,
+    val policyId: String,
 ) : BallotType() {
     override fun toString(): String {
         return "BallotTypePolicyId(policyId=$policyId)"

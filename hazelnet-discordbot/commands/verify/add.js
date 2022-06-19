@@ -24,7 +24,8 @@ module.exports = {
       if (cardanoaddress.isStakedAddress(addressToVerify)) {
         const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
         const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
-        const existingConfirmedVerification = existingVerifications.find((verification) => verification.confirmed && !verification.obsolete && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
+        const existingConfirmedVerification = existingVerifications
+          .find((verification) => verification.confirmed && !verification.obsolete && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
         if (existingConfirmedVerification) {
           await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.alreadyVerified', locale }, { verification: existingConfirmedVerification, address: addressToVerify }), 'verify-add');

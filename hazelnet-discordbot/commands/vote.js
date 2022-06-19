@@ -205,7 +205,7 @@ module.exports = {
   },
   async getVoteDetails(locale, poll, interaction, discordServer, member) {
     let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
-    if (poll.resultsVisible && !poll.voteaireUUID) {
+    if (poll.resultsVisible) {
       const results = await interaction.client.services.discordserver.getPollResults(interaction.guild.id, poll.id);
       resultsText = pollutil.getCurrentResults(discordServer, poll, results);
     }

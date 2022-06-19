@@ -80,7 +80,7 @@ module.exports = {
       try {
         const auditChannelObject = await interaction.guild.channels.fetch(auditChannel);
         const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application.id);
-        if (!auditChannelPermissions.has('SEND_MESSAGES')) {
+        if (!auditChannelPermissions.has('SEND_MESSAGES') || !auditChannelPermissions.has('VIEW_CHANNEL')) {
           problems = true;
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),
