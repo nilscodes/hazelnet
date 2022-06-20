@@ -48,6 +48,14 @@ CREATE TABLE "accounts"
     "account_id" BIGSERIAL PRIMARY KEY
 );
 
+CREATE TABLE "account_settings"
+(
+    "account_id"    bigint,
+    "setting_name"  varchar(64),
+    "setting_value" varchar(4096),
+    UNIQUE ("account_id", "setting_name")
+);
+
 CREATE TABLE "global_settings"
 (
     "setting_id"    SERIAL PRIMARY KEY,
@@ -388,6 +396,8 @@ CREATE TABLE "oauth2_authorization"
     refresh_token_expires_at      timestamp     DEFAULT NULL,
     refresh_token_metadata        varchar(2000) DEFAULT NULL
 );
+
+ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
 

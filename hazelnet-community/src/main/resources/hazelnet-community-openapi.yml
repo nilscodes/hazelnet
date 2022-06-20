@@ -87,12 +87,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        default:
-          description: Unexpected error
+  /accounts/{accountId}/settings/{settingName}:
+    put:
+      summary: Create or update an account setting with the provided value
+      operationId: updateSetting
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmbeddableSetting'
+      responses:
+        '200':
+          description: 'Token Policy'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/EmbeddableSetting'
+    delete:
+      summary: 'Delete account setting by Name'
+      operationId: deleteSetting
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
   /externalaccounts:
     post:
       summary: 'Create External Account'
@@ -204,6 +230,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VerificationImport'
+  /externalaccounts/{externalAccountId}/account:
+    put:
+      summary: 'Get or create a main account for this external account'
+      operationId: setAccountForExternalAccount
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'The existing account associated with this external account, or the newly created account'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
         default:
           description: Unexpected error
           content:
@@ -1380,14 +1423,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordServerSetting'
+              $ref: '#/components/schemas/EmbeddableSetting'
       responses:
         '200':
           description: 'Token Policy'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordServerSetting'
+                $ref: '#/components/schemas/EmbeddableSetting'
     delete:
       summary: 'Delete guild setting by Name'
       operationId: deleteSetting
@@ -1399,12 +1442,6 @@ paths:
       responses:
         '204':
           description: 'Successful deletion'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /discord/servers/{guildId}/accesstoken:
     post:
       summary: Generate (or regenerate) the API access token for this Discord server for the external HAZELnet API
@@ -1469,6 +1506,16 @@ paths:
                   $ref: '#/components/schemas/DiscordPollUpdate'
 components:
   parameters:
+    AccountIdPathParameter:
+      name: accountId
+      in: path
+      description: The account ID
+      required: true
+      style: simple
+      example: 12
+      schema:
+        type: integer
+        format: int64
     GuildIdPathParameter:
       name: guildId
       in: path
@@ -1661,6 +1708,10 @@ components:
           readOnly: true
           type: integer
           format: int64
+        settings:
+          type: object
+          additionalProperties:
+            type: string
     ExternalAccount:
       type: object
       required:
@@ -2340,6 +2391,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DiscordPollOption'
+        voteaireUUID:
+          type: string
+          example: a7fbd4ca-950d-4d02-82fd-f9c6cc9e2165
+          pattern: '[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$'
     DiscordPollPartial:
       type: object
       properties:
@@ -2542,7 +2597,7 @@ components:
         taken:
           readOnly: true
           type: boolean
-    DiscordServerSetting:
+    EmbeddableSetting:
       type: object
       required:
         - name

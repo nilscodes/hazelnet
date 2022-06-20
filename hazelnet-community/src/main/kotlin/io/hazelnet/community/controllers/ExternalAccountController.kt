@@ -35,4 +35,9 @@ class ExternalAccountController(
 
     @PostMapping("/{externalAccountId}/import")
     fun importExternalVerifications(@PathVariable externalAccountId: Long) = externalAccountService.importExternalVerifications(externalAccountId)
+
+    @PutMapping("/{externalAccountId}/account")
+    fun setAccountForExternalAccount(@PathVariable externalAccountId: Long) = externalAccountService.setAccountForExternalAccount(externalAccountId)
+
+
 }

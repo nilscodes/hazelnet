@@ -11,6 +11,10 @@
 			"vote": "View the list of open polls and vote, if you are eligible.",
 			"claim": "Claim virtual or physical goods you are eligible for.",
 			"premium": "Manage your premium account and check your claimable **$HAZEL** balance and other perks.",
+			"profile": "See and change your profile settings.",
+			"profile-toggle": "Toggle one of your on/off style profile settings.",
+			"ping": "Get in touch with an unknown user via $handle or NFT asset fingerprint.",
+			"ping-send": "Send a ping to an unknown party.",
 			"configure-settings": "General configuration options for the bot",
 			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
 			"configure-settings-customize": "Customize the bot and style it with your own branding.",
@@ -47,6 +51,13 @@
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
 		},
 		"options": {
+			"profile": {
+				"option": "The configuration option to change."
+			},
+			"ping": {
+				"ping-type": "The type of identifier to use for pinging the unknown party.",
+				"target": "The exact handle, asset fingerprint or address to ping."
+			},
 			"whitelist": {
 				"name": "Name of the whitelist",
 				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist.",
@@ -93,6 +104,14 @@
 			}
 		},
 		"choices": {
+			"profile": {
+				"OPTION_RECEIVEPINGS": "Turn receiving of pings on/off"
+			},
+			"ping": {
+				"PING_TYPE_HANDLE": "an ADA $handle",
+				"PING_TYPE_NFT": "an NFT (via asset fingerprint)",
+				"PING_TYPE_ADDRESS": "an ADA wallet address (addr1…) or staking address (stake1…)"
+			},
 			"configure-tokenroles": {
 				"EQUALS": "equals",
 				"NOTEQUALS": "does not equal",
@@ -366,6 +385,24 @@
 			"errorNotFound": "⚠ Your unregistration was not successful. No whitelist with the name **{{whitelistName}}** was found for this server.",
 			"noRegisteredWhitelists": "⚠ You are currently not registered for any whitelists.",
 			"otherError": "⚠ Error while deleting your whitelist registration info."
+		}
+	},
+	"ping": {
+		"send": {
+			"messageTitle": "Ping an unknown user",
+			"purpose": "...",
+			"success": "...",
+			"invalidHandle": "⚠ This handle (*{{target}}*) does not look like a valid handle. It has to start with $ and can have at most 15 characters. Please provide a valid handle to ping.",
+			"invalidAssetFingerprint": "⚠ This asset (*{{target}}*) does not look like a valid asset fingerprint (starts with asset1 and has 44 characters total). Please provide a valid asset fingerprint to ping.",
+			"invalidAddress": "⚠ This address (*{{target}}*) does not look like a valid wallet address (starts with addr1 and has 103 characters total) or staking address (starts with stake1). Please provide a correct address to ping.",
+			"unknownPingType": "⚠ Unknown ping type.",
+			"pingInvalidHandle": "⚠ The submitted handle *{{handle}}* is not associated with a stake address and could not be pinged.",
+			"pingTooOften": "⚠ We are limiting pinging unknown users to at most once an hour to prevent abuse. Please wait until you can ping again."
+		}
+	},
+	"profile": {
+		"toggle": {
+			"purpose": "..."
 		}
 	},
 	"configure": {

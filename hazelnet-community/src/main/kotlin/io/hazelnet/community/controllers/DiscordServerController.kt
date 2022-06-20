@@ -1,6 +1,6 @@
 package io.hazelnet.community.controllers
 
-import io.hazelnet.community.data.discord.DiscordServerSetting
+import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.claim.PhysicalOrder
@@ -221,11 +221,11 @@ class DiscordServerController(
 
     @PutMapping("/{guildId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateSetting(@PathVariable guildId: Long, @PathVariable settingName: String, @RequestBody @Valid discordServerSetting: DiscordServerSetting): DiscordServerSetting {
-        if (discordServerSetting.name != settingName) {
-            throw IllegalArgumentException("Discord server setting name in path $settingName did not match setting in request body ${discordServerSetting.name}.")
+    fun updateSetting(@PathVariable guildId: Long, @PathVariable settingName: String, @RequestBody @Valid embeddableSetting: EmbeddableSetting): EmbeddableSetting {
+        if (embeddableSetting.name != settingName) {
+            throw IllegalArgumentException("Discord server setting name in path $settingName did not match setting in request body ${embeddableSetting.name}.")
         }
-        return discordServerService.updateSettings(guildId, discordServerSetting)
+        return discordServerService.updateSettings(guildId, embeddableSetting)
     }
 
     @DeleteMapping("/{guildId}/settings/{settingName}")
