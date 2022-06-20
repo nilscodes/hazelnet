@@ -18,4 +18,10 @@ class ConnectivityConfiguration {
                                 it.defaultCodecs().maxInMemorySize(10000000)
                             }.build())
                     .build()
+
+    @Bean
+    fun voteaireClient(config: CommunityApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.voteaire.url)
+            .build()
 }

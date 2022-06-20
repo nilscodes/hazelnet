@@ -43,7 +43,7 @@ module.exports = {
           },
           {
             name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
-            value: poll.description,
+            value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
           },
           {
             name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),

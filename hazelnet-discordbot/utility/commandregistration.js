@@ -28,7 +28,7 @@ module.exports = {
       const command = require(`../commands/${file}`); // require uses relative path
       const commandIsEnabled = !command.commandTags || command.commandTags.filter((tag) => commandsToEnable.includes(tag)).length;
       if (commandIsEnabled) {
-        let commandJson = command.getCommandData(useLocale).toJSON();
+        let commandJson = command.getCommandData(useLocale, commandsToEnable).toJSON();
         if (command.augmentPermissions) {
           commandJson = command.augmentPermissions(commandJson);
         }

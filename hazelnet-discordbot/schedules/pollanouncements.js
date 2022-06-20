@@ -17,7 +17,7 @@ module.exports = {
             const announceChannel = await guild.channels.fetch(pollUpdateInfo.channelId);
             if (announceChannel) {
               const announceChannelPermissions = announceChannel.permissionsFor(client.application.id);
-              if (announceChannelPermissions.has('SEND_MESSAGES')) {
+              if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
                 const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
                 const locale = discordServer.getBotLanguage();
                 const poll = await client.services.discordserver.getPoll(pollUpdateInfo.guildId, pollUpdateInfo.pollId);
@@ -30,7 +30,7 @@ module.exports = {
                   messageId: announcementMessage.id,
                 });
               } else {
-                client.logger.error({ guildId: pollUpdateInfo.guildId, msg: `Channel permissions for ${pollUpdateInfo.channelId} did not allow publishing poll announcements` });
+                client.logger.error({ guildId: pollUpdateInfo.guildId, msg: `Channel permissions for ${pollUpdateInfo.channelId} did not allow publishing poll announcements for poll ${pollUpdateInfo.pollId}` });
               }
             } else {
               client.logger.error({ guildId: pollUpdateInfo.guildId, msg: `Channel ${pollUpdateInfo.channelId} not found while publishing poll announcements` });
