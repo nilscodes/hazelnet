@@ -290,6 +290,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiAssetInfo'
+  /token/fingerprints/{assetFingerprint}:
+    get:
+      summary: Get the wallet this multi asset resides in
+      operationId: getWalletForAsset
+      tags:
+        - token
+        - wallets
+      parameters:
+        - $ref: '#/components/parameters/AssetFingerprintPathParameter'
+      responses:
+        '200':
+          description: 'The wallet info associated with this asset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletAddress'
   /info/syncstatus:
     get:
       summary: 'Get Synchronization details for Cardano-DB-Sync connected to this HazelNet'
@@ -329,6 +345,14 @@ components:
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
       schema:
         $ref: '#/components/schemas/TokenPolicyId'
+    AssetFingerprintPathParameter:
+      name: assetFingerprint
+      in: path
+      description: The bech32 encoded asset fingerprint
+      required: true
+      style: simple
+      schema:
+        $ref: '#/components/schemas/AssetFingerprint'
     AssetNameHexPathParameter:
       name: assetNameHex
       in: path
@@ -476,6 +500,7 @@ components:
     HandleName:
       type: string
       example: hazelnet
+      pattern: '^[-._a-zA-Z0-9]{1,15}$'
     WalletAddress:
       type: string
     StakepoolHash:

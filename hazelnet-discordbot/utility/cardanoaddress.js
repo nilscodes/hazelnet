@@ -12,6 +12,9 @@ module.exports = {
     return transactionHashRegex.test(transactionHash);
   },
   shorten(address) {
+    if (address[0] === '$') {
+      return address; // Do not shorten handles
+    }
     return `${address.substr(0, 15)}…${address.substr(-5)}`;
   },
 };

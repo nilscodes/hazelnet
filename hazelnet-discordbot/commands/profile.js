@@ -10,12 +10,7 @@ module.exports = {
       .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('toggle')
-        .setDescription(ci18n.subDescription('toggle'))
-        .addStringOption((option) => option.setName('option').setDescription(ci18n.option('option'))
-          .addChoices(
-            { name: ci18n.choice('OPTION_RECEIVEPINGS'), value: 'OPTION_RECEIVEPINGS' },
-          )
-          .setRequired(true)));
+        .setDescription(ci18n.subDescription('toggle')));
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
   execute: commandbase.executeSubcommand,

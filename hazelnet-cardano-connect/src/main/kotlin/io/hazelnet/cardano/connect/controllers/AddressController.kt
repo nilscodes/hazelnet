@@ -12,5 +12,5 @@ class AddressController(
 ) {
     @GetMapping("/{walletAddress}")
     @ResponseStatus(HttpStatus.OK)
-    fun walletInfo(@PathVariable walletAddress: String): AddressDetails = walletService.getAddress(walletAddress)
+    fun walletInfo(@PathVariable walletAddress: String) = walletService.getAddress(walletAddress)
 }

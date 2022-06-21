@@ -9,6 +9,9 @@ module.exports = {
       .setName('ping')
       .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
+        .setName('list')
+        .setDescription(ci18n.subDescription('list')))
+      .addSubcommand((subcommand) => subcommand
         .setName('send')
         .setDescription(ci18n.subDescription('send'))
         .addStringOption((option) => option.setName('ping-type').setDescription(ci18n.option('ping-type'))
@@ -18,7 +21,8 @@ module.exports = {
             { name: ci18n.choice('PING_TYPE_ADDRESS'), value: 'PING_TYPE_ADDRESS' },
           )
           .setRequired(true))
-        .addStringOption((option) => option.setName('target').setDescription(ci18n.option('target')).setRequired(true)));
+        .addStringOption((option) => option.setName('target').setDescription(ci18n.option('target')).setRequired(true))
+        .addStringOption((option) => option.setName('message').setDescription(ci18n.option('message')).setRequired(false)));
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
   execute: commandbase.executeSubcommand,

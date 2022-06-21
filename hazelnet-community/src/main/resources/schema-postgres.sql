@@ -22,11 +22,13 @@ DROP TABLE IF EXISTS "discord_spo_roles";
 DROP TABLE IF EXISTS "discord_spo";
 DROP TABLE IF EXISTS "discord_payments";
 DROP TABLE IF EXISTS "discord_billing";
+DROP TABLE IF EXISTS "external_account_pings";
 DROP TABLE IF EXISTS "discord_servers";
 DROP TABLE IF EXISTS "verification_imports";
 DROP TABLE IF EXISTS "verifications";
 DROP TABLE IF EXISTS "premium_staked";
 DROP TABLE IF EXISTS "external_accounts";
+DROP TABLE IF EXISTS "account_settings";
 DROP TABLE IF EXISTS "accounts";
 DROP TABLE IF EXISTS "global_settings";
 DROP TABLE IF EXISTS "oauth2_authorization";
@@ -72,6 +74,19 @@ CREATE TABLE "external_accounts"
     "account_type"            accounts_external_type NOT NULL,
     "account_id"              bigint,
     "premium"                 boolean                NOT NULL DEFAULT false
+);
+
+CREATE TABLE "external_account_pings"
+(
+    "ping_id"                    BIGSERIAL PRIMARY KEY,
+    "sender_external_account_id" bigint       NOT NULL,
+    "sent_from_server"           int,
+    "recipient_account_id"       bigint       NOT NULL,
+    "recipient_address"          varchar(150) NOT NULL,
+    "sender_message"             varchar(320),
+    "create_time"                timestamp    NOT NULL,
+    "sent_time"                  timestamp,
+    "reported"                   boolean      NOT NULL DEFAULT false
 );
 
 CREATE TABLE "premium_staked"
@@ -400,6 +415,12 @@ CREATE TABLE "oauth2_authorization"
 ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("sender_external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("sent_from_server") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("recipient_account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "premium_staked" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 

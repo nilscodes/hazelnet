@@ -16,9 +16,11 @@ class MultiAssetSnapshot @JsonCreator constructor(
     @Column(name = "snapshot_id")
     var id: Int?,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "snapshot_created", updatable = false)
     var createTime: Date?,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "snapshot_time")
     @field:NonNull
     var snapshotTime: Date,

@@ -15,6 +15,7 @@
 			"profile-toggle": "Toggle one of your on/off style profile settings.",
 			"ping": "Get in touch with an unknown user via $handle or NFT asset fingerprint.",
 			"ping-send": "Send a ping to an unknown party.",
+			"ping-list": "List recent sent and received pings.",
 			"configure-settings": "General configuration options for the bot",
 			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
 			"configure-settings-customize": "Customize the bot and style it with your own branding.",
@@ -56,7 +57,8 @@
 			},
 			"ping": {
 				"ping-type": "The type of identifier to use for pinging the unknown party.",
-				"target": "The exact handle, asset fingerprint or address to ping."
+				"target": "The exact handle, asset fingerprint or address to ping.",
+				"message": "The optional message to send along with the ping."
 			},
 			"whitelist": {
 				"name": "Name of the whitelist",
@@ -104,9 +106,6 @@
 			}
 		},
 		"choices": {
-			"profile": {
-				"OPTION_RECEIVEPINGS": "Turn receiving of pings on/off"
-			},
 			"ping": {
 				"PING_TYPE_HANDLE": "an ADA $handle",
 				"PING_TYPE_NFT": "an NFT (via asset fingerprint)",
@@ -390,19 +389,69 @@
 	"ping": {
 		"send": {
 			"messageTitle": "Ping an unknown user",
-			"purpose": "...",
-			"success": "...",
-			"invalidHandle": "⚠ This handle (*{{target}}*) does not look like a valid handle. It has to start with $ and can have at most 15 characters. Please provide a valid handle to ping.",
-			"invalidAssetFingerprint": "⚠ This asset (*{{target}}*) does not look like a valid asset fingerprint (starts with asset1 and has 44 characters total). Please provide a valid asset fingerprint to ping.",
-			"invalidAddress": "⚠ This address (*{{target}}*) does not look like a valid wallet address (starts with addr1 and has 103 characters total) or staking address (starts with stake1). Please provide a correct address to ping.",
+			"purpose": "You are about to send a message via HAZELnet to the user associated with your recipient **{{targetShort}}**.",
+			"success": "✅ You have successfully pinged the user associated with your recipient **{{targetShort}}**.\n\n💡 Please be aware that the recipient can choose to ignore your message - this does not mean it was not delivered. We take the privacy of our users extremely seriously and discourage the recipient to respond to suspicious messages or spam. If you are reported for abusing the system, your account may be suspended.",
+			"messageContentTitle": "Message Content",
+			"messageContentEmpty": "The ping message will just provide your Discord handle and server you are sending the message from.",
+			"messageContent": "The ping message will include your Discord handle and server you are sending the message from, as well as the following text:\n\n{{{message}}}",
+			"clickBelowToSend": "\n\n👇 Click below to confirm you want to send your ping.",
+			"recipientAcknowledgement": "\n\n💡 Please be aware that the recipient can choose to ignore your message - this does not mean it was not delivered. We take the privacy of our users extremely seriously and discourage the recipient to respond to suspicious messages or spam. If you are reported for abusing the system, your account may be suspended.",
+			"pingLimitTitle": "Ping limit",
+			"pingLimitStandard": "💡 You can currently ping once every 24 hours. If you would like to ping more frequently, considering staking with our partner pool by running the command **/premium**. Any staked amount will give you access to a Black Edition account tier and support the development of this project.",
+			"pingLimitPremium": "🐈 Thanks for supporting HAZELnet with your stake! Your Black Edition account allows you to ping a user once every 60 minutes.",
+			"pingButton": "Ping user",
+			"invalidHandle": "⚠ The handle (*{{target}}*) does not look like a valid handle. It has to start with $ and can have at most 15 characters. Please provide a valid handle to ping.",
+			"invalidAssetFingerprint": "⚠ The asset (*{{target}}*) does not look like a valid asset fingerprint (starts with asset1 and has 44 characters total). Please provide a valid asset fingerprint to ping.",
+			"invalidAddress": "⚠ The address (*{{target}}*) does not look like a valid wallet address (starts with addr1 and has 103 characters total) or staking address (starts with stake1). Please provide a correct address to ping.",
 			"unknownPingType": "⚠ Unknown ping type.",
-			"pingInvalidHandle": "⚠ The submitted handle *{{handle}}* is not associated with a stake address and could not be pinged.",
-			"pingTooOften": "⚠ We are limiting pinging unknown users to at most once an hour to prevent abuse. Please wait until you can ping again."
+			"pingTargetNotFound": "⚠ Unfortunately, the submitted target *{{targetShort}}* is not associated with a verified stake address within our system and could not be pinged.",
+			"pingTooOften": "⚠ We are limiting pinging users to prevent abuse. Please wait {{waitTime}} {{waitUnits}} until you can ping again.",
+			"waitUnitsMinutes": "minutes",
+			"waitUnitsHours": "hours",
+			"tooLongMessage": "⚠ Your ping message can be at most {{maxMessageLength}} characters long - please write a shorter message.",
+			"messageContainsUnsafePhrases": "⚠ Ping messages are not allowed to contain addresses, URLs or handles for the safety of the recipient. Please adjust your ping message accordingly.",
+			"pingOtherError": "⚠ An unknown error ocurred trying to ping the desired target. We apologize for the inconvenience and suggest reaching out to the project team for help.",
+			"failedTimeout": "⚠ This ping is no longer available. Please create a new ping.",
+			"reportPing": "Report this ping as a scam attempt",
+			"pingRecipientTitle": "You were pinged!",
+			"pingRecipientText": "The user <@{{sender}}> has pinged you from the server *{{{guildName}}}*. They have used the {{targetType}} **{{target}}** to reach you and did not receive any Discord information about you. You can decide to respond by contacting them on the respective Discord server or messaging them directly.",
+			"pingTargetTypeNft": "NFT with asset fingerprint",
+			"pingTargetTypeHandle": "ADA $handle",
+			"pingTargetTypeAddress": "Cardano address",
+			"pingRecipientMessageTitle": "They have attached the following message",
+			"pingRecipientAdditionalTitle": "Additional information",
+			"pingRecipientAdditionalContent": "⚠ We highly recommend to not react to any messages that look suspicious to you. Never start an escrow based on Discord messages or send any funds. Use websites like jpg.store and tradingtent.io to safely trade assets.\n\n💡 If you would like to turn off message pings, simply run the command **/profile toggle** in any HAZELnet-enabled Discord to turn off the feature. You can always list recent pings via **/ping list** (even if message-pings are disabled).",
+			"reportTitle": "The ping has been reported",
+			"reportContent": "Thank you for reporting this ping. We will continually investigate repeat-offenders and start blocking their access to the ping feature if abuse is confirmed."
+		},
+		"list": {
+			"messageTitle": "Recent pings",
+			"purpose": "Here are your most recent sent and received pings. Pings will be deleted from this list after seven days.",
+			"receivedPingsTitle": "Received pings",
+			"receivedPingsNone": "📪 No recently received pings",
+			"receivedPing": "Ping from <@{{senderLocal}}> to **{{targetShort}}** on *{{sentTime}}* UTC with message \"{{{message}}}\".",
+			"sentPingsTitle": "Sent pings",
+			"sentPing": "Sent to **{{targetShort}}** on *{{sentTime}}* UTC",
+			"sentPingsNone": "✉ No recently sent pings",
+			"testPingReceive": "Click to test if you can receive ping messages",
+			"testPingTestMessage": "This is an example message you might receive",
+			"noDirectMessageTitle": "No Direct Messaging possible",
+			"noDirectMessage": "⚠ The bot is not able to send you a direct message, which means it will not be able to send you message pings. Please click on the server name, select **Privacy Settings** and enable **Allow direct messages from server members**. Unfortunately, bots cannot be added as friends to allow them to send you messages at all times while keeping direct messages off.\n\n💡 You can regularly check your received pings with **/ping list** if you do not want to open up your DMs.",
+			"testMessageSentTitle": "Test message sent",
+			"testMessageSentContent": "A test message has been sent to your Discord account. Please check your DMs."
 		}
 	},
 	"profile": {
 		"toggle": {
-			"purpose": "..."
+			"messageTitle": "Change your profile settings",
+			"purpose": "Here are your current profile settings. You can switch the ones that are toggleable on or off by selecting them in the dropdown below.",
+			"chooseSetting": "Choose the setting you want to toggle",
+			"turnOn": "✅ Turn on: {{option}}",
+			"turnOff": "❌ Turn off: {{option}}",
+			"OPTION_RECEIVEPINGS": "Receiving pings from other users",
+			"OPTION_RECEIVEPINGS_on": "✅ You currently have turned on receiving pings from other users.",
+			"OPTION_RECEIVEPINGS_off": "❌ You currently do not receive pings from other users.",
+			"OPTION_RECEIVEPINGS_info": "💡 When this feature is enabled, the bot will try to notify you via private Discord message if another user is trying to ping you based on an item in your wallet. The other user will never see your Discord information and you choose if you want to respond. On or off, you will always be able to see the most recent pings via **/ping list**"
 		}
 	},
 	"configure": {

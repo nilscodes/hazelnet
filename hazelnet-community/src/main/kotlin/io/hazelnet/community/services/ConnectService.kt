@@ -42,6 +42,14 @@ class ConnectService(
             .block()!!
     }
 
+    fun getWalletForAsset(assetFingerprint: String): AddressDetails {
+        return connectClient.get()
+            .uri("/token/fingerprints/$assetFingerprint")
+            .retrieve()
+            .bodyToMono(AddressDetails::class.java)
+            .block()!!
+    }
+
     fun getActiveDelegationForPools(stakepoolHashes: List<String>): List<DelegationInfo> {
         return Flux.fromIterable(stakepoolHashes)
             .flatMap {

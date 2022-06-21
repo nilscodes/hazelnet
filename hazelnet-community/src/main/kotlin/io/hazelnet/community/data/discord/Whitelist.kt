@@ -41,9 +41,11 @@ class Whitelist @JsonCreator constructor(
     @field:Size(min = 1, max = 256)
     var displayName: String,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "whitelist_signup_after")
     var signupAfter: Date?,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "whitelist_signup_until")
     var signupUntil: Date?,
 

@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.persistence.token
 
+import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.token.*
 
 interface TokenDao {
@@ -15,4 +16,5 @@ interface TokenDao {
     fun getMultiAssetCountSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetCount>
 
     fun getMultiAssetInfo(policyId: String, assetName: String): MultiAssetInfo
+    fun getWalletForAsset(assetFingerprint: AssetFingerprint): AddressDetails
 }
