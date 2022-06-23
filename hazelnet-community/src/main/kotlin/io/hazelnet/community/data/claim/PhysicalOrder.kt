@@ -29,6 +29,7 @@ class PhysicalOrder @JsonCreator constructor(
     @field:JsonSerialize(using = ToStringSerializer::class)
     var externalAccountId: Long,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "order_creation", updatable = false)
     var createTime: Date?,
 

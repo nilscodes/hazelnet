@@ -1,19 +1,33 @@
 package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.ExternalAccount
+import io.hazelnet.community.data.ping.ExternalAccountPingPartial
 import io.hazelnet.community.services.ExternalAccountService
+import io.hazelnet.community.services.PingService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/externalaccounts")
 class ExternalAccountController(
-        private val externalAccountService: ExternalAccountService
+        private val externalAccountService: ExternalAccountService,
+        private val pingService: PingService,
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createExternalAccount(@RequestBody @Valid externalAccount: ExternalAccount) = externalAccountService.createExternalAccount(externalAccount)
+    fun createExternalAccount(@RequestBody @Valid externalAccount: ExternalAccount): ResponseEntity<ExternalAccount> {
+        val newExternalAccount = externalAccountService.createExternalAccount(externalAccount)
+        return ResponseEntity
+            .created(
+                ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{externalAccountId}")
+                .buildAndExpand(newExternalAccount.id)
+                .toUri())
+            .body(newExternalAccount)
+    }
 
     @GetMapping("/{externalAccountId}")
     @ResponseStatus(HttpStatus.OK)
@@ -30,9 +44,20 @@ class ExternalAccountController(
     @GetMapping("/{externalAccountId}/verifications")
     fun getExternalAccountVerifications(@PathVariable externalAccountId: Long) = externalAccountService.getExternalAccountVerifications(externalAccountId)
 
+    @GetMapping("/{externalAccountId}/pings")
+    fun getExternalAccountPings(@PathVariable externalAccountId: Long) = pingService.getExternalAccountPings(externalAccountId)
+
+    @PatchMapping("/{externalAccountId}/pings/{pingId}")
+    fun updateExternalAccountPing(@PathVariable externalAccountId: Long, @PathVariable pingId: Long, @RequestBody externalAccountPingPartial: ExternalAccountPingPartial) = pingService.updateExternalAccountPing(externalAccountId, pingId, externalAccountPingPartial)
+
     @GetMapping("/{externalAccountId}/premium")
     fun getPremiumInfo(@PathVariable externalAccountId: Long) = externalAccountService.getPremiumInfo(externalAccountId)
 
     @PostMapping("/{externalAccountId}/import")
     fun importExternalVerifications(@PathVariable externalAccountId: Long) = externalAccountService.importExternalVerifications(externalAccountId)
+
+    @PutMapping("/{externalAccountId}/account")
+    fun setAccountForExternalAccount(@PathVariable externalAccountId: Long) = externalAccountService.setAccountForExternalAccount(externalAccountId)
+
+
 }

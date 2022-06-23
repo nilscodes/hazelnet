@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.controllers
 
+import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.services.TokenService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -28,4 +29,9 @@ class TokenController(
     @GetMapping("/assets/{policyId}/{assetNameHex}")
     @ResponseStatus(HttpStatus.OK)
     fun getMultiAssetInfo(@PathVariable policyId: String, @PathVariable assetNameHex: String) = tokenService.getMultiAssetInfo(policyId, assetNameHex)
+
+    @GetMapping("/fingerprints/{assetFingerprint}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getWalletForAsset(@PathVariable assetFingerprint: String) = tokenService.getWalletForAsset(assetFingerprint)
+
 }

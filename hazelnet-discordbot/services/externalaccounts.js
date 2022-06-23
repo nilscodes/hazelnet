@@ -37,6 +37,10 @@ module.exports = {
       return null;
     }
   },
+  async getAccountForExternalAccount(externalAccountId) {
+    const mainAccountResponse = await axios.put(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/account`);
+    return mainAccountResponse.data;
+  },
   clearExternalDiscordAccountCache(discordUserId) {
     this.cache.del(`${discordUserId}`);
   },

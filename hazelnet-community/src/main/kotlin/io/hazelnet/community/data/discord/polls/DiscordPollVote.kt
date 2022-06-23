@@ -7,6 +7,8 @@ import org.springframework.lang.NonNull
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Embeddable
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import javax.validation.constraints.Min
 
 @Embeddable
@@ -16,6 +18,7 @@ class DiscordPollVote @JsonCreator constructor(
     @field:JsonSerialize(using = ToStringSerializer::class)
     var externalAccountId: Long,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "vote_time", updatable = false)
     var time: Date?,
 

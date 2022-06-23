@@ -2,6 +2,7 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
+import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
@@ -47,7 +48,7 @@ class DiscordServerService(
     @Transactional
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
-        discordServer.settings.add(DiscordServerSetting(DiscordSettings.PROTECTION_ADDR_REMOVAL.name, true.toString()))
+        discordServer.settings.add(EmbeddableSetting(DiscordSettings.PROTECTION_ADDR_REMOVAL.name, true.toString()))
         augmentWithSponsoredInfo(discordServer)
         return discordServerRepository.save(discordServer)
     }
@@ -60,10 +61,10 @@ class DiscordServerService(
             .find { it.second.contains(discordServer.guildId) }
             ?.first
         if (sponsoredGuild != null) {
-            discordServer.settings.add(DiscordServerSetting("SPONSORED_BY", sponsoredGuild.toString()))
+            discordServer.settings.add(EmbeddableSetting("SPONSORED_BY", sponsoredGuild.toString()))
             allSettings
                 .filter { it.key.startsWith("SPONSOR_${sponsoredGuild}_") }
-                .forEach { discordServer.settings.add(DiscordServerSetting(it.key.substring("SPONSOR_${sponsoredGuild}_".length), it.value)) }
+                .forEach { discordServer.settings.add(EmbeddableSetting(it.key.substring("SPONSOR_${sponsoredGuild}_".length), it.value)) }
         }
     }
 
@@ -224,12 +225,12 @@ class DiscordServerService(
         return getDiscordServer(guildId).members
     }
 
-    fun updateSettings(guildId: Long, discordServerSetting: DiscordServerSetting): DiscordServerSetting {
+    fun updateSettings(guildId: Long, embeddableSetting: EmbeddableSetting): EmbeddableSetting {
         val discordServer = getDiscordServer(guildId)
-        discordServer.settings.removeIf { it.name == discordServerSetting.name }
-        discordServer.settings.add(discordServerSetting)
+        discordServer.settings.removeIf { it.name == embeddableSetting.name }
+        discordServer.settings.add(embeddableSetting)
         discordServerRepository.save(discordServer)
-        return discordServerSetting
+        return embeddableSetting
     }
 
     fun deleteSettings(guildId: Long, settingName: String) {

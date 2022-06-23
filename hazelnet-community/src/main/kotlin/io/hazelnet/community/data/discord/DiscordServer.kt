@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import io.hazelnet.community.data.Account
+import io.hazelnet.community.data.EmbeddableSetting
+import io.hazelnet.community.data.EmbeddableSettingSerializer
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import java.util.*
@@ -16,84 +18,87 @@ import javax.validation.constraints.Size
 @Entity
 @Table(name = "discord_servers")
 class DiscordServer @JsonCreator constructor(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "discord_server_id")
-        var id: Int?,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "discord_server_id")
+    var id: Int?,
 
-        @Column(name = "guild_id")
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var guildId: Long,
+    @Column(name = "guild_id")
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var guildId: Long,
 
-        @Column(name = "guild_name")
-        @field:NotNull
-        @field:Size(min = 1, max = 100)
-        var guildName: String,
+    @Column(name = "guild_name")
+    @field:NotNull
+    @field:Size(min = 1, max = 100)
+    var guildName: String,
 
-        @Column(name = "guild_owner")
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var guildOwner: Long,
+    @Column(name = "guild_owner")
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var guildOwner: Long,
 
-        @Column(name = "join_time", updatable = false)
-        var joinTime: Date?,
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "join_time", updatable = false)
+    var joinTime: Date?,
 
-        @Column(name = "guild_member_count")
-        @field:Min(1)
-        var guildMemberCount: Int,
+    @Column(name = "guild_member_count")
+    @field:Min(1)
+    var guildMemberCount: Int,
 
-        @Column(name = "guild_member_update")
-        var guildMemberUpdateTime: Date?,
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "guild_member_update")
+    var guildMemberUpdateTime: Date?,
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "owner_account_id")
-        @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
-        @JsonIdentityReference(alwaysAsId = true)
-        var ownerAccount: Account?,
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_account_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator::class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    var ownerAccount: Account?,
 
-        @Column(name = "premium_until")
-        var premiumUntil: Date?,
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "premium_until")
+    var premiumUntil: Date?,
 
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
-        @field:Valid
-        var tokenPolicies: MutableSet<TokenPolicy> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
+    @field:Valid
+    var tokenPolicies: MutableSet<TokenPolicy> = mutableSetOf(),
 
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "discord_spo", joinColumns = [JoinColumn(name = "discord_server_id")])
-        @field:Valid
-        var stakepools: MutableSet<Stakepool> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_spo", joinColumns = [JoinColumn(name = "discord_server_id")])
+    @field:Valid
+    var stakepools: MutableSet<Stakepool> = mutableSetOf(),
 
-        @OneToMany(fetch = FetchType.EAGER)
-        @JoinColumn(name = "discord_server_id")
-        @field:Valid
-        var delegatorRoles: MutableSet<DelegatorRole> = mutableSetOf(),
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "discord_server_id")
+    @field:Valid
+    var delegatorRoles: MutableSet<DelegatorRole> = mutableSetOf(),
 
-        @OneToMany(fetch = FetchType.EAGER)
-        @JoinColumn(name = "discord_server_id")
-        @field:Valid
-        var tokenRoles: MutableSet<TokenOwnershipRole> = mutableSetOf(),
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "discord_server_id")
+    @field:Valid
+    var tokenRoles: MutableSet<TokenOwnershipRole> = mutableSetOf(),
 
-        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-        @JoinColumn(name = "discord_server_id")
-        @field:Valid
-        var whitelists: MutableSet<Whitelist> = mutableSetOf(),
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "discord_server_id")
+    @field:Valid
+    var whitelists: MutableSet<Whitelist> = mutableSetOf(),
 
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "discord_settings", joinColumns = [JoinColumn(name = "discord_server_id")])
-        @field:Valid
-        @field:JsonSerialize(using = DiscordServerSettingSerializer::class)
-        var settings: MutableSet<DiscordServerSetting> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_settings", joinColumns = [JoinColumn(name = "discord_server_id")])
+    @field:Valid
+    @field:JsonSerialize(using = EmbeddableSettingSerializer::class)
+    var settings: MutableSet<EmbeddableSetting> = mutableSetOf(),
 
-        @ElementCollection(fetch = FetchType.LAZY)
-        @CollectionTable(name = "discord_server_members", joinColumns = [JoinColumn(name = "discord_server_id")])
-        @field:Valid
-        @field:JsonIgnore
-        var members: MutableSet<DiscordMember> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "discord_server_members", joinColumns = [JoinColumn(name = "discord_server_id")])
+    @field:Valid
+    @field:JsonIgnore
+    var members: MutableSet<DiscordMember> = mutableSetOf(),
 
-        @Column(name = "active")
-        var active: Boolean = true,
+    @Column(name = "active")
+    var active: Boolean = true,
 ) {
     fun getPremium(): Boolean = premiumUntil != null && Date().before(premiumUntil)
 

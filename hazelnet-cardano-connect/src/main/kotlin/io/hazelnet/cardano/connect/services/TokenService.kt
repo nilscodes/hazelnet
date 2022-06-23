@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.persistence.token.TokenDao
@@ -140,6 +141,8 @@ class TokenService(
                 .map { Pair(PolicyId(it.substring(0, 56)), AssetFingerprint(it.substring(56))) }
         return Pair(purePolicyIds, policyIdsWithAssetFingerprint)
     }
+
+    fun getWalletForAsset(assetFingerprint: String) = tokenDao.getWalletForAsset(AssetFingerprint(assetFingerprint))
 
     @Cacheable(cacheNames = ["tokenmetadata"], unless = "#result == null")
     fun getMultiAssetInfo(policyId: String, assetNameHex: String): MultiAssetInfo {

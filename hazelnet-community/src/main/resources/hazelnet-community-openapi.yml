@@ -87,12 +87,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-        default:
-          description: Unexpected error
+  /accounts/{accountId}/settings/{settingName}:
+    put:
+      summary: Create or update an account setting with the provided value
+      operationId: updateSetting
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmbeddableSetting'
+      responses:
+        '200':
+          description: 'Token Policy'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/EmbeddableSetting'
+    delete:
+      summary: 'Delete account setting by Name'
+      operationId: deleteSetting
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: '#/components/parameters/SettingNamePathParameter'
+      responses:
+        '204':
+          description: 'Successful deletion'
   /externalaccounts:
     post:
       summary: 'Create External Account'
@@ -162,6 +188,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /externalaccounts/{externalAccountId}/pings:
+    get:
+      summary: 'Get pings for this specific account (sent and received)'
+      operationId: getExternalAccountPings
+      tags:
+        - account
+        - ping
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of all pings (sent and received) for this user'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalAccountPing'
+  /externalaccounts/{externalAccountId}/pings/{pingId}:
+    patch:
+      summary: 'Update a specific ping the user is a sender or recipient of'
+      operationId: updateExternalAccountPing
+      tags:
+        - account
+        - ping
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: '#/components/parameters/PingIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccountPingPartial'
+      responses:
+        '200':
+          description: 'The updated ping object'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccountPing'
   /externalaccounts/{externalAccountId}/premium:
     get:
       summary: 'Get Premium data for this specific account'
@@ -204,6 +270,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VerificationImport'
+  /externalaccounts/{externalAccountId}/account:
+    put:
+      summary: 'Get or create a main account for this external account'
+      operationId: setAccountForExternalAccount
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'The existing account associated with this external account, or the newly created account'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
         default:
           description: Unexpected error
           content:
@@ -349,6 +432,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /pings:
+    post:
+      summary: Ping another user
+      operationId: addPing
+      tags:
+        - ping
+        - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccountPing'
+      responses:
+        '201':
+          description: 'The ping created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccountPing'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
   /claimlists:
     post:
       summary: Add Claim List
@@ -1380,14 +1485,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordServerSetting'
+              $ref: '#/components/schemas/EmbeddableSetting'
       responses:
         '200':
           description: 'Token Policy'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordServerSetting'
+                $ref: '#/components/schemas/EmbeddableSetting'
     delete:
       summary: 'Delete guild setting by Name'
       operationId: deleteSetting
@@ -1399,12 +1504,6 @@ paths:
       responses:
         '204':
           description: 'Successful deletion'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /discord/servers/{guildId}/accesstoken:
     post:
       summary: Generate (or regenerate) the API access token for this Discord server for the external HAZELnet API
@@ -1469,6 +1568,16 @@ paths:
                   $ref: '#/components/schemas/DiscordPollUpdate'
 components:
   parameters:
+    AccountIdPathParameter:
+      name: accountId
+      in: path
+      description: The account ID
+      required: true
+      style: simple
+      example: 12
+      schema:
+        type: integer
+        format: int64
     GuildIdPathParameter:
       name: guildId
       in: path
@@ -1485,6 +1594,16 @@ components:
       style: simple
       schema:
         $ref: '#/components/schemas/DiscordUser'
+    PingIdPathParameter:
+      name: pingId
+      in: path
+      description: The ping ID
+      required: true
+      style: simple
+      example: 2
+      schema:
+        type: integer
+        format: int64
     PolicyIdPathParameter:
       name: policyId
       in: path
@@ -1658,9 +1777,11 @@ components:
         - id
       properties:
         id:
-          readOnly: true
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/AccountId'
+        settings:
+          type: object
+          additionalProperties:
+            type: string
     ExternalAccount:
       type: object
       required:
@@ -1668,9 +1789,7 @@ components:
         - referenceId
       properties:
         id:
-          readOnly: true
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/ExternalAccountId'
         registrationTime:
           readOnly: true
           type: string
@@ -1836,6 +1955,57 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+    ExternalAccountPing:
+      type: object
+      required:
+        - sender
+        - recipientAddress
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        sender:
+          $ref: '#/components/schemas/ExternalAccountId'
+        senderLocal:
+          type: string
+          description: The senders ID in the format corresponding to the senders original channel (for example Discord)
+        sentFromServer:
+          $ref: '#/components/schemas/DiscordServerId'
+        recipient:
+          $ref: '#/components/schemas/AccountId'
+        recipientLocal:
+          type: string
+          description: The recipient ID in the format corresponding to the senders current channel (for example Discord), if a recipient in the same realm is available.
+        recipientAddress:
+          oneOf:
+            - $ref: '#/components/schemas/WalletAddress'
+            - $ref: '#/components/schemas/StakeAddressView'
+            - $ref: '#/components/schemas/AssetFingerprint'
+            - $ref: '#/components/schemas/HandleWithPrefix'
+        senderMessage:
+          type: string
+          maxLength: 320
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        sentTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        reported:
+          type: boolean
+    ExternalAccountPingPartial:
+      type: object
+      properties:
+        sentTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        reported:
+          type: boolean
     ClaimList:
       type: object
       required:
@@ -1988,9 +2158,7 @@ components:
         - guildMemberCount
       properties:
         id:
-          readOnly: true
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/DiscordServerId'
         guildId:
           type: integer
           format: int64
@@ -2340,6 +2508,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DiscordPollOption'
+        voteaireUUID:
+          type: string
+          example: a7fbd4ca-950d-4d02-82fd-f9c6cc9e2165
+          pattern: '[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$'
     DiscordPollPartial:
       type: object
       properties:
@@ -2542,7 +2714,7 @@ components:
         taken:
           readOnly: true
           type: boolean
-    DiscordServerSetting:
+    EmbeddableSetting:
       type: object
       required:
         - name
@@ -2590,6 +2762,10 @@ components:
           $ref: '#/components/schemas/DiscordUser'
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    DiscordServerId:
+      readOnly: true
+      type: integer
+      format: int64
     DiscordGuild:
       description: Snowflake ID matching a Discord guild
       type: integer
@@ -2640,8 +2816,23 @@ components:
       description: The fingerprint of an asset
       example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
       pattern: '^asset1[A-Za-z-0-9]{38}$'
+    HandleWithPrefix:
+      type: string
+      example: $hazelnet
+      pattern: '^\$[-._a-zA-Z0-9]{1,15}$'
     WalletAddress:
       type: string
+      description: The wallet address (non-enterprise)
+      example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
+      pattern: '^addr1[A-Za-z-0-9]{98}$'
+    AccountId:
+      readOnly: true
+      type: integer
+      format: int64
+    ExternalAccountId:
+      readOnly: true
+      type: integer
+      format: int64
     ExternalAccountType:
       type: string
       enum:

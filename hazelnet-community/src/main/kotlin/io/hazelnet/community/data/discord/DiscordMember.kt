@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Embeddable
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 import javax.validation.constraints.Min
 
 @Embeddable
@@ -15,6 +17,7 @@ class DiscordMember @JsonCreator constructor(
         @field:JsonSerialize(using = ToStringSerializer::class)
         var externalAccountId: Long,
 
+        @Temporal(TemporalType.TIMESTAMP)
         @Column(name = "join_time", updatable = false)
         var joinTime: Date?,
 
