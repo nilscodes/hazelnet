@@ -2,7 +2,6 @@ const i18n = require('i18n');
 const {
   MessageActionRow, MessageSelectMenu, MessageButton,
 } = require('discord.js');
-const datetime = require('./datetime');
 const discordemoji = require('./discordemoji');
 
 module.exports = {
@@ -56,8 +55,8 @@ module.exports = {
       return {
         name: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
         value: i18n.__({ phrase: pollPhrase, locale }, {
-          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+          openAfterTimestamp: Math.floor(new Date(poll.openAfter).getTime() / 1000),
+          openUntilTimestamp: Math.floor(new Date(poll.openUntil).getTime() / 1000),
           resultsVisible: i18n.__({ phrase: (poll.resultsVisible ? 'configure.poll.add.publicVoteYes' : 'configure.poll.add.publicVoteNo'), locale }),
           voteaireUUID: poll.voteaireUUID,
           voteaireLink: this.getVoteaireResultsUrl(poll.voteaireUUID),
@@ -135,8 +134,8 @@ module.exports = {
     detailFields.push({
       name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
       value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-        openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-        openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+        openAfterTimestamp: Math.floor(new Date(poll.openAfter).getTime() / 1000),
+        openUntilTimestamp: Math.floor(new Date(poll.openUntil).getTime() / 1000),
       }),
     });
 
@@ -187,13 +186,13 @@ module.exports = {
         },
         {
           name: i18n.__({ phrase: 'configure.poll.list.detailsCreation', locale }),
-          value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: datetime.getUTCDateFormatted(poll, 'createTime') }),
+          value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: Math.floor(new Date(poll.createTime).getTime() / 1000) }),
         },
         {
           name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
           value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-            openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-            openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+            openAfterTimestamp: Math.floor(new Date(poll.openAfter).getTime() / 1000),
+            openUntilTimestamp: Math.floor(new Date(poll.openUntil).getTime() / 1000),
           }),
         },
         {
@@ -217,13 +216,13 @@ module.exports = {
       },
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsCreation', locale }),
-        value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: datetime.getUTCDateFormatted(poll, 'createTime') }),
+        value: i18n.__({ phrase: 'configure.poll.list.creationDate', locale }, { createTime: Math.floor(new Date(poll.createTime).getTime() / 1000) }),
       },
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
         value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+          openAfterTimestamp: Math.floor(new Date(poll.openAfter).getTime() / 1000),
+          openUntilTimestamp: Math.floor(new Date(poll.openUntil).getTime() / 1000),
         }),
       },
       {

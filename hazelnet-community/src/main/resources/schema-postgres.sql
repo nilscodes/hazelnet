@@ -243,19 +243,20 @@ CREATE TABLE "discord_settings"
 
 CREATE TABLE "discord_whitelists"
 (
-    "discord_whitelist_id"     BIGSERIAL PRIMARY KEY,
-    "discord_server_id"        int          NOT NULL,
-    "external_account_id"      bigint       NOT NULL,
-    "whitelist_creation"       timestamp    NOT NULL,
-    "whitelist_name"           varchar(30)  NOT NULL,
-    "whitelist_displayname"    varchar(256) NOT NULL,
-    "whitelist_signup_after"   timestamp,
-    "whitelist_signup_until"   timestamp,
-    "whitelist_launch_date"    timestamp,
-    "whitelist_max_users"      int,
-    "whitelist_closed"         boolean      NOT NULL DEFAULT false,
-    "required_discord_role_id" bigint,
+    "discord_whitelist_id"       BIGSERIAL PRIMARY KEY,
+    "discord_server_id"          int          NOT NULL,
+    "external_account_id"        bigint       NOT NULL,
+    "whitelist_creation"         timestamp    NOT NULL,
+    "whitelist_name"             varchar(30)  NOT NULL,
+    "whitelist_displayname"      varchar(256) NOT NULL,
+    "whitelist_signup_after"     timestamp,
+    "whitelist_signup_until"     timestamp,
+    "whitelist_launch_date"      timestamp,
+    "whitelist_max_users"        int,
+    "whitelist_closed"           boolean      NOT NULL DEFAULT false,
+    "required_discord_role_id"   bigint,
     "shared_with_discord_server" int,
+    "whitelist_logo_url"         varchar(1000),
     UNIQUE ("discord_server_id", "whitelist_name")
 );
 
@@ -286,6 +287,7 @@ CREATE TABLE "discord_polls"
     "poll_multiple_votes"  boolean       NOT NULL DEFAULT false,
     "poll_archived"        boolean       NOT NULL DEFAULT false,
     "poll_snapshot_id"     int,
+    "poll_voteaire_id"     uuid,
     UNIQUE ("discord_server_id", "poll_name")
 );
 
@@ -464,6 +466,8 @@ ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("shared_with_discord_server") 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+CREATE INDEX "discord_whitelists_signup_external_account_id_index" ON "discord_whitelists_signup" ("external_account_id");
 
 ALTER TABLE "discord_polls" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

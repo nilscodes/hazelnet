@@ -2,6 +2,7 @@ const i18n = require('i18n');
 const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
+const embedBuilder = require('./embedbuilder');
 const datetime = require('./datetime');
 const cardanoaddress = require('./cardanoaddress');
 
@@ -13,18 +14,22 @@ module.exports = {
     const running = started && !ended;
     const datePhrase = this.getDatePhrase(whitelist, ended, started, running);
 
-    const signupAfterFormatted = datetime.getUTCDateFormatted(whitelist, 'signupAfter');
-    const signupUntilFormatted = datetime.getUTCDateFormatted(whitelist, 'signupUntil');
-    const datePart = i18n.__({ phrase: datePhrase, locale }, { signupAfterFormatted, signupUntilFormatted });
+    const datePart = i18n.__({ phrase: datePhrase, locale }, {
+      signupAfterTimestamp: whitelist.signupAfter ? Math.floor(new Date(whitelist.signupAfter).getTime() / 1000) : 0,
+      signupUntilTimestamp: whitelist.signupUntil ? Math.floor(new Date(whitelist.signupUntil).getTime() / 1000) : 0,
+    });
     const roleAndDatePart = i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirement', locale }, { whitelist, datePart });
 
     const memberPhrase = this.getMemberPhrase(whitelist, noCurrentNumbers);
     const lockIcon = running && !whitelist.closed ? '🔓' : '🔒';
     const memberPart = i18n.__({ phrase: memberPhrase, locale }, { whitelist });
 
+    const launchDate = whitelist.launchDate ? i18n.__({ phrase: 'whitelist.list.whitelistLaunchDate', locale }, {
+      launchDateTimestamp: Math.floor(new Date(whitelist.launchDate).getTime() / 1000),
+    }) : '';
     const manualClose = whitelist.closed ? i18n.__({ phrase: 'whitelist.list.whitelistManuallyClosed', locale }) : '';
 
-    return `${lockIcon} ${roleAndDatePart} ${memberPart} ${manualClose}`;
+    return `${lockIcon} ${roleAndDatePart} ${memberPart} ${launchDate} ${manualClose}`;
   },
   hasSignupEnded(whitelist) {
     if (whitelist.signupUntil) {
@@ -95,7 +100,7 @@ module.exports = {
     if (existingSignup) {
       const phrase = 'whitelist.list.youAreRegisteredWithAddress';
       return `\n${i18n.__({ phrase, locale: discordServer.getBotLanguage() }, {
-        signupTime: new Date(existingSignup.signupTime).toISOString().replace(/\.[0-9]{3}Z/, '').replace('T', ' '),
+        signupTime: Math.floor(new Date(existingSignup.signupTime).getTime() / 1000),
         address: includeFullAddress ? existingSignup.address : cardanoaddress.shorten(existingSignup.address),
       })}`;
     }
@@ -154,5 +159,21 @@ module.exports = {
           .setStyle('SECONDARY'),
       ),
     ];
+  },
+  getWhitelistErrorEmbed(discordServer, commandTitle, commandId, signupAfter, signupUntil, launchDate, logoUrl) {
+    const locale = discordServer.getBotLanguage();
+    if (signupAfter && !datetime.isValidISOTimestamp(signupAfter)) {
+      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'signup-start', value: signupAfter }), commandId);
+    }
+    if (signupUntil && !datetime.isValidISOTimestamp(signupUntil)) {
+      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'signup-end', value: signupUntil }), commandId);
+    }
+    if (launchDate && !datetime.isValidISOTimestamp(launchDate)) {
+      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'launch-date', value: launchDate }), commandId);
+    }
+    if (logoUrl && !/(https:(?:\/\/)?)/i.test(logoUrl)) {
+      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidHttpsUrl', locale }, { parameter: 'logo-url', value: logoUrl }), commandId);
+    }
+    return null;
   },
 };

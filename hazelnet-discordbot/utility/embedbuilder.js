@@ -11,8 +11,8 @@ module.exports = {
     const { useImage, useFields } = this.augmentWithAdvertisement(image, fields, discordServer, allowAdvertisement);
     return this.build(discordServer, color, topLogo, title, message, commandId, useFields, useImage);
   },
-  buildForAdmin(discordServer, title, message, commandId, fields) {
-    return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields);
+  buildForAdmin(discordServer, title, message, commandId, fields, image) {
+    return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields, image);
   },
   buildForAudit(discordServer, title, message, commandId, fields) {
     return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields);

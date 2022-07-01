@@ -159,7 +159,7 @@ class DiscordServerController(
 
     @GetMapping("/{guildId}/whitelists/shared")
     @ResponseStatus(HttpStatus.OK)
-    fun getSharedWhitelists(@PathVariable guildId: Long) = whitelistService.getSharedWhitelists(guildId)
+    fun getSharedWhitelists(@PathVariable guildId: Long, @RequestParam(required = false, defaultValue = "false") withSignups: Boolean) = whitelistService.getSharedWhitelists(guildId, withSignups)
 
     @GetMapping("/{guildId}/whitelists/{whitelistIdOrName}/signups")
     @ResponseStatus(HttpStatus.OK)

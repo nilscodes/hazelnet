@@ -49,7 +49,8 @@
 			"configure-tokenroles-policies-add": "Adds an accepted policy to your existing token role.",
 			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
-			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems."
+			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
+			"configure-whitelist-update": "commands.descriptions.configure-whitelist-update"
 		},
 		"options": {
 			"profile": {
@@ -83,7 +84,9 @@
 				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
 				"signup-end": "An optional UTC time until which registration is possible (Format: 2022-01-31T15:00:00Z)",
 				"guild-id": "The Discord guild/server ID (Snowflake Format: 717264144759390238)",
-				"channel": "The channel to send the whitelist announcement and signup widget to."
+				"channel": "The channel to send the whitelist announcement and signup widget to.",
+				"logo-url": "A https URL to the image you want to represent your whitelist with",
+				"launch-date": "The date on which users can claim their whitelist spot (Format: 2022-01-31T15:00:00Z)"
 			},
 			"configure-tokenroles": {
 				"policy-id": "Policy ID (Does not need to be an official policy of this server)",
@@ -336,13 +339,14 @@
 			"noWhitelistsTitle": "No whitelists",
 			"noWhitelistsDetail": "*Currently, this server has no open or recently closed whitelists.*",
 			"whitelistRoleRequirement": "Requirement for this whitelist is to have the role <@&{{whitelist.requiredRoleId}}>. {{{datePart}}}",
-			"whitelistWithEndDateOpen": "Signup is open until {{signupUntilFormatted}} UTC.",
-			"whitelistWithEndDateClosed": "Signup closed at {{signupUntilFormatted}} UTC.",
-			"whitelistWithStartDateOpen": "Signup opened at {{signupAfterFormatted}} UTC.",
-			"whitelistWithStartDateClosed": "Signup will open at {{signupAfterFormatted}} UTC.",
-			"whitelistWithStartDateClosedAndOpenEndDate": "Signup will open at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
-			"whitelistWithStartDateOpenAndOpenEndDate": "Signup opened at {{signupAfterFormatted}} UTC and will be available until {{signupUntilFormatted}}.",
-			"whitelistWithStartDateOpenAndClosedEndDate": "Signup opened at {{signupAfterFormatted}} UTC and closed at {{signupUntilFormatted}}.",
+			"whitelistWithEndDateOpen": "Signup is open until <t:{{signupUntilTimestamp}}>.",
+			"whitelistWithEndDateClosed": "Signup closed at <t:{{signupUntilTimestamp}}>.",
+			"whitelistWithStartDateOpen": "Signup opened at <t:{{signupAfterTimestamp}}>.",
+			"whitelistWithStartDateClosed": "Signup will open at <t:{{signupAfterTimestamp}}>.",
+			"whitelistWithStartDateClosedAndOpenEndDate": "Signup will open at <t:{{signupAfterTimestamp}}> and will be available until <t:{{signupUntilTimestamp}}>.",
+			"whitelistWithStartDateOpenAndOpenEndDate": "Signup opened at <t:{{signupAfterTimestamp}}> and will be available until <t:{{signupUntilTimestamp}}>.",
+			"whitelistWithStartDateOpenAndClosedEndDate": "Signup opened at <t:{{signupAfterTimestamp}}> and closed at <t:{{signupUntilTimestamp}}>.",
+			"whitelistLaunchDate": "\n🚀 The team has published a launch date for <t:{{launchDateTimestamp}}>.",
 			"whitelistManuallyClosed": "\n⏸ The signup for this whitelist is currently paused by an administrator.",
 			"openWhitelist": "There are no start or end dates for this registration.",
 			"whitelistMembersNoLimit": "Any number of users can sign up.",
@@ -351,9 +355,13 @@
 			"whitelistMembersLimitReached": "All {{whitelist.maxUsers}} users have already registered.",
 			"youQualify": "✅ You qualify for this whitelist. Add your address via '/whitelist register', if you would like to sign up.",
 			"youDontQualify": "⛔ You currently do not qualify for this whitelist.",
-			"youAreRegistered": "♥ You successfully registered for this whitelist at {{signupTime}} UTC.",
-			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC with the address *{{address}}*",
-			"showWithAddresses": "Show with addresses on screen"
+			"youAreRegistered": "♥ You successfully registered for this whitelist at <t:{{signupTime}}>.",
+			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at <t:{{signupTime}}> with the address *{{address}}*",
+			"showWithAddresses": "Show with addresses on screen",
+			"externalWhitelists": "Whitelists from other servers",
+			"externalWhitelistsDetail": "Here is a list of whitelists you have successfully signed up for on other servers. If the project has submitted a launch date, this is included as well so you know when to be ready!",
+			"externalWhitelistsEntry": "• **{{{whitelistDisplayName}}}** on Discord *{{{guildName}}}*.{{{launchDateText}}}",
+			"launchDateText": " The launch date is set for <t:{{launchDateTimestamp}}>"
 		},
 		"register": {
 			"messageTitle": "Register for a whitelist",
@@ -369,9 +377,9 @@
 			"otherError": "⚠ Error while registering for this whitelist.",
 			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
 			"widgetNotVerified": "⚠ You currently have no verified wallets. You can use the command **/whitelist register** in a channel that allows bot commands to register any address (*addr1…*) or *$handle* for this whitelist.\n\n💡 **Better**: We recommend verifying a wallet via **/verify add** and then registering it with the whitelist by clicking the same button again.",
-			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at {{signupTime}} UTC with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
+			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at <t:{{signupTime}}> with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
 			"widgetSelectAddress": "Please select which of your verified wallets you would like to register for the whitelist\n\n**{{whitelist.displayName}}**\n\nIf you would like to register a non-verified address or $handle, simply use the **/whitelist register** command.",
-			"widgetSelectAddressAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at {{signupTime}} UTC with the address *{{addressShort}}*. If you would like to change your used address, select the new address below.\n\nIf you would like to register a non-verified address or $handle, simply use the **/whitelist register** command.",
+			"widgetSelectAddressAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at <t:{{signupTime}}> with the address *{{addressShort}}*. If you would like to change your used address, select the new address below.\n\nIf you would like to register a non-verified address or $handle, simply use the **/whitelist register** command.",
 			"chooseAddressToWhitelist": "Select one of your verified addresses to register",
 			"alreadyRegisteredTitle": "You're good! 👍",
 			"userDoesNotQualify": "💔 Unfortunately, you currently do not qualify for this whitelist or it is already closed/full."
@@ -429,9 +437,9 @@
 			"purpose": "Here are your most recent sent and received pings. Pings will be deleted from this list after seven days.",
 			"receivedPingsTitle": "Received pings",
 			"receivedPingsNone": "📪 No recently received pings",
-			"receivedPing": "Ping from <@{{senderLocal}}> to **{{targetShort}}** on *{{sentTime}}* UTC with message \"{{{message}}}\".",
+			"receivedPing": "Ping from <@{{senderLocal}}> to **{{targetShort}}** on *<t:{{sentTime}}>* with message \"{{{message}}}\".",
 			"sentPingsTitle": "Sent pings",
-			"sentPing": "Sent to **{{targetShort}}** on *{{sentTime}}* UTC",
+			"sentPing": "Sent to **{{targetShort}}** on *<t:{{sentTime}}>*",
 			"sentPingsNone": "✉ No recently sent pings",
 			"testPingReceive": "Click to test if you can receive ping messages",
 			"testPingTestMessage": "This is an example message you might receive",
@@ -614,15 +622,15 @@
 			"list": {
 				"purpose": "This is the list of all existing polls for this Discord server.",
 				"noPollsDetail": "*There are no configured polls on this server.*",
-				"pollInfo": "Opens on: {{openAfterFormatted}} UTC\nCloses on: {{openUntilFormatted}} UTC\n{{{resultsVisible}}}",
-				"pollInfoVoteaire": "Opens on: {{openAfterFormatted}} UTC\nCloses on: {{openUntilFormatted}} UTC\n[Voteaire ID {{voteaireUUID}}]({{{voteaireLink}}})",
+				"pollInfo": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n{{{resultsVisible}}}",
+				"pollInfoVoteaire": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n[Voteaire ID {{voteaireUUID}}]({{{voteaireLink}}})",
 				"choosePollDetails": "Choose the poll you want more details on",
 				"details": "Poll Details",
 				"detailsName": "Display name (Internal name)",
 				"detailsDescription": "Description/Question",
 				"detailsDescriptionEmpty": "N/A",
 				"detailsCreation": "Created at",
-				"creationDate": "{{createTime}} UTC",
+				"creationDate": "<t:{{createTime}}>",
 				"detailsDates": "Opens/Closes",
 				"detailsChoices": "Poll voting choices",
 				"detailsVoteaireLink": "Link to on-chain ballot",
@@ -707,13 +715,20 @@
 				"purpose": "This is the list of all existing whitelists for this Discord server.",
 				"noWhitelistsDetail": "*There are no configured whitelists on this server.*",
 				"adminName": "{{{whitelist.displayName}}} (API name: {{whitelist.name}})",
-				"noPremium": "🙀 Users currently can not register for any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+				"noPremium": "🙀 Users currently can not register for any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"sharedWhitelists": "🤝 Whitelists shared with you",
+				"sharedWhitelistsDetail": "Here are all the whitelists other servers have shared with you. You can download the signups for these lists via the **/configure-whitelist download** command.",
+				"sharedWhitelistsEntry": "• **{{{whitelistDisplayName}}}** on Discord *{{{guildName}}}*."
 			},
 			"add": {
 				"success": "✅ New whitelist with the following requirements added to this server:",
 				"alreadyExists": "⚠ A whitelist with the name \"{{whitelistName}}\" already exists. Please choose a different internal name.",
 				"invalidName": "⚠ Could not add whitelist because the name \"{{whitelistName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
 				"noPremium": "🙀 You currently can not add any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+			},
+			"update": {
+				"success": "✅ Whitelist **{{{whitelist.displayName}}}** (API name: {{whitelist.name}}) was successfully updated:",
+				"notFound": "⚠ No whitelist with API name **{{whitelistName}}** found. Use **/configure-whitelist list** to see your available API names."
 			},
 			"close": {
 				"purpose": "Close registrations for this whitelist, either permanently or temporarily. You can close lists before they reach their end times or max user counts with this command. You can reopen it later via */configure-whitelist open*.",
@@ -755,8 +770,11 @@
 			"download": {
 				"purpose": "Select which whitelist you would like to download the address data for",
 				"success": "📂 Here is the download with address data for the whitelist **{{whitelist.displayName}}**. Thank you for using HAZELnet.",
+				"successExternal": "📂 Here is the download with address data for the whitelist **{{{whitelistDisplayName}}}** from Discord server *{{{guildName}}}*. Thank you for using HAZELnet.",
 				"errorSignupsEmpty": "⚠ No download is available for the whitelist **{{whitelist.displayName}}**. No one has signed up, yet.",
-				"otherError": "⚠ Error while downloading this whitelist."
+				"otherError": "⚠ Error while downloading this whitelist.",
+				"externalWhitelist": "{{{whitelistDisplayName}}} ({{{guildName}}})",
+				"errorNotFound": "⚠ No whitelist with the name **{{whitelistName}}** was found for this server. Nothing was removed."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following whitelist from this server:",
@@ -850,9 +868,9 @@
 				"purpose": "Find out all you need to get your server Black Edition ready. See your last bill, current prepaid balance, monthly cost and delegation-based discounts all in one place.",
 				"premiumStatus": "Current Premium Status",
 				"premiumStatusNo": "Your Discord server is currently not running Black Edition.",
-				"premiumStatusYes": "Your Discord server is on **Black Edition**! Thanks for supporting us 😻 Your automatic renewal will run on {{premiumUntilFormatted}} UTC.",
+				"premiumStatusYes": "Your Discord server is on **Black Edition**! Thanks for supporting us 😻 Your automatic renewal will run on <t:{{premiumUntilTimestamp}}>.",
 				"lastBill": "Last Bill",
-				"lastBillInfo": "Your last bill with an amount of **{{lastBillingAmount}} ADA** was for {{lastBillingGuildMemberCountFormatted}} discord members and was deducted from your prepaid balance on {{lastBillingTimeFormatted}} UTC.",
+				"lastBillInfo": "Your last bill with an amount of **{{lastBillingAmount}} ADA** was for {{lastBillingGuildMemberCountFormatted}} discord members and was deducted from your prepaid balance on <t:{{lastBillingTimeTimestamp}}>.",
 				"cost": "Current costs",
 				"costInfo": "Based on {{currentGuildMemberCountFormatted}} discord members, your monthly base cost is **{{monthlyCostFormatted}} ADA**. With your delegation discount of {{discount}}%, your current expected monthly price for Black Edition is **{{actualMonthlyCostFormatted}} ADA**.\n\n💡 Your community members can pledge support to your server via the **/premium** command, or you can stake and use the same command to pledge your stake to receive a discount or completely free Black Edition.",
 				"discount": "Delegation discount",
@@ -865,11 +883,11 @@
 				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ … and much more @ https://www.hazelnet.io/pricing"
 			},
 			"refill": {
-				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",
+				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",
 				"cancelOutstanding": "Cancel open payment request",
 				"cancelSuccess": "❌ Your outstanding refill payment was successfully cancelled. You can now start a new refill process.\n\n😻 Thank you for supporting HAZELnet!",
 				"errorAmountToSmall": "⚠ The submitted amount of **{{refillAmount}} ADA** is too small. The minimum refill amount is **{{minimumAmount}} ADA**.\n\n😻 Thank you for supporting HAZELnet!",
-				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{existingIncomingPayment.receivingAddress}}* by {{expirationDateFormatted}} UTC to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting HAZELnet!"
+				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{existingIncomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting HAZELnet!"
 			}
 		}
 	},
@@ -932,7 +950,8 @@
 		"permissionDeniedInformation": "⛔ You do not have permission to access this information.",
 		"permissionDeniedChanges": "⛔ You do not have permission to make these changes.",
 		"notWhitelisted": "Thank you for your interest in HAZELnet. Unfortunately, your server is not on the early access list. Contact @NilsCodes on Twitter to see if you can participate in the beta program.",
-		"invalidIsoDateFormat": "Invalid date format value \"{{value}}\" for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)"
+		"invalidIsoDateFormat": "Invalid date format value \"{{value}}\" for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)",
+		"invalidHttpsUrl": "Invalid URL provided with value \"{{value}}\" for parameter \"{{parameter}}\". Please provide a valid *https://* URL."
 	},
 	"about": {
 		"title": "About HAZELnet",

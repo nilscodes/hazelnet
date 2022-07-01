@@ -2,7 +2,6 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.data.Account
 import io.hazelnet.community.data.ExternalAccount
-import io.hazelnet.community.data.discord.SummarizedWhitelistSignup
 import io.hazelnet.community.data.ping.*
 import io.hazelnet.community.persistence.PingRepository
 import io.hazelnet.community.persistence.VerificationRepository

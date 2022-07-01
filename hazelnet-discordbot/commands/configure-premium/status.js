@@ -1,6 +1,5 @@
 const i18n = require('i18n');
 const embedBuilder = require('../../utility/embedbuilder');
-const datetime = require('../../utility/datetime');
 
 module.exports = {
   async execute(interaction) {
@@ -9,10 +8,10 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const premiumInfo = await interaction.client.services.discordserver.getPremiumInfo(interaction.guild.id);
-      const premiumUntilFormatted = datetime.getUTCDateFormatted(premiumInfo, 'premiumUntil');
+      const premiumUntilTimestamp = Math.floor(new Date(premiumInfo.premiumUntil).getTime() / 1000);
       const premiumFields = [{
         name: i18n.__({ phrase: 'configure.premium.status.premiumStatus', locale }),
-        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilFormatted }),
+        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilFormatted: premiumUntilTimestamp }),
       }];
       this.addBillingInfo(premiumInfo, premiumFields, discordServer, locale);
       this.addCostInfo(premiumInfo, premiumFields, discordServer, locale);
@@ -27,14 +26,14 @@ module.exports = {
   },
   addBillingInfo(premiumInfo, premiumFields, discordServer, locale) {
     if (premiumInfo.lastBillingTime) {
-      const lastBillingTimeFormatted = datetime.getUTCDateFormatted(premiumInfo, 'lastBillingTime');
+      const lastBillingTimeTimestamp = Math.floor(new Date(premiumInfo.lastBillingTime).getTime() / 1000);
       premiumFields.push({
         name: i18n.__({ phrase: 'configure.premium.status.lastBill', locale }),
         value: i18n.__({ phrase: 'configure.premium.status.lastBillInfo', locale }, {
           ...premiumInfo,
           lastBillingAmount: Math.round(premiumInfo.lastBillingAmount / 100000) / 10,
           lastBillingGuildMemberCountFormatted: discordServer.formatNumber(premiumInfo.lastBillingGuildMemberCount),
-          lastBillingTimeFormatted,
+          lastBillingTimeTimestamp,
         }),
       });
     }

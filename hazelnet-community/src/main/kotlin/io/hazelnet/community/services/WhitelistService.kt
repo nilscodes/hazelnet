@@ -4,11 +4,14 @@ import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.shared.data.SharedWhitelist
+import io.hazelnet.shared.data.SummarizedWhitelistSignup
 import io.hazelnet.shared.data.WhitelistSignup
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.memberProperties
 
 @Service
 class WhitelistService(
@@ -28,23 +31,50 @@ class WhitelistService(
     fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val whitelistToUpdate = getWhitelistById(discordServer, whitelistId)
+        if (whitelistPartial.displayName != null) {
+            whitelistToUpdate.displayName = whitelistPartial.displayName
+        }
         if (whitelistPartial.closed != null) {
             whitelistToUpdate.closed = whitelistPartial.closed
         }
-        if (whitelistPartial.sharedWithServer != null) {
-            if (whitelistPartial.sharedWithServer == 0) {
-                whitelistToUpdate.sharedWithServer = null
-            } else {
-                whitelistToUpdate.sharedWithServer = whitelistPartial.sharedWithServer
+
+        fun updateIntPropertyIfNeeded(propertyName: String) {
+            val propertyOnPartial = WhitelistPartial::class.memberProperties.find { it.name == propertyName }!!
+            val valueOnPartial = propertyOnPartial.get(whitelistPartial) as Int?
+            if (valueOnPartial != null) {
+                val propertyOnWhitelist =
+                    Whitelist::class.memberProperties.find { it.name == propertyName }!! as KMutableProperty1<Whitelist, Any?>
+                // Hacky way of removing ints only if they are 0 (since null on the partial means the object should remain untouched)
+                if (valueOnPartial == 0) {
+                    propertyOnWhitelist.set(whitelistToUpdate, null)
+                } else {
+                    propertyOnWhitelist.set(whitelistToUpdate, valueOnPartial)
+                }
             }
         }
-        if (whitelistPartial.launchDate != null) {
-            // Hacky way of removing launchDate is to send a date that is 20 years in the past
-            if (whitelistPartial.launchDate.before(Date.from(ZonedDateTime.now().minusYears(20).toInstant()))) {
-                whitelistToUpdate.launchDate = null
-            } else {
-                whitelistToUpdate.launchDate = whitelistPartial.launchDate
+        updateIntPropertyIfNeeded("sharedWithServer")
+        updateIntPropertyIfNeeded("maxUsers")
+
+        fun updateDatePropertyIfNeeded(propertyName: String) {
+            val propertyOnPartial = WhitelistPartial::class.memberProperties.find { it.name == propertyName }!!
+            val valueOnPartial = propertyOnPartial.get(whitelistPartial) as Date?
+            if (valueOnPartial != null) {
+                val propertyOnWhitelist =
+                    Whitelist::class.memberProperties.find { it.name == propertyName }!! as KMutableProperty1<Whitelist, Any?>
+                // Hacky way of removing dates only if they are older than 20 years (since null on the partial means the object should remain untouched)
+                if (valueOnPartial.before(Date.from(ZonedDateTime.now().minusYears(20).toInstant()))) {
+                    propertyOnWhitelist.set(whitelistToUpdate, null)
+                } else {
+                    propertyOnWhitelist.set(whitelistToUpdate, valueOnPartial)
+                }
             }
+        }
+
+        updateDatePropertyIfNeeded("launchDate")
+        updateDatePropertyIfNeeded("signupAfter")
+        updateDatePropertyIfNeeded("signupUntil")
+        if (whitelistPartial.logoUrl != null) {
+            whitelistToUpdate.logoUrl = whitelistPartial.logoUrl.ifBlank { null }
         }
         discordWhitelistRepository.save(whitelistToUpdate)
         return whitelistToUpdate
@@ -65,17 +95,17 @@ class WhitelistService(
         }
     }
 
-    fun getSharedWhitelists(guildId: Long): List<SharedWhitelist> {
+    fun getSharedWhitelists(guildId: Long, withSignups: Boolean): List<SharedWhitelist> {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val sharedWhitelists = discordWhitelistRepository.findBySharedWithServer(discordServer.id!!)
         return sharedWhitelists.map {
             val sharingServer = discordServerService.getDiscordServerByInternalId(it.sharedWithServer!!)
             SharedWhitelist(
-                sharingServer.guildId,
-                sharingServer.guildName,
-                it.name,
-                it.displayName,
-                it.signups.map { signup -> WhitelistSignup(signup.address, signup.signupTime!!) }.toSet()
+                guildId = sharingServer.guildId,
+                guildName = sharingServer.guildName,
+                whitelistName = it.name,
+                whitelistDisplayName = it.displayName,
+                signups = if (withSignups) it.signups.map { signup -> WhitelistSignup(signup.address, signup.signupTime!!) }.toSet() else emptySet()
             )
         }
     }
@@ -144,6 +174,7 @@ class WhitelistService(
                 whitelistDisplayName = it.displayName,
                 signupTime = it.signups.first { signup -> signup.externalAccountId == externalAccountId}.signupTime!!,
                 launchDate = it.launchDate,
+                logoUrl = it.logoUrl,
             )
         }
     }

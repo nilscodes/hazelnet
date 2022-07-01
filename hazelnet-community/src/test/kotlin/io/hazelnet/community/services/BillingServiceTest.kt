@@ -14,21 +14,21 @@ import java.util.*
 
 internal class BillingServiceTest {
     private val testServer = DiscordServer(
-        12,
-        717264144759390200,
-        "My guild",
-        69693469034096,
-        Date(),
-        420,
-        null,
-        null,
-        null,
-        mutableSetOf(),
-        mutableSetOf(),
-        mutableSetOf(),
-        mutableSetOf(),
-        mutableSetOf(),
-        mutableSetOf()
+        id = 12,
+        guildId = 717264144759390200,
+        guildName = "My guild",
+        guildOwner = 69693469034096,
+        joinTime = Date(),
+        guildMemberCount = 420,
+        guildMemberUpdateTime = null,
+        ownerAccount = null,
+        premiumUntil = null,
+        tokenPolicies = mutableSetOf(),
+        stakepools = mutableSetOf(),
+        delegatorRoles = mutableSetOf(),
+        tokenRoles = mutableSetOf(),
+        whitelists = mutableSetOf(),
+        settings = mutableSetOf()
     )
 
     @Test

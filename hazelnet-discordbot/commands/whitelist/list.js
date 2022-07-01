@@ -29,6 +29,22 @@ module.exports = {
       if (!whitelistFields.length) {
         whitelistFields.push({ name: i18n.__({ phrase: 'whitelist.list.noWhitelistsTitle', locale }), value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale }) });
       }
+      const whitelistsFromAllServers = await interaction.client.services.externalaccounts.getExternalAccountWhitelists(externalAccount.id);
+      const whitelistsFromOtherServers = whitelistsFromAllServers.filter((whitelistSummary) => whitelistSummary.guildId !== discordServer.guildId);
+      if (whitelistsFromOtherServers.length) {
+        whitelistFields.push({
+          name: i18n.__({ phrase: 'whitelist.list.externalWhitelists', locale }),
+          value: `${i18n.__({ phrase: 'whitelist.list.externalWhitelistsDetail', locale })}\n\n${whitelistsFromOtherServers.map((whitelistSummary) => {
+            const launchDateText = whitelistSummary.launchDate ? i18n.__({ phrase: 'whitelist.list.launchDateText', locale }, {
+              launchDateTimestamp: Math.floor(new Date(whitelistSummary.launchDate).getTime() / 1000),
+            }) : '';
+            return i18n.__({ phrase: 'whitelist.list.externalWhitelistsEntry', locale }, {
+              ...whitelistSummary,
+              launchDateText,
+            });
+          }).join('\n')}`,
+        });
+      }
       const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'whitelist.list.messageTitle', locale }), i18n.__({ phrase: 'whitelist.list.purpose', locale }), 'whitelist-list', whitelistFields);
       await interaction.editReply({ components, embeds: [embed], ephemeral: true });
     } catch (error) {
