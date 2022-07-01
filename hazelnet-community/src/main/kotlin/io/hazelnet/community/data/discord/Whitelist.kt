@@ -49,6 +49,10 @@ class Whitelist @JsonCreator constructor(
     @Column(name = "whitelist_signup_until")
     var signupUntil: Date?,
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "whitelist_launch_date")
+    var launchDate: Date?,
+
     @Column(name = "required_discord_role_id")
     @field:NonNull
     @field:Min(1)
@@ -84,6 +88,7 @@ class Whitelist @JsonCreator constructor(
         if (displayName != other.displayName) return false
         if (signupAfter != other.signupAfter) return false
         if (signupUntil != other.signupUntil) return false
+        if (launchDate != other.launchDate) return false
         if (requiredRoleId != other.requiredRoleId) return false
         if (maxUsers != other.maxUsers) return false
         if (closed != other.closed) return false
@@ -101,6 +106,7 @@ class Whitelist @JsonCreator constructor(
         result = 31 * result + displayName.hashCode()
         result = 31 * result + (signupAfter?.hashCode() ?: 0)
         result = 31 * result + (signupUntil?.hashCode() ?: 0)
+        result = 31 * result + (launchDate?.hashCode() ?: 0)
         result = 31 * result + requiredRoleId.hashCode()
         result = 31 * result + (maxUsers ?: 0)
         result = 31 * result + closed.hashCode()
@@ -110,7 +116,7 @@ class Whitelist @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "Whitelist(id=$id, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithGuild=$sharedWithServer)"
+        return "Whitelist(id=$id, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithGuild=$sharedWithServer)"
     }
 
 }

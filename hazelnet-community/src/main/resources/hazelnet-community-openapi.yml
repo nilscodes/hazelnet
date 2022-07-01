@@ -228,6 +228,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalAccountPing'
+  /externalaccounts/{externalAccountId}/whitelists:
+    get:
+      summary: 'Get whitelists this specific account is signed up for'
+      operationId: getExternalAccountWhitelists
+      tags:
+        - account
+        - ping
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of all whitelists this user is signed up for'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SummarizedWhitelistSignup'
   /externalaccounts/{externalAccountId}/premium:
     get:
       summary: 'Get Premium data for this specific account'
@@ -2654,6 +2672,10 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+        launchDate:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         closed:
           type: boolean
           default: false
@@ -2672,6 +2694,10 @@ components:
           type: integer
           format: int32
           description: The server ID (not guild ID) of another HAZELnet Discord server that you want to share the members of this whitelist with.
+        launchDate:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
     WhitelistSignup:
       type: object
       required:
@@ -2684,6 +2710,43 @@ components:
           type: integer
           format: int64
         signupTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+    SummarizedWhitelistSignup:
+      type: object
+      required:
+        - externalAccountId
+        - guildId
+        - guildName
+        - whitelistDisplayName
+        - signupTime
+      properties:
+        externalAccountId:
+          readOnly: true
+          type: integer
+          format: int64
+        guildId:
+          readOnly: true
+          type: integer
+          format: int64
+          example: 717264144759390238
+        guildName:
+          readOnly: true
+          type: string
+          example: Guild Name
+        whitelistDisplayName:
+          readOnly: true
+          type: string
+          minLength: 1
+          maxLength: 256
+        signupTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        launchDate:
           readOnly: true
           type: string
           format: date-time

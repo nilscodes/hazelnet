@@ -62,8 +62,7 @@
 			},
 			"whitelist": {
 				"name": "Name of the whitelist",
-				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist.",
-				"includeaddress": "Use this parameter and pass True if you want your registered address fully displayed on screen."
+				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist."
 			},
 			"configure-poll": {
 				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
@@ -93,7 +92,7 @@
 				"max-count": "Maximum amount of tokens to qualify for this role",
 				"asset-fingerprint": "Asset fingerprint (useful for multiple FTs under one policy)",
 				"token-role-id": "Token role ID to change (get ID from list command)",
-				"attribute-name": "Metadata attribute to check (case sensitive!)",
+				"attribute-path": "Metadata attribute to check (case sensitive!)",
 				"operator": "Comparison operator to use",
 				"attribute-value": "Value to check for (case sensitive!)"
 			},
@@ -353,7 +352,8 @@
 			"youQualify": "✅ You qualify for this whitelist. Add your address via '/whitelist register', if you would like to sign up.",
 			"youDontQualify": "⛔ You currently do not qualify for this whitelist.",
 			"youAreRegistered": "♥ You successfully registered for this whitelist at {{signupTime}} UTC.",
-			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC with the address *{{address}}*"
+			"youAreRegisteredWithAddress": "♥ You successfully registered for this whitelist at {{signupTime}} UTC with the address *{{address}}*",
+			"showWithAddresses": "Show with addresses on screen"
 		},
 		"register": {
 			"messageTitle": "Register for a whitelist",
