@@ -16,7 +16,9 @@ module.exports = {
         .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true))
         .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
         .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
-        .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false)))
+        .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
+        .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
+        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
@@ -26,6 +28,16 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('open')
         .setDescription(ci18n.subDescription('open')))
+      .addSubcommand((subcommand) => subcommand
+        .setName('update')
+        .setDescription(ci18n.subDescription('update'))
+        .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
+        .addStringOption((option) => option.setName('whitelist-displayname').setDescription(ci18n.option('whitelist-displayname')).setRequired(false))
+        .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
+        .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
+        .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
+        .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
+        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))

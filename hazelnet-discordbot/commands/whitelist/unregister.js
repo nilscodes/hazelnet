@@ -45,7 +45,7 @@ module.exports = {
         if (whitelistToUnregisterFrom) {
           const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
           await interaction.client.services.discordserver.unregisterFromWhitelist(interaction.guild.id, whitelistToUnregisterFrom.id, externalAccount.id);
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.unregister.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.unregister.success', locale: useLocale }, { whitelist: whitelistToUnregisterFrom }), 'whitelist-unregister');
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.unregister.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.unregister.success', locale: useLocale }, { whitelist: whitelistToUnregisterFrom }), 'whitelist-unregister', [], whitelistToUnregisterFrom.logoUrl);
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         } else {
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.unregister.messageTitle', locale: useLocale }), i18n.__({ phrase: 'whitelist.unregister.errorNotFound', locale: useLocale }, { whitelistName }), 'whitelist-unregister');

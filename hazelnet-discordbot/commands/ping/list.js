@@ -3,7 +3,6 @@ const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
-const datetime = require('../../utility/datetime');
 const cardanoaddress = require('../../utility/cardanoaddress');
 
 module.exports = {
@@ -21,7 +20,7 @@ module.exports = {
       const pingFields = [{
         name: i18n.__({ phrase: 'ping.list.receivedPingsTitle', locale }),
         value: receivedPings.length ? receivedPings.map((ping) => {
-          const sentTime = datetime.getUTCDateFormatted(ping, 'sentTime');
+          const sentTime = Math.floor(new Date(ping.sentTime).getTime() / 1000);
           return i18n.__({ phrase: 'ping.list.receivedPing', locale }, {
             senderLocal: ping.senderLocal,
             sentTime,
@@ -33,7 +32,7 @@ module.exports = {
       {
         name: i18n.__({ phrase: 'ping.list.sentPingsTitle', locale }),
         value: sentPings.length ? sentPings.map((ping) => {
-          const sentTime = datetime.getUTCDateFormatted(ping, 'sentTime');
+          const sentTime = Math.floor(new Date(ping.sentTime).getTime() / 1000);
           return i18n.__({ phrase: 'ping.list.sentPing', locale }, {
             sentTime,
             targetShort: cardanoaddress.shorten(ping.recipientAddress),

@@ -157,7 +157,7 @@ module.exports = {
     const discordPollPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`, discordPollPartial);
     return discordPollPromise.data;
   },
-  async createWhitelist(guildId, creator, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId) {
+  async createWhitelist(guildId, creator, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId, launchDate, logoUrl) {
     const newWhitelistPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists`, {
       creator,
       displayName,
@@ -166,6 +166,8 @@ module.exports = {
       signupUntil,
       maxUsers,
       requiredRoleId,
+      launchDate,
+      logoUrl,
     });
     this.clearCacheEntry(guildId);
     return newWhitelistPromise;
@@ -174,6 +176,10 @@ module.exports = {
     const newWhitelistPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}`, whitelistPartial);
     this.clearCacheEntry(guildId);
     return newWhitelistPromise.data;
+  },
+  async getSharedWhitelists(guildId, withSignups) {
+    const sharedWhitelistsPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/shared?withSignups=${withSignups ? 'true' : 'false'}`);
+    return sharedWhitelistsPromise.data;
   },
   async getWhitelistSignupsForExternalAccount(guildId, whitelistId, externalAccountId) {
     const registrationPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups/${externalAccountId}`);

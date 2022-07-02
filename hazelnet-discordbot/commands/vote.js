@@ -7,7 +7,6 @@ const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 const pollUtil = require('../utility/poll');
-const datetime = require('../utility/datetime');
 const discordemoji = require('../utility/discordemoji');
 const pollutil = require('../utility/poll');
 const discordstring = require('../utility/discordstring');
@@ -217,8 +216,8 @@ module.exports = {
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDates', locale }),
         value: i18n.__({ phrase: 'configure.poll.list.pollInfo', locale }, {
-          openAfterFormatted: datetime.getUTCDateFormatted(poll, 'openAfter'),
-          openUntilFormatted: datetime.getUTCDateFormatted(poll, 'openUntil'),
+          openAfterTimestamp: Math.floor(new Date(poll.openAfter).getTime() / 1000),
+          openUntilTimestamp: Math.floor(new Date(poll.openUntil).getTime() / 1000),
         }),
       },
     ];

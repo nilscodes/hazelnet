@@ -228,6 +228,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExternalAccountPing'
+  /externalaccounts/{externalAccountId}/whitelists:
+    get:
+      summary: 'Get whitelists this specific account is signed up for'
+      operationId: getExternalAccountWhitelists
+      tags:
+        - account
+        - ping
+      parameters:
+        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+      responses:
+        '200':
+          description: 'List of all whitelists this user is signed up for'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SummarizedWhitelistSignup'
   /externalaccounts/{externalAccountId}/premium:
     get:
       summary: 'Get Premium data for this specific account'
@@ -1340,6 +1358,31 @@ paths:
           headers:
             Location:
               $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/whitelists/shared:
+    get:
+      summary: Get external whitelists shared with this Discord server
+      operationId: getSharedWhitelists
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - name: withSignups
+          in: query
+          description: If signups should be included
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: All whitelists shared with this server
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SharedWhitelist'
   /discord/servers/{guildId}/whitelists/{whitelistId}:
     patch:
       summary: Update a whitelist on this discord server
@@ -2160,16 +2203,12 @@ components:
         id:
           $ref: '#/components/schemas/DiscordServerId'
         guildId:
-          type: integer
-          format: int64
-          example: 717264144759390238
+          $ref: '#/components/schemas/DiscordGuild'
         guildName:
           type: string
           example: Guild Name
         guildOwner:
-          type: integer
-          format: int64
-          example: 9358923890
+          $ref: '#/components/schemas/DiscordUser'
         joinTime:
           readOnly: true
           type: string
@@ -2227,9 +2266,7 @@ components:
           type: string
           example: Guild Name
         guildOwner:
-          type: integer
-          format: int64
-          example: 9358923890
+          $ref: '#/components/schemas/DiscordUser'
         guildMemberCount:
           type: integer
           format: int32
@@ -2608,9 +2645,7 @@ components:
         - channelId
       properties:
         guildId:
-          type: integer
-          format: int64
-          example: 717264144759390238
+          $ref: '#/components/schemas/DiscordGuild'
         pollId:
           readOnly: true
           type: integer
@@ -2654,6 +2689,10 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+        launchDate:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         closed:
           type: boolean
           default: false
@@ -2663,15 +2702,42 @@ components:
           type: integer
           format: int64
           description: The server ID (not guild ID) of another HAZELnet Discord server that you want to share the members of this whitelist with
+        logoUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
     WhitelistPartial:
       type: object
       properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        signupAfter:
+          description: The date after which people can sign up for the whitelist (pass a date 20+ years in the past to remove the signupAfter date)
+          type: string
+          format: date-time
+          example: 2020-11-10T13:20:57Z
+        signupUntil:
+          description: The date until which people can sign up for the whitelist (pass a date 20+ years in the past to remove the signupUntil date)
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
         closed:
           type: boolean
         sharedWithServer:
           type: integer
           format: int32
           description: The server ID (not guild ID) of another HAZELnet Discord server that you want to share the members of this whitelist with.
+        launchDate:
+          description: The date at which people can redeem their whitelist spot (pass a date 20+ years in the past to remove the launchDate date)
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        logoUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
     WhitelistSignup:
       type: object
       required:
@@ -2684,6 +2750,71 @@ components:
           type: integer
           format: int64
         signupTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+    SharedWhitelist:
+      type: object
+      required:
+        - guildId
+        - guildName
+        - whitelistName
+        - whitelistDisplayName
+        - signups
+      properties:
+        guildId:
+          $ref: '#/components/schemas/DiscordGuild'
+        guildName:
+          type: string
+          example: Guild Name
+        whitelistDisplayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        whitelistName:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        signups:
+          type: array
+          items:
+            $ref: '#/components/schemas/WhitelistSignup'
+    SummarizedWhitelistSignup:
+      type: object
+      required:
+        - externalAccountId
+        - guildId
+        - guildName
+        - whitelistDisplayName
+        - signupTime
+      properties:
+        externalAccountId:
+          readOnly: true
+          type: integer
+          format: int64
+        guildId:
+          readOnly: true
+          $ref: '#/components/schemas/DiscordGuild'
+        guildName:
+          readOnly: true
+          type: string
+          example: Guild Name
+        whitelistDisplayName:
+          readOnly: true
+          type: string
+          minLength: 1
+          maxLength: 256
+        whitelistLogoUrl:
+          readOnly: true
+          type: string
+          minLength: 1
+          maxLength: 1000
+        signupTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        launchDate:
           readOnly: true
           type: string
           format: date-time

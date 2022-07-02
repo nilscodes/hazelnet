@@ -3,7 +3,6 @@ const {
   MessageActionRow, MessageButton,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
-const datetime = require('../../utility/datetime');
 
 module.exports = {
   async execute(interaction) {
@@ -18,8 +17,8 @@ module.exports = {
       if (!existingIncomingPayment) {
         if (refillAmount >= 5) {
           const incomingPayment = await interaction.client.services.discordserver.requestIncomingPayment(interaction.guild.id, refillAmount * 1000000);
-          const expirationDateFormatted = datetime.getUTCDateFormatted(incomingPayment, 'validBefore');
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.success', locale }, { incomingPayment, amount: incomingPayment.amount / 1000000, expirationDateFormatted }), 'configure-premium-refill');
+          const expirationDateTimestamp = Math.floor(new Date(existingIncomingPayment.validBefore).getTime() / 1000);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.success', locale }, { incomingPayment, amount: incomingPayment.amount / 1000000, expirationDateTimestamp }), 'configure-premium-refill');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         } else {
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.errorAmountToSmall', locale }, { minimumAmount: 5, refillAmount }), 'configure-premium-refill');
@@ -34,8 +33,8 @@ module.exports = {
               .setStyle('DANGER'),
           ),
         ];
-        const expirationDateFormatted = datetime.getUTCDateFormatted(existingIncomingPayment, 'validBefore');
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.errorAlreadyPending', locale }, { existingIncomingPayment, amount: existingIncomingPayment.amount / 1000000, expirationDateFormatted }), 'configure-premium-refill');
+        const expirationDateTimestamp = Math.floor(new Date(existingIncomingPayment.validBefore).getTime() / 1000);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.errorAlreadyPending', locale }, { existingIncomingPayment, amount: existingIncomingPayment.amount / 1000000, expirationDateTimestamp }), 'configure-premium-refill');
         await interaction.editReply({ embeds: [embed], components, ephemeral: true });
       }
     } catch (error) {

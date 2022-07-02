@@ -4,6 +4,7 @@ import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.ping.ExternalAccountPingPartial
 import io.hazelnet.community.services.ExternalAccountService
 import io.hazelnet.community.services.PingService
+import io.hazelnet.community.services.WhitelistService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,6 +16,7 @@ import javax.validation.Valid
 class ExternalAccountController(
         private val externalAccountService: ExternalAccountService,
         private val pingService: PingService,
+        private val whitelistService: WhitelistService,
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,6 +51,9 @@ class ExternalAccountController(
 
     @PatchMapping("/{externalAccountId}/pings/{pingId}")
     fun updateExternalAccountPing(@PathVariable externalAccountId: Long, @PathVariable pingId: Long, @RequestBody externalAccountPingPartial: ExternalAccountPingPartial) = pingService.updateExternalAccountPing(externalAccountId, pingId, externalAccountPingPartial)
+
+    @GetMapping("/{externalAccountId}/whitelists")
+    fun getExternalAccountWhitelists(@PathVariable externalAccountId: Long) = whitelistService.getExternalAccountWhitelists(externalAccountId)
 
     @GetMapping("/{externalAccountId}/premium")
     fun getPremiumInfo(@PathVariable externalAccountId: Long) = externalAccountService.getPremiumInfo(externalAccountId)
