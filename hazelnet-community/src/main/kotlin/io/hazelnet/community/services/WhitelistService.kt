@@ -99,7 +99,7 @@ class WhitelistService(
         val discordServer = discordServerService.getDiscordServer(guildId)
         val sharedWhitelists = discordWhitelistRepository.findBySharedWithServer(discordServer.id!!)
         return sharedWhitelists.map {
-            val sharingServer = discordServerService.getDiscordServerByInternalId(it.sharedWithServer!!)
+            val sharingServer = discordServerService.getDiscordServerByInternalId(it.discordServerId)
             SharedWhitelist(
                 guildId = sharingServer.guildId,
                 guildName = sharingServer.guildName,
