@@ -11,7 +11,7 @@ module.exports = {
       const premiumUntilTimestamp = Math.floor(new Date(premiumInfo.premiumUntil).getTime() / 1000);
       const premiumFields = [{
         name: i18n.__({ phrase: 'configure.premium.status.premiumStatus', locale }),
-        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilFormatted: premiumUntilTimestamp }),
+        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilTimestamp }),
       }];
       this.addBillingInfo(premiumInfo, premiumFields, discordServer, locale);
       this.addCostInfo(premiumInfo, premiumFields, discordServer, locale);

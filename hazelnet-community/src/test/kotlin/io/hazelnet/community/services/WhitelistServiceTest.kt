@@ -4,6 +4,7 @@ import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.Whitelist
 import io.hazelnet.community.data.discord.WhitelistPartial
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
+import io.hazelnet.shared.data.SharedWhitelist
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
@@ -97,6 +98,58 @@ internal class WhitelistServiceTest {
             maxUsers = null,
         ))
         assertEquals(now, whitelistSaveSlot.captured.signupUntil)
+    }
+
+    @Test
+    fun getSharedWhitelists() {
+        val sharedServer = DiscordServer(
+            id = 66,
+            guildId = 717264144759390238,
+            guildName = "My shared",
+            guildOwner = 69693469034096,
+            joinTime = Date(),
+            guildMemberCount = 420,
+            guildMemberUpdateTime = null,
+            ownerAccount = null,
+            premiumUntil = null,
+            tokenPolicies = mutableSetOf(),
+            stakepools = mutableSetOf(),
+            delegatorRoles = mutableSetOf(),
+            tokenRoles = mutableSetOf(),
+            whitelists = mutableSetOf(),
+            settings = mutableSetOf()
+        )
+        val mockWhitelistRepository = mockk<DiscordWhitelistRepository>()
+        every {
+            mockWhitelistRepository.findBySharedWithServer(testServer.id!!)
+        } returns listOf(Whitelist(
+            id = 15,
+            name = "white",
+            displayName = "Black",
+            discordServerId = 66,
+            creator = 15L,
+            createTime = Date(),
+            requiredRoleId = 4141L,
+            sharedWithServer = testServer.id
+        ))
+
+        val mockDiscordServerService = getMockDiscordServerService()
+        every {
+            mockDiscordServerService.getDiscordServerByInternalId(sharedServer.id!!)
+        } returns sharedServer
+        val whitelistService = WhitelistService(
+            mockDiscordServerService,
+            mockk(),
+            mockk(),
+            mockWhitelistRepository,
+        )
+        assertEquals(listOf(SharedWhitelist(
+            guildId = sharedServer.guildId,
+            guildName = sharedServer.guildName,
+            whitelistName = "white",
+            whitelistDisplayName = "Black",
+            signups = emptySet(),
+        )), whitelistService.getSharedWhitelists(testServer.guildId, false))
     }
 
     private fun prepareWhitelistTest(): Pair<CapturingSlot<Whitelist>, WhitelistService> {

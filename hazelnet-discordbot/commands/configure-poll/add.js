@@ -374,51 +374,61 @@ module.exports = {
     }
   },
   async executeButton(interaction) {
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-    const locale = discordServer.getBotLanguage();
-    if (interaction.customId === 'configure-poll/add/startphase3') {
-      const pollObjectPhase3 = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-      const content = this.buildContent(locale, interaction.channel.id, pollObjectPhase3, 3);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
-      await interaction.update({ embeds: [embed], components: [], ephemeral: true });
-      this.startPhase3(interaction, discordServer, pollObjectPhase3);
-    } else if (interaction.customId === 'configure-poll/add/startphase4') {
-      const { optionCollector, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-      optionCollector.stop('cancelled');
-      this.startPhase4(interaction, discordServer, pollObject);
-    } else if (interaction.customId === 'configure-poll/add/startphase5' || interaction.customId === 'configure-poll/add/redophase5') {
-      const pollObjectPhase5 = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-      this.startPhase5(interaction, discordServer, pollObjectPhase5);
-    } else if (interaction.customId === 'configure-poll/add/redophase2') {
-      const { description, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-      const content = this.buildContent(locale, interaction.channel.id, pollObject, 1);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
-      await interaction.update({ embeds: [embed], components: [], ephemeral: true });
-      this.startPhase2(interaction, discordServer, pollObject);
-    } else if (interaction.customId === 'configure-poll/add/redophase3') {
-      const { options, optionCollector, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-      optionCollector.stop('cancelled');
-      const content = this.buildContent(locale, interaction.channel.id, pollObject, 3);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
-      await interaction.update({ embeds: [embed], components: [], ephemeral: true });
-      this.startPhase3(interaction, discordServer, pollObject);
-    } else if (interaction.customId === 'configure-poll/add/finish') {
-      this.createPoll(interaction, discordServer);
+    try {
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const locale = discordServer.getBotLanguage();
+      if (interaction.customId === 'configure-poll/add/startphase3') {
+        const pollObjectPhase3 = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+        const content = this.buildContent(locale, interaction.channel.id, pollObjectPhase3, 3);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
+        await interaction.update({ embeds: [embed], components: [], ephemeral: true });
+        this.startPhase3(interaction, discordServer, pollObjectPhase3);
+      } else if (interaction.customId === 'configure-poll/add/startphase4') {
+        const { optionCollector, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+        optionCollector.stop('cancelled');
+        this.startPhase4(interaction, discordServer, pollObject);
+      } else if (interaction.customId === 'configure-poll/add/startphase5' || interaction.customId === 'configure-poll/add/redophase5') {
+        const pollObjectPhase5 = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+        this.startPhase5(interaction, discordServer, pollObjectPhase5);
+      } else if (interaction.customId === 'configure-poll/add/redophase2') {
+        const { description, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+        const content = this.buildContent(locale, interaction.channel.id, pollObject, 1);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
+        await interaction.update({ embeds: [embed], components: [], ephemeral: true });
+        this.startPhase2(interaction, discordServer, pollObject);
+      } else if (interaction.customId === 'configure-poll/add/redophase3') {
+        const { options, optionCollector, ...pollObject } = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+        optionCollector.stop('cancelled');
+        const content = this.buildContent(locale, interaction.channel.id, pollObject, 3);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
+        await interaction.update({ embeds: [embed], components: [], ephemeral: true });
+        this.startPhase3(interaction, discordServer, pollObject);
+      } else if (interaction.customId === 'configure-poll/add/finish') {
+        this.createPoll(interaction, discordServer);
+      }
+    } catch (error) {
+      interaction.client.logger.error(error);
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async executeSelectMenu(interaction) {
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-    const pollObject = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-    if (interaction.customId === 'configure-poll/add/resultsvisible') {
-      pollObject.resultsVisible = interaction.values[0] === 'yes';
-    } else if (interaction.customId === 'configure-poll/add/multiplevotes') {
-      pollObject.multipleVotes = interaction.values[0] === 'yes';
-    } else if (interaction.customId === 'configure-poll/add/tokentype') {
-      [pollObject.tokenType] = interaction.values;
-      pollObject.weighted = pollObject.tokenType === 'tokenweighted';
+    try {
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const pollObject = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
+      if (interaction.customId === 'configure-poll/add/resultsvisible') {
+        pollObject.resultsVisible = interaction.values[0] === 'yes';
+      } else if (interaction.customId === 'configure-poll/add/multiplevotes') {
+        pollObject.multipleVotes = interaction.values[0] === 'yes';
+      } else if (interaction.customId === 'configure-poll/add/tokentype') {
+        [pollObject.tokenType] = interaction.values;
+        pollObject.weighted = pollObject.tokenType === 'tokenweighted';
+      }
+      this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, pollObject);
+      this.startPhase4(interaction, discordServer, pollObject);
+    } catch (error) {
+      interaction.client.logger.error(error);
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
-    this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, pollObject);
-    this.startPhase4(interaction, discordServer, pollObject);
   },
   defaultCollectorOptions(filter, max) {
     return {

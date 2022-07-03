@@ -17,7 +17,7 @@ module.exports = {
       if (!existingIncomingPayment) {
         if (refillAmount >= 5) {
           const incomingPayment = await interaction.client.services.discordserver.requestIncomingPayment(interaction.guild.id, refillAmount * 1000000);
-          const expirationDateTimestamp = Math.floor(new Date(existingIncomingPayment.validBefore).getTime() / 1000);
+          const expirationDateTimestamp = Math.floor(new Date(incomingPayment.validBefore).getTime() / 1000);
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium refill', i18n.__({ phrase: 'configure.premium.refill.success', locale }, { incomingPayment, amount: incomingPayment.amount / 1000000, expirationDateTimestamp }), 'configure-premium-refill');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         } else {

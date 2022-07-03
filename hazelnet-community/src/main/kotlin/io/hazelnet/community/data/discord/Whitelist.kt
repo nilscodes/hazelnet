@@ -43,15 +43,15 @@ class Whitelist @JsonCreator constructor(
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "whitelist_signup_after")
-    var signupAfter: Date?,
+    var signupAfter: Date? = null,
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "whitelist_signup_until")
-    var signupUntil: Date?,
+    var signupUntil: Date? = null,
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "whitelist_launch_date")
-    var launchDate: Date?,
+    var launchDate: Date? = null,
 
     @Column(name = "required_discord_role_id")
     @field:NonNull
@@ -60,7 +60,7 @@ class Whitelist @JsonCreator constructor(
     var requiredRoleId: Long,
 
     @Column(name = "whitelist_max_users")
-    var maxUsers: Int?,
+    var maxUsers: Int? = null,
 
     @Column(name = "whitelist_closed")
     var closed: Boolean = false,
@@ -75,7 +75,7 @@ class Whitelist @JsonCreator constructor(
 
     @Column(name = "whitelist_logo_url")
     @field:Size(min = 1, max = 1000)
-    var logoUrl: String?,
+    var logoUrl: String? = null,
 ) {
     fun getCurrentUsers(): Int = signups.size
 
