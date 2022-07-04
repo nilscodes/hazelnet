@@ -17,6 +17,21 @@ module.exports = {
         .addStringOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false))
         .addStringOption((option) => option.setName('asset-fingerprint').setDescription(ci18n.option('asset-fingerprint')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
+        .setName('update')
+        .setDescription(ci18n.subDescription('update'))
+        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))
+        .addStringOption((option) => option.setName('aggregation-type').setDescription(ci18n.option('aggregation-type'))
+          .addChoices(
+            { name: ci18n.choice('ANY_POLICY_FILTERED_AND'), value: 'ANY_POLICY_FILTERED_AND' },
+            { name: ci18n.choice('ANY_POLICY_FILTERED_OR'), value: 'ANY_POLICY_FILTERED_OR' },
+            { name: ci18n.choice('ANY_POLICY_FILTERED_ONE_EACH'), value: 'ANY_POLICY_FILTERED_ONE_EACH' },
+            { name: ci18n.choice('EVERY_POLICY_FILTERED_OR'), value: 'EVERY_POLICY_FILTERED_OR' },
+          )
+          .setRequired(false))
+        .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(false))
+        .addStringOption((option) => option.setName('count').setDescription(ci18n.option('count')).setRequired(false))
+        .addStringOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false)))
+      .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
