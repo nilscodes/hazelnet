@@ -55,13 +55,16 @@ class DiscordPoll @JsonCreator constructor(
     @field:Size(min = 1, max = 4096)
     var description: String,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "poll_creation", updatable = false)
     var createTime: Date?,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "poll_open_after")
     @field:NonNull
     var openAfter: Date,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "poll_open_until")
     @field:NonNull
     var openUntil: Date,

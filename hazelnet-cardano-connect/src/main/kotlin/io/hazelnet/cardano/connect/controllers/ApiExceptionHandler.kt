@@ -3,6 +3,7 @@ package io.hazelnet.cardano.connect.controllers
 import io.hazelnet.cardano.connect.data.transactions.NoTransactionFoundException
 import io.hazelnet.shared.data.ApiErrorResponse
 import org.springframework.core.annotation.Order
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -16,6 +17,13 @@ class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun processNoTransactionFoundException(ex: NoTransactionFoundException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun processEmptyResultDataAccessException(ex: EmptyResultDataAccessException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 }

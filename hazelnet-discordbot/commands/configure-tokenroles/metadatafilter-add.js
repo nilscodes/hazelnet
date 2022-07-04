@@ -5,7 +5,7 @@ const tokenroles = require('../../utility/tokenroles');
 module.exports = {
   async execute(interaction) {
     const tokenRoleId = interaction.options.getInteger('token-role-id');
-    const attributeName = interaction.options.getString('attribute-name');
+    const attributeName = interaction.options.getString('attribute-path');
     const operator = interaction.options.getString('operator');
     const attributeValue = interaction.options.getString('attribute-value');
     try {

@@ -21,7 +21,7 @@ module.exports = {
       } else {
         addressToVerify = addressOrHandle;
       }
-      if (cardanoaddress.isStakedAddress(addressToVerify)) {
+      if (cardanoaddress.isWalletAddress(addressToVerify)) {
         const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
         const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
         const existingConfirmedVerification = existingVerifications

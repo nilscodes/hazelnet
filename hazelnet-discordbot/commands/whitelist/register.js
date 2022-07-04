@@ -85,7 +85,7 @@ module.exports = {
           if (whitelistToRegisterFor) {
             const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
             await interaction.client.services.discordserver.registerForWhitelist(interaction.guild.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
-            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist: whitelistToRegisterFor, address: addressToWhitelist }), 'whitelist-register');
+            const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist: whitelistToRegisterFor, address: addressToWhitelist }), 'whitelist-register', [], whitelistToRegisterFor.logoUrl);
             await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
           } else {
             const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.errorNotFound', locale }, { whitelistName }), 'whitelist-register');
@@ -109,7 +109,7 @@ module.exports = {
       const verificationToUse = existingVerifications.find((verification) => verification.confirmed && !verification.obsolete && verification.id === +verificationId);
       if (verificationToUse && whitelistToRegisterFor) {
         await interaction.client.services.discordserver.registerForWhitelist(interaction.guild.id, whitelistToRegisterFor.id, externalAccount.id, verificationToUse.address);
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist: whitelistToRegisterFor, address: verificationToUse.address }), 'whitelist-register');
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist: whitelistToRegisterFor, address: verificationToUse.address }), 'whitelist-register', [], whitelistToRegisterFor.logoUrl);
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       }
     }
@@ -171,7 +171,7 @@ module.exports = {
 
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), i18n.__({ phrase: registerPhrase, locale }, {
             whitelist: whitelistToRegisterFor,
-            signupTime: existingSignup ? new Date(existingSignup.signup.signupTime).toISOString().replace(/\.[0-9]{3}Z/, '').replace('T', ' ') : '',
+            signupTime: existingSignup ? Math.floor(new Date(existingSignup.signup.signupTime).getTime() / 1000) : 0,
             addressShort: existingSignup ? cardanoaddress.shorten(existingSignup.signup.address) : '',
           }), 'whitelist-register');
           await interaction.editReply({ embeds: [embed], components, ephemeral: true });
@@ -179,7 +179,7 @@ module.exports = {
           const registerPhrase = existingSignup ? 'whitelist.register.widgetNotVerifiedAlreadyRegistered' : 'whitelist.register.widgetNotVerified';
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), i18n.__({ phrase: registerPhrase, locale }, {
             whitelist: whitelistToRegisterFor,
-            signupTime: existingSignup ? new Date(existingSignup.signup.signupTime).toISOString().replace(/\.[0-9]{3}Z/, '').replace('T', ' ') : '',
+            signupTime: existingSignup ? Math.floor(new Date(existingSignup.signup.signupTime).getTime() / 1000) : 0,
             addressShort: existingSignup ? cardanoaddress.shorten(existingSignup.signup.address) : '',
           }), 'whitelist-register');
           await interaction.editReply({ embeds: [embed], ephemeral: true });

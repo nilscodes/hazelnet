@@ -18,6 +18,7 @@ class ExternalAccountService(
     private val verificationRepository: VerificationRepository,
     private val verificationService: VerificationService,
     private val discordServerRepository: DiscordServerRepository,
+    private val accountService: AccountService,
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
     private val connectService: ConnectService,
@@ -135,5 +136,16 @@ class ExternalAccountService(
     fun importExternalVerifications(externalAccountId: Long): List<VerificationImport> {
         val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
         return verificationService.importExternalVerifications(externalAccount)
+    }
+
+    fun setAccountForExternalAccount(externalAccountId: Long): Account {
+        val externalAccount = getExternalAccount(externalAccountId)
+        if (externalAccount.account == null) {
+            val newAccount = accountService.createAccount(Account(id = null))
+            externalAccount.account = newAccount
+            externalAccountRepository.save(externalAccount)
+            return newAccount
+        }
+        return externalAccount.account!!
     }
 }

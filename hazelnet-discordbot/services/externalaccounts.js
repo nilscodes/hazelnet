@@ -37,12 +37,20 @@ module.exports = {
       return null;
     }
   },
+  async getAccountForExternalAccount(externalAccountId) {
+    const mainAccountResponse = await axios.put(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/account`);
+    return mainAccountResponse.data;
+  },
   clearExternalDiscordAccountCache(discordUserId) {
     this.cache.del(`${discordUserId}`);
   },
   async getActiveVerificationsForExternalAccount(externalAccountId) {
     const verifications = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/verifications`);
     return verifications.data;
+  },
+  async getExternalAccountWhitelists(externalAccountId) {
+    const whitelistsPromise = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/whitelists`);
+    return whitelistsPromise.data;
   },
   async getPremiumInfoForExternalAccount(externalAccountId) {
     const premiumInfo = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/premium`);

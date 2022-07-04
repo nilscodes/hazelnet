@@ -14,8 +14,7 @@ module.exports = {
         .addStringOption((option) => option.setName('address-or-handle').setDescription(ci18n.option('address-or-handle')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription(ci18n.subDescription('list'))
-        .addBooleanOption((option) => option.setName('includeaddress').setDescription(ci18n.option('includeaddress')).setRequired(false)))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('unregister')
         .setDescription(ci18n.subDescription('unregister')));

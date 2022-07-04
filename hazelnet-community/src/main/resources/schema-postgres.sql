@@ -22,11 +22,13 @@ DROP TABLE IF EXISTS "discord_spo_roles";
 DROP TABLE IF EXISTS "discord_spo";
 DROP TABLE IF EXISTS "discord_payments";
 DROP TABLE IF EXISTS "discord_billing";
+DROP TABLE IF EXISTS "external_account_pings";
 DROP TABLE IF EXISTS "discord_servers";
 DROP TABLE IF EXISTS "verification_imports";
 DROP TABLE IF EXISTS "verifications";
 DROP TABLE IF EXISTS "premium_staked";
 DROP TABLE IF EXISTS "external_accounts";
+DROP TABLE IF EXISTS "account_settings";
 DROP TABLE IF EXISTS "accounts";
 DROP TABLE IF EXISTS "global_settings";
 DROP TABLE IF EXISTS "oauth2_authorization";
@@ -48,6 +50,14 @@ CREATE TABLE "accounts"
     "account_id" BIGSERIAL PRIMARY KEY
 );
 
+CREATE TABLE "account_settings"
+(
+    "account_id"    bigint,
+    "setting_name"  varchar(64),
+    "setting_value" varchar(4096),
+    UNIQUE ("account_id", "setting_name")
+);
+
 CREATE TABLE "global_settings"
 (
     "setting_id"    SERIAL PRIMARY KEY,
@@ -64,6 +74,19 @@ CREATE TABLE "external_accounts"
     "account_type"            accounts_external_type NOT NULL,
     "account_id"              bigint,
     "premium"                 boolean                NOT NULL DEFAULT false
+);
+
+CREATE TABLE "external_account_pings"
+(
+    "ping_id"                    BIGSERIAL PRIMARY KEY,
+    "sender_external_account_id" bigint       NOT NULL,
+    "sent_from_server"           int,
+    "recipient_account_id"       bigint       NOT NULL,
+    "recipient_address"          varchar(150) NOT NULL,
+    "sender_message"             varchar(320),
+    "create_time"                timestamp    NOT NULL,
+    "sent_time"                  timestamp,
+    "reported"                   boolean      NOT NULL DEFAULT false
 );
 
 CREATE TABLE "premium_staked"
@@ -220,18 +243,20 @@ CREATE TABLE "discord_settings"
 
 CREATE TABLE "discord_whitelists"
 (
-    "discord_whitelist_id"     BIGSERIAL PRIMARY KEY,
-    "discord_server_id"        int          NOT NULL,
-    "external_account_id"      bigint       NOT NULL,
-    "whitelist_creation"       timestamp    NOT NULL,
-    "whitelist_name"           varchar(30)  NOT NULL,
-    "whitelist_displayname"    varchar(256) NOT NULL,
-    "whitelist_signup_after"   timestamp,
-    "whitelist_signup_until"   timestamp,
-    "whitelist_max_users"      int,
-    "whitelist_closed"         boolean      NOT NULL DEFAULT false,
-    "required_discord_role_id" bigint,
+    "discord_whitelist_id"       BIGSERIAL PRIMARY KEY,
+    "discord_server_id"          int          NOT NULL,
+    "external_account_id"        bigint       NOT NULL,
+    "whitelist_creation"         timestamp    NOT NULL,
+    "whitelist_name"             varchar(30)  NOT NULL,
+    "whitelist_displayname"      varchar(256) NOT NULL,
+    "whitelist_signup_after"     timestamp,
+    "whitelist_signup_until"     timestamp,
+    "whitelist_launch_date"      timestamp,
+    "whitelist_max_users"        int,
+    "whitelist_closed"           boolean      NOT NULL DEFAULT false,
+    "required_discord_role_id"   bigint,
     "shared_with_discord_server" int,
+    "whitelist_logo_url"         varchar(1000),
     UNIQUE ("discord_server_id", "whitelist_name")
 );
 
@@ -262,6 +287,7 @@ CREATE TABLE "discord_polls"
     "poll_multiple_votes"  boolean       NOT NULL DEFAULT false,
     "poll_archived"        boolean       NOT NULL DEFAULT false,
     "poll_snapshot_id"     int,
+    "poll_voteaire_id"     uuid,
     UNIQUE ("discord_server_id", "poll_name")
 );
 
@@ -389,7 +415,15 @@ CREATE TABLE "oauth2_authorization"
     refresh_token_metadata        varchar(2000) DEFAULT NULL
 );
 
+ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
+
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("sender_external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("sent_from_server") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "external_account_pings" ADD FOREIGN KEY ("recipient_account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "premium_staked" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
@@ -432,6 +466,8 @@ ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("shared_with_discord_server") 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+CREATE INDEX "discord_whitelists_signup_external_account_id_index" ON "discord_whitelists_signup" ("external_account_id");
 
 ALTER TABLE "discord_polls" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

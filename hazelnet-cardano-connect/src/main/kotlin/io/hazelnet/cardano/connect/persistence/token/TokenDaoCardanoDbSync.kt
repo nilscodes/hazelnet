@@ -2,6 +2,7 @@ package io.hazelnet.cardano.connect.persistence.token
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.services.decodeHex
 import org.springframework.dao.EmptyResultDataAccessException
@@ -27,6 +28,9 @@ const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES =
     "SELECT encode(ma.policy, 'hex') AS policy, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) GROUP BY policy, sa.view"
 const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES_AND_FINGERPRINT =
     "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint, sa.view"
+
+const val GET_STAKE_ADDRESS_BY_ASSET_FINGERPRINT =
+    "SELECT sa.view FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.fingerprint=?"
 
 const val GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME =
     "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash, tm.json FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx_metadata tm ON mtm.tx_id = tm.tx_id JOIN tx ON mtm.tx_id = tx.id WHERE policy=DECODE(?, 'hex') AND name=cast(? as asset32type) AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
@@ -202,5 +206,15 @@ class TokenDaoCardanoDbSync(
             // TODO should be changed to return null and a 404 on the controller, but need to adjust connectService on the community end to deal with that in a healthy way
             MultiAssetInfo(PolicyId(policyId), assetName, AssetFingerprint("asset1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), "", "", 0)
         }
+    }
+
+    override fun getWalletForAsset(assetFingerprint: AssetFingerprint): AddressDetails {
+        return AddressDetails(
+            jdbcTemplate.queryForObject(
+                GET_STAKE_ADDRESS_BY_ASSET_FINGERPRINT,
+                String::class.java,
+                assetFingerprint.assetFingerprint
+            )
+        )
     }
 }

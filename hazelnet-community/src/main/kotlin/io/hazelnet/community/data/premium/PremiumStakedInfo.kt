@@ -3,6 +3,8 @@ package io.hazelnet.community.data.premium
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Embeddable
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 
 @Embeddable
 class PremiumStakedInfo(
@@ -12,6 +14,7 @@ class PremiumStakedInfo(
     @Column(name="active_stake")
     var activeStake: Long,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "snapshot_time", updatable = false)
     var snapshotTime: Date,
 

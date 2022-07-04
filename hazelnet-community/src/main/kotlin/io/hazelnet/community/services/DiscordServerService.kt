@@ -2,6 +2,7 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
+import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.cardano.Stakepool
@@ -37,7 +38,6 @@ class DiscordServerService(
         private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
         private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
         private val discordMetadataFilterRepository: DiscordMetadataFilterRepository,
-        private val discordWhitelistRepository: DiscordWhitelistRepository,
         private val oAuth2AuthorizationService: OAuth2AuthorizationService,
         private val registeredClientRepository: RegisteredClientRepository,
         private val externalAccountService: ExternalAccountService,
@@ -47,7 +47,7 @@ class DiscordServerService(
     @Transactional
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
         discordServer.joinTime = Date.from(ZonedDateTime.now().toInstant())
-        discordServer.settings.add(DiscordServerSetting(DiscordSettings.PROTECTION_ADDR_REMOVAL.name, true.toString()))
+        discordServer.settings.add(EmbeddableSetting(DiscordSettings.PROTECTION_ADDR_REMOVAL.name, true.toString()))
         augmentWithSponsoredInfo(discordServer)
         return discordServerRepository.save(discordServer)
     }
@@ -60,10 +60,10 @@ class DiscordServerService(
             .find { it.second.contains(discordServer.guildId) }
             ?.first
         if (sponsoredGuild != null) {
-            discordServer.settings.add(DiscordServerSetting("SPONSORED_BY", sponsoredGuild.toString()))
+            discordServer.settings.add(EmbeddableSetting("SPONSORED_BY", sponsoredGuild.toString()))
             allSettings
                 .filter { it.key.startsWith("SPONSOR_${sponsoredGuild}_") }
-                .forEach { discordServer.settings.add(DiscordServerSetting(it.key.substring("SPONSOR_${sponsoredGuild}_".length), it.value)) }
+                .forEach { discordServer.settings.add(EmbeddableSetting(it.key.substring("SPONSOR_${sponsoredGuild}_".length), it.value)) }
         }
     }
 
@@ -184,14 +184,6 @@ class DiscordServerService(
         return metadataFilter
     }
 
-    fun addWhitelist(guildId: Long, whitelist: Whitelist): Whitelist {
-        val discordServer = getDiscordServer(guildId)
-        whitelist.createTime = Date.from(ZonedDateTime.now().toInstant())
-        discordServer.whitelists.add(whitelist)
-        discordServerRepository.save(discordServer)
-        return whitelist
-    }
-
     fun addMember(guildId: Long, discordMember: DiscordMember): DiscordMember {
         val discordServer = getDiscordServer(guildId)
         discordMember.joinTime = Date.from(ZonedDateTime.now().toInstant())
@@ -224,12 +216,12 @@ class DiscordServerService(
         return getDiscordServer(guildId).members
     }
 
-    fun updateSettings(guildId: Long, discordServerSetting: DiscordServerSetting): DiscordServerSetting {
+    fun updateSettings(guildId: Long, embeddableSetting: EmbeddableSetting): EmbeddableSetting {
         val discordServer = getDiscordServer(guildId)
-        discordServer.settings.removeIf { it.name == discordServerSetting.name }
-        discordServer.settings.add(discordServerSetting)
+        discordServer.settings.removeIf { it.name == embeddableSetting.name }
+        discordServer.settings.add(embeddableSetting)
         discordServerRepository.save(discordServer)
-        return discordServerSetting
+        return embeddableSetting
     }
 
     fun deleteSettings(guildId: Long, settingName: String) {
@@ -286,104 +278,6 @@ class DiscordServerService(
         return discordServer.delegatorRoles
             .find { it.id == delegatorRoleId }
             ?: throw NoSuchElementException("No delegator role with ID $delegatorRoleId found on guild $guildId")
-    }
-
-    fun updateWhitelist(guildId: Long, whitelistId: Long, whitelistPartial: WhitelistPartial): Whitelist {
-        val discordServer = getDiscordServer(guildId)
-        val whitelistToUpdate = getWhitelistById(discordServer, whitelistId)
-        if (whitelistPartial.closed != null) {
-            whitelistToUpdate.closed = whitelistPartial.closed
-        }
-        if (whitelistPartial.sharedWithServer != null) {
-            if (whitelistPartial.sharedWithServer == 0) {
-                whitelistToUpdate.sharedWithServer = null
-            } else {
-                whitelistToUpdate.sharedWithServer = whitelistPartial.sharedWithServer
-            }
-        }
-        discordWhitelistRepository.save(whitelistToUpdate)
-        return whitelistToUpdate
-    }
-
-    fun deleteWhitelist(guildId: Long, whitelistId: Long) {
-        discordWhitelistRepository.deleteById(whitelistId)
-    }
-
-    fun getWhitelistSignups(guildId: Long, whitelistIdOrName: String): Set<WhitelistSignup> {
-        val discordServer = getDiscordServer(guildId)
-        return try {
-            val whitelistId = whitelistIdOrName.toLong()
-            return getWhitelistById(discordServer, whitelistId).signups
-        }
-        catch(e: NumberFormatException) {
-            getWhitelistByName(discordServer, whitelistIdOrName).signups
-        }
-    }
-
-    fun getSharedWhitelists(guildId: Long): List<SharedWhitelist> {
-        val discordServer = getDiscordServer(guildId)
-        val sharedWhitelists = discordWhitelistRepository.findBySharedWithServer(discordServer.id!!)
-        return sharedWhitelists.map {
-            val sharingServer = getDiscordServerByInternalId(it.sharedWithServer!!)
-            SharedWhitelist(
-                sharingServer.guildId,
-                sharingServer.guildName,
-                it.name,
-                it.displayName,
-                it.signups.map { signup -> io.hazelnet.shared.data.WhitelistSignup(signup.address, signup.signupTime!!) }.toSet()
-            )
-        }
-    }
-
-    private fun getWhitelistById(discordServer: DiscordServer, whitelistId: Long) =
-            discordServer.whitelists.find { it.id == whitelistId }
-                    ?: throw NoSuchElementException("No whitelist with ID $whitelistId found on Discord server ${discordServer.guildId}")
-
-    private fun getWhitelistByName(discordServer: DiscordServer, whitelistName: String) =
-            discordServer.whitelists.find { it.name == whitelistName }
-                    ?: throw NoSuchElementException("No whitelist with name $whitelistName found on Discord server ${discordServer.guildId}")
-
-    @Transactional
-    fun addWhitelistSignup(guildId: Long, whitelistId: Long, whitelistSignup: WhitelistSignup): WhitelistSignup {
-        val discordServer = getDiscordServer(guildId)
-        val whitelist = getWhitelistById(discordServer, whitelistId)
-        if (whitelist.closed) {
-            throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} is currently closed.")
-        }
-        if(whitelist.getCurrentUsers() >= (whitelist.maxUsers ?: Int.MAX_VALUE)) {
-            throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} has already reached the user limit.")
-        }
-        whitelist.signupAfter?.let {
-            if(Date().before(it)) {
-                throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} has not yet opened for registration.")
-            }
-        }
-        whitelist.signupUntil?.let {
-            if(Date().after(it)) {
-                throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} already closed its registration.")
-            }
-        }
-        // Remove existing signup (currently only one per external account possible)
-        whitelist.signups.removeIf { it.externalAccountId == whitelistSignup.externalAccountId }
-        whitelistSignup.signupTime = Date.from(ZonedDateTime.now().toInstant())
-        whitelist.signups.add(whitelistSignup)
-        discordWhitelistRepository.save(whitelist)
-        return whitelistSignup
-    }
-
-    @Transactional
-    fun deleteWhitelistSignup(guildId: Long, whitelistId: Long, externalAccountId: Long) {
-        val discordServer = getDiscordServer(guildId)
-        val whitelist = getWhitelistById(discordServer, whitelistId)
-        whitelist.signups.removeIf { it.externalAccountId == externalAccountId }
-        discordWhitelistRepository.save(whitelist)
-    }
-
-    fun getWhitelistSignup(guildId: Long, whitelistId: Long, externalAccountId: Long): WhitelistSignup {
-        val discordServer = getDiscordServer(guildId)
-        val whitelist = getWhitelistById(discordServer, whitelistId)
-        return whitelist.signups.find { it.externalAccountId == externalAccountId }
-                ?: throw NoSuchElementException("No whitelist registration found for external account $externalAccountId for whitelist ID $whitelistId on Discord server ${discordServer.guildId}")
     }
 
     fun getDiscordServers(): Iterable<DiscordServer> = discordServerRepository.findAll()

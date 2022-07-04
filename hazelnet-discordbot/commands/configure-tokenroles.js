@@ -30,7 +30,7 @@ module.exports = {
           .setName('add')
           .setDescription(ci18n.subDescription('metadatafilter-add'))
           .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true))
-          .addStringOption((option) => option.setName('attribute-name').setDescription(ci18n.option('attribute-name')).setRequired(true))
+          .addStringOption((option) => option.setName('attribute-path').setDescription(ci18n.option('attribute-path')).setRequired(true))
           .addStringOption((option) => option.setName('operator').setDescription(ci18n.option('operator'))
             .addChoices(
               { name: ci18n.choice('EQUALS'), value: 'EQUALS' },

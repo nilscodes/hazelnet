@@ -28,6 +28,7 @@ class CommunityService(
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/discord/servers/$guildId/whitelists/shared")
+                    .queryParam("withSignups", "true")
                     .build()
             }.retrieve()
             .bodyToMono(object : ParameterizedTypeReference<List<SharedWhitelist>>() {})

@@ -30,6 +30,7 @@ class ClaimList (
     @field:Size(min = 1, max = 2000)
     var description: String?,
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "claim_list_creation", updatable = false)
     var createTime: Date?,
 

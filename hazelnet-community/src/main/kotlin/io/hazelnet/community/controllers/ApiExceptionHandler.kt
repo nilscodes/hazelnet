@@ -7,6 +7,8 @@ import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
 import io.hazelnet.community.data.discord.WhitelistRequirementNotMetException
+import io.hazelnet.community.data.ping.LastPingTooRecentException
+import io.hazelnet.community.data.ping.PingTargetNotFoundException
 import mu.KotlinLogging
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -35,6 +37,26 @@ class ApiExceptionHandler {
     @ResponseBody
     fun processStakeAddressNotFoundException(ex: StakeAddressInUseException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(LastPingTooRecentException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    fun processLastPingTooRecentException(ex: LastPingTooRecentException): ApiErrorResponse {
+        return ApiErrorResponse(
+            listOf(ApiErrorMessage(
+                message = ex.message ?: "",
+                additionalData = mapOf(Pair("minutesSinceLastPing", ex.minutesSinceLastPing)))
+            ),
+            HttpStatus.FORBIDDEN
+        )
+    }
+
+    @ExceptionHandler(PingTargetNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun processPingTargetNotFoundException(ex: PingTargetNotFoundException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler(InvalidAddressException::class)

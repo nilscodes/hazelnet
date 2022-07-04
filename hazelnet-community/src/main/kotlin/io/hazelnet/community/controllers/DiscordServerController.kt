@@ -1,6 +1,6 @@
 package io.hazelnet.community.controllers
 
-import io.hazelnet.community.data.discord.DiscordServerSetting
+import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.claim.PhysicalOrder
@@ -10,6 +10,7 @@ import io.hazelnet.community.data.premium.IncomingDiscordPaymentRequest
 import io.hazelnet.community.services.BillingService
 import io.hazelnet.community.services.DiscordServerService
 import io.hazelnet.community.services.IncomingPaymentService
+import io.hazelnet.community.services.WhitelistService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -20,6 +21,7 @@ import javax.validation.Valid
 @RequestMapping("/discord/servers")
 class DiscordServerController(
         private val discordServerService: DiscordServerService,
+        private val whitelistService: WhitelistService,
         private val billingService: BillingService,
         private val incomingPaymentService: IncomingPaymentService,
 ) {
@@ -138,7 +140,7 @@ class DiscordServerController(
     @PostMapping("/{guildId}/whitelists")
     @ResponseStatus(HttpStatus.CREATED)
     fun addWhitelist(@PathVariable guildId: Long, @RequestBody @Valid whitelist: Whitelist): ResponseEntity<Whitelist> {
-        val newWhitelist = discordServerService.addWhitelist(guildId, whitelist)
+        val newWhitelist = whitelistService.addWhitelist(guildId, whitelist)
         return ResponseEntity
                 .created(ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{whitelistId}")
@@ -149,24 +151,24 @@ class DiscordServerController(
 
     @PatchMapping("/{guildId}/whitelists/{whitelistId}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @RequestBody @Valid whitelistPartial: WhitelistPartial) = discordServerService.updateWhitelist(guildId, whitelistId, whitelistPartial)
+    fun updateWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @RequestBody @Valid whitelistPartial: WhitelistPartial) = whitelistService.updateWhitelist(guildId, whitelistId, whitelistPartial)
 
     @DeleteMapping("/{guildId}/whitelists/{whitelistId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = discordServerService.deleteWhitelist(guildId, whitelistId)
+    fun deleteWhitelist(@PathVariable guildId: Long, @PathVariable whitelistId: Long) = whitelistService.deleteWhitelist(guildId, whitelistId)
 
     @GetMapping("/{guildId}/whitelists/shared")
     @ResponseStatus(HttpStatus.OK)
-    fun getSharedWhitelists(@PathVariable guildId: Long) = discordServerService.getSharedWhitelists(guildId)
+    fun getSharedWhitelists(@PathVariable guildId: Long, @RequestParam(required = false, defaultValue = "false") withSignups: Boolean) = whitelistService.getSharedWhitelists(guildId, withSignups)
 
     @GetMapping("/{guildId}/whitelists/{whitelistIdOrName}/signups")
     @ResponseStatus(HttpStatus.OK)
-    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistIdOrName: String) = discordServerService.getWhitelistSignups(guildId, whitelistIdOrName)
+    fun getWhitelistSignups(@PathVariable guildId: Long, @PathVariable whitelistIdOrName: String) = whitelistService.getWhitelistSignups(guildId, whitelistIdOrName)
 
     @PostMapping("/{guildId}/whitelists/{whitelistId}/signups")
     @ResponseStatus(HttpStatus.CREATED)
     fun addWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @RequestBody @Valid whitelistSignup: WhitelistSignup): ResponseEntity<WhitelistSignup> {
-        val newWhitelistSignup = discordServerService.addWhitelistSignup(guildId, whitelistId, whitelistSignup)
+        val newWhitelistSignup = whitelistService.addWhitelistSignup(guildId, whitelistId, whitelistSignup)
         return ResponseEntity
                 .created(ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{externalAccountId}")
@@ -177,11 +179,11 @@ class DiscordServerController(
 
     @GetMapping("/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = discordServerService.getWhitelistSignup(guildId, whitelistId, externalAccountId)
+    fun getWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = whitelistService.getWhitelistSignup(guildId, whitelistId, externalAccountId)
 
     @DeleteMapping("/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = discordServerService.deleteWhitelistSignup(guildId, whitelistId, externalAccountId)
+    fun deleteWhitelistSignup(@PathVariable guildId: Long, @PathVariable whitelistId: Long, @PathVariable externalAccountId: Long) = whitelistService.deleteWhitelistSignup(guildId, whitelistId, externalAccountId)
 
     @PostMapping("/{guildId}/members")
     @ResponseStatus(HttpStatus.CREATED)
@@ -221,11 +223,11 @@ class DiscordServerController(
 
     @PutMapping("/{guildId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)
-    fun updateSetting(@PathVariable guildId: Long, @PathVariable settingName: String, @RequestBody @Valid discordServerSetting: DiscordServerSetting): DiscordServerSetting {
-        if (discordServerSetting.name != settingName) {
-            throw IllegalArgumentException("Discord server setting name in path $settingName did not match setting in request body ${discordServerSetting.name}.")
+    fun updateSetting(@PathVariable guildId: Long, @PathVariable settingName: String, @RequestBody @Valid embeddableSetting: EmbeddableSetting): EmbeddableSetting {
+        if (embeddableSetting.name != settingName) {
+            throw IllegalArgumentException("Discord server setting name in path $settingName did not match setting in request body ${embeddableSetting.name}.")
         }
-        return discordServerService.updateSettings(guildId, discordServerSetting)
+        return discordServerService.updateSettings(guildId, embeddableSetting)
     }
 
     @DeleteMapping("/{guildId}/settings/{settingName}")
