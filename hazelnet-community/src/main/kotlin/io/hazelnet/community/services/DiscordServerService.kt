@@ -172,6 +172,15 @@ class DiscordServerService(
         if (tokenOwnershipRolePartial.aggregationType != null) {
             tokenOwnershipRole.aggregationType = tokenOwnershipRolePartial.aggregationType
         }
+        if (tokenOwnershipRolePartial.minimumTokenQuantity != null) {
+            tokenOwnershipRole.minimumTokenQuantity = tokenOwnershipRolePartial.minimumTokenQuantity
+        }
+        if (tokenOwnershipRolePartial.maximumTokenQuantity != null) {
+            tokenOwnershipRole.maximumTokenQuantity = if (tokenOwnershipRolePartial.maximumTokenQuantity == 0L) null else tokenOwnershipRolePartial.maximumTokenQuantity
+        }
+        if (tokenOwnershipRolePartial.roleId != null) {
+            tokenOwnershipRole.roleId = tokenOwnershipRolePartial.roleId
+        }
         discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
         return tokenOwnershipRole
     }

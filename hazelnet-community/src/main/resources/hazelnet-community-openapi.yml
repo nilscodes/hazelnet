@@ -2423,14 +2423,24 @@ components:
     DiscordTokenRolePartial:
       type: object
       properties:
-        aggregationType:
-          $ref: '#/components/schemas/TokenOwnershipAggregationType'
         acceptedAssets:
           type: array
           minItems: 1
           maxItems: 50
           items:
             $ref: '#/components/schemas/TokenRoleAssetInfo'
+        minimumTokenQuantity:
+          type: integer
+          format: int64
+          example: 1
+        maximumTokenQuantity:
+          type: integer
+          format: int64
+          example: 10
+        aggregationType:
+          $ref: '#/components/schemas/TokenOwnershipAggregationType'
+        roleId:
+          $ref: '#/components/schemas/DiscordRole'
     TokenOwnershipAggregationType:
       type: string
       default: ANY_POLICY_FILTERED_AND
