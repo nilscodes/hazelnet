@@ -12,7 +12,7 @@ module.exports = {
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
-        if (discordServer.active && discordServer.guildId % 180 === minutesInDay) {
+        if (discordServer.active && discordServer.guildId % 180 === minutesInDay % 180) {
           try {
             const removeInvalid = discordServer.settings?.REMOVE_INVALID_DELEGATORROLES !== 'false';
             const expectedRoleAssignments = await client.services.discordserver.getCurrentDelegatorRoleAssignments(discordServer.guildId);
