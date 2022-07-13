@@ -6,11 +6,13 @@ module.exports = {
   async execute(client) {
     client.logger.info('Running token role assignment job');
     try {
-      const minutes = new Date().getMinutes() % 60;
+      const hours = new Date().getHours();
+      const minutes = new Date().getMinutes();
+      const minutesInDay = hours * 60 + minutes;
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
-        if (discordServer.active && discordServer.guildId % 60 === minutes) {
+        if (discordServer.active && discordServer.guildId % 180 === minutesInDay) {
           try {
             const removeInvalid = discordServer.settings?.REMOVE_INVALID_TOKENROLES !== 'false';
             const expectedRoleAssignments = await client.services.discordserver.getCurrentTokenRoleAssignments(discordServer.guildId);
