@@ -50,7 +50,7 @@ module.exports = {
         if (whitelistToDownload) {
           const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild.id, whitelistToDownload.id);
           if (signups.length) {
-            const fileToDownload = this.buildFileToDownload(signups, discordServer.guildId, whitelistToDownload.name);
+            const fileToDownload = this.buildFileToDownload(whitelistToDownload, signups, discordServer.guildId, whitelistToDownload.name);
 
             const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelistToDownload);
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.success', locale }, { whitelist: whitelistToDownload }), 'configure-whitelist-download', [
@@ -100,12 +100,18 @@ module.exports = {
       }
     }
   },
-  buildFileToDownload(signups, guildId, whitelistName) {
-    const csvList = [['address', 'signupTime'], ...signups.map((signup) => ([signup.address, signup.signupTime]))];
+  buildFileToDownload(whitelist, signups, guildId, whitelistName) {
+    const csvList = this.getCsvContent(whitelist, signups);
     const csv = csvStringify.stringify(csvList);
     const csvBuffer = Buffer.from(csv, 'utf8');
     const fileToDownload = new MessageAttachment(csvBuffer, `hazelnet-${guildId}-whitelist-${whitelistName}.csv`);
     fileToDownload.setDescription('HAZELnet Whitelist Signups Download');
     return fileToDownload;
+  },
+  getCsvContent(whitelist, signups) {
+    if (whitelist.type !== 'CARDANO_ADDRESS') {
+      return [['referenceId', 'referenceName', 'referenceType', 'signupTime'], ...signups.map((signup) => ([signup.referenceId, signup.referenceName, signup.referenceType, signup.signupTime]))];
+    }
+    return [['address', 'signupTime'], ...signups.map((signup) => ([signup.address, signup.signupTime]))];
   },
 };

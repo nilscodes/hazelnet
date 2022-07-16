@@ -20,7 +20,7 @@ class WhitelistSignup @JsonCreator constructor(
         @Column(name = "address")
         @field:Size(min = 10, max = 103)
         @field:Pattern(regexp = "[a-zA-Z0-9]+")
-        var address: String,
+        var address: String?,
 
         @Column(name = "signup_time", updatable = false)
         var signupTime: Date?
@@ -40,7 +40,7 @@ class WhitelistSignup @JsonCreator constructor(
 
     override fun hashCode(): Int {
         var result = externalAccountId.hashCode()
-        result = 31 * result + address.hashCode()
+        result = 31 * result + (address?.hashCode() ?: 0)
         result = 31 * result + (signupTime?.hashCode() ?: 0)
         return result
     }

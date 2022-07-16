@@ -163,11 +163,12 @@ module.exports = {
     const discordPollPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`, discordPollPartial);
     return discordPollPromise.data;
   },
-  async createWhitelist(guildId, creator, name, displayName, signupAfter, signupUntil, maxUsers, requiredRoleId, launchDate, logoUrl) {
+  async createWhitelist(guildId, creator, name, displayName, type, signupAfter, signupUntil, maxUsers, requiredRoleId, launchDate, logoUrl) {
     const newWhitelistPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists`, {
       creator,
       displayName,
       name,
+      type,
       signupAfter,
       signupUntil,
       maxUsers,

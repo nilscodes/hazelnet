@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import io.hazelnet.community.data.premium.PremiumStakedInfo
+import io.hazelnet.shared.data.ExternalAccountType
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*

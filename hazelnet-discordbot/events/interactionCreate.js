@@ -3,7 +3,11 @@ module.exports = {
   async execute(interaction) {
     try {
       if (interaction.isCommand()) {
+        const startRun = new Date();
         const command = interaction.client.commands.get(interaction.commandName);
+        const subcommandGroup = interaction.options.getSubcommandGroup(false);
+        const subcommand = interaction.options.getSubcommand(false);
+        const subcommandName = subcommandGroup ? `${subcommandGroup}-${subcommand}` : subcommand;
         if (!command) return;
 
         try {
@@ -12,6 +16,13 @@ module.exports = {
           interaction.client.logger.error({ guildId: interaction.guild?.id, error });
           await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
+        const durationInMs = new Date().getTime() - startRun.getTime();
+        interaction.client.metrics.commandDuration
+          .labels({
+            command: subcommandName ? `${interaction.commandName}-${subcommandName}` : interaction.commandName,
+            guild: interaction.guild?.id,
+          })
+          .observe(durationInMs);
       } else if (interaction.isSelectMenu()) {
         const commandForSelect = interaction.customId.split('/')[0];
         const command = interaction.client.commands.get(commandForSelect);

@@ -84,14 +84,19 @@ class WhitelistService(
         discordWhitelistRepository.deleteById(whitelistId)
     }
 
-    fun getWhitelistSignups(guildId: Long, whitelistIdOrName: String): Set<io.hazelnet.community.data.discord.WhitelistSignup> {
+    fun getWhitelistSignups(guildId: Long, whitelistIdOrName: String): Set<WhitelistSignup> {
         val discordServer = discordServerService.getDiscordServer(guildId)
         return try {
             val whitelistId = whitelistIdOrName.toLong()
-            return getWhitelistById(discordServer, whitelistId).signups
-        }
-        catch(e: NumberFormatException) {
-            getWhitelistByName(discordServer, whitelistIdOrName).signups
+            val whitelist = getWhitelistById(discordServer, whitelistId)
+            whitelist.signups.map { signup ->
+                buildWhitelistSignup(whitelist, signup)
+            }.toSet()
+        } catch(e: NumberFormatException) {
+            val whitelist = getWhitelistByName(discordServer, whitelistIdOrName)
+            whitelist.signups.map { signup ->
+                buildWhitelistSignup(whitelist, signup)
+            }.toSet()
         }
     }
 
@@ -105,9 +110,28 @@ class WhitelistService(
                 guildName = sharingServer.guildName,
                 whitelistName = it.name,
                 whitelistDisplayName = it.displayName,
-                signups = if (withSignups) it.signups.map { signup -> WhitelistSignup(signup.address, signup.signupTime!!) }.toSet() else emptySet()
+                signups = if (withSignups) it.signups.map { signup ->
+                    buildWhitelistSignup(it, signup)
+                }.toSet() else emptySet()
             )
         }
+    }
+
+    private fun buildWhitelistSignup(
+        whitelist: Whitelist,
+        signup: io.hazelnet.community.data.discord.WhitelistSignup
+    ): WhitelistSignup {
+        // TODO improve very inefficient looped SQL queries
+        val externalAccount =
+            if (whitelist.type == WhitelistType.DISCORD_ID) externalAccountService.getExternalAccount(signup.externalAccountId) else null
+        return WhitelistSignup(
+            externalAccountId = signup.externalAccountId,
+            address = signup.address,
+            signupTime = signup.signupTime!!,
+            referenceId = externalAccount?.referenceId,
+            referenceName = externalAccount?.referenceName,
+            referenceType = externalAccount?.type,
+        )
     }
 
     private fun getWhitelistById(discordServer: DiscordServer, whitelistId: Long) =
@@ -137,6 +161,11 @@ class WhitelistService(
             if(Date().after(it)) {
                 throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} already closed its registration.")
             }
+        }
+        if (whitelist.type == WhitelistType.CARDANO_ADDRESS && whitelistSignup.address == null) {
+            throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} cannot be signed up to without a valid address.")
+        } else if (whitelist.type == WhitelistType.DISCORD_ID) {
+            whitelistSignup.address = null
         }
         // Remove existing signup (currently only one per external account possible)
         whitelist.signups.removeIf { it.externalAccountId == whitelistSignup.externalAccountId }
