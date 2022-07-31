@@ -6,6 +6,7 @@ import io.hazelnet.community.data.premium.PremiumStakedInfo
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationRepository
+import io.hazelnet.shared.data.ExternalAccountType
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime

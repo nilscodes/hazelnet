@@ -75,7 +75,8 @@ class MetadataFilter @JsonCreator constructor(
         metadata: String
     ): Any? {
         return try {
-            JsonPath.read<Any>(metadata, "$.${attributeName}")
+            val attributePath = if (attributeName.startsWith("$.")) attributeName.substring(2) else attributeName
+            JsonPath.read<Any>(metadata, "$.${attributePath}")
         } catch(pnfe: PathNotFoundException) {
             null
         }

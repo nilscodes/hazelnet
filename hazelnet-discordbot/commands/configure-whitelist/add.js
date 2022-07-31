@@ -6,6 +6,7 @@ module.exports = {
   async execute(interaction) {
     const whitelistName = interaction.options.getString('whitelist-name');
     const whitelistDisplayName = interaction.options.getString('whitelist-displayname');
+    const whitelistType = interaction.options.getString('type');
     const requiredRole = interaction.options.getRole('required-role');
     const maxUsers = interaction.options.getInteger('max-users');
     const signupAfter = interaction.options.getString('signup-start');
@@ -34,6 +35,7 @@ module.exports = {
               externalAccount.id,
               whitelistName,
               whitelistDisplayName,
+              whitelistType,
               signupAfter,
               signupUntil,
               maxUsers,

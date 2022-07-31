@@ -22,6 +22,10 @@ class Whitelist @JsonCreator constructor(
     @Column(name = "discord_server_id", insertable = false, updatable = false)
     var discordServerId: Int,
 
+    @Column(name = "whitelist_type")
+    @Enumerated(EnumType.ORDINAL)
+    var type: WhitelistType = WhitelistType.CARDANO_ADDRESS,
+
     @Column(name = "external_account_id")
     @field:NonNull
     @field:Min(1)
@@ -99,6 +103,7 @@ class Whitelist @JsonCreator constructor(
         if (signups != other.signups) return false
         if (sharedWithServer != other.sharedWithServer) return false
         if (logoUrl != other.logoUrl) return false
+        if (type != other.type) return false
 
         return true
     }
@@ -118,11 +123,12 @@ class Whitelist @JsonCreator constructor(
         result = 31 * result + signups.hashCode()
         result = 31 * result + (sharedWithServer?.hashCode() ?: 0)
         result = 31 * result + (logoUrl?.hashCode() ?: 0)
+        result = 31 * result + type.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "Whitelist(id=$id, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
+        return "Whitelist(id=$id, type=$type, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoleId=$requiredRoleId, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
     }
 
 }

@@ -97,11 +97,12 @@ module.exports = {
     return false;
   },
   async getQualifyText(interaction, discordServer, whitelist, existingSignup, includeFullAddress) {
+    const isAddressBasedWhitelist = whitelist.type === 'CARDANO_ADDRESS';
     if (existingSignup) {
-      const phrase = 'whitelist.list.youAreRegisteredWithAddress';
+      const phrase = `whitelist.list.${isAddressBasedWhitelist ? 'youAreRegisteredWithAddress' : 'youAreRegistered'}`;
       return `\n${i18n.__({ phrase, locale: discordServer.getBotLanguage() }, {
         signupTime: Math.floor(new Date(existingSignup.signupTime).getTime() / 1000),
-        address: includeFullAddress ? existingSignup.address : cardanoaddress.shorten(existingSignup.address),
+        address: includeFullAddress || !isAddressBasedWhitelist ? existingSignup.address : cardanoaddress.shorten(existingSignup.address),
       })}`;
     }
     if (this.hasSignupEnded(whitelist) || !this.hasSignupStarted(whitelist) || (whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
@@ -147,18 +148,19 @@ module.exports = {
   },
   getSignupComponents(discordServer, whitelist) {
     const locale = discordServer.getBotLanguage();
-    return [new MessageActionRow()
-      .addComponents(
-        new MessageButton()
-          .setCustomId(`whitelist/register/widgetsignup-${whitelist.id}`)
-          .setLabel(i18n.__({ phrase: 'whitelist.register.registerButton', locale }))
-          .setStyle('PRIMARY'),
-        new MessageButton()
-          .setCustomId('verify/add/widgetverify')
-          .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
-          .setStyle('SECONDARY'),
-      ),
+    const buttons = [
+      new MessageButton()
+        .setCustomId(`whitelist/register/widgetsignup-${whitelist.id}`)
+        .setLabel(i18n.__({ phrase: 'whitelist.register.registerButton', locale }))
+        .setStyle('PRIMARY'),
     ];
+    if (whitelist.type === 'CARDANO_ADDRESS') {
+      buttons.push(new MessageButton()
+        .setCustomId('verify/add/widgetverify')
+        .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
+        .setStyle('SECONDARY'));
+    }
+    return [new MessageActionRow().addComponents(buttons)];
   },
   getWhitelistErrorEmbed(discordServer, commandTitle, commandId, signupAfter, signupUntil, launchDate, logoUrl) {
     const locale = discordServer.getBotLanguage();

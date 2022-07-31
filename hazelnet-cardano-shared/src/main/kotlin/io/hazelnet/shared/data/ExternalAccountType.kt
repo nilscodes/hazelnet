@@ -1,4 +1,4 @@
-package io.hazelnet.community.data
+package io.hazelnet.shared.data
 
 enum class ExternalAccountType {
     DISCORD

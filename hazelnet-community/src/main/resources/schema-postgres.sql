@@ -257,6 +257,7 @@ CREATE TABLE "discord_whitelists"
     "required_discord_role_id"   bigint,
     "shared_with_discord_server" int,
     "whitelist_logo_url"         varchar(1000),
+    "whitelist_type"             smallint     NOT NULL DEFAULT 0,
     UNIQUE ("discord_server_id", "whitelist_name")
 );
 

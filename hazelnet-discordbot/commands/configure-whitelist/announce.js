@@ -62,7 +62,8 @@ module.exports = {
         const components = whitelistUtil.getSignupComponents(discordServer, whitelistToAnnounce);
         try {
           const announceChannel = await interaction.guild.channels.fetch(announceChannelId);
-          const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.whitelist.announce.publicSuccessTitle', locale }), i18n.__({ phrase: 'configure.whitelist.announce.publicSuccess', locale }), 'whitelist-register', detailFields, whitelistToAnnounce.logoUrl);
+          const successText = i18n.__({ phrase: `configure.whitelist.announce.${whitelistToAnnounce.type === 'CARDANO_ADDRESS' ? 'publicSuccess' : 'publicSuccessNoAddress'}`, locale });
+          const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.whitelist.announce.publicSuccessTitle', locale }), successText, 'whitelist-register', detailFields, whitelistToAnnounce.logoUrl);
           await announceChannel.send({ embeds: [embedPublic], components });
           const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist announce', i18n.__({ phrase: 'configure.whitelist.announce.success', locale }, { channel: announceChannelId }), 'configure-whitelist-announce');
           await interaction.editReply({ embeds: [embedAdmin], components: [], ephemeral: true });

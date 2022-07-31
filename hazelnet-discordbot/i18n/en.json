@@ -80,6 +80,7 @@
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
 				"whitelist-displayname": "The display name for this whitelist (for your users)",
+				"type": "The type of whitelist signups you are looking to collect",
 				"required-role": "Role that is required for a user to have, to be able to register for this whitelist.",
 				"max-users": "The maximum number of users that can sign up for this whitelist.",
 				"signup-start": "An optional UTC time after which registration is possible (Format: 2022-01-01T15:00:00Z)",
@@ -138,6 +139,10 @@
 				"INFO_CONTENT_TEXT": "Content for /info command",
 				"INFO_CONTENT_IMAGE": "Image for /info command",
 				"RESET": "Reset all (value must be \"YES\" to confirm)"
+			},
+			"configure-whitelist": {
+				"CARDANO_ADDRESS": "Cardano wallet address (addr1...)",
+				"DISCORD_ID": "Discord ID and tag"
 			}
 		}
 	},
@@ -294,8 +299,8 @@
 			"outstandingData": "Waiting for **₳{{amount}}** to be sent to *{{verification.address}}* for a successful verification.",
 			"accountIsLinked": "⚡ Linked",
 			"accountIsLinkedInfo": "Your verified wallets are linked with this Discord server and you will be automatically assigned roles and access other features, if configured by the server admin.\nℹ To unlink, use */verify unlink*",
-			"accountIsNotLinked": "🔌 Not Linked",
-			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a validated wallet.\nℹ To link your already verified wallets to this server, use */verify link*",
+			"accountIsNotLinked": "🔌 Not Linked ⚠",
+			"accountIsNotLinkedInfo": "Your verified wallets are not linked with this Discord server and your privacy is ensured. No automatic role assignments will be done and you cannot use any other features that require a verified wallet.\nℹ To link your already verified wallets to this server, use */verify link*",
 			"cancelOutstanding": "Cancel open verification",
 			"cancelSuccess": "❌ Outstanding verification for address {{address}} was successfully cancelled. You can now start a new verification process."
 		},
@@ -377,7 +382,8 @@
 			"chooseWhitelist": "Select your whitelist",
 			"noOpenWhitelists": "There are currently no further whitelists that you qualify for.\n\n💡 If you verified your wallet within the last few minutes, please wait at least one hour for the automatic role-assignments to take effect. Then try again.",
 			"registerButton": "Register for this whitelist",
-			"success": "✅ Congratulations, you have successfully registered for the whitelist **{{{whitelist.displayName}}}**!\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
+			"success": "✅ Congratulations, you have successfully registered for the whitelist **{{{whitelist.displayName}}}**!",
+			"successUsedAddress": "\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
@@ -757,6 +763,7 @@
 				"success": "✅ Whitelist successfully announced in <#{{channel}}>.",
 				"publicSuccessTitle": "📢 Whitelist opportunity!",
 				"publicSuccess": "The following whitelist is available to this community. If you fulfill the conditions, register one of your verified addresses via the button below or verify your wallet first and then register!",
+				"publicSuccessNoAddress": "The following whitelist is available to this community. If you fulfill the conditions, register via the button below!",
 				"detailsDescription": "Whitelist details",
 				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be announced.",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",

@@ -2,6 +2,7 @@ package io.hazelnet.community.data
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
+import io.hazelnet.shared.data.ExternalAccountType
 import org.hibernate.annotations.Type
 import javax.persistence.*
 import javax.validation.constraints.NotNull

@@ -1,7 +1,7 @@
 package io.hazelnet.external.controllers
 
-import io.hazelnet.shared.data.SharedWhitelist
-import io.hazelnet.shared.data.WhitelistSignup
+import io.hazelnet.external.data.SanitizedSharedWhitelist
+import io.hazelnet.external.data.SanitizedWhitelistSignup
 import io.hazelnet.external.services.WhitelistService
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication
@@ -14,14 +14,14 @@ class WhitelistController(
 ) {
     @GetMapping("/{whitelistName}/signups")
     @ResponseStatus(HttpStatus.OK)
-    fun getWhitelistSignups(@PathVariable whitelistName: String, authentication: BearerTokenAuthentication): List<WhitelistSignup> {
+    fun getWhitelistSignups(@PathVariable whitelistName: String, authentication: BearerTokenAuthentication): List<SanitizedWhitelistSignup> {
         val guildId = getGuildIdFromToken(authentication)
         return whitelistService.getWhitelistSignups(guildId, whitelistName)
     }
 
     @GetMapping("/shared")
     @ResponseStatus(HttpStatus.OK)
-    fun getSharedWhitelistSignups(authentication: BearerTokenAuthentication): List<SharedWhitelist> {
+    fun getSharedWhitelistSignups(authentication: BearerTokenAuthentication): List<SanitizedSharedWhitelist> {
         val guildId = getGuildIdFromToken(authentication)
         return whitelistService.getSharedWhitelists(guildId)
     }

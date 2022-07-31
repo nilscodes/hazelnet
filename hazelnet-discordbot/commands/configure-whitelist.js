@@ -13,6 +13,12 @@ module.exports = {
         .setDescription(ci18n.subDescription('add'))
         .addStringOption((option) => option.setName('whitelist-displayname').setDescription(ci18n.option('whitelist-displayname')).setRequired(true))
         .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
+        .addStringOption((option) => option.setName('type').setDescription(ci18n.option('type'))
+          .addChoices(
+            { name: ci18n.choice('CARDANO_ADDRESS'), value: 'CARDANO_ADDRESS' },
+            { name: ci18n.choice('DISCORD_ID'), value: 'DISCORD_ID' },
+          )
+          .setRequired(true))
         .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true))
         .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
         .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))

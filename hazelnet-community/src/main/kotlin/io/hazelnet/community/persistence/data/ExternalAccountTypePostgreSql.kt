@@ -1,6 +1,6 @@
 package io.hazelnet.community.persistence.data
 
-import io.hazelnet.community.data.ExternalAccountType
+import io.hazelnet.shared.data.ExternalAccountType
 import org.hibernate.HibernateException
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.EnumType

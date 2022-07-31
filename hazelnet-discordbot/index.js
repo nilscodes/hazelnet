@@ -7,8 +7,11 @@ const path = require('path');
 const { Client, Collection, Intents } = require('discord.js');
 const i18n = require('i18n');
 const cron = require('node-cron');
+const express = require('express');
+const prometheus = require('prom-client');
 const logger = require('pino')();
 const services = require('./services');
+const metrics = require('./utility/metrics');
 
 // Configure localization singleton
 i18n.configure({
@@ -26,6 +29,7 @@ const client = new Client({
 // Inject shared services and utilities into the client
 client.services = services;
 client.logger = logger;
+client.metrics = metrics.setup(prometheus);
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -71,3 +75,13 @@ scheduleFiles.forEach((file) => {
 
 // Login to Discord with your client's token
 client.login(process.env.TOKEN);
+
+// Start express server to expose prometheus metrics
+const app = express();
+
+app.get('/metrics', async (_, res) => {
+  res.set('Content-Type', prometheus.register.contentType);
+  res.end(await prometheus.register.metrics());
+});
+
+app.listen(3000);

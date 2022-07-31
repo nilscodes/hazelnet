@@ -7,13 +7,13 @@ module.exports = {
   async executeSubcommandIfAdmin(interaction) {
     const subcommandGroup = interaction.options.getSubcommandGroup(false);
     const subcommand = interaction.options.getSubcommand(true);
-    const subommandName = subcommandGroup ? `${subcommandGroup}-${subcommand}` : subcommand;
-    if (this.subcommands[subommandName]) {
+    const subcommandName = subcommandGroup ? `${subcommandGroup}-${subcommand}` : subcommand;
+    if (this.subcommands[subcommandName]) {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const isAdminUser = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
       if (isAdminUser) {
         try {
-          await this.subcommands[subommandName].execute(interaction);
+          await this.subcommands[subcommandName].execute(interaction);
         } catch (error) {
           interaction.client.logger.error(error);
         }

@@ -52,7 +52,7 @@ module.exports = {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async buildSetupMessage(discordServer, guild) {
@@ -185,7 +185,7 @@ module.exports = {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   isSetupComplete(discordServer) {
