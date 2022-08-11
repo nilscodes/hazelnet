@@ -67,7 +67,7 @@ module.exports = {
               try {
                 await member.roles.add(guildRole);
               } catch (error) {
-                client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+                client.logger.error({ msg: `Failed to add ${roleProperty} ${guildRole.name} to member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
               }
             }
           } catch (e) {

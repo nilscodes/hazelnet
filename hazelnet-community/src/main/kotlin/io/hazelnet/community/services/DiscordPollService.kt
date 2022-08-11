@@ -5,13 +5,11 @@ import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.polls.*
 import io.hazelnet.community.data.external.voteaire.BallotTypePolicyId
 import io.hazelnet.community.persistence.DiscordPollRepository
+import io.hazelnet.community.services.external.VoteaireService
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
-import javax.validation.Valid
 import kotlin.NoSuchElementException
 import kotlin.math.floor
 

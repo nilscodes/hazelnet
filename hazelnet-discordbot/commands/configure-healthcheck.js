@@ -100,10 +100,14 @@ module.exports = {
   async healthCheckBlackEdition(discordServer, interaction, healthCheckFields, locale) {
     let problems = false;
     if (!discordServer.premium) {
-      const polls = (await interaction.client.services.discordserver.getPolls(interaction.guild.id));
+      const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
+      const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id);
       const blackEditionIssues = [];
       if (polls.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssuePolls', locale }));
+      }
+      if (marketplaceChannels.length) {
+        blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueMarketplaceChannels', locale }));
       }
       if (discordServer.whitelists.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueWhitelists', locale }));

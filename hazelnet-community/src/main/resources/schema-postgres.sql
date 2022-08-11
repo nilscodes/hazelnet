@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS "discord_marketplace_channels";
 DROP TABLE IF EXISTS "physical_orders_items";
 DROP TABLE IF EXISTS "physical_orders";
 DROP TABLE IF EXISTS "claim_lists_snapshot_cardano";
@@ -388,6 +389,18 @@ CREATE TABLE "physical_products"
     "product_variations" jsonb
 );
 
+CREATE TABLE "discord_marketplace_channels"
+(
+    "marketplace_channel_id"       SERIAL PRIMARY KEY,
+    "discord_server_id"            int,
+    "external_account_id"          bigint      NOT NULL,
+    "policy_id"                    varchar(56) NOT NULL,
+    "marketplace"                  varchar(50) NOT NULL,
+    "marketplace_channel_creation" timestamp   NOT NULL,
+    "discord_channel_id"           bigint      NOT NULL,
+    "minimum_value"                bigint
+);
+
 CREATE TABLE "oauth2_authorization"
 (
     id                            varchar(100) NOT NULL PRIMARY KEY,
@@ -503,5 +516,10 @@ ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claim_list_id") REF
 ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimable_product_id") REFERENCES "physical_products" ("product_id") ON DELETE RESTRICT;
 
 ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimed_in_order") REFERENCES "physical_orders" ("order_id") ON DELETE SET NULL;
+
+ALTER TABLE "discord_marketplace_channels" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_marketplace_channels" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
 
 CREATE INDEX ON "verification_imports" ("external_reference_id");

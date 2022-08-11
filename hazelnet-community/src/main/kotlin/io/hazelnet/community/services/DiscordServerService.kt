@@ -14,6 +14,7 @@ import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
 import io.hazelnet.shared.data.SharedWhitelist
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
@@ -652,6 +653,18 @@ class DiscordServerService(
             val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
             val claimListForOrder = claimListsOfDiscord.find { claimListIdOrName == it.name }
             claimListForOrder ?: throw NoSuchElementException("No claim list with name $claimListIdOrName found on Discord server with guild ID $guildId")
+        }
+    }
+
+    /**
+     * This cache never expires, it is minimal and the data in the database can never change
+     */
+    @Cacheable(cacheNames = ["serverIdToGuildId"])
+    fun getGuildIdFromServerId(discordServerId: Int): Long {
+        return try {
+            getDiscordServerByInternalId(discordServerId).guildId
+        } catch (e: NoSuchElementException) {
+            0
         }
     }
 

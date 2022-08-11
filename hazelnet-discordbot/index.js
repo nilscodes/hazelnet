@@ -10,6 +10,7 @@ const cron = require('node-cron');
 const express = require('express');
 const prometheus = require('prom-client');
 const logger = require('pino')();
+const amqplib = require('amqplib');
 const services = require('./services');
 const metrics = require('./utility/metrics');
 
@@ -75,6 +76,30 @@ scheduleFiles.forEach((file) => {
 
 // Login to Discord with your client's token
 client.login(process.env.TOKEN);
+
+// Connect to AMQP queues
+const queueFiles = fs.readdirSync('./queues').filter((file) => file.endsWith('.js'));
+
+if (queueFiles.length) {
+  (async () => {
+    const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(process.env.RABBITMQ_PASSWORD)}@localhost`);
+    queueFiles.forEach(async (file) => {
+      const queue = require(`./queues/${file}`);
+      if (queue.name && queue.consume) {
+        const queueChannel = await conn.createChannel();
+        await queueChannel.assertQueue(queue.name);
+        queueChannel.consume(queue.name, (msg) => {
+          if (msg !== null) {
+            queue.consume(client, JSON.parse(msg.content.toString()));
+            queueChannel.ack(msg);
+          } else {
+            logger.error({ msg: `Consumer for queue ${queue.name} cancelled by server` });
+          }
+        });
+      }
+    });
+  })();
+}
 
 // Start express server to expose prometheus metrics
 const app = express();
