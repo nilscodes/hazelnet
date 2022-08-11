@@ -18,6 +18,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -186,5 +187,12 @@ class ConnectService(
                     .retrieve()
                     .bodyToFlux(MultiAssetInfo::class.java)
             }.collectList().block()!!
+    }
+
+    fun getMultiAssetInfoSingle(policyId: String, assetNameHex: String): Mono<MultiAssetInfo> {
+        return connectClient.get()
+            .uri("/token/assets/{policyId}/{assetNameHex}", policyId, assetNameHex)
+            .retrieve()
+            .bodyToMono(MultiAssetInfo::class.java)
     }
 }

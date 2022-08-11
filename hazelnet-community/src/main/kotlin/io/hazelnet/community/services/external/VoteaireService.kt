@@ -1,6 +1,5 @@
-package io.hazelnet.community.services
+package io.hazelnet.community.services.external
 
-import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.community.data.external.voteaire.ProposalInfo
 import io.hazelnet.community.data.external.voteaire.ProposalResults
 import org.springframework.beans.factory.annotation.Qualifier

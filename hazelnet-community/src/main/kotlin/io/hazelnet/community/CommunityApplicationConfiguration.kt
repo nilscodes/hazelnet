@@ -8,8 +8,10 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class CommunityApplicationConfiguration(
         val connect: ConnectConfiguration,
         val voteaire: VoteaireConfiguration,
+        val cnftjungle: CnftJungleConfiguration,
         val fundedpool: String?,
         val fundedhandle: String?,
+        val ipfslink: String?,
 )
 
 data class ConnectConfiguration(
@@ -17,5 +19,9 @@ data class ConnectConfiguration(
 )
 
 data class VoteaireConfiguration(
+        val url: String
+)
+
+data class CnftJungleConfiguration(
         val url: String
 )

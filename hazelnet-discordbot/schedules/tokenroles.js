@@ -12,7 +12,7 @@ module.exports = {
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
-        if (discordServer.active && discordServer.guildId % 180 === minutesInDay % 180) {
+        if (discordServer.active && discordServer.guildId % 120 === minutesInDay % 120) {
           try {
             const removeInvalid = discordServer.settings?.REMOVE_INVALID_TOKENROLES !== 'false';
             const expectedRoleAssignments = await client.services.discordserver.getCurrentTokenRoleAssignments(discordServer.guildId);

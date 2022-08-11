@@ -28,7 +28,7 @@ module.exports = {
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist announce', i18n.__({ phrase: 'configure.whitelist.announce.purpose', locale }), 'configure-whitelist-announce');
             await interaction.editReply({ components, embeds: [embed], ephemeral: true });
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist announce', i18n.__({ phrase: 'configure.whitelist.announce.noWhitelistsDetail', locale }), 'configure-whitelist-open');
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist announce', i18n.__({ phrase: 'configure.whitelist.announce.noWhitelistsDetail', locale }), 'configure-whitelist-announce');
             await interaction.editReply({ embeds: [embed], ephemeral: true });
           }
         } else {

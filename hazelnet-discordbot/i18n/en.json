@@ -51,6 +51,11 @@
 			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
+			"configure-marketplace": "Configure marketplace integrations.",
+			"configure-marketplace-sales": "Configure your sales trackers.",
+			"configure-marketplace-sales-add": "Add a sales tracker one of your Discord channels.",
+			"configure-marketplace-sales-list": "Show all your configured sales trackers.",
+			"configure-marketplace-sales-remove": "Remove an existing sales tracker.",
 			"configure-whitelist-update": "commands.descriptions.configure-whitelist-update"
 		},
 		"options": {
@@ -102,6 +107,11 @@
 				"attribute-value": "Value to check for (case sensitive!)",
 				"aggregation-type": "The method with which to calculate if someone qualifies for a token role"
 			},
+			"configure-marketplace": {
+				"marketplace": "Marketplace to use",
+				"minimum-price": "The minimum price for a sale to be considered",
+				"channel": "The channel to send tracking announcements to"
+			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
 			},
@@ -143,6 +153,9 @@
 			"configure-whitelist": {
 				"CARDANO_ADDRESS": "Cardano wallet address (addr1...)",
 				"DISCORD_ID": "Discord ID and tag"
+			},
+			"configure-marketplace": {
+				"JPGSTORE": "jpg.store"
 			}
 		}
 	},
@@ -800,6 +813,53 @@
 				"otherError": "⚠ Error while removing this whitelist."
 			}
 		},
+		"marketplace": {
+			"sales": {
+				"add": {
+					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"minimumPriceAddon": " Only sales above the price of **₳{{minimumPriceAda}}** will be announced.",
+					"chooseProject": "Select project/policy",
+					"policyId": "Policy ID: {{policyId}}",
+					"success": "A sales tracker for the project **{{projectName}}** has been added! Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"noPoliciesDetail": "*This server has no official projects added and cannot track any sales.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
+					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+					"errorWrongChannelType": "This channel cannot be used for sales announcements.",
+					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} sales trackers to your server.",
+					"otherError": "⚠ Error while adding a sales tracking channel.",
+					"noPremium": "🙀 You currently can not add any sales trackers as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+				},
+				"list": {
+					"purpose": "Show the list of all active sales trackers in this Discord server.",
+					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
+					"entry": "Announcements for any sales on **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"noMarketplaceChannels": "*There are no configured sales trackers on this server.*"
+				},
+				"announce": {
+					"title": "New sale!",
+					"viewOnMarketplace": "View on marketplace",
+					"viewOnCnftJungle": "View on cnftjungle.io",
+					"itemContentBuy": "**{{displayName}}** just sold!",
+					"itemContentOffer": "**{{displayName}}** just sold for an offer!",
+					"rank": "Asset rank",
+					"rankContent": "Rank #{{rank}}",
+					"marketplace": "Sold on Marketplace",
+					"soldFor": "Sold for",
+					"offerPrice": "Offer price",
+					"soldForContent": "{{price}} ADA"
+				},
+				"remove": {
+					"purpose": "Remove a sales tracker from your Discord server by selecting it in the below dropdown.",
+					"success": "🗑️ Removed the following sales tracker from this server:",
+					"deleted": "Announcements for sales on **{{marketplaceName}}** will no longer be posted in <#{{channel}}>.",
+					"chooseMarketplaceChannel": "Choose a sales tracker",
+					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
+					"entry": "{{marketplaceName}}, #{{channelName}}",
+					"entryAddon": ", > ₳{{minimumPriceAda}}",
+					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
+					"deletedChannel": "#deleted"
+				}
+			}
+		},
 		"adminaccess": {
 			"list": {
 				"purpose": "This is the list of all current roles that have bot administrator status on this Discord server:",
@@ -868,6 +928,7 @@
 			"blackEditionNotAvailable": "The following features are used beyond their free tier and only function in a limited capacity at the current time:\n\n",
 			"blackEditionIssueWhitelists": "Whitelists (Black Edition required)",
 			"blackEditionIssuePolls": "Polls and voting (Black Edition required)",
+			"blackEditionIssueMarketplaceChannels": "Marketplace sales trackers (Black Edition required)",
 			"blackEditionIssueTokenRoles": "Token Roles (only one available in free edition)",
 			"blackEditionIssueDelegatorRoles": "Delegator Roles (only one available in free edition)",
 			"blackEditionEntry": "• **{{{blackEditionIssue}}}**"
@@ -947,7 +1008,12 @@
 		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
+		"marketplaceTitle": "Marketplaces (Black Edition only)",
+		"marketplace": "Marketplace integrations, listings, and sales trackers",
 		"cardolphins": "Cardolphins Special"
+	},
+	"marketplaces": {
+		"JPGSTORE": "JPG.store"
 	},
 	"generic": {
 		"cancel": "Cancel",
@@ -977,8 +1043,5 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	},
-	"/configure-whitelist share": "/configure-whitelist share",
-	"/configure-whitelist unshare": "/configure-whitelist unshare",
-	"doink": "doink"
+	}
 }

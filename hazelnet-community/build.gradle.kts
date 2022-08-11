@@ -23,6 +23,8 @@ dependencies {
 	implementation("org.springframework.security:spring-security-oauth2-authorization-server:0.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	implementation("org.springframework.retry:spring-retry:1.2.5.RELEASE")
 	implementation("io.micrometer:micrometer-registry-prometheus")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")

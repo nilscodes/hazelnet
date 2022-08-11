@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  version: '0.0.1'
-  title: 'HazelNet External'
+    version: '0.0.1'
+    title: 'HazelNet External'
 servers:
-  - url: 'https://api.hazelnet.io'
+    - url: 'https://api.hazelnet.io'
 
 paths:
     /community/whitelists/{whitelistName}/signups:
@@ -30,6 +30,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorResponse'
+    /community/whitelists/shared:
+        get:
+            summary: 'Get signups for all shared whitelists'
+            operationId: getSharedWhitelistSignups
+            tags:
+                - discord
+                - whitelist
+            responses:
+                '200':
+                    description: 'All signups for all whitelists shared with this server'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/SharedWhitelist'
+                default:
+                    description: Unexpected error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+
     /community/claimlists/{claimListName}/orders:
         get:
             summary: 'Get orders for a claim list'
@@ -100,6 +123,34 @@ components:
                 type: string
 
     schemas:
+        SharedWhitelist:
+            type: object
+            required:
+                - guildId
+                - guildName
+                - whitelistName
+                - whitelistDisplayName
+                - signups
+            properties:
+                guildId:
+                    type: integer
+                    format: int64
+                    example: 717264144759390238
+                guildName:
+                    type: string
+                    example: Guild Name
+                whitelistDisplayName:
+                    type: string
+                    minLength: 1
+                    maxLength: 256
+                whitelistName:
+                    type: string
+                    pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+                signups:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WhitelistSignup'
+
         WhitelistSignup:
             type: object
             required:

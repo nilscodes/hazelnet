@@ -1334,6 +1334,76 @@ paths:
                     $ref: '#/components/schemas/VoteData'
                   poll:
                     $ref: '#/components/schemas/VoteData'
+  /discord/servers/{guildId}/marketplaces/channels:
+    get:
+      summary: 'Get marketplace channels for this Discord server'
+      operationId: listMarketplaceChannels
+      tags:
+        - discord
+        - marketplace
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'All marketplace channels for this server'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordMarketplaceChannel'
+    post:
+      summary: Create a marketplace channel on this server
+      operationId: addMarketplaceChannel
+      tags:
+        - discord
+        - marketplace
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordMarketplaceChannel'
+      responses:
+        '201':
+          description: 'A new marketplace channel object'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordMarketplaceChannel'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}:
+    get:
+      summary: 'Get specific marketplace channel for this Discord server'
+      operationId: getMarketplaceChannel
+      tags:
+        - discord
+        - marketplace
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+      responses:
+        '200':
+          description: 'The poll with the specified ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordMarketplaceChannel'
+    delete:
+      summary: Remove a marketplace channel from this Discord server
+      operationId: deleteMarketplaceChannel
+      tags:
+        - discord
+        - marketplace
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
   /discord/servers/{guildId}/whitelists:
     post:
       summary: Add a whitelist for owners of a specific role to this server
@@ -1745,6 +1815,16 @@ components:
       required: true
       style: simple
       example: 44
+      schema:
+        type: integer
+        format: int64
+    MarketplaceChannelIdPathParameter:
+      name: marketplaceChannelId
+      in: path
+      description: The ID of the marketplace channel info
+      required: true
+      style: simple
+      example: 85
       schema:
         type: integer
         format: int64
@@ -2664,6 +2744,36 @@ components:
           $ref: '#/components/schemas/DiscordChannel'
         messageId:
           $ref: '#/components/schemas/DiscordMessage'
+    DiscordMarketplaceChannel:
+      type: object
+      required:
+        - creator
+        - channelId
+        - policyId
+        - marketplace
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        minimumValue:
+          description: The (optional) minimum value in Lovelace that is required for the listing, sale or offer to be displayed
+          type: integer
+          format: int64
     Whitelist:
       type: object
       required:
@@ -2752,7 +2862,6 @@ components:
       type: object
       required:
         - externalAccountId
-        - address
       properties:
         address:
           $ref: '#/components/schemas/WalletAddress'
@@ -2966,6 +3075,10 @@ components:
       description: The wallet address (non-enterprise)
       example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
       pattern: '^addr1[A-Za-z-0-9]{98}$'
+    Marketplace:
+      type: string
+      enum:
+        - JPGSTORE
     AccountId:
       readOnly: true
       type: integer

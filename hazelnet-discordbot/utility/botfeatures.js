@@ -2,32 +2,37 @@ const i18n = require('i18n');
 
 module.exports = {
   getFeatureOptions(discordServer) {
-    const useLocale = discordServer.getBotLanguage();
+    const locale = discordServer.getBotLanguage();
     return [{
-      label: i18n.__({ phrase: 'features.stakepoolTitle', locale: useLocale }),
-      description: i18n.__({ phrase: 'features.stakepool', locale: useLocale }),
+      label: i18n.__({ phrase: 'features.stakepoolTitle', locale }),
+      description: i18n.__({ phrase: 'features.stakepool', locale }),
       value: 'stakepool',
       emoji: { id: null, name: '🌊' },
     }, {
-      label: i18n.__({ phrase: 'features.tokenTitle', locale: useLocale }),
-      description: i18n.__({ phrase: 'features.token', locale: useLocale }),
+      label: i18n.__({ phrase: 'features.tokenTitle', locale }),
+      description: i18n.__({ phrase: 'features.token', locale }),
       value: 'token',
       emoji: { id: null, name: '📃' },
     }, {
-      label: i18n.__({ phrase: 'features.pollTitle', locale: useLocale }),
-      description: i18n.__({ phrase: 'features.poll', locale: useLocale }),
+      label: i18n.__({ phrase: 'features.pollTitle', locale }),
+      description: i18n.__({ phrase: 'features.poll', locale }),
       value: 'poll',
       emoji: { id: null, name: '✏' },
     }, {
-      label: i18n.__({ phrase: 'features.pollVoteaireTitle', locale: useLocale }),
-      description: i18n.__({ phrase: 'features.pollvoteaire', locale: useLocale }),
+      label: i18n.__({ phrase: 'features.pollVoteaireTitle', locale }),
+      description: i18n.__({ phrase: 'features.pollvoteaire', locale }),
       value: 'pollvoteaire',
       emoji: { id: null, name: '☑' },
     }, {
-      label: i18n.__({ phrase: 'features.whitelistTitle', locale: useLocale }),
-      description: i18n.__({ phrase: 'features.whitelist', locale: useLocale }),
+      label: i18n.__({ phrase: 'features.whitelistTitle', locale }),
+      description: i18n.__({ phrase: 'features.whitelist', locale }),
       value: 'whitelist',
       emoji: { id: null, name: '🤍' },
+    }, {
+      label: i18n.__({ phrase: 'features.marketplaceTitle', locale }),
+      description: i18n.__({ phrase: 'features.marketplace', locale }),
+      value: 'marketplace',
+      emoji: { id: null, name: '🛒' },
     }];
   },
 };

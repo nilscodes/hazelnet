@@ -4,7 +4,9 @@ import io.hazelnet.community.data.discord.polls.DiscordPoll
 import io.hazelnet.community.data.discord.polls.DiscordPollPartial
 import io.hazelnet.community.services.DiscordPollService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
@@ -19,7 +21,16 @@ class DiscordPollController(
 
     @PostMapping("/servers/{guildId}/polls")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addPoll(@PathVariable guildId: Long, @RequestBody @Valid discordPoll: DiscordPoll) = discordPollService.addPoll(guildId, discordPoll)
+    fun addPoll(@PathVariable guildId: Long, @RequestBody @Valid discordPoll: DiscordPoll): ResponseEntity<DiscordPoll> {
+        val newPoll = discordPollService.addPoll(guildId, discordPoll)
+        return ResponseEntity
+            .created(
+                ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{pollId}")
+                .buildAndExpand(newPoll.id)
+                .toUri())
+            .body(newPoll)
+    }
 
     @GetMapping("/servers/{guildId}/polls/{pollId}")
     @ResponseStatus(HttpStatus.OK)

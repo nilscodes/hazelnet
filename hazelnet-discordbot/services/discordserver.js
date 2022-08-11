@@ -211,6 +211,23 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups/${externalAccountId}`);
     this.clearCacheEntry(guildId);
   },
+  async listMarketplaceChannels(guildId) {
+    const marketplaceChannelListPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`);
+    return marketplaceChannelListPromise.data;
+  },
+  async createMarketplaceChannel(guildId, creator, channelId, policyId, marketplace, minimumValue) {
+    const newMarketplaceChannelPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`, {
+      creator,
+      channelId,
+      policyId,
+      marketplace,
+      minimumValue,
+    });
+    return newMarketplaceChannelPromise.data;
+  },
+  async deleteMarketplaceChannel(guildId, marketplaceChannelId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels/${marketplaceChannelId}`);
+  },
   async getCurrentDelegatorRoleAssignments(guildId) {
     const roleAssignments = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/roleassignments/delegatorroles`);
     return roleAssignments.data;
