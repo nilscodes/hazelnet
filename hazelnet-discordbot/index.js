@@ -82,7 +82,7 @@ const queueFiles = fs.readdirSync('./queues').filter((file) => file.endsWith('.j
 
 if (queueFiles.length) {
   (async () => {
-    const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(process.env.RABBITMQ_PASSWORD)}@localhost`);
+    const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(process.env.RABBITMQ_PASSWORD)}@${process.env.RABBITMQ_HOST}`);
     queueFiles.forEach(async (file) => {
       const queue = require(`./queues/${file}`);
       if (queue.name && queue.consume) {
