@@ -39,6 +39,12 @@ gradle-build:
 
   stage: build
   script: gradle --build-cache assemble
+  artifacts:
+    paths:
+      - hazelnet-community/build/libs
+      - hazelnet-cardano-connect/build/libs
+      - hazelnet-external/build/libs
+      - marketplace-aggregator/build/libs
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -151,8 +157,8 @@ market-docker:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE/marketplace-aggregator{tag}" .
-    - docker push "$CI_REGISTRY_IMAGE/marketplace-aggregator{tag}"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/marketplace-aggregator${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/marketplace-aggregator${tag}"
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
