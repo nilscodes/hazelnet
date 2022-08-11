@@ -39,11 +39,6 @@ gradle-build:
 
   stage: build
   script: gradle --build-cache assemble
-  artifacts:
-    paths:
-      - hazelnet-community/build/libs
-      - hazelnet-cardano-connect/build/libs
-      - hazelnet-external/build/libs
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -56,6 +51,7 @@ gradle-build:
         - "hazelnet-cardano-connect/**/*"
         - "hazelnet-cardano-shared/**/*"
         - "hazelnet-external/**/*"
+        - "marketplace-aggregator/**/*"
 
 community-docker:
   image: docker:latest
@@ -136,4 +132,31 @@ external-docker:
         - "hazelnet-external/Dockerfile"
       changes:
         - "hazelnet-external/**/*"
+        - "hazelnet-cardano-shared/**/*"
+
+market-docker:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - cd marketplace-aggregator
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/marketplace-aggregator{tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/marketplace-aggregator{tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "marketplace-aggregator/Dockerfile"
+      changes:
+        - "marketplace-aggregator/**/*"
         - "hazelnet-cardano-shared/**/*"
