@@ -1,10 +1,9 @@
 package io.hazelnet.community.services
 
-import com.jayway.jsonpath.JsonPath
-import com.jayway.jsonpath.PathNotFoundException
-import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.external.cnftjungle.AssetInfo
+import io.hazelnet.community.data.getImageUrlFromAssetInfo
+import io.hazelnet.community.data.getItemNameFromAssetInfo
 import io.hazelnet.community.services.external.CnftJungleService
 import io.hazelnet.marketplace.data.SaleAnnouncement
 import io.hazelnet.marketplace.data.SalesInfo
@@ -42,7 +41,7 @@ class DiscordMarketplaceChannelPublisher(
                     displayName = getItemNameFromAssetInfo(combinedAssetInfo.t1),
                     source = sale.source,
                     marketplaceAssetUrl = sale.marketplaceAssetUrl,
-                    assetImageUrl = getImageUrlFromAssetInfo(combinedAssetInfo.t1),
+                    assetImageUrl = getImageUrlFromAssetInfo(config, combinedAssetInfo.t1),
                     price = sale.price,
                     saleDate = sale.saleDate,
                     rarityRank = combinedAssetInfo.t2.rarityRank,
@@ -54,22 +53,4 @@ class DiscordMarketplaceChannelPublisher(
         }
             .forEach { rabbitTemplate.convertAndSend("saleannouncements", it) }
     }
-
-    private fun getImageUrlFromAssetInfo(assetInfo: MultiAssetInfo): String? {
-        return try {
-            val ipfsLink = JsonPath.read<String>(assetInfo.metadata, "$.image").replace("ipfs://", "", true)
-            String.format(config.ipfslink ?: "%s", ipfsLink)
-        } catch(pnfe: PathNotFoundException) {
-            null
-        }
-    }
-
-    private fun getItemNameFromAssetInfo(assetInfo: MultiAssetInfo): String {
-        return try {
-            return JsonPath.read<String>(assetInfo.metadata, "$.name")
-        } catch(pnfe: PathNotFoundException) {
-            assetInfo.assetName
-        }
-    }
-
 }

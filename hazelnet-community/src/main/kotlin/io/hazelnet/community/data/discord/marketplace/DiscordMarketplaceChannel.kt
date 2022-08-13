@@ -28,6 +28,11 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
     @field:Min(1)
     var creator: Long,
 
+    @Column(name = "tracker_type")
+    @Enumerated(EnumType.ORDINAL)
+    @field:NonNull
+    var type: DiscordMarketplaceChannelType,
+
     @Column(name = "policy_id")
     @field:NonNull
     @field:Size(min = 56, max = 56)

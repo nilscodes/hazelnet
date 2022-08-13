@@ -19,7 +19,7 @@ module.exports = {
         .setDescription('Remove the Cardano policy ID from this server\'s official policy list.')
         .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to remove as official token policy from this server').setRequired(true)));
   },
-  commandTags: ['token'],
+  commandTags: ['token', 'marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
 };

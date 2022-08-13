@@ -394,6 +394,7 @@ CREATE TABLE "discord_marketplace_channels"
     "marketplace_channel_id"       SERIAL PRIMARY KEY,
     "discord_server_id"            int,
     "external_account_id"          bigint      NOT NULL,
+    "tracker_type"                 int NOT NULL DEFAULT 0,
     "policy_id"                    varchar(56) NOT NULL,
     "marketplace"                  varchar(50) NOT NULL,
     "marketplace_channel_creation" timestamp   NOT NULL,
@@ -520,6 +521,10 @@ ALTER TABLE "claim_lists_snapshot_cardano" ADD FOREIGN KEY ("claimed_in_order") 
 ALTER TABLE "discord_marketplace_channels" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_marketplace_channels" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
+CREATE INDEX "discord_marketplace_discord_server_index" ON "discord_marketplace_channels" ("discord_server_id");
+
+CREATE INDEX "discord_marketplace_tracker_type_index" ON "discord_marketplace_channels" ("tracker_type");
 
 
 CREATE INDEX ON "verification_imports" ("external_reference_id");

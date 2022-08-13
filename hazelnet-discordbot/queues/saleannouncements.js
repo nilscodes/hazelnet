@@ -28,6 +28,10 @@ module.exports = {
                   .setURL(saleAnnouncement.marketplaceAssetUrl)
                   .setStyle('LINK'),
                 new MessageButton()
+                  .setLabel(i18n.__({ phrase: 'configure.marketplace.sales.announce.viewOnPixlPage', locale }))
+                  .setURL(`https://pixl.page/asset/${saleAnnouncement.policyId}${saleAnnouncement.assetNameHex}`)
+                  .setStyle('LINK'),
+                new MessageButton()
                   .setLabel(i18n.__({ phrase: 'configure.marketplace.sales.announce.viewOnCnftJungle', locale }))
                   .setURL(`https://www.cnftjungle.io/collections/${saleAnnouncement.policyId}?assetId=${saleAnnouncement.policyId}.${saleAnnouncement.assetName}`)
                   .setStyle('LINK'),

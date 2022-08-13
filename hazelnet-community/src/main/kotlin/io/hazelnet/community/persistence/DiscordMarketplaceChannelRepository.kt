@@ -11,6 +11,9 @@ import java.util.*
 interface DiscordMarketplaceChannelRepository : CrudRepository<DiscordMarketplaceChannel, Int> {
     fun findByDiscordServerId(discordServerId: Int): List<DiscordMarketplaceChannel>
 
-    @Query(value = "SELECT m FROM DiscordMarketplaceChannel m JOIN DiscordServer d ON m.discordServerId=d.id WHERE d.premiumUntil>:now AND d.active=true")
-    fun findAllForActivePremium(@Param("now") now: Date): List<DiscordMarketplaceChannel>
+    @Query(value = "SELECT m FROM DiscordMarketplaceChannel m JOIN DiscordServer d ON m.discordServerId=d.id WHERE m.type=0 AND d.premiumUntil>:now AND d.active=true")
+    fun findAllSalesChannelsForActivePremium(@Param("now") now: Date): List<DiscordMarketplaceChannel>
+
+    @Query(value = "SELECT m FROM DiscordMarketplaceChannel m JOIN DiscordServer d ON m.discordServerId=d.id WHERE m.type=1 AND d.premiumUntil>:now AND d.active=true")
+    fun findAllMintChannelsForActivePremium(@Param("now") now: Date): List<DiscordMarketplaceChannel>
 }

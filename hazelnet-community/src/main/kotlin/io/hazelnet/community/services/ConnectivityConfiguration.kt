@@ -46,6 +46,9 @@ class ConnectivityConfiguration {
     fun saleAnnouncementsQueue() = Queue("saleannouncements")
 
     @Bean
+    fun mintAnnouncementsQueue() = Queue("mintannouncements")
+
+    @Bean
     fun exchange() = DirectExchange("hazelnet")
 
     @Bean
@@ -59,6 +62,10 @@ class ConnectivityConfiguration {
     @Bean
     fun saleAnnouncementsBinding(@Qualifier("saleAnnouncementsQueue") saleAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(saleAnnouncementsQueue).to(exchange)
+
+    @Bean
+    fun mintAnnouncementsBinding(@Qualifier("mintAnnouncementsQueue") mintAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(mintAnnouncementsQueue).to(exchange)
 
     @Bean
     fun messageConverter() = Jackson2JsonMessageConverter()
