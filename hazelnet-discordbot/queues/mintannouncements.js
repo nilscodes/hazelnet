@@ -29,7 +29,7 @@ module.exports = {
                   .setStyle('LINK'),
                 new MessageButton()
                   .setLabel(i18n.__({ phrase: 'configure.marketplace.mint.announce.viewOnCnftJungle', locale }))
-                  .setURL(`https://www.cnftjungle.io/collections/${mintAnnouncement.policyId}?assetId=${mintAnnouncement.policyId}.${mintAnnouncement.assetName}`)
+                  .setURL(`https://www.cnftjungle.io/collections/${mintAnnouncement.policyId}?assetId=${mintAnnouncement.policyId}.${encodeURIComponent(mintAnnouncement.assetName)}`)
                   .setStyle('LINK'),
               ),
             ];
