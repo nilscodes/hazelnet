@@ -6,8 +6,6 @@ const embedBuilder = require('../../utility/embedbuilder');
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
-    const marketplace = interaction.options.getString('marketplace');
-    const minimumPriceAda = interaction.options.getInteger('minimum-price');
     const announceChannel = interaction.options.getChannel('channel');
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -15,9 +13,9 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
         const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
-          .filter((channel) => channel.type === 'SALES');
-        const maxSalesTrackerCount = 5;
-        if (marketplaceChannels.length < maxSalesTrackerCount) {
+          .filter((channel) => channel.type === 'MINT');
+        const maxMintTrackerCount = 1;
+        if (marketplaceChannels.length < maxMintTrackerCount) {
           if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
             const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
             if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
@@ -25,55 +23,51 @@ module.exports = {
                 .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
                 .map((tokenPolicy) => ({
                   label: tokenPolicy.projectName,
-                  description: i18n.__({ phrase: 'configure.marketplace.sales.add.policyId', locale }, { policyId: tokenPolicy.policyId }),
+                  description: i18n.__({ phrase: 'configure.marketplace.mint.add.policyId', locale }, { policyId: tokenPolicy.policyId }),
                   value: tokenPolicy.policyId,
                 }));
               if (officialProjects.length) {
                 this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
                   channelId: announceChannel.id,
-                  minimumPriceAda,
-                  marketplace,
                 });
                 const components = [new MessageActionRow()
                   .addComponents(
                     new MessageSelectMenu()
-                      .setCustomId('configure-marketplace/sales-add/add')
-                      .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.sales.add.chooseProject', locale }))
+                      .setCustomId('configure-marketplace/mint-add/add')
+                      .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.mint.add.chooseProject', locale }))
                       .addOptions(officialProjects),
                   )];
 
-                const marketplaceName = i18n.__({ phrase: `marketplaces.${marketplace}`, locale });
-                const content = i18n.__({ phrase: 'configure.marketplace.sales.add.purpose', locale }, { marketplaceName, channel: announceChannel.id })
-                  + (minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.sales.add.minimumPriceAddon', locale }, { minimumPriceAda }) : '');
-                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
+                const content = i18n.__({ phrase: 'configure.marketplace.mint.add.purpose', locale }, { channel: announceChannel.id });
+                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', content, 'configure-marketplace-mint-add');
                 await interaction.editReply({ components, embeds: [embed], ephemeral: true });
               } else {
-                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.noPoliciesDetail', locale }), 'configure-marketplace-sales-add');
+                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.noPoliciesDetail', locale }), 'configure-marketplace-mint-add');
                 await interaction.editReply({ embeds: [embed], ephemeral: true });
               }
             } else {
-              const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-marketplace-sales-add');
+              const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-marketplace-mint-add');
               await interaction.editReply({ embeds: [embedAdmin], components: [], ephemeral: true });
             }
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.errorWrongChannelType', locale }), 'configure-marketplace-sales-add');
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.errorWrongChannelType', locale }), 'configure-marketplace-mint-add');
             await interaction.editReply({ embeds: [embed], ephemeral: true });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.errorLimitReached', locale }, { maxCount: maxSalesTrackerCount }), 'configure-marketplace-sales-add');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.errorLimitReached', locale }, { maxCount: maxMintTrackerCount }), 'configure-marketplace-mint-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.noPremium', locale }), 'configure-marketplace-sales-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.noPremium', locale }), 'configure-marketplace-mint-add');
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting sales channel list to announce. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting mint channel list to announce. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async executeSelectMenu(interaction) {
-    if (interaction.customId === 'configure-marketplace/sales-add/add') {
+    if (interaction.customId === 'configure-marketplace/mint-add/add') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
@@ -85,24 +79,23 @@ module.exports = {
         await interaction.client.services.discordserver.createMarketplaceChannel(
           interaction.guild.id,
           externalAccount.id,
-          'SALES',
+          'MINT',
           marketplaceChannelData.channelId,
           policyIdToTrack,
-          marketplaceChannelData.marketplace,
-          marketplaceChannelData.minimumPriceAda * 1000000,
+          'JPGSTORE',
+          null,
         );
 
         const { projectName } = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
 
         const marketplaceName = i18n.__({ phrase: `marketplaces.${marketplaceChannelData.marketplace}`, locale });
-        const content = i18n.__({ phrase: 'configure.marketplace.sales.add.success', locale }, { projectName, marketplaceName, channel: marketplaceChannelData.channelId })
-          + (marketplaceChannelData.minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.sales.add.minimumPriceAddon', locale }, { minimumPriceAda: marketplaceChannelData.minimumPriceAda }) : '');
+        const content = i18n.__({ phrase: 'configure.marketplace.mint.add.success', locale }, { projectName, marketplaceName, channel: marketplaceChannelData.channelId });
 
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', content, 'configure-marketplace-mint-add');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       } catch (error) {
         interaction.client.logger.error(error);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', i18n.__({ phrase: 'configure.marketplace.sales.add.otherError', locale }), 'configure-marketplace-sales-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', i18n.__({ phrase: 'configure.marketplace.mint.add.otherError', locale }), 'configure-marketplace-mint-add');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       }
     }

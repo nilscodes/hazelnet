@@ -56,7 +56,11 @@
 			"configure-marketplace-sales-add": "Add a sales tracker one of your Discord channels.",
 			"configure-marketplace-sales-list": "Show all your configured sales trackers.",
 			"configure-marketplace-sales-remove": "Remove an existing sales tracker.",
-			"configure-whitelist-update": "commands.descriptions.configure-whitelist-update"
+			"configure-whitelist-update": "commands.descriptions.configure-whitelist-update",
+			"configure-marketplace-mint": "commands.descriptions.configure-marketplace-mint",
+			"configure-marketplace-mint-add": "commands.descriptions.configure-marketplace-mint-add",
+			"configure-marketplace-mint-list": "commands.descriptions.configure-marketplace-mint-list",
+			"configure-marketplace-mint-remove": "commands.descriptions.configure-marketplace-mint-remove"
 		},
 		"options": {
 			"profile": {
@@ -816,7 +820,7 @@
 		"marketplace": {
 			"sales": {
 				"add": {
-					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**",
 					"minimumPriceAddon": " Only sales above the price of **₳{{minimumPriceAda}}** will be announced.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
@@ -837,6 +841,7 @@
 				"announce": {
 					"title": "New sale!",
 					"viewOnMarketplace": "View on marketplace",
+					"viewOnPixlPage": "View on pixl.page",
 					"viewOnCnftJungle": "View on cnftjungle.io",
 					"itemContentBuy": "**{{displayName}}** just sold!",
 					"itemContentOffer": "**{{displayName}}** just sold for an offer!",
@@ -856,7 +861,46 @@
 					"entry": "{{marketplaceName}}, #{{channelName}}",
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
-					"deletedChannel": "#deleted"
+					"deletedChannel": "#deleted",
+					"otherError": "⚠ Error while remove a sales tracking channel."
+				}
+			},
+			"mint": {
+				"add": {
+					"purpose": "You are about to add a mint tracker for a project. Announcements for any mints of the project's policy will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**",
+					"chooseProject": "Select project/policy",
+					"policyId": "Policy ID: {{policyId}}",
+					"success": "A mint tracker for the project **{{projectName}}** has been added! Announcements for any mints of the projects policy will be posted in <#{{channel}}>.",
+					"noPoliciesDetail": "*This server has no official projects added and cannot track any mints.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
+					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+					"errorWrongChannelType": "This channel cannot be used for mint announcements.",
+					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} mint trackers to your server.",
+					"otherError": "⚠ Error while adding a mint tracking channel.",
+					"noPremium": "🙀 You currently can not add any mint trackers as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+				},
+				"list": {
+					"purpose": "Show the list of all active mint trackers in this Discord server.",
+					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
+					"entry": "Announcements for any mints of this project will be posted in <#{{channel}}>.",
+					"noMarketplaceChannels": "*There are no configured mint trackers on this server.*"
+				},
+				"announce": {
+					"title": "New asset minted!",
+					"viewOnPixlPage": "View on pixl.page",
+					"viewOnCnftJungle": "View on cnftjungle.io",
+					"itemContentMint": "**{{displayName}}** just minted!",
+					"rank": "Asset rank",
+					"rankContent": "Rank #{{rank}}"
+				},
+				"remove": {
+					"purpose": "Remove a mint tracker from your Discord server by selecting it in the below dropdown.",
+					"success": "🗑️ Removed the following mint tracker from this server:",
+					"deleted": "Announcements for mints will no longer be posted in <#{{channel}}>.",
+					"chooseMarketplaceChannel": "Choose a mint tracker",
+					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
+					"entry": "#{{channelName}}",
+					"deletedChannel": "#deleted",
+					"otherError": "⚠ Error while remove a mint tracking channel."
 				}
 			}
 		},
@@ -1008,8 +1052,8 @@
 		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
-		"marketplaceTitle": "Marketplaces (Black Edition only)",
-		"marketplace": "Marketplace integrations, listings, and sales trackers",
+		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
+		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
 		"cardolphins": "Cardolphins Special"
 	},
 	"marketplaces": {

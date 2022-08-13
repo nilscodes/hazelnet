@@ -50,20 +50,25 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedDelay = 60000)
     fun publishPoliciesForSalesAggregation() {
-        val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllForActivePremium(Date())
+        val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("policies", it) }
     }
 
-    @Cacheable(cacheNames = ["marketplacechannels"])
+    @Cacheable(cacheNames = ["salesmarketplacechannels"])
     fun listAllMarketplaceChannels(policyId: String): List<DiscordMarketplaceChannel> =
-        discordMarketplaceChannelRepository.findAllForActivePremium(Date())
+        discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
             .filter { it.policyId == policyId }
 
+    @Cacheable(cacheNames = ["mintmarketplacechannels"])
+    fun listAllMintMarketplaceChannels(): List<DiscordMarketplaceChannel> =
+        discordMarketplaceChannelRepository.findAllMintChannelsForActivePremium(Date())
+
+
     @Scheduled(fixedRate = 60000)
-    @CacheEvict(allEntries = true, cacheNames = ["marketplacechannels"], )
+    @CacheEvict(allEntries = true, cacheNames = ["salesmarketplacechannels", "mintmarketplacechannels"], )
     fun clearMarketplaceChannelCache() {
         // Annotation-based cache clearing of marketplace channel data every minute
     }

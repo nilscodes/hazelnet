@@ -26,7 +26,20 @@ module.exports = {
           .setDescription(ci18n.subDescription('sales-list')))
         .addSubcommand((subcommand) => subcommand
           .setName('remove')
-          .setDescription(ci18n.subDescription('sales-remove'))));
+          .setDescription(ci18n.subDescription('sales-remove'))))
+      .addSubcommandGroup((group) => group
+        .setName('mint')
+        .setDescription(ci18n.subDescription('mint'))
+        .addSubcommand((subcommand) => subcommand
+          .setName('add')
+          .setDescription(ci18n.subDescription('mint-add'))
+          .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('list')
+          .setDescription(ci18n.subDescription('mint-list')))
+        .addSubcommand((subcommand) => subcommand
+          .setName('remove')
+          .setDescription(ci18n.subDescription('mint-remove'))));
   },
   commandTags: ['marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

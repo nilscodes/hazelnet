@@ -37,4 +37,20 @@ module.exports = {
     }
     return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentBuy', locale }, saleAnnouncement);
   },
+  createMintAnnouncementFields(mintAnnouncement, locale) {
+    const fields = [];
+
+    if (mintAnnouncement.rarityRank) {
+      fields.push({
+        name: i18n.__({ phrase: 'configure.marketplace.mint.announce.rank', locale }),
+        value: i18n.__({ phrase: 'configure.marketplace.mint.announce.rankContent', locale }, { rank: mintAnnouncement.rarityRank }),
+        inline: true,
+      });
+    }
+
+    return fields;
+  },
+  getMintAnnouncementTitle(mintAnnouncement, locale) {
+    return i18n.__({ phrase: 'configure.marketplace.mint.announce.itemContentMint', locale }, mintAnnouncement);
+  },
 };

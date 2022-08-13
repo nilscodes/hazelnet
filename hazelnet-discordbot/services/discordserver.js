@@ -215,9 +215,10 @@ module.exports = {
     const marketplaceChannelListPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`);
     return marketplaceChannelListPromise.data;
   },
-  async createMarketplaceChannel(guildId, creator, channelId, policyId, marketplace, minimumValue) {
+  async createMarketplaceChannel(guildId, creator, type, channelId, policyId, marketplace, minimumValue) {
     const newMarketplaceChannelPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`, {
       creator,
+      type,
       channelId,
       policyId,
       marketplace,

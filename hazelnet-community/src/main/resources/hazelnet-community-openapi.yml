@@ -2748,6 +2748,7 @@ components:
       type: object
       required:
         - creator
+        - type
         - channelId
         - policyId
         - marketplace
@@ -2759,6 +2760,11 @@ components:
         creator:
           type: integer
           format: int64
+        type:
+          type: string
+          enum:
+            - SALES
+            - MINT
         policyId:
           $ref: '#/components/schemas/TokenPolicyId'
         marketplace:

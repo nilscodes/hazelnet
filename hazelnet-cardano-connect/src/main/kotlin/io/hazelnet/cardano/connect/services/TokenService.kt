@@ -1,25 +1,16 @@
 package io.hazelnet.cardano.connect.services
 
-import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.persistence.token.TokenDao
 import io.hazelnet.cardano.connect.util.PolicyTools
+import io.hazelnet.shared.decodeHex
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-
-fun String.decodeHex(): String {
-    require(length % 2 == 0) {"Must have an even length"}
-    return String(
-        chunked(2)
-            .map { it.toInt(16).toByte() }
-            .toByteArray()
-    )
-}
 
 @Service
 @CacheConfig(cacheNames = ["tokenmetadata", "handleforstake"])

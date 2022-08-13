@@ -82,9 +82,6 @@ class OAuth2AuthorizationServerSecurityConfiguration(
 
     @Bean
     fun registeredClientRepository(): RegisteredClientRepository {
-        println(oauth2BaseUrl)
-        println(introspectionClientId)
-        println(introspectionClientSecret)
         val registeredClient = RegisteredClient.withId("b5f5479d-4a6a-4d88-89ca-f1bfba7d2e89")
                 .clientId(introspectionClientId)
                 .clientSecret(introspectionClientSecret)
