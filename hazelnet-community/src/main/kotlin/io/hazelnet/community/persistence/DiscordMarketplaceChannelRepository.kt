@@ -16,4 +16,7 @@ interface DiscordMarketplaceChannelRepository : CrudRepository<DiscordMarketplac
 
     @Query(value = "SELECT m FROM DiscordMarketplaceChannel m JOIN DiscordServer d ON m.discordServerId=d.id WHERE m.type=1 AND d.premiumUntil>:now AND d.active=true")
     fun findAllMintChannelsForActivePremium(@Param("now") now: Date): List<DiscordMarketplaceChannel>
+
+    @Query(value = "SELECT m FROM DiscordMarketplaceChannel m JOIN DiscordServer d ON m.discordServerId=d.id WHERE m.type=2 AND d.premiumUntil>:now AND d.active=true")
+    fun findAllListingChannelsForActivePremium(@Param("now") now: Date): List<DiscordMarketplaceChannel>
 }

@@ -86,7 +86,6 @@ class OuraEventService(
         val queueToRetry = mutableListOf<OuraMintEvent>()
         while (mintQueue.isNotEmpty()) {
             val mintToProcess = mintQueue.pop()
-            println(mintToProcess.assetNameHex.decodeHex() + "/" + mintToProcess.date)
             if (metadataMap.containsKey(mintToProcess.transactionHash)) {
                 val metadataOfPolicy = metadataMap[mintToProcess.transactionHash]?.metadata?.get(mintToProcess.policyId) as Map<String, Any>?
                 if (metadataOfPolicy is Map<String, Any>) {

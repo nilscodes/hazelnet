@@ -54,12 +54,26 @@ class DiscordMarketplaceService(
         allMarketplaceChannels
             .map { it.policyId }
             .toSet()
-            .forEach { rabbitTemplate.convertAndSend("policies", it) }
+            .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    fun publishPoliciesForListingsAggregation() {
+        val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
+        allMarketplaceChannels
+            .map { it.policyId }
+            .toSet()
+            .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }
     }
 
     @Cacheable(cacheNames = ["salesmarketplacechannels"])
-    fun listAllMarketplaceChannels(policyId: String): List<DiscordMarketplaceChannel> =
+    fun listAllSalesMarketplaceChannels(policyId: String): List<DiscordMarketplaceChannel> =
         discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
+            .filter { it.policyId == policyId }
+
+    @Cacheable(cacheNames = ["listingsmarketplacechannels"])
+    fun listAllListingMarketplaceChannels(policyId: String): List<DiscordMarketplaceChannel> =
+        discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
             .filter { it.policyId == policyId }
 
     @Cacheable(cacheNames = ["mintmarketplacechannels"])
@@ -68,7 +82,11 @@ class DiscordMarketplaceService(
 
 
     @Scheduled(fixedRate = 60000)
-    @CacheEvict(allEntries = true, cacheNames = ["salesmarketplacechannels", "mintmarketplacechannels"], )
+    @CacheEvict(allEntries = true, cacheNames = [
+        "salesmarketplacechannels",
+        "mintmarketplacechannels",
+        "listingsmarketplacechannels",
+    ], )
     fun clearMarketplaceChannelCache() {
         // Annotation-based cache clearing of marketplace channel data every minute
     }

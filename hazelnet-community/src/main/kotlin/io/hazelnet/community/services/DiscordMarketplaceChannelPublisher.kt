@@ -1,16 +1,20 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.external.cnftjungle.AssetInfo
 import io.hazelnet.community.data.getImageUrlFromAssetInfo
 import io.hazelnet.community.data.getItemNameFromAssetInfo
 import io.hazelnet.community.services.external.CnftJungleService
+import io.hazelnet.marketplace.data.ListingAnnouncement
+import io.hazelnet.marketplace.data.ListingsInfo
 import io.hazelnet.marketplace.data.SaleAnnouncement
 import io.hazelnet.marketplace.data.SalesInfo
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.util.function.Tuple2
 
 @Service
 class DiscordMarketplaceChannelPublisher(
@@ -24,12 +28,8 @@ class DiscordMarketplaceChannelPublisher(
 
     @RabbitListener(queues = ["sales"])
     fun processSales(sale: SalesInfo) {
-        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllMarketplaceChannels(sale.policyId)
-        val blockchainAssetInfo = connectService.getMultiAssetInfoSingle(sale.policyId, sale.assetNameHex)
-        val cnftJungleAssetInfo = cnftJungleService.getAssetInfo(sale.policyId, sale.assetNameHex)
-            .onErrorReturn(AssetInfo(assetId = "${sale.policyId}${sale.assetNameHex}", policyId = sale.policyId))
-        val combinedAssetInfo = Mono.zip(blockchainAssetInfo, cnftJungleAssetInfo)
-            .block()!!
+        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(sale.policyId)
+        val combinedAssetInfo = retrieveAssetInfo(sale.policyId, sale.assetNameHex)
         marketplaceChannelsForPolicy.mapNotNull {
             if (it.minimumValue == null || sale.price > it.minimumValue!!) {
                 SaleAnnouncement(
@@ -52,5 +52,45 @@ class DiscordMarketplaceChannelPublisher(
             }
         }
             .forEach { rabbitTemplate.convertAndSend("saleannouncements", it) }
+    }
+
+    @RabbitListener(queues = ["listings"])
+    fun processListings(listing: ListingsInfo) {
+        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(listing.policyId)
+        val combinedAssetInfo = retrieveAssetInfo(listing.policyId, listing.assetNameHex)
+        marketplaceChannelsForPolicy.mapNotNull {
+            if (it.minimumValue == null || listing.price > it.minimumValue!!) {
+                ListingAnnouncement(
+                    guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
+                    channelId = it.channelId,
+                    policyId = listing.policyId,
+                    assetNameHex = listing.assetNameHex,
+                    assetName = combinedAssetInfo.t1.assetName,
+                    displayName = getItemNameFromAssetInfo(combinedAssetInfo.t1),
+                    source = listing.source,
+                    marketplaceAssetUrl = listing.marketplaceAssetUrl,
+                    assetImageUrl = getImageUrlFromAssetInfo(config, combinedAssetInfo.t1),
+                    price = listing.price,
+                    listingDate = listing.listingDate,
+                    rarityRank = combinedAssetInfo.t2.rarityRank,
+                )
+            } else {
+                null
+            }
+        }
+            .forEach { rabbitTemplate.convertAndSend("listingannouncements", it) }
+    }
+
+    private fun retrieveAssetInfo(policyId: String, assetNameHex: String): Tuple2<MultiAssetInfo, AssetInfo> {
+        val blockchainAssetInfo = connectService.getMultiAssetInfoSingle(policyId, assetNameHex)
+        val cnftJungleAssetInfo = cnftJungleService.getAssetInfo(policyId, assetNameHex)
+            .onErrorReturn(
+                AssetInfo(
+                    assetId = "${policyId}${assetNameHex}",
+                    policyId = policyId
+                )
+            )
+        return Mono.zip(blockchainAssetInfo, cnftJungleAssetInfo)
+            .block()!!
     }
 }

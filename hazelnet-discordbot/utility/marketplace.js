@@ -37,6 +37,30 @@ module.exports = {
     }
     return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentBuy', locale }, saleAnnouncement);
   },
+  createListingAnnouncementFields(listingAnnouncement, locale) {
+    const fields = [{
+      name: i18n.__({ phrase: 'configure.marketplace.listings.announce.listedFor', locale }),
+      value: i18n.__({ phrase: 'configure.marketplace.listings.announce.listedForContent', locale }, { price: Math.ceil(listingAnnouncement.price / 1000000) }),
+    }];
+
+    fields.push({
+      name: i18n.__({ phrase: 'configure.marketplace.listings.announce.marketplace', locale }),
+      value: i18n.__({ phrase: `marketplaces.${listingAnnouncement.source}`, locale }),
+    });
+
+    if (listingAnnouncement.rarityRank) {
+      fields.push({
+        name: i18n.__({ phrase: 'configure.marketplace.listings.announce.rank', locale }),
+        value: i18n.__({ phrase: 'configure.marketplace.listings.announce.rankContent', locale }, { rank: listingAnnouncement.rarityRank }),
+        inline: true,
+      });
+    }
+
+    return fields;
+  },
+  getListingAnnouncementTitle(listingAnnouncement, locale) {
+    return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, listingAnnouncement);
+  },
   createMintAnnouncementFields(mintAnnouncement, locale) {
     const fields = [];
 
