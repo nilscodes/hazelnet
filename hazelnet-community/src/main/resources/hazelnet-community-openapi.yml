@@ -2751,7 +2751,7 @@ components:
         - type
         - channelId
         - policyId
-        - marketplace
+        - marketplaces
       properties:
         id:
           readOnly: true
@@ -2767,8 +2767,11 @@ components:
             - MINT
         policyId:
           $ref: '#/components/schemas/TokenPolicyId'
-        marketplace:
-          $ref: '#/components/schemas/Marketplace'
+        marketplaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/Marketplace'
+          minItems: 1
         createTime:
           readOnly: true
           type: string

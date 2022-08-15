@@ -221,7 +221,7 @@ module.exports = {
       type,
       channelId,
       policyId,
-      marketplace,
+      marketplaces: [marketplace],
       minimumValue,
     });
     return newMarketplaceChannelPromise.data;

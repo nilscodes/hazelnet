@@ -12,42 +12,42 @@ import javax.validation.constraints.Size
 @Entity
 @Table(name = "discord_token_roles")
 class TokenOwnershipRole @JsonCreator constructor(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name ="discord_token_role_id")
-        var id: Long?,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name ="discord_token_role_id")
+    var id: Long?,
 
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "discord_token_role_policies", joinColumns = [JoinColumn(name = "discord_token_role_id")])
-        @field:Valid
-        @field:Size(min = 1, max = 50)
-        var acceptedAssets: MutableSet<TokenRoleAssetInfo> = mutableSetOf(),
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_token_role_policies", joinColumns = [JoinColumn(name = "discord_token_role_id")])
+    @field:Valid
+    @field:Size(min = 1, max = 50)
+    var acceptedAssets: MutableSet<TokenRoleAssetInfo> = mutableSetOf(),
 
-        @Column(name = "minimum_token_quantity")
-        @field:NonNull
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var minimumTokenQuantity: Long,
+    @Column(name = "minimum_token_quantity")
+    @field:NonNull
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var minimumTokenQuantity: Long,
 
-        @Column(name = "maximum_token_quantity")
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var maximumTokenQuantity: Long?,
+    @Column(name = "maximum_token_quantity")
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var maximumTokenQuantity: Long?,
 
-        @OneToMany(fetch = FetchType.EAGER)
-        @JoinColumn(name = "discord_token_role_id")
-        @field:Valid
-        var filters: MutableSet<MetadataFilter> = mutableSetOf(),
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "discord_token_role_id")
+    @field:Valid
+    var filters: MutableSet<TokenRoleMetadataFilter> = mutableSetOf(),
 
-        @Column(name = "discord_role_id")
-        @field:NonNull
-        @field:Min(1)
-        @field:JsonSerialize(using = ToStringSerializer::class)
-        var roleId: Long,
+    @Column(name = "discord_role_id")
+    @field:NonNull
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var roleId: Long,
 
-        @Column(name = "aggregation_type")
-        @Enumerated(EnumType.ORDINAL)
-        var aggregationType: TokenOwnershipAggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
+    @Column(name = "aggregation_type")
+    @Enumerated(EnumType.ORDINAL)
+    var aggregationType: TokenOwnershipAggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
 ) {
 
     fun meetsFilterCriteria(metadata: String): Boolean {

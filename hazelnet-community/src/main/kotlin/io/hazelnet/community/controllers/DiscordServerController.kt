@@ -123,8 +123,8 @@ class DiscordServerController(
 
     @PostMapping("/{guildId}/tokenroles/{tokenRoleId}/metadatafilters")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addMetadataFilter(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @RequestBody @Valid metadataFilter: MetadataFilter): ResponseEntity<MetadataFilter> {
-        val newMetadataFilter = discordServerService.addMetadataFilter(guildId, tokenRoleId, metadataFilter)
+    fun addMetadataFilter(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @RequestBody @Valid tokenRoleMetadataFilter: TokenRoleMetadataFilter): ResponseEntity<TokenRoleMetadataFilter> {
+        val newMetadataFilter = discordServerService.addMetadataFilter(guildId, tokenRoleId, tokenRoleMetadataFilter)
         return ResponseEntity
             .created(ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{filterId}")

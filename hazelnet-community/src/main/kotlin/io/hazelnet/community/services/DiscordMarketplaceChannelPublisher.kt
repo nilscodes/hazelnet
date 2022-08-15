@@ -31,7 +31,8 @@ class DiscordMarketplaceChannelPublisher(
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(sale.policyId)
         val combinedAssetInfo = retrieveAssetInfo(sale.policyId, sale.assetNameHex)
         marketplaceChannelsForPolicy.mapNotNull {
-            if (it.minimumValue == null || sale.price > it.minimumValue!!) {
+            if ((it.minimumValue == null || sale.price > it.minimumValue!!)
+                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)) {
                 SaleAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,
@@ -59,7 +60,8 @@ class DiscordMarketplaceChannelPublisher(
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(listing.policyId)
         val combinedAssetInfo = retrieveAssetInfo(listing.policyId, listing.assetNameHex)
         marketplaceChannelsForPolicy.mapNotNull {
-            if (it.minimumValue == null || listing.price > it.minimumValue!!) {
+            if ((it.minimumValue == null || listing.price > it.minimumValue!!)
+                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)) {
                 ListingAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,

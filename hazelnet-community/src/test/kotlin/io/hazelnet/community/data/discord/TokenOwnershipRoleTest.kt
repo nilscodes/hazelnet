@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test
 internal class TokenOwnershipRoleTest {
     @Test
     fun meetsFilterCriteria() {
-        val matchingFilter1 = MetadataFilter(0, "name", AttributeOperatorType.CONTAINS, "01813")
-        val matchingFilter2 = MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
-        val nonMatchingFilter = MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drowsy")
+        val matchingFilter1 = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.CONTAINS, "01813")
+        val matchingFilter2 = TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
+        val nonMatchingFilter = TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drowsy")
 
         val matchingRole = TokenOwnershipRole(1, mutableSetOf(), 1, null, mutableSetOf(matchingFilter1, matchingFilter2), 1)
         assertTrue(matchingRole.meetsFilterCriteria(METADATA_TAVERNSQUAD_1))

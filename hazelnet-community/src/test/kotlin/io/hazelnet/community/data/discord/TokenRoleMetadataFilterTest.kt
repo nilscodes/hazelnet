@@ -145,135 +145,135 @@ const val METADATA_ADAGOTCHI_1 = """{
         "name": "Adagotchi #0662"
       }"""
 
-internal class MetadataFilterTest {
+internal class TokenRoleMetadataFilterTest {
     @Test
     fun testEquals() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.EQUALS, "text/html")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.EQUALS, "text/html")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.EQUALS, "text/htm")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.EQUALS, "text/htm")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drows")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drows")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testEqualsIsCaseSensitive() {
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "drowsy")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.EQUALS, "drowsy")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testContains() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.CONTAINS, "text/ht")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.CONTAINS, "text/ht")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.CONTAINS, "text\\html")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.CONTAINS, "text\\html")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val matchingSampleFilterIterable = MetadataFilter(0, "tags", AttributeOperatorType.CONTAINS, "smoking")
+        val matchingSampleFilterIterable = TokenRoleMetadataFilter(0, "tags", AttributeOperatorType.CONTAINS, "smoking")
         assertTrue(matchingSampleFilterIterable.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilterIterable = MetadataFilter(0, "tags", AttributeOperatorType.CONTAINS, "soul")
+        val nonMatchingSampleFilterIterable = TokenRoleMetadataFilter(0, "tags", AttributeOperatorType.CONTAINS, "soul")
         assertFalse(nonMatchingSampleFilterIterable.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Head", AttributeOperatorType.CONTAINS, "lame")
+            TokenRoleMetadataFilter(0, "attributes.Head", AttributeOperatorType.CONTAINS, "lame")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Head", AttributeOperatorType.CONTAINS, "lamer")
+            TokenRoleMetadataFilter(0, "attributes.Head", AttributeOperatorType.CONTAINS, "lamer")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testNotContains() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.NOTCONTAINS, "text\\ht")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.NOTCONTAINS, "text\\ht")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.NOTCONTAINS, "text/htm")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.NOTCONTAINS, "text/htm")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val matchingSampleFilterIterable = MetadataFilter(0, "tags", AttributeOperatorType.NOTCONTAINS, "soul")
+        val matchingSampleFilterIterable = TokenRoleMetadataFilter(0, "tags", AttributeOperatorType.NOTCONTAINS, "soul")
         assertTrue(matchingSampleFilterIterable.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilterIterable = MetadataFilter(0, "tags", AttributeOperatorType.NOTCONTAINS, "smoking")
+        val nonMatchingSampleFilterIterable = TokenRoleMetadataFilter(0, "tags", AttributeOperatorType.NOTCONTAINS, "smoking")
         assertFalse(nonMatchingSampleFilterIterable.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Head", AttributeOperatorType.NOTCONTAINS, "lamer")
+            TokenRoleMetadataFilter(0, "attributes.Head", AttributeOperatorType.NOTCONTAINS, "lamer")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Head", AttributeOperatorType.NOTCONTAINS, "lame")
+            TokenRoleMetadataFilter(0, "attributes.Head", AttributeOperatorType.NOTCONTAINS, "lame")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testNotEquals() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.NOTEQUALS, "text/htm")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.NOTEQUALS, "text/htm")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.NOTEQUALS, "text/html")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.NOTEQUALS, "text/html")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drows")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drows")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drowsy")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.NOTEQUALS, "Drowsy")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testStartsWith() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.STARTSWITH, "text")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.STARTSWITH, "text")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.STARTSWITH, "ext")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.STARTSWITH, "ext")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.STARTSWITH, "Drows")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.STARTSWITH, "Drows")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.STARTSWITH, "rows")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.STARTSWITH, "rows")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testEndsWith() {
-        val matchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.ENDSWITH, "html")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.ENDSWITH, "html")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
-        val nonMatchingSampleFilter = MetadataFilter(0, "type", AttributeOperatorType.ENDSWITH, "htm")
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "type", AttributeOperatorType.ENDSWITH, "htm")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
 
         val matchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.ENDSWITH, "rowsy")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.ENDSWITH, "rowsy")
         assertTrue(matchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
         val nonMatchingSampleFilterWithSubAttribute =
-            MetadataFilter(0, "attributes.Eyes", AttributeOperatorType.ENDSWITH, "rows")
+            TokenRoleMetadataFilter(0, "attributes.Eyes", AttributeOperatorType.ENDSWITH, "rows")
         assertFalse(nonMatchingSampleFilterWithSubAttribute.apply(METADATA_TAVERNSQUAD_1))
     }
 
     @Test
     fun testEqualsWithComplexJsonPath() {
         val matchingSampleFilter =
-            MetadataFilter(0, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "dead")
+            TokenRoleMetadataFilter(0, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "dead")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
         val nonMatchingSampleFilter =
-            MetadataFilter(0, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "zomato")
+            TokenRoleMetadataFilter(0, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "zomato")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
     }
 
     @Test
     fun testWithInvalidProperty() {
-        val matchingSampleFilter = MetadataFilter(0, "NONEXISTENT", AttributeOperatorType.EQUALS, "dead")
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "NONEXISTENT", AttributeOperatorType.EQUALS, "dead")
         assertFalse(matchingSampleFilter.apply(METADATA_DEADPXLZ_1))
     }
 
     @Test
     fun testArrayIndex() {
         val matchingSampleFilter =
-            MetadataFilter(0, "files[0].Head", AttributeOperatorType.CONTAINS, "Fauxhawk")
+            TokenRoleMetadataFilter(0, "files[0].Head", AttributeOperatorType.CONTAINS, "Fauxhawk")
         assertTrue(matchingSampleFilter.apply(METADATA_ADAGOTCHI_1))
     }
 }
