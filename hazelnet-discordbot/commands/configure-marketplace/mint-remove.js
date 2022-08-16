@@ -2,6 +2,7 @@ const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
+const marketplaceUtil = require('../../utility/marketplace');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
@@ -14,18 +15,7 @@ module.exports = {
       const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
         .filter((channel) => channel.type === 'MINT');
 
-      const marketplaceChannelOptionsPromise = marketplaceChannels.map(async (marketplaceChannel) => {
-        const projectData = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannel.policyId);
-        const projectName = projectData ? projectData.projectName : marketplaceChannel.policyId;
-        const announceChannel = await interaction.guild.channels.fetch(marketplaceChannel.channelId);
-        const channelName = announceChannel ? announceChannel.name : i18n.__({ phrase: 'configure.marketplace.mint.remove.deletedChannel', locale });
-        const description = i18n.__({ phrase: 'configure.marketplace.mint.remove.entry', locale }, { channelName });
-        return {
-          label: i18n.__({ phrase: 'configure.marketplace.mint.remove.entryTitle', locale }, { projectName, marketplaceChannel }).substring(0, 100),
-          description: description.substring(0, 100),
-          value: `marketplace-channel-id-${marketplaceChannel.id}`,
-        };
-      });
+      const marketplaceChannelOptionsPromise = marketplaceChannels.map(async (marketplaceChannel) => marketplaceUtil.getMarketplaceChannelOption(discordServer, marketplaceChannel, interaction, 'mint'));
       const marketplaceChannelOptions = await Promise.all(marketplaceChannelOptionsPromise);
 
       if (marketplaceChannels.length) {
@@ -60,16 +50,8 @@ module.exports = {
         const marketplaceChannelToDelete = marketplaceChannels.find((marketplaceChannel) => marketplaceChannel.id === marketplaceChannelId);
         if (marketplaceChannelToDelete) {
           await interaction.client.services.discordserver.deleteMarketplaceChannel(interaction.guild.id, marketplaceChannelToDelete.id);
-
-          const projectData = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannelToDelete.policyId);
-          const projectName = projectData ? projectData.projectName : marketplaceChannelToDelete.policyId;
-
-          const content = i18n.__({ phrase: 'configure.marketplace.mint.remove.deleted', locale }, { projectName, channel: marketplaceChannelToDelete.channelId });
-
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint remove', i18n.__({ phrase: 'configure.marketplace.mint.remove.success', locale }), 'configure-marketplace-mint-remove', [{
-            name: i18n.__({ phrase: 'configure.marketplace.mint.list.entryTitle', locale }, { projectName, marketplaceChannel: marketplaceChannelToDelete }),
-            value: content,
-          }]);
+          const marketplaceChannelFields = [marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, marketplaceChannelToDelete, 'remove.deleted')];
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint remove', i18n.__({ phrase: 'configure.marketplace.mint.remove.success', locale }), 'configure-marketplace-mint-remove', marketplaceChannelFields);
           await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
         }
       } catch (error) {

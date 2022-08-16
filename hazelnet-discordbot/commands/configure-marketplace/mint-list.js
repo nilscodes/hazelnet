@@ -1,9 +1,8 @@
-const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const embedBuilder = require('../../utility/embedbuilder');
+const marketplaceUtil = require('../../utility/marketplace');
 
 module.exports = {
-  cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -13,15 +12,7 @@ module.exports = {
       const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
         .filter((channel) => channel.type === 'MINT');
 
-      const marketplaceChannelFields = marketplaceChannels.map((marketplaceChannel) => {
-        const projectData = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannel.policyId);
-        const projectName = projectData ? projectData.projectName : marketplaceChannel.policyId;
-        const content = i18n.__({ phrase: 'configure.marketplace.mint.list.entry', locale }, { channel: marketplaceChannel.channelId });
-        return {
-          name: i18n.__({ phrase: 'configure.marketplace.mint.list.entryTitle', locale }, { projectName, marketplaceChannel }),
-          value: content,
-        };
-      });
+      const marketplaceChannelFields = marketplaceChannels.map((marketplaceChannel) => marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, marketplaceChannel, 'list.entry'));
 
       if (marketplaceChannels.length) {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint list', i18n.__({ phrase: 'configure.marketplace.mint.list.purpose', locale }), 'configure-marketplace-mint-list', marketplaceChannelFields);

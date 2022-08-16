@@ -1128,7 +1128,7 @@ paths:
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters:
     post:
       summary: Add a metadata filter to the designated token role
-      operationId: addMetadataFilter
+      operationId: addMetadataFilterToTokenRole
       tags:
         - discord
         - token
@@ -1142,7 +1142,7 @@ paths:
               $ref: '#/components/schemas/MetadataFilter'
       responses:
         '201':
-          description: 'Token Policy'
+          description: 'The newly added metadata filter for this token role'
           content:
             application/json:
               schema:
@@ -1153,7 +1153,7 @@ paths:
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}:
     delete:
       summary: Remove a metadata filter from the designated token role
-      operationId: deleteMetadataFilter
+      operationId: deleteMetadataFilterFromTokenRole
       tags:
         - discord
         - token
@@ -1401,6 +1401,45 @@ paths:
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
+  /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters:
+    post:
+      summary: Add a metadata filter to the designated marketplace channel
+      operationId: addMetadataFilterToMarketplaceChannel
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetadataFilter'
+      responses:
+        '201':
+          description: 'The newly added metadata filter for this marketplace channel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataFilter'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters/{filterId}:
+    delete:
+      summary: Remove a metadata filter from the designated marketplace channel
+      operationId: deleteMetadataFilterFromMarketplaceChannel
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+        - $ref: '#/components/parameters/TrackerFilterIdPathParameter'
       responses:
         '204':
           description: Successful deletion
@@ -1679,6 +1718,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DiscordPollUpdate'
+  /oura:
+    post:
+      summary: Publish an event from Oura to the community service (to react to mint events)
+      operationId: receiveEvent
+      tags:
+        - oura
+        - global
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OuraEvent'
+      responses:
+        '200':
+          description: 'Empty response body and 200 response (as prescribed by Oura)'
+
 components:
   parameters:
     AccountIdPathParameter:
@@ -1757,6 +1812,16 @@ components:
       name: filterId
       in: path
       description: The ID of this token role assignments filter
+      required: true
+      style: simple
+      example: 2
+      schema:
+        type: integer
+        format: int64
+    TrackerFilterIdPathParameter:
+      name: filterId
+      in: path
+      description: The ID of this marketplace channel filter
       required: true
       style: simple
       example: 2
@@ -2562,6 +2627,7 @@ components:
             - NOTCONTAINS
             - STARTSWITH
             - ENDSWITH
+            - REGEX
         attributeValue:
           type: string
           minLength: 1
@@ -3084,6 +3150,11 @@ components:
       description: The wallet address (non-enterprise)
       example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
       pattern: '^addr1[A-Za-z-0-9]{98}$'
+    TransactionHash:
+      type: string
+      description: A cardano transaction hash
+      example: 20de8b6406e66e3d3f18d4fd788d30146cacbd6a08ba6529b4406156d31d278e
+      pattern: '^[A-Za-z-0-9]{54}$'
     Marketplace:
       type: string
       enum:
@@ -3105,6 +3176,66 @@ components:
       enum:
         - CARDANO
         - ETHEREUM
+    OuraEvent:
+      type: object
+      required:
+        - variant
+        - context
+      properties:
+        variant:
+          type: string
+          enum:
+            - Mint
+            - Metadata
+        context:
+          $ref: '#/components/schemas/OuraEventContext'
+        mint:
+          $ref: '#/components/schemas/OuraMintEvent'
+        metadata:
+          $ref: '#/components/schemas/OuraMetadataEvent'
+    OuraEventContext:
+      type: object
+      required:
+        - timestamp
+        - tx_hash
+      properties:
+        timestamp:
+          type: integer
+          example: 1660685739000
+          description: Timestamp in milliseconds since 1/1/1970 0:00
+          format: int64
+        tx_hash:
+          $ref: '#/components/schemas/TransactionHash'
+    OuraMintEvent:
+      type: object
+      required:
+        - policy
+        - asset
+        - quantity
+      properties:
+        policy:
+          $ref: '#/components/schemas/TokenPolicyId'
+        asset:
+          type: string
+          description: The hex-encoded name of the minted asset
+          example: 706f7461746f
+        quantity:
+          type: integer
+          example: 1
+          format: int64
+          description: The number of minted assets
+    OuraMetadataEvent:
+      type: object
+      required:
+        - label
+        - map_json
+      properties:
+        label:
+          type: string
+          description: The root key of the metadata event (721 for NFT metadata for example)
+        map_json:
+          type: object
+          description: 'The raw map for the metadata of this the associated mint transaction'
     CreatedResponseHeader:
       type: string
       format: uri

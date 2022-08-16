@@ -61,7 +61,31 @@ module.exports = {
           .setDescription(ci18n.subDescription('mint-list')))
         .addSubcommand((subcommand) => subcommand
           .setName('remove')
-          .setDescription(ci18n.subDescription('mint-remove'))));
+          .setDescription(ci18n.subDescription('mint-remove'))))
+      .addSubcommandGroup((group) => group
+        .setName('metadatafilter')
+        .setDescription(ci18n.subDescription('metadatafilter'))
+        .addSubcommand((subcommand) => subcommand
+          .setName('add')
+          .setDescription(ci18n.subDescription('metadatafilter-add'))
+          .addIntegerOption((option) => option.setName('tracker-id').setDescription(ci18n.option('tracker-id')).setRequired(true))
+          .addStringOption((option) => option.setName('attribute-path').setDescription(ci18n.option('attribute-path')).setRequired(true))
+          .addStringOption((option) => option.setName('operator').setDescription(ci18n.option('operator'))
+            .addChoices(
+              { name: ci18n.choice('EQUALS'), value: 'EQUALS' },
+              { name: ci18n.choice('NOTEQUALS'), value: 'NOTEQUALS' },
+              { name: ci18n.choice('CONTAINS'), value: 'CONTAINS' },
+              { name: ci18n.choice('NOTCONTAINS'), value: 'NOTCONTAINS' },
+              { name: ci18n.choice('STARTSWITH'), value: 'STARTSWITH' },
+              { name: ci18n.choice('ENDSWITH'), value: 'ENDSWITH' },
+              { name: ci18n.choice('REGEX'), value: 'REGEX' },
+            )
+            .setRequired(true))
+          .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('remove')
+          .setDescription(ci18n.subDescription('metadatafilter-remove'))
+          .addIntegerOption((option) => option.setName('tracker-id').setDescription(ci18n.option('tracker-id')).setRequired(true))));
   },
   commandTags: ['marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

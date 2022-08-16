@@ -47,6 +47,7 @@ module.exports = {
               const operatorText = i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
               return {
                 label: i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText }).substring(0, 100),
+                description: i18n.__({ phrase: 'configure.tokenroles.metadatafilter.remove.valueRepeat', locale }, { attributeValue: filter.attributeValue }).substring(0, 100),
                 value: `metadata-filter-id-${tokenRole.id}-${filter.id}`,
               };
             })),
@@ -69,6 +70,7 @@ module.exports = {
         tokenRoleToRemoveFilterFrom.filters = tokenRoleToRemoveFilterFrom.filters.filter((metadataFilter) => metadataFilter.id !== filterId);
         const tokenRoleFields = [tokenroles.getTokenRoleDetailsText(tokenRoleToRemoveFilterFrom, discordServer, locale, true)];
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter remove', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.remove.success', locale }), 'configure-tokenroles-metadatafilter-remove', tokenRoleFields);
+        interaction.editReply({ components: [], ephemeral: true });
         await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter remove', i18n.__({ phrase: 'configure.tokenroles.list.errorNotFound', locale }, { tokenRoleId }), 'configure-tokenroles-metadatafilter-remove');

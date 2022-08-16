@@ -64,7 +64,10 @@
 			"configure-marketplace-listings": "Configure your listing trackers.",
 			"configure-marketplace-listings-add": "Add a listing tracker one of your Discord channels.",
 			"configure-marketplace-listings-list": "Show all your configured listing trackers.",
-			"configure-marketplace-listings-remove": "Remove an existing listing tracker."
+			"configure-marketplace-listings-remove": "Remove an existing listing tracker.",
+			"configure-marketplace-metadatafilter": "Manage metadata filters on your trackers.",
+			"configure-marketplace-metadatafilter-add": "Adds a metadata filter to your existing tracker.",
+			"configure-marketplace-metadatafilter-remove": "Remove a metadata filter from your existing tracker."
 		},
 		"options": {
 			"profile": {
@@ -119,7 +122,11 @@
 				"policy-id": "Policy ID (Needs to be an official policy of this server)",
 				"marketplace": "Marketplace to use",
 				"minimum-price": "The minimum price for a sale to be considered",
-				"channel": "The channel to send tracking announcements to"
+				"channel": "The channel to send tracking announcements to",
+				"tracker-id": "The ID of the sales/mint/listings tracker",
+				"attribute-path": "Metadata attribute to check (case sensitive!)",
+				"operator": "Comparison operator to use",
+				"attribute-value": "Value to check for (case sensitive!)"
 			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
@@ -142,6 +149,7 @@
 				"NOTCONTAINS": "does not contain",
 				"STARTSWITH": "starts with",
 				"ENDSWITH": "ends with",
+				"REGEX": "matches the Regular Expression",
 				"ANY_POLICY_FILTERED_AND": "Any policy of the role, each NFT must match all filters",
 				"ANY_POLICY_FILTERED_OR": "Any policy of the role, each NFT must match at least one filter",
 				"ANY_POLICY_FILTERED_ONE_EACH": "Any policy of the role, one NFT matching each filter is required",
@@ -164,7 +172,14 @@
 				"DISCORD_ID": "Discord ID and tag"
 			},
 			"configure-marketplace": {
-				"JPGSTORE": "jpg.store"
+				"JPGSTORE": "jpg.store",
+				"EQUALS": "equals",
+				"NOTEQUALS": "does not equal",
+				"CONTAINS": "contains",
+				"NOTCONTAINS": "does not contain",
+				"STARTSWITH": "starts with",
+				"ENDSWITH": "ends with",
+				"REGEX": "matches the Regular Expression"
 			}
 		}
 	},
@@ -569,13 +584,14 @@
 			"metadatafilter": {
 				"add": {
 					"metadataFiltersTitle": "**Active Filters**",
-					"metadataFiltersContent": "Metadata attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
+					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
 					"metadataOperator-EQUALS": "is",
 					"metadataOperator-NOTEQUALS": "is not",
 					"metadataOperator-CONTAINS": "contains the text",
 					"metadataOperator-NOTCONTAINS": "does not contain the text",
 					"metadataOperator-STARTSWITH": "starts with the text",
 					"metadataOperator-ENDSWITH": "ends with the text",
+					"metadataOperator-REGEX": "matches the Regular Expression",
 					"metadataFilterJoinPhraseAnd": " **AND** ",
 					"metadataFilterJoinPhraseOr": " **OR** ",
 					"metadataFilterJoinPhraseOneEach": " **AND ANOTHER TOKEN WITH** ",
@@ -585,6 +601,7 @@
 				},
 				"remove": {
 					"purpose": "Choose the metadata filter you want to remove from this role.",
+					"valueRepeat": "Value: {{{attributeValue}}}",
 					"errorNoFiltersTitle": "No filters found",
 					"errorNoFilters": "⚠ No metadata filters are active for this token role - nothing to remove.",
 					"chooseRemove": "Choose the metadata filter to remove",
@@ -825,11 +842,11 @@
 		"marketplace": {
 			"sales": {
 				"add": {
-					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
+					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceNames}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
 					"minimumPriceAddon": " Only sales above the price of **₳{{minimumPriceAda}}** will be announced.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
-					"success": "A sales tracker for the project **{{projectName}}** has been added! Announcements for any sales from **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"success": "A sales tracker for the project **{{projectName}}** has been added! Announcements for any sales from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any sales.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
@@ -841,7 +858,8 @@
 				"list": {
 					"purpose": "Show the list of all active sales trackers in this Discord server.",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
-					"entry": "Announcements for any sales on **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"entry": "Announcements for sales on **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
+					"filterActive": "Only sales for assets that match the following metadata filters will be announced:",
 					"noMarketplaceChannels": "*There are no configured sales trackers on this server.*"
 				},
 				"announce": {
@@ -861,10 +879,10 @@
 				"remove": {
 					"purpose": "Remove a sales tracker from your Discord server by selecting it in the below dropdown.",
 					"success": "🗑️ Removed the following sales tracker from this server:",
-					"deleted": "Announcements for sales on **{{marketplaceName}}** will no longer be posted in <#{{channel}}>.",
+					"deleted": "Announcements for sales on **{{marketplaceNames}}** will no longer be posted in <#{{channel}}>.",
 					"chooseMarketplaceChannel": "Choose a sales tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
-					"entry": "{{marketplaceName}}, #{{channelName}}",
+					"entry": "{{marketplaceNames}}, #{{channelName}}",
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
 					"deletedChannel": "#deleted",
@@ -873,11 +891,11 @@
 			},
 			"listings": {
 				"add": {
-					"purpose": "You are about to add a listings tracker for a project. Announcements for any listings on **{{marketplaceName}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
+					"purpose": "You are about to add a listings tracker for a project. Announcements for listings on **{{marketplaceNames}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
 					"minimumPriceAddon": " Only listings above the asking price of **₳{{minimumPriceAda}}** will be announced.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
-					"success": "A listings tracker for the project **{{projectName}}** has been added! Announcements for any listings from **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"success": "A listings tracker for the project **{{projectName}}** has been added! Announcements for listings from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any listings.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
@@ -889,7 +907,8 @@
 				"list": {
 					"purpose": "Show the list of all active listing trackers in this Discord server.",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
-					"entry": "Announcements for any listings on **{{marketplaceName}}** will be posted in <#{{channel}}>.",
+					"entry": "Announcements for listings on **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
+					"filterActive": "Only listings for assets that match the following metadata filters will be announced:",
 					"noMarketplaceChannels": "*There are no configured listing trackers on this server.*"
 				},
 				"announce": {
@@ -907,10 +926,10 @@
 				"remove": {
 					"purpose": "Remove a listing tracker from your Discord server by selecting it in the below dropdown.",
 					"success": "🗑️ Removed the following listing tracker from this server:",
-					"deleted": "Announcements for listings on **{{marketplaceName}}** will no longer be posted in <#{{channel}}>.",
+					"deleted": "Announcements for listings on **{{marketplaceNames}}** will no longer be posted in <#{{channel}}>.",
 					"chooseMarketplaceChannel": "Choose a listing tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
-					"entry": "{{marketplaceName}}, #{{channelName}}",
+					"entry": "{{marketplaceNames}}, #{{channelName}}",
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any listings with a minimum asking price of **₳{{minimumPriceAda}}**",
 					"deletedChannel": "#deleted",
@@ -919,10 +938,10 @@
 			},
 			"mint": {
 				"add": {
-					"purpose": "You are about to add a mint tracker for a project. Announcements for any mints of the project's policy will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
+					"purpose": "You are about to add a mint tracker for a project. Announcements for mints of the project's policy will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
-					"success": "A mint tracker for the project **{{projectName}}** has been added! Announcements for any mints of the projects policy will be posted in <#{{channel}}>.",
+					"success": "A mint tracker for the project **{{projectName}}** has been added! Announcements for mints of the projects policy will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any mints.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
@@ -934,7 +953,8 @@
 				"list": {
 					"purpose": "Show the list of all active mint trackers in this Discord server.",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
-					"entry": "Announcements for any mints of this project will be posted in <#{{channel}}>.",
+					"entry": "Announcements for mints of this project will be posted in <#{{channel}}>.",
+					"filterActive": "Only mints for assets that match the following metadata filters will be announced:",
 					"noMarketplaceChannels": "*There are no configured mint trackers on this server.*"
 				},
 				"announce": {
@@ -954,6 +974,35 @@
 					"entry": "#{{channelName}}",
 					"deletedChannel": "#deleted",
 					"otherError": "⚠ Error while removing a mint tracking channel."
+				}
+			},
+			"metadatafilter": {
+				"add": {
+					"success": "✅ Successfully added a new metadata filter to the below tracker.",
+					"metadataFiltersTitle": "**Active Filters**",
+					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
+					"metadataOperator-EQUALS": "is",
+					"metadataOperator-NOTEQUALS": "is not",
+					"metadataOperator-CONTAINS": "contains the text",
+					"metadataOperator-NOTCONTAINS": "does not contain the text",
+					"metadataOperator-STARTSWITH": "starts with the text",
+					"metadataOperator-ENDSWITH": "ends with the text",
+					"metadataOperator-REGEX": "matches the Regular Expression",
+					"metadataFilterJoinPhraseAnd": " **AND** ",
+					"metadataFilterJoinPhraseOr": " **OR** ",
+					"errorLimitReached": "⚠ You cannot add more than ten metadata filters to any tracker. Please get in touch with us to request more filters for your trackers.",
+					"errorAttributeValueLength": "⚠ You cannot use attribute values with more than {{maxLength}} characters.",
+					"errorAttributeNameLength": "⚠ You cannot use attribute names with more than {{maxLength}} characters.",
+					"errorNotFound": "⚠ No tracker with the ID **{{trackerId}}** was found for this server."
+				},
+				"remove": {
+					"purpose": "Choose the metadata filter you want to remove from this tracker.",
+					"valueRepeat": "Value: {{{attributeValue}}}",
+					"errorNoFiltersTitle": "No filters found",
+					"errorNoFilters": "⚠ No metadata filters are active for this tracker - nothing to remove.",
+					"errorNotFound": "⚠ No tracker with the ID **{{trackerId}}** was found for this server.",
+					"chooseRemove": "Choose the metadata filter to remove",
+					"success": "🗑️ Removed the metadata filter from this tracker. The remaining details are as follows:"
 				}
 			}
 		},
@@ -1110,7 +1159,8 @@
 		"cardolphins": "Cardolphins Special"
 	},
 	"marketplaces": {
-		"JPGSTORE": "JPG.store"
+		"JPGSTORE": "JPG.store",
+		"MINT_ONCHAIN": "Minting"
 	},
 	"generic": {
 		"cancel": "Cancel",

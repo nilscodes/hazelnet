@@ -20,6 +20,9 @@ enum class AttributeOperatorType {
     },
     ENDSWITH {
         override fun makeAlgorithm() = EndsWithOperatorAlgorithm()
+    },
+    REGEX {
+        override fun makeAlgorithm() = RegexOperatorAlgorithm()
     };
 
     abstract fun makeAlgorithm(): OperatorAlgorithm

@@ -2,7 +2,9 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.marketplace.DiscordMarketplaceChannel
+import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
 import io.hazelnet.community.persistence.DiscordMarketplaceChannelRepository
+import io.hazelnet.community.persistence.DiscordTrackerMetadataFilterRepository
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -14,6 +16,7 @@ import java.util.*
 @Service
 class DiscordMarketplaceService(
     private val discordMarketplaceChannelRepository: DiscordMarketplaceChannelRepository,
+    private val discordMarketplaceChannelMetadataFilterRepository: DiscordTrackerMetadataFilterRepository,
     private val discordServerService: DiscordServerService,
     private val rabbitTemplate: RabbitTemplate,
 ) {
@@ -38,6 +41,23 @@ class DiscordMarketplaceService(
         val discordServer = discordServerService.getDiscordServer(guildId)
         val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
         discordMarketplaceChannelRepository.delete(marketplaceChannel)
+    }
+
+    fun addMetadataFilter(guildId: Long, marketplaceChannelId: Int, trackerMetadataFilter: TrackerMetadataFilter): TrackerMetadataFilter {
+        val discordServer = discordServerService.getDiscordServer(guildId)
+        val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
+        discordMarketplaceChannelMetadataFilterRepository.save(trackerMetadataFilter)
+        marketplaceChannel.filters.add(trackerMetadataFilter)
+        discordMarketplaceChannelRepository.save(marketplaceChannel)
+        return trackerMetadataFilter
+    }
+
+    fun deleteMetadataFilter(guildId: Long, marketplaceChannelId: Int, filterId: Long) {
+        val discordServer = discordServerService.getDiscordServer(guildId)
+        val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
+        val metadataFilter = marketplaceChannel.filters
+            .find { it.id == filterId } ?: throw NoSuchElementException("No filter with ID $filterId found on marketplace channel with ID $marketplaceChannelId on guild $guildId")
+        discordMarketplaceChannelMetadataFilterRepository.delete(metadataFilter)
     }
 
     private fun getMarketplaceChannel(discordServer: DiscordServer, marketplaceChannelId: Int): DiscordMarketplaceChannel {

@@ -2,6 +2,7 @@ const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
+const marketplaceUtil = require('../../utility/marketplace');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
@@ -25,7 +26,7 @@ module.exports = {
                 if (officialProjectForPolicy) {
                   const content = await this.createMintChannel(interaction, {
                     channelId: announceChannel.id,
-                  }, policyIdToTrack, discordServer, locale);
+                  }, policyIdToTrack, discordServer);
                   const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', content, 'configure-marketplace-mint-add');
                   await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
                 } else {
@@ -89,7 +90,7 @@ module.exports = {
       try {
         const policyIdToTrack = interaction.values[0];
         const marketplaceChannelData = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-        const content = await this.createMintChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer, locale);
+        const content = await this.createMintChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', content, 'configure-marketplace-mint-add');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       } catch (error) {
@@ -99,7 +100,7 @@ module.exports = {
       }
     }
   },
-  async createMintChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer, locale) {
+  async createMintChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer) {
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
 
     await interaction.client.services.discordserver.createMarketplaceChannel(
@@ -108,14 +109,14 @@ module.exports = {
       'MINT',
       marketplaceChannelData.channelId,
       policyIdToTrack,
-      'JPGSTORE',
+      'MINT_ONCHAIN',
       null,
     );
 
-    const { projectName } = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
-
-    const marketplaceName = i18n.__({ phrase: `marketplaces.${marketplaceChannelData.marketplace}`, locale });
-    const content = i18n.__({ phrase: 'configure.marketplace.mint.add.success', locale }, { projectName, marketplaceName, channel: marketplaceChannelData.channelId });
-    return content;
+    return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, {
+      channelId: marketplaceChannelData.channelId,
+      policyId: policyIdToTrack,
+      type: 'MINT',
+    }, 'add.success').value;
   },
 };

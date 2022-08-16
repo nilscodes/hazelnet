@@ -27,7 +27,7 @@ const val METADATA_DEADPXLZ_1 = """{
 
 const val METADATA_DEADPXLZ_2 = """{
         "image": "ipfs://ipfs/QmRrFYTD2k8LVLkxdmyyqnuAbKBY664mkisEgMzw7rxZTZ",
-        "name": "PXL#500",
+        "name": "PXL#5011",
         "properties": [
           {
             "key": "type",
@@ -275,5 +275,13 @@ internal class TokenRoleMetadataFilterTest {
         val matchingSampleFilter =
             TokenRoleMetadataFilter(0, "files[0].Head", AttributeOperatorType.CONTAINS, "Fauxhawk")
         assertTrue(matchingSampleFilter.apply(METADATA_ADAGOTCHI_1))
+    }
+
+    @Test
+    fun testRegex() {
+        val matchingSampleFilter = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.REGEX, "[0-9]{4}$")
+        assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_2))
+        val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.REGEX, "[0-9]{4}$")
+        assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
     }
 }

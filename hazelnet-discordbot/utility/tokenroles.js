@@ -1,4 +1,5 @@
 const i18n = require('i18n');
+const cardanotoken = require('./cardanotoken');
 
 module.exports = {
   getTokenRoleDetailsText(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
@@ -30,29 +31,10 @@ module.exports = {
     }
 
     const maximumInfo = tokenRole.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale }, { tokenRole }) : '';
-    const metadataFiltersList = tokenRole.filters.map((filter) => {
-      const operatorText = i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
-      return i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText });
-    });
     let metadataFilters = '';
     let acceptedPolicies = '';
     if (includeAllDetails) {
-      let joinPhrase;
-      switch (tokenRole.aggregationType) {
-        case 'ANY_POLICY_FILTERED_AND':
-          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseAnd';
-          break;
-        case 'ANY_POLICY_FILTERED_ONE_EACH':
-          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseOneEach';
-          break;
-        case 'EVERY_POLICY_FILTERED_OR':
-        case 'ANY_POLICY_FILTERED_OR':
-        default:
-          joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseOr';
-          break;
-      }
-      const joinPhraseText = i18n.__({ phrase: joinPhrase, locale });
-      metadataFilters = metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhraseText)}` : '';
+      metadataFilters = cardanotoken.buildMetadataFilterContentText(tokenRole.filters, tokenRole.aggregationType, locale);
 
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
         const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint: acceptedAsset.assetFingerprint }) : '';

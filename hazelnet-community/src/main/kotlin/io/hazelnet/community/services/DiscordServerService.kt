@@ -185,7 +185,7 @@ class DiscordServerService(
         return tokenOwnershipRole
     }
 
-    fun addMetadataFilter(guildId: Long, tokenRoleId: Long, tokenRoleMetadataFilter: TokenRoleMetadataFilter): TokenRoleMetadataFilter {
+    fun addMetadataFilterToTokenRole(guildId: Long, tokenRoleId: Long, tokenRoleMetadataFilter: TokenRoleMetadataFilter): TokenRoleMetadataFilter {
         val tokenRole = getTokenRole(guildId, tokenRoleId)
         discordTokenRoleMetadataFilterRepository.save(tokenRoleMetadataFilter)
         tokenRole.filters.add(tokenRoleMetadataFilter)
@@ -200,7 +200,6 @@ class DiscordServerService(
         discordServerRepository.save(discordServer)
         return discordMember
     }
-
 
     fun getMember(guildId: Long, externalAccountId: Long): DiscordMember {
         val discordServer = getDiscordServer(guildId)
@@ -262,7 +261,7 @@ class DiscordServerService(
         discordTokenOwnershipRoleRepository.deleteById(tokenRoleId)
     }
 
-    fun deleteMetadataFilter(guildId: Long, tokenRoleId: Long, filterId: Long) {
+    fun deleteMetadataFilterFromTokenRole(guildId: Long, tokenRoleId: Long, filterId: Long) {
         val tokenRole = getTokenRole(guildId, tokenRoleId)
         val metadataFilter = tokenRole.filters
             .find { it.id == filterId } ?: throw NoSuchElementException("No filter with ID $filterId found on token role with ID $tokenRoleId on guild $guildId")

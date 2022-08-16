@@ -54,6 +54,7 @@ module.exports = {
               { name: ci18n.choice('NOTCONTAINS'), value: 'NOTCONTAINS' },
               { name: ci18n.choice('STARTSWITH'), value: 'STARTSWITH' },
               { name: ci18n.choice('ENDSWITH'), value: 'ENDSWITH' },
+              { name: ci18n.choice('REGEX'), value: 'REGEX' },
             )
             .setRequired(true))
           .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true)))

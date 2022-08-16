@@ -2,6 +2,7 @@ const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
+const marketplaceUtil = require('../../utility/marketplace');
 
 module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
@@ -29,7 +30,7 @@ module.exports = {
                     channelId: announceChannel.id,
                     minimumPriceAda,
                     marketplace,
-                  }, policyIdToTrack, discordServer, locale);
+                  }, policyIdToTrack, discordServer);
                   const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
                   await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
                 } else {
@@ -58,8 +59,8 @@ module.exports = {
                         .addOptions(officialProjects.slice(0, 25)),
                     )];
 
-                  const marketplaceName = i18n.__({ phrase: `marketplaces.${marketplace}`, locale });
-                  const content = i18n.__({ phrase: 'configure.marketplace.sales.add.purpose', locale }, { marketplaceName, channel: announceChannel.id })
+                  const marketplaceNames = [marketplace].map((marketplaceKey) => i18n.__({ phrase: `marketplaces.${marketplaceKey}`, locale })).join(', ');
+                  const content = i18n.__({ phrase: 'configure.marketplace.sales.add.purpose', locale }, { marketplaceNames, channel: announceChannel.id })
                     + (minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.sales.add.minimumPriceAddon', locale }, { minimumPriceAda }) : '');
                   const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
                   await interaction.editReply({ components, embeds: [embed], ephemeral: true });
@@ -97,7 +98,7 @@ module.exports = {
       try {
         const policyIdToTrack = interaction.values[0];
         const marketplaceChannelData = this.cache.take(`${interaction.guild.id}-${interaction.user.id}`);
-        const content = await this.createMarketplaceSalesChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer, locale);
+        const content = await this.createMarketplaceSalesChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
         await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
       } catch (error) {
@@ -107,8 +108,9 @@ module.exports = {
       }
     }
   },
-  async createMarketplaceSalesChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer, locale) {
+  async createMarketplaceSalesChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer) {
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+    const minimumValue = marketplaceChannelData.minimumPriceAda * 1000000;
 
     await interaction.client.services.discordserver.createMarketplaceChannel(
       interaction.guild.id,
@@ -117,14 +119,15 @@ module.exports = {
       marketplaceChannelData.channelId,
       policyIdToTrack,
       marketplaceChannelData.marketplace,
-      marketplaceChannelData.minimumPriceAda * 1000000,
+      minimumValue,
     );
 
-    const { projectName } = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
-
-    const marketplaceName = i18n.__({ phrase: `marketplaces.${marketplaceChannelData.marketplace}`, locale });
-    const content = i18n.__({ phrase: 'configure.marketplace.sales.add.success', locale }, { projectName, marketplaceName, channel: marketplaceChannelData.channelId })
-      + (marketplaceChannelData.minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.sales.add.minimumPriceAddon', locale }, { minimumPriceAda: marketplaceChannelData.minimumPriceAda }) : '');
-    return content;
+    return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, {
+      channelId: marketplaceChannelData.channelId,
+      marketplaces: [marketplaceChannelData.marketplace],
+      minimumValue,
+      policyId: policyIdToTrack,
+      type: 'SALES',
+    }, 'add.success', 'add').value;
   },
 };
