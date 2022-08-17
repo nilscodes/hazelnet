@@ -394,12 +394,27 @@ CREATE TABLE "discord_marketplace_channels"
     "marketplace_channel_id"       SERIAL PRIMARY KEY,
     "discord_server_id"            int,
     "external_account_id"          bigint      NOT NULL,
-    "tracker_type"                 int NOT NULL DEFAULT 0,
+    "tracker_type"                 int         NOT NULL DEFAULT 0,
     "policy_id"                    varchar(56) NOT NULL,
-    "marketplace"                  varchar(50) NOT NULL,
     "marketplace_channel_creation" timestamp   NOT NULL,
     "discord_channel_id"           bigint      NOT NULL,
-    "minimum_value"                bigint
+    "minimum_value"                bigint,
+    "aggregation_type"             int         NOT NULL DEFAULT 0
+);
+
+CREATE TABLE "discord_marketplace_markets"
+(
+    "marketplace_channel_id" bigint,
+    "marketplace"            varchar(50) NOT NULL
+);
+
+CREATE TABLE "discord_marketplace_filters"
+(
+    "metadata_filter_id"     BIGSERIAL PRIMARY KEY,
+    "marketplace_channel_id" bigint,
+    "attribute_name"         varchar(64),
+    "operator"               varchar(16),
+    "attribute_value"        varchar(128)
 );
 
 CREATE TABLE "oauth2_authorization"
@@ -526,5 +541,12 @@ CREATE INDEX "discord_marketplace_discord_server_index" ON "discord_marketplace_
 
 CREATE INDEX "discord_marketplace_tracker_type_index" ON "discord_marketplace_channels" ("tracker_type");
 
+ALTER TABLE "discord_marketplace_markets" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id");
+
+CREATE INDEX "discord_marketplace_markets_channel_index" ON "discord_marketplace_markets" ("marketplace_channel_id");
+
+ALTER TABLE "discord_marketplace_filters" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id");
+
+CREATE INDEX "discord_marketplace_filters_channel_index" ON "discord_marketplace_filters" ("marketplace_channel_id");
 
 CREATE INDEX ON "verification_imports" ("external_reference_id");

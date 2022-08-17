@@ -34,7 +34,7 @@ module.exports = {
             await interaction.editReply({ embeds: [embed], ephemeral: true });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter add', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.errorLimitReached', locale }, { tokenRoleId }), 'configure-tokenroles-metadatafilter-add');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter add', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.errorLimitReached', locale }), 'configure-tokenroles-metadatafilter-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {

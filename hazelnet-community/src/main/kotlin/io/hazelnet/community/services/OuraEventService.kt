@@ -9,9 +9,7 @@ import io.hazelnet.community.data.external.oura.OuraMetadataEvent
 import io.hazelnet.community.data.external.oura.OuraMintEvent
 import io.hazelnet.community.data.getImageUrlFromAssetInfo
 import io.hazelnet.community.data.getItemNameFromAssetInfo
-import io.hazelnet.marketplace.data.Marketplace
-import io.hazelnet.marketplace.data.SaleAnnouncement
-import io.hazelnet.marketplace.data.SalesType
+import io.hazelnet.marketplace.data.MintAnnouncement
 import io.hazelnet.shared.decodeHex
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
@@ -86,7 +84,6 @@ class OuraEventService(
         val queueToRetry = mutableListOf<OuraMintEvent>()
         while (mintQueue.isNotEmpty()) {
             val mintToProcess = mintQueue.pop()
-            println(mintToProcess.assetNameHex.decodeHex() + "/" + mintToProcess.date)
             if (metadataMap.containsKey(mintToProcess.transactionHash)) {
                 val metadataOfPolicy = metadataMap[mintToProcess.transactionHash]?.metadata?.get(mintToProcess.policyId) as Map<String, Any>?
                 if (metadataOfPolicy is Map<String, Any>) {
@@ -104,22 +101,19 @@ class OuraEventService(
                         )
 
                         currentMintChannels
-                            .filter { it.policyId == mintToProcess.policyId }
+                            .filter { it.policyId == mintToProcess.policyId
+                                    && it.meetsFilterCriteria(combinedAssetInfo.metadata)}
                             .map {
-                                SaleAnnouncement(
+                                MintAnnouncement(
                                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                                     channelId = it.channelId,
                                     policyId = mintToProcess.policyId,
                                     assetNameHex = mintToProcess.assetNameHex,
                                     assetName = combinedAssetInfo.assetName,
                                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),
-                                    source = Marketplace.JPGSTORE,
-                                    marketplaceAssetUrl = "",
                                     assetImageUrl = getImageUrlFromAssetInfo(config, combinedAssetInfo),
-                                    price = 1,
-                                    saleDate = mintToProcess.date,
+                                    mintDate = mintToProcess.date,
                                     rarityRank = 0,
-                                    type = SalesType.OFFER,
                                 )
                             }
                             .forEach { rabbitTemplate.convertAndSend("mintannouncements", it) }

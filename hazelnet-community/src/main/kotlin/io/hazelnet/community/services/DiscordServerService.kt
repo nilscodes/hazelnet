@@ -13,7 +13,6 @@ import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
-import io.hazelnet.shared.data.SharedWhitelist
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
@@ -32,18 +31,18 @@ const val LOOKUP_NAME_ALL_POOLS = "all"
 
 @Service
 class DiscordServerService(
-        private val stakepoolService: StakepoolService,
-        private val verificationService: VerificationService,
-        private val connectService: ConnectService,
-        private val discordServerRepository: DiscordServerRepository,
-        private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
-        private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
-        private val discordMetadataFilterRepository: DiscordMetadataFilterRepository,
-        private val oAuth2AuthorizationService: OAuth2AuthorizationService,
-        private val registeredClientRepository: RegisteredClientRepository,
-        private val externalAccountService: ExternalAccountService,
-        private val claimListService: ClaimListService,
-        private val globalCommunityService: GlobalCommunityService,
+    private val stakepoolService: StakepoolService,
+    private val verificationService: VerificationService,
+    private val connectService: ConnectService,
+    private val discordServerRepository: DiscordServerRepository,
+    private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
+    private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
+    private val discordTokenRoleMetadataFilterRepository: DiscordTokenRoleMetadataFilterRepository,
+    private val oAuth2AuthorizationService: OAuth2AuthorizationService,
+    private val registeredClientRepository: RegisteredClientRepository,
+    private val externalAccountService: ExternalAccountService,
+    private val claimListService: ClaimListService,
+    private val globalCommunityService: GlobalCommunityService,
 ) {
     @Transactional
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {
@@ -186,12 +185,12 @@ class DiscordServerService(
         return tokenOwnershipRole
     }
 
-    fun addMetadataFilter(guildId: Long, tokenRoleId: Long, metadataFilter: MetadataFilter): MetadataFilter {
+    fun addMetadataFilterToTokenRole(guildId: Long, tokenRoleId: Long, tokenRoleMetadataFilter: TokenRoleMetadataFilter): TokenRoleMetadataFilter {
         val tokenRole = getTokenRole(guildId, tokenRoleId)
-        discordMetadataFilterRepository.save(metadataFilter)
-        tokenRole.filters.add(metadataFilter)
+        discordTokenRoleMetadataFilterRepository.save(tokenRoleMetadataFilter)
+        tokenRole.filters.add(tokenRoleMetadataFilter)
         discordTokenOwnershipRoleRepository.save(tokenRole)
-        return metadataFilter
+        return tokenRoleMetadataFilter
     }
 
     fun addMember(guildId: Long, discordMember: DiscordMember): DiscordMember {
@@ -201,7 +200,6 @@ class DiscordServerService(
         discordServerRepository.save(discordServer)
         return discordMember
     }
-
 
     fun getMember(guildId: Long, externalAccountId: Long): DiscordMember {
         val discordServer = getDiscordServer(guildId)
@@ -263,11 +261,11 @@ class DiscordServerService(
         discordTokenOwnershipRoleRepository.deleteById(tokenRoleId)
     }
 
-    fun deleteMetadataFilter(guildId: Long, tokenRoleId: Long, filterId: Long) {
+    fun deleteMetadataFilterFromTokenRole(guildId: Long, tokenRoleId: Long, filterId: Long) {
         val tokenRole = getTokenRole(guildId, tokenRoleId)
         val metadataFilter = tokenRole.filters
             .find { it.id == filterId } ?: throw NoSuchElementException("No filter with ID $filterId found on token role with ID $tokenRoleId on guild $guildId")
-        discordMetadataFilterRepository.delete(metadataFilter)
+        discordTokenRoleMetadataFilterRepository.delete(metadataFilter)
     }
 
     private fun getTokenRole(

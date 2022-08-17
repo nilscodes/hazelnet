@@ -37,16 +37,25 @@ class ConnectivityConfiguration {
             .build()
 
     @Bean
-    fun requestedPoliciesQueue() = Queue("policies")
+    fun salesPoliciesQueue() = Queue("salespolicies")
 
     @Bean
     fun salesQueue() = Queue("sales")
+
+    @Bean
+    fun listingsPoliciesQueue() = Queue("listingspolicies")
+
+    @Bean
+    fun listingsQueue() = Queue("listings")
 
     @Bean
     fun saleAnnouncementsQueue() = Queue("saleannouncements")
 
     @Bean
     fun mintAnnouncementsQueue() = Queue("mintannouncements")
+
+    @Bean
+    fun listingAnnouncementsQueue() = Queue("listingannouncements")
 
     @Bean
     fun exchange() = DirectExchange("hazelnet")
@@ -56,12 +65,24 @@ class ConnectivityConfiguration {
             = BindingBuilder.bind(salesQueue).to(exchange)
 
     @Bean
-    fun requestedPoliciesBinding(@Qualifier("requestedPoliciesQueue") requestedPoliciesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
-            = BindingBuilder.bind(requestedPoliciesQueue).to(exchange)
+    fun salesPoliciesBinding(@Qualifier("salesPoliciesQueue") salesPoliciesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(salesPoliciesQueue).to(exchange)
 
     @Bean
     fun saleAnnouncementsBinding(@Qualifier("saleAnnouncementsQueue") saleAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(saleAnnouncementsQueue).to(exchange)
+
+    @Bean
+    fun listingsBinding(@Qualifier("listingsQueue") listingsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(listingsQueue).to(exchange)
+
+    @Bean
+    fun listingsPoliciesBinding(@Qualifier("listingsPoliciesQueue") listingsPoliciesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(listingsPoliciesQueue).to(exchange)
+
+    @Bean
+    fun listingAnnouncementsBinding(@Qualifier("listingAnnouncementsQueue") listingAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(listingAnnouncementsQueue).to(exchange)
 
     @Bean
     fun mintAnnouncementsBinding(@Qualifier("mintAnnouncementsQueue") mintAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer

@@ -1,6 +1,7 @@
 package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.discord.marketplace.DiscordMarketplaceChannel
+import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
 import io.hazelnet.community.services.DiscordMarketplaceService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -37,4 +38,20 @@ class DiscordMarketplaceController(
     @DeleteMapping("/{guildId}/marketplaces/channels/{marketplaceChannelId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteMarketplaceChannel(@PathVariable guildId: Long, @PathVariable marketplaceChannelId: Int) = discordMarketplaceService.deleteMarketplaceChannel(guildId, marketplaceChannelId)
+
+    @PostMapping("/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addMetadataFilterToMarketplaceChannel(@PathVariable guildId: Long, @PathVariable marketplaceChannelId: Int, @RequestBody @Valid trackerMetadataFilter: TrackerMetadataFilter): ResponseEntity<TrackerMetadataFilter> {
+        val newMetadataFilter = discordMarketplaceService.addMetadataFilter(guildId, marketplaceChannelId, trackerMetadataFilter)
+        return ResponseEntity
+            .created(ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{filterId}")
+                .buildAndExpand(newMetadataFilter.id)
+                .toUri())
+            .body(newMetadataFilter)
+    }
+
+    @DeleteMapping("/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters/{filterId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteMetadataFilterFromMarketplaceChannel(@PathVariable guildId: Long, @PathVariable marketplaceChannelId: Int, @PathVariable filterId: Long) = discordMarketplaceService.deleteMetadataFilter(guildId, marketplaceChannelId, filterId)
 }

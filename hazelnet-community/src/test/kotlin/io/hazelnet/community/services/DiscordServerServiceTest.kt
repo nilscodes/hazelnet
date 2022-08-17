@@ -85,7 +85,7 @@ internal class DiscordServerServiceTest {
                 1,
                 null,
                 mutableSetOf(
-                    MetadataFilter(3, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
+                    TokenRoleMetadataFilter(3, "attributes.Eyes", AttributeOperatorType.EQUALS, "Drowsy")
                 ),
                 16
             ),
@@ -95,8 +95,8 @@ internal class DiscordServerServiceTest {
                 2,
                 null,
                 mutableSetOf(
-                    MetadataFilter(1, "tags", AttributeOperatorType.CONTAINS, "smoking"),
-                    MetadataFilter(2, "tags", AttributeOperatorType.CONTAINS, "soul patch"),
+                    TokenRoleMetadataFilter(1, "tags", AttributeOperatorType.CONTAINS, "smoking"),
+                    TokenRoleMetadataFilter(2, "tags", AttributeOperatorType.CONTAINS, "soul patch"),
                 ),
                 17
             ),
@@ -106,8 +106,8 @@ internal class DiscordServerServiceTest {
                 2,
                 null,
                 mutableSetOf(
-                    MetadataFilter(3, "tags", AttributeOperatorType.CONTAINS, "potatoes"),
-                    MetadataFilter(4, "tags", AttributeOperatorType.CONTAINS, "face mask"),
+                    TokenRoleMetadataFilter(3, "tags", AttributeOperatorType.CONTAINS, "potatoes"),
+                    TokenRoleMetadataFilter(4, "tags", AttributeOperatorType.CONTAINS, "face mask"),
                 ),
                 18,
                 aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
@@ -118,9 +118,9 @@ internal class DiscordServerServiceTest {
                 3,
                 null,
                 mutableSetOf(
-                    MetadataFilter(5, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "dead"),
-                    MetadataFilter(6, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "vampire"),
-                    MetadataFilter(7, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "alien"),
+                    TokenRoleMetadataFilter(5, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "dead"),
+                    TokenRoleMetadataFilter(6, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "vampire"),
+                    TokenRoleMetadataFilter(7, "properties[?(@.key==\"type\")].value", AttributeOperatorType.EQUALS, "alien"),
                 ),
                 19,
                 aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH,
@@ -135,7 +135,7 @@ internal class DiscordServerServiceTest {
                 3,
                 null,
                 mutableSetOf(
-                    MetadataFilter(8, "image", AttributeOperatorType.STARTSWITH, "ipfs://"),
+                    TokenRoleMetadataFilter(8, "image", AttributeOperatorType.STARTSWITH, "ipfs://"),
                 ),
                 20,
                 aggregationType = TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR,

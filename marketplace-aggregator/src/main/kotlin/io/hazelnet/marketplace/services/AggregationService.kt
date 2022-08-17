@@ -20,19 +20,23 @@ class AggregationService(
     private val meterRegistry: MeterRegistry,
 ) {
 
-    private var lastSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
-    private val jpgStoreStatusCounter: Counter.Builder = Counter
-        .builder("jpgstore_statuscodes")
-        .description("HTTP status codes for encountered errors when aggregating from jpg.store")
+    private var lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val jpgStoreSalesStatusCounter: Counter.Builder = Counter
+        .builder("jpgstore_statuscodes_sales")
+        .description("HTTP status codes for encountered errors when aggregating sales from jpg.store")
+    private var lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val jpgStoreListingsStatusCounter: Counter.Builder = Counter
+        .builder("jpgstore_statuscodes_listings")
+        .description("HTTP status codes for encountered errors when aggregating listings from jpg.store")
 
-    @RabbitListener(queues = ["policies"])
-    fun processSalesListingsForPolicies(policyId: String) {
-        val lastSyncTimeBeforeCall = lastSyncTimeForPolicy[policyId] ?: Date()
-        lastSyncTimeForPolicy[policyId] = Date()
+    @RabbitListener(queues = ["salespolicies"])
+    fun processSalesForPolicies(policyId: String) {
+        val lastSyncTimeBeforeCall = lastSalesSyncTimeForPolicy[policyId] ?: Date()
+        lastSalesSyncTimeForPolicy[policyId] = Date()
         jpgStoreService.getSales(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
                 logger.info(e) { "Failed getting jpg.store sales for policy $policyId" }
-                jpgStoreStatusCounter
+                jpgStoreSalesStatusCounter
                     .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
                     .register(meterRegistry)
                     .increment()
@@ -42,7 +46,7 @@ class AggregationService(
         jpgStoreService.getTransactionsForCollection(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
                 logger.info(e) { "Failed getting jpg.store transactions for policy $policyId" }
-                jpgStoreStatusCounter
+                jpgStoreSalesStatusCounter
                     .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
                     .register(meterRegistry)
                     .increment()
@@ -52,5 +56,21 @@ class AggregationService(
                     && it.transactionConfirmationDate.after(lastSyncTimeBeforeCall)
                     && it.action == JpgStoreTransactionAction.ACCEPT_OFFER }
             .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo()) }
+    }
+
+    @RabbitListener(queues = ["listingspolicies"])
+    fun processListingsForPolicies(policyId: String) {
+        val lastSyncTimeBeforeCall = lastListingsSyncTimeForPolicy[policyId] ?: Date()
+        lastListingsSyncTimeForPolicy[policyId] = Date()
+        jpgStoreService.getListings(listOf(policyId), 1)
+            .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
+                logger.info(e) { "Failed getting jpg.store listings for policy $policyId" }
+                jpgStoreListingsStatusCounter
+                    .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
+                    .register(meterRegistry)
+                    .increment()
+            }
+            .filter { it.listingDate.after(lastSyncTimeBeforeCall) }
+            .subscribe { rabbitTemplate.convertAndSend("listings", it.toListingsInfo()) }
     }
 }

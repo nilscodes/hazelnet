@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.util.*
 
-data class SaleAnnouncement @JsonCreator constructor(
+data class ListingAnnouncement @JsonCreator constructor(
     @field:JsonSerialize(using = ToStringSerializer::class)
     val guildId: Long,
 
@@ -25,10 +25,8 @@ data class SaleAnnouncement @JsonCreator constructor(
 
     @field:JsonSerialize(using = ToStringSerializer::class)
     val price: Long,
-    val saleDate: Date,
+    val listingDate: Date,
 
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     val rarityRank: Int? = null,
-
-    val type: SalesType,
 )

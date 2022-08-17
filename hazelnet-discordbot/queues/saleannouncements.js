@@ -33,7 +33,7 @@ module.exports = {
                   .setStyle('LINK'),
                 new MessageButton()
                   .setLabel(i18n.__({ phrase: 'configure.marketplace.sales.announce.viewOnCnftJungle', locale }))
-                  .setURL(`https://www.cnftjungle.io/collections/${saleAnnouncement.policyId}?assetId=${saleAnnouncement.policyId}.${saleAnnouncement.assetName}`)
+                  .setURL(`https://www.cnftjungle.io/collections/${saleAnnouncement.policyId}?assetId=${saleAnnouncement.policyId}.${encodeURIComponent(saleAnnouncement.assetName)}`)
                   .setStyle('LINK'),
               ),
             ];

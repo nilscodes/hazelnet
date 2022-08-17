@@ -85,10 +85,6 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleIdToRemove}`);
     this.clearCacheEntry(guildId);
   },
-  async deleteTokenRoleMetadataFilter(guildId, tokenRoleId, filterIdToRemove) {
-    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
-    this.clearCacheEntry(guildId);
-  },
   async deleteDelegatorRole(guildId, delegatorRoleIdToRemove) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/delegatorroles/${delegatorRoleIdToRemove}`);
     this.clearCacheEntry(guildId);
@@ -144,6 +140,10 @@ module.exports = {
     });
     this.clearCacheEntry(guildId);
     return newMetadataFilterPromise.data;
+  },
+  async deleteTokenRoleMetadataFilter(guildId, tokenRoleId, filterIdToRemove) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
+    this.clearCacheEntry(guildId);
   },
   async createDelegatorRole(guildId, poolHash, minimumStakeAda, discordRoleId) {
     const newDelegatorRolePromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/delegatorroles`, {
@@ -221,13 +221,24 @@ module.exports = {
       type,
       channelId,
       policyId,
-      marketplace,
+      marketplaces: [marketplace],
       minimumValue,
     });
     return newMarketplaceChannelPromise.data;
   },
   async deleteMarketplaceChannel(guildId, marketplaceChannelId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels/${marketplaceChannelId}`);
+  },
+  async addMarketplaceChannelMetadataFilter(guildId, marketplaceChannelId, attributeName, operator, attributeValue) {
+    const newMetadataFilterPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels/${marketplaceChannelId}/metadatafilters`, {
+      attributeName,
+      operator,
+      attributeValue,
+    });
+    return newMetadataFilterPromise.data;
+  },
+  async deleteMarketplaceChannelMetadataFilter(guildId, marketplaceChannelId, filterIdToRemove) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels/${marketplaceChannelId}/metadatafilters/${filterIdToRemove}`);
   },
   async getCurrentDelegatorRoleAssignments(guildId) {
     const roleAssignments = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/roleassignments/delegatorroles`);
