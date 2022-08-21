@@ -110,10 +110,20 @@ module.exports = {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
       const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
-      const instructions = (existingConfirmedVerifications.length ? `${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length })}\n\n` : '')
-        + i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild.id);
+      const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);
+      if (existingConfirmedVerifications.length) {
+        if (!currentMemberData) {
+          await interaction.client.services.discordserver.connectExternalAccount(interaction.guild.id, externalAccount.id);
+        }
+        const instructions = `${i18n.__({ phrase: 'verify.link.success', locale })}\n\n${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length })}`;
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), instructions, 'verify-link');
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
+      } else {
+        const instructions = i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
+      }
     }
   },
 };

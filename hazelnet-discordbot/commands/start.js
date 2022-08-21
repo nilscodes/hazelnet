@@ -39,9 +39,6 @@ module.exports = {
           case 'start/adminRole':
             await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES', interaction.values[0]);
             break;
-          case 'start/userRole':
-            await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'USER_ROLES', interaction.values[0]);
-            break;
           case 'start/features':
             await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS', interaction.values.join(','));
             break;
@@ -62,7 +59,6 @@ module.exports = {
     const languageOptions = this.getLanguageOptions(discordServer);
     let selectedLanguage = '';
     let selectedAdminRoles = '';
-    let selectedUserRoles = '';
     let selectedFeatures = '';
     let disabled = false;
     if (!discordServer.settings?.BOT_LANGUAGE || !discordServer.settings?.BOT_LANGUAGE.length) {
@@ -92,20 +88,6 @@ module.exports = {
     } else {
       selectedAdminRoles = `\n\n${i18n.__({ phrase: 'start.selectedAdminRoles', locale: useLocale })}\n`;
       selectedAdminRoles += adminRoleIds.map((roleId) => (i18n.__({ phrase: 'configure.adminaccess.list.administratorEntry', locale: useLocale }, { roleId }))).join('\n');
-    }
-    const userRoleIds = (discordServer?.settings?.USER_ROLES?.split(',')) ?? [];
-    if (!userRoleIds.length) {
-      disabled = true;
-      components.push(new MessageActionRow()
-        .addComponents(
-          new MessageSelectMenu()
-            .setCustomId('start/userRole')
-            .setPlaceholder(i18n.__({ phrase: 'start.chooseUserRole', locale: useLocale }))
-            .addOptions(roleOptions),
-        ));
-    } else {
-      selectedUserRoles = `\n\n${i18n.__({ phrase: 'start.selectedUserRoles', locale: useLocale })}\n`;
-      selectedUserRoles += userRoleIds.map((roleId) => (i18n.__({ phrase: 'configure.useraccess.list.userEntry', locale: useLocale }, { roleId }))).join('\n');
     }
     if (!discordServer.settings?.ENABLED_COMMAND_TAGS || !discordServer.settings?.ENABLED_COMMAND_TAGS.length) {
       disabled = true;
@@ -139,7 +121,6 @@ module.exports = {
     const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, 'start', [
       { name: i18n.__({ phrase: 'start.configureLanguageTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureLanguageText', locale: useLocale }) + selectedLanguage },
       { name: i18n.__({ phrase: 'start.configureAdminRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureAdminRoleText', locale: useLocale }) + selectedAdminRoles },
-      { name: i18n.__({ phrase: 'start.configureUserRoleTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureUserRoleText', locale: useLocale }) + selectedUserRoles },
       { name: i18n.__({ phrase: 'start.configureFeaturesTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureFeaturesText', locale: useLocale }) + selectedFeatures },
     ]);
     return {
@@ -191,7 +172,6 @@ module.exports = {
   isSetupComplete(discordServer) {
     return discordServer.settings?.BOT_LANGUAGE?.length
      && discordServer.settings?.ADMIN_ROLES?.length
-     && discordServer.settings?.USER_ROLES?.length
      && discordServer.settings?.ENABLED_COMMAND_TAGS?.length;
   },
   async isBotLackingRequiredPermissions(interaction) {
@@ -206,7 +186,6 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
     await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'BOT_LANGUAGE');
     await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'ADMIN_ROLES');
-    await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'USER_ROLES');
     await interaction.client.services.discordserver.deleteDiscordServerSetting(interaction.guild.id, 'ENABLED_COMMAND_TAGS');
     await this.editReplyWithSetupMessage(interaction);
   },

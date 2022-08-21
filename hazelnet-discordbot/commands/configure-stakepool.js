@@ -1,22 +1,24 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('configure-stakepool', locale);
     return new SlashCommandBuilder()
       .setName('configure-stakepool')
-      .setDescription('Configure stakepools')
+      .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.')
-        .addStringOption((option) => option.setName('pool-id').setDescription('Pool ID (not ticker) for the pool you want to add').setRequired(true)))
+        .setDescription(ci18n.subDescription('add'))
+        .addStringOption((option) => option.setName('pool-id').setDescription(ci18n.option('pool-id')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all Cardano stakepool IDs for which this Discord server is assigning auto-roles for delegators.'))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Remove the Cardano stakepool ID from the list of pools this server is configured for.')
-        .addStringOption((option) => option.setName('pool-id').setDescription('Pool ID (not ticker) for the pool you want to remove').setRequired(true)));
+        .setDescription(ci18n.subDescription('remove'))
+        .addStringOption((option) => option.setName('pool-id').setDescription(ci18n.option('pool-id')).setRequired(true)));
     /*
       .addSubcommand((subcommand) => subcommand
         .setName('infochannel')

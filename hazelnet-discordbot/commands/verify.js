@@ -1,31 +1,33 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('verify', locale);
     return new SlashCommandBuilder()
       .setName('verify')
-      .setDescription('Starts a verification process or let\'s you manage your current verifications on this server.')
+      .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Starts a transaction-based verification of a staking address')
-        .addStringOption((option) => option.setName('address-or-handle').setDescription('Enter the Cardano wallet address or $handle to verify.').setRequired(true)))
+        .setDescription(ci18n.subDescription('add'))
+        .addStringOption((option) => option.setName('address-or-handle').setDescription(ci18n.option('address-or-handle')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('help')
-        .setDescription('Get help about the verification features'))
+        .setDescription(ci18n.subDescription('help')))
       .addSubcommand((subcommand) => subcommand
         .setName('link')
-        .setDescription('Link your verified addresses to this Discord server to enable additional features'))
+        .setDescription(ci18n.subDescription('link')))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all staking addresses and link status associated with this Discord user and server'))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Removes a verified wallet address')
-        .addStringOption((option) => option.setName('address').setDescription('Enter the Cardano wallet address to remove from the verified address list.').setRequired(true)))
+        .setDescription(ci18n.subDescription('remove'))
+        .addStringOption((option) => option.setName('address').setDescription(ci18n.option('address')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('unlink')
-        .setDescription('Unlink your verified addresses from this server (verifications will remain)'));
+        .setDescription(ci18n.subDescription('unlink')));
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],

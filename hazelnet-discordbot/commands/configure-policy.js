@@ -1,23 +1,25 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('configure-policy', locale);
     return new SlashCommandBuilder()
       .setName('configure-policy')
-      .setDescription('Manage asset policies that are officially represented by this server')
+      .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Add a Cardano policy ID and associated project name to the list of official projects on this server.')
-        .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to add as an official token policy on this server').setRequired(true))
-        .addStringOption((option) => option.setName('project-name').setDescription('The project name to list this policy ID under').setRequired(true)))
+        .setDescription(ci18n.subDescription('add'))
+        .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true))
+        .addStringOption((option) => option.setName('project-name').setDescription(ci18n.option('project-name')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all Cardano policy IDs configured as official policies for projects on this server.'))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Remove the Cardano policy ID from this server\'s official policy list.')
-        .addStringOption((option) => option.setName('policy-id').setDescription('Policy ID to remove as official token policy from this server').setRequired(true)));
+        .setDescription(ci18n.subDescription('remove'))
+        .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true)));
   },
   commandTags: ['token', 'marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

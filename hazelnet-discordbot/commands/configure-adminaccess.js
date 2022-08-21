@@ -1,22 +1,24 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('configure-adminaccess', locale);
     return new SlashCommandBuilder()
       .setName('configure-adminaccess')
-      .setDescription('Configure roles that can administer the bot')
+      .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('add')
-        .setDescription('Adds a role that is allowed to administer the bot.')
-        .addRoleOption((option) => option.setName('admin-role').setDescription('Role to make an admin on this Discord server.').setRequired(true)))
+        .setDescription(ci18n.subDescription('add'))
+        .addRoleOption((option) => option.setName('admin-role').setDescription(ci18n.option('admin-role')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
-        .setDescription('List all roles that are allowed to administer the bot.'))
+        .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription('Remove a role that is currently allowed to administer the bot.')
-        .addRoleOption((option) => option.setName('admin-role').setDescription('Role to remove as an admin on this Discord server.').setRequired(true)));
+        .setDescription(ci18n.subDescription('remove'))
+        .addRoleOption((option) => option.setName('admin-role').setDescription(ci18n.option('admin-role')).setRequired(true)));
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
