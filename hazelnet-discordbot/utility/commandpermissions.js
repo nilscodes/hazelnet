@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 module.exports = {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-useraccess', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck'],
   async setSlashCommandPermissions(client, guildId, discordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {
@@ -41,14 +41,6 @@ module.exports = {
     const adminRoleIds = (discordServer?.settings?.ADMIN_ROLES?.split(',')) ?? [];
     if (adminRoleIds.length && (this.adminCommands.includes(command.name) || this.userCommands.includes(command.name))) {
       permissions.push(...adminRoleIds.map((roleId) => ({
-        type: 'ROLE',
-        id: roleId,
-        permission: true,
-      })));
-    }
-    const userRoleIds = (discordServer?.settings?.USER_ROLES?.split(',')) ?? [];
-    if (userRoleIds.length && this.userCommands.includes(command.name)) {
-      permissions.push(...userRoleIds.map((roleId) => ({
         type: 'ROLE',
         id: roleId,
         permission: true,

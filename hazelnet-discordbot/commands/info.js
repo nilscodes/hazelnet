@@ -5,12 +5,14 @@ const {
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
+const CommandTranslations = require('../utility/commandtranslations');
 
 module.exports = {
   getCommandData(locale) {
+    const ci18n = new CommandTranslations('info', locale);
     return new SlashCommandBuilder()
       .setName('info')
-      .setDescription(i18n.__({ phrase: 'commands.descriptions.info', locale }));
+      .setDescription(ci18n.description());
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
   async execute(interaction) {

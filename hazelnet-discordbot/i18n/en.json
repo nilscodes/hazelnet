@@ -1,6 +1,13 @@
 {
 	"commands": {
 		"descriptions": {
+			"verify": "Starts a verification process or let's you manage your current verifications on this server.",
+			"verify-add": "Starts a transaction-based verification of a staking address",
+			"verify-help": "Get help about the verification features",
+			"verify-link": "Link your verified addresses to this Discord server to enable additional features",
+			"verify-list": "List all staking addresses and link status associated with this Discord user and server",
+			"verify-remove": "Removes a verified wallet address",
+			"verify-unlink": "Unlink your verified addresses from this server (verifications will remain)",
 			"policyid": "Lists all policy IDs and projects associated with this server.",
 			"info": "Shows info and stakepools for this server.",
 			"whitelist": "View and register for whitelist events in this Discord.",
@@ -16,6 +23,13 @@
 			"ping": "Get in touch with an unknown user via $handle or NFT asset fingerprint.",
 			"ping-send": "Send a ping to an unknown party.",
 			"ping-list": "List recent sent and received pings.",
+			"configure-protection": "Configuration options around scammer protection",
+			"configure-protection-status": "Show the status of all protection-related mechanisms.",
+			"configure-protection-addressremove": "Turn on/off autoremoval of messages that contain an address/handle to protect from scammers.",
+			"configure-protection-auditchannel": "Dedicate a channel for all messages that are related to warnings/auditing.",
+			"configure-verify": "Configure the verification process and requirements and see verification info.",
+			"configure-verify-info": "Show some basic statistics about your communities verification status.",
+			"configure-verify-announce": "Announce the verification process and create a verification widget.",
 			"configure-settings": "General configuration options for the bot",
 			"configure-settings-features": "Turn features of the bot on and off for the whole server.",
 			"configure-settings-customize": "Customize the bot and style it with your own branding.",
@@ -51,6 +65,18 @@
 			"configure-tokenroles-policies-add": "Adds an accepted policy to your existing token role.",
 			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
+			"configure-delegatorroles": "Configure delegator-roles",
+			"configure-delegatorroles-add": "Adds an auto-assignment for the given role.",
+			"configure-delegatorroles-list": "List all auto-assigned roles for delegators of the pools configured for this server.",
+			"configure-delegatorroles-remove": "Remove all auto-assignments (for all stake amounts) for the given role for delegators.",
+			"configure-stakepool": "Configure stakepools",
+			"configure-stakepool-add": "Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.",
+			"configure-stakepool-list": "List all Cardano stakepool IDs for which this Discord server is assigning auto-roles for delegators.",
+			"configure-stakepool-remove": "Remove the Cardano stakepool ID from the list of pools this server is configured for.",
+			"configure-policy": "Manage asset policies that are officially represented by this server",
+			"configure-policy-add": "Add a Cardano policy ID and associated project name to the list of official projects on this server.",
+			"configure-policy-list": "List all Cardano policy IDs configured as official policies for projects on this server.",
+			"configure-policy-remove": "Remove the Cardano policy ID from this server's official policy list.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
 			"configure-marketplace": "Configure marketplace integrations.",
 			"configure-marketplace-sales": "Configure your sales trackers.",
@@ -67,9 +93,20 @@
 			"configure-marketplace-listings-remove": "Remove an existing listing tracker.",
 			"configure-marketplace-metadatafilter": "Manage metadata filters on your trackers.",
 			"configure-marketplace-metadatafilter-add": "Adds a metadata filter to your existing tracker.",
-			"configure-marketplace-metadatafilter-remove": "Remove a metadata filter from your existing tracker."
+			"configure-marketplace-metadatafilter-remove": "Remove a metadata filter from your existing tracker.",
+			"configure-api": "Manage your access token to connect to the public API of HAZELnet",
+			"configure-api-generatetoken": "Generates a new token to access the API. ⚠ This will overwrite any existing token, if present.",
+			"configure-api-removetoken": "Delete the current access token, revoking all access to the public API of HAZELnet",
+			"configure-adminaccess": "Configure roles that can administer the bot",
+			"configure-adminaccess-add": "Adds a role that is allowed to administer the bot.",
+			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
+			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot."
 		},
 		"options": {
+			"verify": {
+				"address-or-handle": "Enter the Cardano wallet address or $handle to verify.",
+				"address": "Enter the Cardano wallet address to remove from the verified address list."
+			},
 			"profile": {
 				"option": "The configuration option to change."
 			},
@@ -81,6 +118,29 @@
 			"whitelist": {
 				"name": "Name of the whitelist",
 				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist."
+			},
+			"configure-verify": {
+				"channel": "Channel to post the verification widget to.",
+				"welcome-text": "A text included in your verification widget to welcome the community."
+			},
+			"configure-protection": {
+				"status": "Set to False to turn this feature off",
+				"auditchannel": "The channel to send audit/warning messages to."
+			},
+			"configure-adminaccess": {
+				"admin-role": "Role to make an admin/remove as admin on this Discord server."
+			},
+			"configure-stakepool": {
+				"pool-id": "'Pool ID (not ticker) for the pool you want to add/remove"
+			},
+			"configure-policy": {
+				"policy-id": "Policy ID to add/remove as an official token policy on this server",
+				"project-name": "The project name to list this policy ID under"
+			},
+			"configure-delegatorroles": {
+				"role": "Role to assign users with the given amount of stake for configured pools.",
+				"minimum-stake": "The minimum stake (in ADA) required for this role (0 for any amount).",
+				"pool-id": "Pool ID (not ticker) required to be delegating to, or ignore for all pools of this server."
 			},
 			"configure-poll": {
 				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
@@ -195,6 +255,7 @@
 	},
 	"help": {
 		"messageTitle": "Get help for {{{botName}}}",
+		"messageTitleAdmin": "Help for admin commands of {{{botName}}}",
 		"generalCommands": {
 			"verify": "The */verify* command and its subcommands let you verify your own Cardano address and will enable features like automatic role-assignments based on delegation and token roles.\n**Important:** 💡 The admins of this Discord will *not* be able to see any of your verified addresses. They can only see addresses that you register for a whitelist! Your security always comes first.",
 			"verify-add": "With */verify add* you can add a new address to your list of verified wallets. Issuing the command will ask you to send a specific amount of ADA to yourself within a specific amount of time. If the transaction is confirmed this verifies your wallet and allows the system to also verify token and NFT ownership. A wallet can only be registered with one Discord user at one time.\n❕ You can also provide a handle for verification - it will automatically be resolved into an address.\n💡 Verifying a wallet will link the Discord server on which you are performing the verification as part of the process, so no explicit */verify link* is needed.",
@@ -203,7 +264,11 @@
 			"verify-list": "When using */verify list*, all your open and confirmed verifications will be listed. If you ever get disconnected during a verification process, you can retrieve the info needed to verify here. This command also lets you cancel your open verification, if needed.",
 			"verify-remove": "If you want to remove a verified address from your account, simply use */verify remove* and the wallet will not be used for any token roles or other features on any of your link Discord servers any more.",
 			"verify-unlink": "If you would like to unlink a wallet from a specific Discord server, because you wish to not receive automatic role-assignments or other treatment that might reveal anything about you, use the */verify unlink* command.",
-			"help": "Shows this help text."
+			"help": "Shows this help text.",
+			"profile": "Change your profile information and account settings.",
+			"vote": "Participate in a poll on this Discord server.",
+			"ping": "Ping the owner of an NFT, address or staking address via a private message, without knowing their name.",
+			"premium": "See your premium status and $HAZEL balance, as well as pledge your stake to your Discord server."
 		},
 		"stakepoolCommands": {
 			"info": "The */info* command gives you some basic information about the server and lists any official stakepools of the server, if it has any set up."
@@ -217,14 +282,16 @@
 		"adminCommands": {
 			"title": "The following are commands for administrators only (normal users do not get this text when using */help*)",
 			"configure-protection": "With */configure-protection* you can view and set up the scam and fake protection of the bot. It will let you set up automatic removal of messages with **addr1** as content, as well as an optional auditing of such messages to a dedicated channel for moderators.",
+			"configure-settings": "Under */configure-settings* you can find subcommands that let you customize and control your bot to match your projects needs.",
 			"configure-stakepool": "*/configure-stakepool* provides commands to add, list and remove stakepools for this Discord server. These are needed if you intend to set up delegator roles or if you want your pool information to be listed via the */info* command.",
 			"configure-delegatorroles": "Once you have set up your official stakepool information via */configure-stakepool* you can assign roles based on delegation to specific pools. You will need the pool hash or you can reference \"all official pools of this Discord\" by leaving the pool hash parameter empty.",
 			"configure-policy": "With */configure-policy* you can set up official policy IDs that users can inspect and easily find via the public */policyids* command.",
 			"configure-tokenroles": "The */configure-tokenroles* command will allow you to set up automatic role assignments for users that have tokens of specific policies in their verified staking addresses. Users can verify via the public */verify* command.",
 			"configure-whitelist": "With this command you can manage whitelists on this server that people can register for via the public */whitelist* command.",
 			"configure-adminaccess": "The */configure-adminaccess* command allows you to manage which users can access administrative functions of the bot, like all the */configure* commands.",
-			"configure-useraccess": "The */configure-useraccess* command allows you to manage which users on your server are allowed to access this Discord bots basic features.",
 			"configure-poll": "The */configure-poll* command enables the creation and management of polls and helps admins set up votings on their server, open or restricted to token-holders.",
+			"configure-healthcheck": "With */configure-healthcheck* you can find out if there are any obvious misconfigurations or issues present in your bot that prevent normal operations.",
+			"configure-marketplace": "Using */configure-marketplace* allows you to create sales, listing and mint trackers and configure them with rules for metadata and rarity information.",
 			"start": "The */start* command is what you use to set the bot up initially, but also what you can use to reset your bot features and what you might be asked to run if new capabilities get added to the bot."
 		}
 	},
@@ -360,7 +427,7 @@
 			"resolveSuccess": "The handle resolved to {{resolvedAddress}}",
 			"verifyButton": "Verify your wallet",
 			"widgetInstructionsAlreadyVerified": "🚨 You have {{verifiedWallets}} verified wallets. If you would like to see which ones, use **/verify list** in a channel where commands are enabled.",
-			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n⚡ Use **/verify link** instead, if you have already verified a wallet with HAZELnet on another server.\n\n❔ For more information, use **/verify help** and **/help**."
+			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n❔ For more information, use **/verify help** and **/help**."
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",
@@ -512,6 +579,21 @@
 		}
 	},
 	"configure": {
+		"verify": {
+			"info": {
+				"purpose": "Has it tho?"
+			},
+			"announce": {
+				"purpose": "You are about to create a verification widget and announcement in the channel <#{{channel}}>. The widget will contain your provided welcome text as shown below, and buttons to initiate verification via HAZELnet. Please confirm below if you want to continue.",
+				"success": "✅ Verification widget successfully published in <#{{channel}}>.",
+				"publicSuccessTitle": "✅ Verify here!",
+				"publicSuccess": "You can verify your wallet here, or quickly link your already verified wallets with this Discord by clicking the below button.",
+				"welcomeMessage": "Welcome Message",
+				"publish": "Create announcement",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for verification announcements."
+			}
+		},
 		"policy": {
 			"list": {
 				"purpose": "This is the list of official policies that this server will present when end users use the /policyid command.\n\n⚠ Do not add policy IDs for projects that are not your own or that you are not officially supporting. Reports of misused policy IDs will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage."
@@ -546,8 +628,8 @@
 				"auditChannelTitle": "Auditing of potential scam messages and events"
 			},
 			"addressremove": {
-				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing *addr1*. These messages will be automatically removed in all channels where this bot has permissions to view and manage messages.",
-				"protectionOff": "⚠ You have turned off the autoremoval of text messags that contain *addr1* for protection of your users from address-based scams."
+				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing Cardano *addr1* addresses or Etherum *0x* addresses. These messages will be automatically removed in all channels where this bot has permissions to view and manage messages.",
+				"protectionOff": "⚠ You have turned off the autoremoval of text messags that contain Cardano or ETH addresses, for protection of your users from address-based scams."
 			},
 			"auditchannel": {
 				"auditChannelOn": "✅ Suspicious messages and events in your server will be sent to the channel <#{{auditChannel}}>, if the bot has permissions to send messages to this channel.",
@@ -1125,7 +1207,6 @@
 		"configureFeaturesTitle": "Features",
 		"configureLanguageText": "This setting determines the language of all bot commands and interactions. Currently it is not possible to have commands translate on a per-user basis - bot replies will in the future be able to be based on a user-selected language.",
 		"configureAdminRoleText": "All users with the admin role will be able to configure the bot. Admins can set official stakepools, policies and automatic role-assignments. Expose these abilities to as few people as possible. The guild owner will always have access to all commands, regardless of this setting. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-adminaccess* command to adjust this later.",
-		"configureUserRoleText": "The users in this role will be able to verify their wallets and access basic information about this server's stakepools, NFT policies etc. If you have more than 25 roles, only your first 25 will be shown here. Use the */configure-useraccess* command to adjust this later.",
 		"configureFeaturesText": "The features that you enable will determine which commands are available to users and administrators. Depending on which features you turn on, you will have different capabilities available. Certain features require a premium subscription called **Black Edition**. See our website for more information.",
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",
