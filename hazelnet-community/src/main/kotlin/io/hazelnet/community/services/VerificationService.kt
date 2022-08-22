@@ -20,8 +20,10 @@ class VerificationService(
     private val connectService: ConnectService,
     private val verificationRepository: VerificationRepository,
     private val verificationImportRepository: VerificationImportRepository,
+    private val externalAccountService: ExternalAccountService,
     private val externalAccountRepository: ExternalAccountRepository,
-    private val globalCommunityService: GlobalCommunityService
+    private val accountService: AccountService,
+    private val globalCommunityService: GlobalCommunityService,
 ) {
     @Transactional
     fun createVerificationRequest(verificationRequest: VerificationRequest): Verification {
@@ -29,7 +31,19 @@ class VerificationService(
         if (associatedExternalAccount.isPresent) {
             val walletInfo = connectService.getWalletInfo(verificationRequest.address)
             if (walletInfo.stakeAddress != null) {
-                return generateAndSaveVerificationRequest(verificationRequest, associatedExternalAccount.get())
+                val blacklistedStakeAddresses = globalCommunityService.getBlacklistedStakeAddresses()
+                if (!blacklistedStakeAddresses.contains(walletInfo.stakeAddress)) {
+                    return generateAndSaveVerificationRequest(verificationRequest, associatedExternalAccount.get())
+                } else {
+                    val mainAccount = accountService.setAccountForExternalAccount(verificationRequest.externalAccountId)
+                    accountService.updateSettings(mainAccount.id!!, EmbeddableSetting("BLACKLISTED", true.toString()))
+                    externalAccountService.getExternalAccountVerifications(verificationRequest.externalAccountId)
+                        .forEach {
+                            it.obsolete = true
+                            this.verificationRepository.save(it)
+                        }
+                    throw InvalidAddressException("The address ${verificationRequest.address} has a blacklisted stake address associated with it.")
+                }
             } else {
                 throw InvalidAddressException("The address ${verificationRequest.address} does not have a valid stake address associated with it.")
             }
@@ -92,7 +106,7 @@ class VerificationService(
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun runVerifications() {
         val syncStatus = connectService.getSyncInfo()
-        val minutesUntilConsideredDesynchronized = 15 * 60;
+        val minutesUntilConsideredDesynchronized = 15 * 60
         if (syncStatus.getSecondsSinceLastSync() > minutesUntilConsideredDesynchronized) {
             verificationRepository.bumpObsoleteTime(Date(), Date(System.currentTimeMillis() + minutesUntilConsideredDesynchronized * 1000L))
         }
@@ -156,4 +170,11 @@ class VerificationService(
         }
         return importedVerifications
     }
+
+
+    fun importExternalVerifications(externalAccountId: Long): List<VerificationImport> {
+        val externalAccount = externalAccountService.getExternalAccount(externalAccountId) // Ensure account exists
+        return importExternalVerifications(externalAccount)
+    }
+
 }

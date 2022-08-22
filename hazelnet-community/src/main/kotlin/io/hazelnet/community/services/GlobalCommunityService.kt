@@ -10,6 +10,11 @@ class GlobalCommunityService(
 ) {
     fun getSettings() = settingsRepository.findAll().associate { Pair(it.name, it.value) }
 
+    fun getBlacklistedStakeAddresses() =
+        settingsRepository.findByName("BLACKLISTED_STAKE_ADDRESSES")
+            .orElse(GlobalSetting(0, "BLACKLISTED_STAKE_ADDRESSES", ""))
+            .value.split(",")
+
     fun updateSetting(globalSetting: GlobalSetting): GlobalSetting {
         val existingSetting = settingsRepository.findByName(globalSetting.name)
         return if (existingSetting.isPresent) {

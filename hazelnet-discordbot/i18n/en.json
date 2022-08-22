@@ -427,7 +427,9 @@
 			"resolveSuccess": "The handle resolved to {{resolvedAddress}}",
 			"verifyButton": "Verify your wallet",
 			"widgetInstructionsAlreadyVerified": "🚨 You have {{verifiedWallets}} verified wallets. If you would like to see which ones, use **/verify list** in a channel where commands are enabled.",
-			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n❔ For more information, use **/verify help** and **/help**."
+			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n❔ For more information, use **/verify help** and **/help**.",
+			"blacklistedTitle": "Blocked",
+			"blacklisted": "🛑 Your account is currently blocked from using HAZELnet."
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",

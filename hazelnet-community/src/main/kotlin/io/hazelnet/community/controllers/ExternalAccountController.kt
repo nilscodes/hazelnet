@@ -2,9 +2,7 @@ package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.ping.ExternalAccountPingPartial
-import io.hazelnet.community.services.ExternalAccountService
-import io.hazelnet.community.services.PingService
-import io.hazelnet.community.services.WhitelistService
+import io.hazelnet.community.services.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,6 +13,8 @@ import javax.validation.Valid
 @RequestMapping("/externalaccounts")
 class ExternalAccountController(
         private val externalAccountService: ExternalAccountService,
+        private val accountService: AccountService,
+        private val verificationService: VerificationService,
         private val pingService: PingService,
         private val whitelistService: WhitelistService,
 ) {
@@ -59,10 +59,10 @@ class ExternalAccountController(
     fun getPremiumInfo(@PathVariable externalAccountId: Long) = externalAccountService.getPremiumInfo(externalAccountId)
 
     @PostMapping("/{externalAccountId}/import")
-    fun importExternalVerifications(@PathVariable externalAccountId: Long) = externalAccountService.importExternalVerifications(externalAccountId)
+    fun importExternalVerifications(@PathVariable externalAccountId: Long) = verificationService.importExternalVerifications(externalAccountId)
 
     @PutMapping("/{externalAccountId}/account")
-    fun setAccountForExternalAccount(@PathVariable externalAccountId: Long) = externalAccountService.setAccountForExternalAccount(externalAccountId)
+    fun setAccountForExternalAccount(@PathVariable externalAccountId: Long) = accountService.setAccountForExternalAccount(externalAccountId)
 
 
 }

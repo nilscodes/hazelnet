@@ -27,6 +27,10 @@ class AccountController(
             .body(newAccount)
     }
 
+    @GetMapping("/{accountId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getAccount(@PathVariable accountId: Long) = accountService.getAccount(accountId)
+
     @PutMapping("/{accountId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)
     fun updateSetting(@PathVariable accountId: Long, @PathVariable settingName: String, @RequestBody @Valid embeddableSetting: EmbeddableSetting): EmbeddableSetting {
