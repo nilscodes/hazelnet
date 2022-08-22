@@ -1,7 +1,9 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.CommunityApplicationConfiguration
-import io.hazelnet.community.data.*
+import io.hazelnet.community.data.ExternalAccount
+import io.hazelnet.community.data.ExternalAccountPremiumInfo
+import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.premium.PremiumStakedInfo
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
@@ -17,9 +19,7 @@ import javax.transaction.Transactional
 class ExternalAccountService(
     private val externalAccountRepository: ExternalAccountRepository,
     private val verificationRepository: VerificationRepository,
-    private val verificationService: VerificationService,
     private val discordServerRepository: DiscordServerRepository,
-    private val accountService: AccountService,
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
     private val connectService: ConnectService,
@@ -134,19 +134,6 @@ class ExternalAccountService(
         }
     }
 
-    fun importExternalVerifications(externalAccountId: Long): List<VerificationImport> {
-        val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
-        return verificationService.importExternalVerifications(externalAccount)
-    }
+    fun updateExternalAccount(externalAccount: ExternalAccount) = externalAccountRepository.save(externalAccount)
 
-    fun setAccountForExternalAccount(externalAccountId: Long): Account {
-        val externalAccount = getExternalAccount(externalAccountId)
-        if (externalAccount.account == null) {
-            val newAccount = accountService.createAccount(Account(id = null))
-            externalAccount.account = newAccount
-            externalAccountRepository.save(externalAccount)
-            return newAccount
-        }
-        return externalAccount.account!!
-    }
 }

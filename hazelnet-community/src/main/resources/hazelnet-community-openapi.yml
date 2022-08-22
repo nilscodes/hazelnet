@@ -87,6 +87,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+  /accounts/{accountId}:
+    get:
+      summary: Get account info
+      operationId: getAccount
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+      responses:
+        '200':
+          description: 'Account data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
   /accounts/{accountId}/settings/{settingName}:
     put:
       summary: Create or update an account setting with the provided value
@@ -103,7 +118,7 @@ paths:
               $ref: '#/components/schemas/EmbeddableSetting'
       responses:
         '200':
-          description: 'Token Policy'
+          description: 'Account Setting'
           content:
             application/json:
               schema:

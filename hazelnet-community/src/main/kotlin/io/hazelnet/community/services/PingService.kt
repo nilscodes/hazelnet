@@ -16,6 +16,7 @@ import kotlin.math.ceil
 class PingService(
     private val pingRepository: PingRepository,
     private val externalAccountService: ExternalAccountService,
+    private val accountService: AccountService,
     private val discordServerService: DiscordServerService,
     private val connectService: ConnectService,
     private val verificationRepository: VerificationRepository,
@@ -30,7 +31,7 @@ class PingService(
         }
         verifyPingCanBeSent(sender)
         val recipientExternalAccount = this.lookupRecipient(externalAccountPing.recipientAddress)
-        val recipient = externalAccountService.setAccountForExternalAccount(recipientExternalAccount.id!!)
+        val recipient = accountService.setAccountForExternalAccount(recipientExternalAccount.id!!)
         val disableReceivePingsSetting = recipient.settings.find { it.name == "OPTION_RECEIVEPINGS" }
         val sendPing = (disableReceivePingsSetting == null || disableReceivePingsSetting.value == "true")
         val newPing = pingRepository.save(
@@ -89,7 +90,7 @@ class PingService(
 
     fun getExternalAccountPings(externalAccountId: Long): List<ExternalAccountPingDto> {
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId) // Ensure account exists
-        val account = externalAccountService.setAccountForExternalAccount(externalAccountId) // Ensure main account exists
+        val account = accountService.setAccountForExternalAccount(externalAccountId) // Ensure main account exists
         val allPings = getAllPingsForUser(externalAccount, account)
         return allPings
             .distinctBy { it.id } // Filter out duplicates due to self-pings
@@ -112,7 +113,7 @@ class PingService(
 
     fun updateExternalAccountPing(externalAccountId: Long, pingId: Long, externalAccountPingPartial: ExternalAccountPingPartial): Any {
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId) // Ensure account exists
-        val account = externalAccountService.setAccountForExternalAccount(externalAccountId) // Ensure main account exists
+        val account = accountService.setAccountForExternalAccount(externalAccountId) // Ensure main account exists
         val sentPings = pingRepository.findAllBySender(externalAccount)
         var pingToPatch = sentPings.find { it.id == pingId }
         if (pingToPatch == null) {
