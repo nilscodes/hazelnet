@@ -199,7 +199,11 @@ class DiscordServerController(
 
     @DeleteMapping("/{guildId}/members/{externalAccountId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun disconnectExternalAccount(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.removeMember(guildId, externalAccountId)
+    fun disconnectExternalAccount(
+        @PathVariable guildId: Long,
+        @PathVariable externalAccountId: Long,
+        @RequestParam(required = false, defaultValue = "false") skipRoleUpdates: Boolean,
+    ) = discordServerService.removeMember(guildId, externalAccountId, skipRoleUpdates)
 
     @GetMapping("/{guildId}/members/{externalAccountId}/claimlists")
     @ResponseStatus(HttpStatus.OK)
@@ -240,11 +244,11 @@ class DiscordServerController(
 
     @GetMapping("/{guildId}/roleassignments/delegatorroles")
     @ResponseStatus(HttpStatus.OK)
-    fun getCurrentDelegatorRoleAssignments(@PathVariable guildId: Long) = discordServerService.getCurrentDelegatorRoleAssignments(guildId)
+    fun getCurrentDelegatorRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentDelegatorRoleAssignmentsForGuild(guildId)
 
     @GetMapping("/{guildId}/roleassignments/tokenroles")
     @ResponseStatus(HttpStatus.OK)
-    fun getCurrentTokenRoleAssignments(@PathVariable guildId: Long) = discordServerService.getCurrentTokenRolesAssignments(guildId)
+    fun getCurrentTokenRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentTokenRoleAssignmentsForGuild(guildId)
 
     @PostMapping("/{guildId}/accesstoken")
     @ResponseStatus(HttpStatus.OK)

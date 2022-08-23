@@ -804,6 +804,13 @@ paths:
       parameters:
         - $ref: '#/components/parameters/GuildIdPathParameter'
         - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - name: skipRoleUpdates
+          in: query
+          description: Set to true if no role updates should be triggered as part of this unlinking
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         '204':
           description: 'Successful deletion'

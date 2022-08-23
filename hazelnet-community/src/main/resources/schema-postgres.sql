@@ -172,10 +172,10 @@ CREATE TABLE "discord_incoming_payments"
 
 CREATE TABLE "discord_server_members"
 (
-    "discord_server_id"   int,
-    "external_account_id" bigint,
-    "join_time"           timestamp,
-    "premium_support"     boolean NOT NULL DEFAULT false
+    "discord_server_id"       int,
+    "external_account_id"     bigint,
+    "join_time"               timestamp,
+    "premium_support"         boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "discord_spo"
@@ -487,6 +487,8 @@ ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("discord_server_id") REFER
 
 ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
+CREATE INDEX "discord_server_members_external_account" ON "discord_server_members" ("external_account_id");
+
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
@@ -541,11 +543,11 @@ CREATE INDEX "discord_marketplace_discord_server_index" ON "discord_marketplace_
 
 CREATE INDEX "discord_marketplace_tracker_type_index" ON "discord_marketplace_channels" ("tracker_type");
 
-ALTER TABLE "discord_marketplace_markets" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id");
+ALTER TABLE "discord_marketplace_markets" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id") ON DELETE CASCADE;
 
 CREATE INDEX "discord_marketplace_markets_channel_index" ON "discord_marketplace_markets" ("marketplace_channel_id");
 
-ALTER TABLE "discord_marketplace_filters" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id");
+ALTER TABLE "discord_marketplace_filters" ADD FOREIGN KEY ("marketplace_channel_id") REFERENCES "discord_marketplace_channels" ("marketplace_channel_id") ON DELETE CASCADE;
 
 CREATE INDEX "discord_marketplace_filters_channel_index" ON "discord_marketplace_filters" ("marketplace_channel_id");
 

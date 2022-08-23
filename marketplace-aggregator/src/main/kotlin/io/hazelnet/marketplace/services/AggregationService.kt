@@ -20,11 +20,11 @@ class AggregationService(
     private val meterRegistry: MeterRegistry,
 ) {
 
-    private var lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
     private val jpgStoreSalesStatusCounter: Counter.Builder = Counter
         .builder("jpgstore_statuscodes_sales")
         .description("HTTP status codes for encountered errors when aggregating sales from jpg.store")
-    private var lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
     private val jpgStoreListingsStatusCounter: Counter.Builder = Counter
         .builder("jpgstore_statuscodes_listings")
         .description("HTTP status codes for encountered errors when aggregating listings from jpg.store")

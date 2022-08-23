@@ -47,11 +47,15 @@ class ExternalAccountService(
     }
 
     fun getVerifiedStakeAddressesForExternalAccount(externalAccountId: Long): Set<String> {
+        return getConfirmedExternalAccountVerifications(externalAccountId)
+            .map { it.cardanoStakeAddress!! }
+            .toSet()
+    }
+
+    fun getConfirmedExternalAccountVerifications(externalAccountId: Long): List<Verification> {
         val verifications = getExternalAccountVerifications(externalAccountId)
         return verifications
             .filter { it.confirmed && !it.obsolete && it.cardanoStakeAddress != null }
-            .map { it.cardanoStakeAddress!! }
-            .toSet()
     }
 
     fun getExternalAccountForDiscordUser(discordUserId: Long): ExternalAccount {
