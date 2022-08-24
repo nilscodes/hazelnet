@@ -13,6 +13,14 @@ module.exports = {
       client.logger.warn(`Did not find guild for ${roleProperty} assignments in guild cache for server ${discordServer.guildName} (${discordServer.guildId}).`);
     }
   },
+  async ensureRoleAssignmentsForUser(client, discordServer, roleProperty, guildForAssignments, expectedRoleAssignments, userId, removeInvalid) {
+    client.logger.info(`Processing ${roleProperty} for single user with ID ${userId} on ${discordServer.guildName} (${discordServer.guildId}). ${removeInvalid ? 'R' : 'Not r'}emoving invalid role assignments. Processing a total of ${expectedRoleAssignments.length} roles that should be assigned.`);
+    const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
+    if (removeInvalid && (discordServer.premium || discordServer[roleProperty].length <= 1)) {
+      await this.removeInvalidRolesFromMember(discordServer, roleProperty, guildForAssignments, rolesToUsers, client, userId);
+    }
+    await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+  },
   createRolesToUsersMap(discordServer, roleProperty, roleAssignments) {
     const rolesToUsers = {};
     discordServer[roleProperty].forEach((roleMapping) => { rolesToUsers[roleMapping.roleId] = []; });
@@ -24,6 +32,32 @@ module.exports = {
       }
     });
     return rolesToUsers;
+  },
+  /*
+   * Remove roles from individual user they do not qualify any more for
+   */
+  async removeInvalidRolesFromMember(discordServer, roleProperty, guildForAssignments, rolesToUsers, client, userId) {
+    try {
+      const member = await guildForAssignments.members.fetch(userId);
+      for (let r = 0, len = discordServer[roleProperty].length; r < len; r += 1) {
+        const roleMapping = discordServer[roleProperty][r];
+        const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
+        if (guildRole) {
+          if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
+            client.logger.info(`Removing ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`);
+            try {
+              await member.roles.remove(guildRole);
+            } catch (error) {
+              client.logger.error({ msg: `Failed to remove ${roleProperty} ${guildRole.name} from member ${member.user.tag} (${member.user.id}) on discord server ${discordServer.guildName}`, error });
+            }
+          }
+        } else {
+          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
+        }
+      }
+    } catch (error) {
+      client.logger.error({ msg: `Failed fetching member ${userId} for ${discordServer.guildName} (${discordServer.guildId})`, error });
+    }
   },
   async removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
     try {
@@ -71,7 +105,11 @@ module.exports = {
               }
             }
           } catch (e) {
-            client.logger.info(`No member with ID ${userIdToAssignRole} found on discord server ${discordServer.guildName} (${discordServer.guildId})`);
+            client.logger.info(`No member with ID ${userIdToAssignRole} found on discord server ${discordServer.guildName} (${discordServer.guildId}). Unlinking user to avoid further attempts.`);
+            const externalAccount = await client.services.externalaccounts.getExternalDiscordAccount(userIdToAssignRole);
+            if (externalAccount !== null) {
+              await client.services.discordserver.disconnectExternalAccount(discordServer.guildId, externalAccount.id, true);
+            }
           }
         }
       } else {

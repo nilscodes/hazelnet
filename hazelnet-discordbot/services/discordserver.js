@@ -58,8 +58,8 @@ module.exports = {
     const memberPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`, discordMemberPartial);
     return memberPromise.data;
   },
-  async disconnectExternalAccount(guildId, externalAccountId) {
-    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}`);
+  async disconnectExternalAccount(guildId, externalAccountId, skipRoleUpdates) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}?skipRoleUpdates=${!!skipRoleUpdates}`);
     this.clearCacheEntry(guildId);
   },
   async updateDiscordServerSetting(guildId, settingName, settingValue) {

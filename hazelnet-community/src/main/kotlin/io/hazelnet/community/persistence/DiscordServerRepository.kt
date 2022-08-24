@@ -17,4 +17,7 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
 
     @Query(value = "SELECT DISTINCT guild_name FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId AND premium_support=true", nativeQuery = true)
     fun getDiscordServersForPremiumMember(@Param("externalAccountId") externalAccountId: Long): List<String>
+
+    @Query(value = "SELECT DISTINCT ds.* FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId", nativeQuery = true)
+    fun getDiscordServersForMember(@Param("externalAccountId") externalAccountId: Long): List<DiscordServer>
 }

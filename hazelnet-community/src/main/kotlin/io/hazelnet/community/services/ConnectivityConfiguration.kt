@@ -58,6 +58,12 @@ class ConnectivityConfiguration {
     fun listingAnnouncementsQueue() = Queue("listingannouncements")
 
     @Bean
+    fun tokenRolesQueue() = Queue("tokenroles")
+
+    @Bean
+    fun delegatorRolesQueue() = Queue("delegatorroles")
+
+    @Bean
     fun exchange() = DirectExchange("hazelnet")
 
     @Bean
@@ -87,6 +93,14 @@ class ConnectivityConfiguration {
     @Bean
     fun mintAnnouncementsBinding(@Qualifier("mintAnnouncementsQueue") mintAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(mintAnnouncementsQueue).to(exchange)
+
+    @Bean
+    fun tokenRolesBinding(@Qualifier("tokenRolesQueue") tokenRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(tokenRolesQueue).to(exchange)
+
+    @Bean
+    fun delegatorRolesBinding(@Qualifier("delegatorRolesQueue") delegatorRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(delegatorRolesQueue).to(exchange)
 
     @Bean
     fun messageConverter() = Jackson2JsonMessageConverter()

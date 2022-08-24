@@ -24,6 +24,7 @@ class VerificationService(
     private val externalAccountRepository: ExternalAccountRepository,
     private val accountService: AccountService,
     private val globalCommunityService: GlobalCommunityService,
+    private val roleAssignmentService: RoleAssignmentService,
 ) {
     @Transactional
     fun createVerificationRequest(verificationRequest: VerificationRequest): Verification {
@@ -121,6 +122,7 @@ class VerificationService(
                 verification.confirmedAt = Date.from(ZonedDateTime.now().toInstant())
                 verificationRepository.save(verification)
                 verificationRepository.invalidateOutdatedVerifications(verification.cardanoStakeAddress!!, verification.id!!)
+                roleAssignmentService.publishRoleAssignmentsForGuildMemberOnAllServers(verification.externalAccount.id!!)
             } catch (e: WebClientResponseException) {
                 logger.debug { "No valid verification found for ${verification.address} for verification with ID ${verification.id}" }
             }
@@ -128,7 +130,9 @@ class VerificationService(
     }
 
     fun deleteVerification(verificationId: Long) {
-        verificationRepository.deleteById(verificationId)
+        val verificationToDelete = getVerificationInfo(verificationId)
+        verificationRepository.delete(verificationToDelete)
+        roleAssignmentService.publishRoleAssignmentsForGuildMemberOnAllServers(verificationToDelete.externalAccount.id!!)
     }
 
     fun getAllCompletedVerificationsForDiscordServer(discordServerId: Int) =
