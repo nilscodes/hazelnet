@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
+import com.jayway.jsonpath.JsonPath
+import com.jayway.jsonpath.PathNotFoundException
 import io.hazelnet.community.data.discord.TokenOwnershipAggregationType
 import io.hazelnet.marketplace.data.Marketplace
 import org.springframework.lang.NonNull
@@ -68,12 +70,41 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
     @Column(name = "aggregation_type")
     @Enumerated(EnumType.ORDINAL)
     var aggregationType: TokenOwnershipAggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
+
+    @Column(name = "highlight_attribute_name")
+    @field:Size(min = 1, max = 64)
+    var highlightAttributeName: String?,
+
+    @Column(name = "highlight_attribute_display_name")
+    @field:Size(min = 1, max = 64)
+    var highlightAttributeDisplayName: String?,
 ) {
     fun meetsFilterCriteria(metadata: String): Boolean {
         return when (aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
             else -> throw IllegalArgumentException("Invalid aggregation type for marketplace channel $id")
+        }
+    }
+
+    fun extractHighlightAttribute(metadata: String): String? {
+        return if (highlightAttributeName != null) {
+            return findAttribute(metadata, highlightAttributeName!!).toString()
+        } else {
+            null
+        }
+    }
+
+    // TODO same method as in MetadataFilter.kt
+    private fun findAttribute(
+        metadata: String,
+        attributeName: String,
+    ): Any? {
+        return try {
+            val attributePath = if (attributeName.startsWith("$.")) attributeName.substring(2) else attributeName
+            JsonPath.read<Any>(metadata, "$.${attributePath}")
+        } catch (pnfe: PathNotFoundException) {
+            null
         }
     }
 
@@ -92,7 +123,10 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
         if (createTime != other.createTime) return false
         if (channelId != other.channelId) return false
         if (minimumValue != other.minimumValue) return false
+        if (filters != other.filters) return false
         if (aggregationType != other.aggregationType) return false
+        if (highlightAttributeName != other.highlightAttributeName) return false
+        if (highlightAttributeDisplayName != other.highlightAttributeDisplayName) return false
 
         return true
     }
@@ -107,12 +141,15 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
         result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + channelId.hashCode()
         result = 31 * result + (minimumValue?.hashCode() ?: 0)
+        result = 31 * result + filters.hashCode()
         result = 31 * result + aggregationType.hashCode()
+        result = 31 * result + (highlightAttributeName?.hashCode() ?: 0)
+        result = 31 * result + (highlightAttributeDisplayName?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "DiscordMarketplaceChannel(id=$id, discordServerId=$discordServerId, creator=$creator, type=$type, policyId='$policyId', marketplaces=$marketplaces, createTime=$createTime, channelId=$channelId, minimumValue=$minimumValue, aggregationType=$aggregationType)"
+        return "DiscordMarketplaceChannel(id=$id, discordServerId=$discordServerId, creator=$creator, type=$type, policyId='$policyId', marketplaces=$marketplaces, createTime=$createTime, channelId=$channelId, minimumValue=$minimumValue, filters=$filters, aggregationType=$aggregationType, highlightAttributeName=$highlightAttributeName, highlightAttributeDisplayName=$highlightAttributeDisplayName)"
     }
 
 }

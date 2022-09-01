@@ -8,6 +8,7 @@ module.exports = {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
     const announceChannel = interaction.options.getChannel('channel');
+    const highlightAttributeName = interaction.options.getString('highlight-attribute');
     const policyIdToTrack = interaction.options.getString('policy-id');
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -20,12 +21,14 @@ module.exports = {
         if (marketplaceChannels.length < maxMintTrackerCount) {
           if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
             const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-            if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
+            if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
               if (policyIdToTrack) {
                 const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
                 if (officialProjectForPolicy) {
                   const content = await this.createMintChannel(interaction, {
                     channelId: announceChannel.id,
+                    highlightAttributeName,
+                    highlightAttributeDisplayName: highlightAttributeName,
                   }, policyIdToTrack, discordServer);
                   const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace mint add', content, 'configure-marketplace-mint-add');
                   await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
@@ -44,6 +47,8 @@ module.exports = {
                 if (officialProjects.length) {
                   this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
                     channelId: announceChannel.id,
+                    highlightAttributeName,
+                    highlightAttributeDisplayName: highlightAttributeName,
                   });
                   const components = [new MessageActionRow()
                     .addComponents(
@@ -111,6 +116,8 @@ module.exports = {
       policyIdToTrack,
       'MINT_ONCHAIN',
       null,
+      marketplaceChannelData.highlightAttributeName,
+      marketplaceChannelData.highlightAttributeDisplayName,
     );
 
     return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, {

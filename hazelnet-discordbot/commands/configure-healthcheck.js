@@ -80,7 +80,7 @@ module.exports = {
       try {
         const auditChannelObject = await interaction.guild.channels.fetch(auditChannel);
         const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application.id);
-        if (!auditChannelPermissions.has('SEND_MESSAGES') || !auditChannelPermissions.has('VIEW_CHANNEL')) {
+        if (!auditChannelPermissions.has('SEND_MESSAGES') || !auditChannelPermissions.has('VIEW_CHANNEL') || !auditChannelPermissions.has('EMBED_LINKS')) {
           problems = true;
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),
@@ -102,6 +102,7 @@ module.exports = {
     if (!discordServer.premium) {
       const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
       const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id);
+      // TODO Check each marketplace channel!
       const blackEditionIssues = [];
       if (polls.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssuePolls', locale }));

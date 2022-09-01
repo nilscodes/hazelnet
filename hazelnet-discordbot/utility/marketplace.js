@@ -29,6 +29,7 @@ module.exports = {
         inline: true,
       });
     }
+    this.addMetadataAttributeHighlightField(saleAnnouncement, fields);
 
     return fields;
   },
@@ -56,6 +57,7 @@ module.exports = {
         inline: true,
       });
     }
+    this.addMetadataAttributeHighlightField(listingAnnouncement, fields);
 
     return fields;
   },
@@ -72,6 +74,7 @@ module.exports = {
         inline: true,
       });
     }
+    this.addMetadataAttributeHighlightField(mintAnnouncement, fields);
 
     return fields;
   },
@@ -114,5 +117,14 @@ module.exports = {
   getProjectName(discordServer, marketplaceChannel) {
     const projectData = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannel.policyId);
     return projectData ? projectData.projectName : marketplaceChannel.policyId;
+  },
+  addMetadataAttributeHighlightField(announcement, fields) {
+    if (announcement.highlightAttributeDisplayName) {
+      fields.push({
+        name: announcement.highlightAttributeDisplayName,
+        value: announcement.highlightAttributeValue,
+        inline: true,
+      });
+    }
   },
 };

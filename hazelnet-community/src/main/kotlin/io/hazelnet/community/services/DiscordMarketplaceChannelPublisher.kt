@@ -47,6 +47,8 @@ class DiscordMarketplaceChannelPublisher(
                     saleDate = sale.saleDate,
                     rarityRank = combinedAssetInfo.t2.rarityRank,
                     type = sale.type,
+                    highlightAttributeDisplayName = it.highlightAttributeDisplayName,
+                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.t1.metadata)
                 )
             } else {
                 null
@@ -75,6 +77,8 @@ class DiscordMarketplaceChannelPublisher(
                     price = listing.price,
                     listingDate = listing.listingDate,
                     rarityRank = combinedAssetInfo.t2.rarityRank,
+                    highlightAttributeDisplayName = it.highlightAttributeDisplayName,
+                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.t1.metadata)
                 )
             } else {
                 null

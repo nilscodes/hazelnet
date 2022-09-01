@@ -114,6 +114,8 @@ class OuraEventService(
                                     assetImageUrl = getImageUrlFromAssetInfo(config, combinedAssetInfo),
                                     mintDate = mintToProcess.date,
                                     rarityRank = 0,
+                                    highlightAttributeDisplayName = it.highlightAttributeDisplayName,
+                                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.metadata)
                                 )
                             }
                             .forEach { rabbitTemplate.convertAndSend("mintannouncements", it) }
