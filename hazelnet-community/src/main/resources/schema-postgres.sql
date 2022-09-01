@@ -391,15 +391,17 @@ CREATE TABLE "physical_products"
 
 CREATE TABLE "discord_marketplace_channels"
 (
-    "marketplace_channel_id"       SERIAL PRIMARY KEY,
-    "discord_server_id"            int,
-    "external_account_id"          bigint      NOT NULL,
-    "tracker_type"                 int         NOT NULL DEFAULT 0,
-    "policy_id"                    varchar(56) NOT NULL,
-    "marketplace_channel_creation" timestamp   NOT NULL,
-    "discord_channel_id"           bigint      NOT NULL,
-    "minimum_value"                bigint,
-    "aggregation_type"             int         NOT NULL DEFAULT 0
+    "marketplace_channel_id"           SERIAL PRIMARY KEY,
+    "discord_server_id"                int,
+    "external_account_id"              bigint      NOT NULL,
+    "tracker_type"                     int         NOT NULL DEFAULT 0,
+    "policy_id"                        varchar(56) NOT NULL,
+    "marketplace_channel_creation"     timestamp   NOT NULL,
+    "discord_channel_id"               bigint      NOT NULL,
+    "minimum_value"                    bigint,
+    "aggregation_type"                 int         NOT NULL DEFAULT 0,
+    "highlight_attribute_name"         varchar(64),
+    "highlight_attribute_display_name" varchar(64)
 );
 
 CREATE TABLE "discord_marketplace_markets"

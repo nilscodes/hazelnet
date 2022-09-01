@@ -31,4 +31,10 @@ data class SaleAnnouncement @JsonCreator constructor(
     val rarityRank: Int? = null,
 
     val type: SalesType,
+
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    var highlightAttributeDisplayName: String? = null,
+
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    var highlightAttributeValue: String? = null,
 )

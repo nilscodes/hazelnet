@@ -29,4 +29,10 @@ data class ListingAnnouncement @JsonCreator constructor(
 
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     val rarityRank: Int? = null,
+
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    var highlightAttributeDisplayName: String? = null,
+
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    var highlightAttributeValue: String? = null,
 )

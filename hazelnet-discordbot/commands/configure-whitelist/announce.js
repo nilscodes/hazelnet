@@ -12,7 +12,7 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
+        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
           const whitelistOptions = discordServer.whitelists
             .filter((whitelist) => !whitelist.closed)
             .map((whitelist) => ({ label: whitelist.displayName, value: `${announceChannel.id}-${whitelist.id}` }));

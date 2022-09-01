@@ -10,6 +10,7 @@ module.exports = {
     const marketplace = interaction.options.getString('marketplace');
     const minimumPriceAda = interaction.options.getInteger('minimum-price');
     const announceChannel = interaction.options.getChannel('channel');
+    const highlightAttributeName = interaction.options.getString('highlight-attribute');
     const policyIdToTrack = interaction.options.getString('policy-id');
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -22,7 +23,7 @@ module.exports = {
         if (marketplaceChannels.length < maxListingsTrackerCount) {
           if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
             const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-            if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
+            if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
               if (policyIdToTrack) {
                 const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
                 if (officialProjectForPolicy) {
@@ -30,6 +31,8 @@ module.exports = {
                     channelId: announceChannel.id,
                     minimumPriceAda,
                     marketplace,
+                    highlightAttributeName,
+                    highlightAttributeDisplayName: highlightAttributeName,
                   }, policyIdToTrack, discordServer);
                   const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', content, 'configure-marketplace-listings-add');
                   await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
@@ -50,6 +53,8 @@ module.exports = {
                     channelId: announceChannel.id,
                     minimumPriceAda,
                     marketplace,
+                    highlightAttributeName,
+                    highlightAttributeDisplayName: highlightAttributeName,
                   });
                   const components = [new MessageActionRow()
                     .addComponents(
@@ -120,6 +125,8 @@ module.exports = {
       policyIdToTrack,
       marketplaceChannelData.marketplace,
       marketplaceChannelData.minimumPriceAda * 1000000,
+      marketplaceChannelData.highlightAttributeName,
+      marketplaceChannelData.highlightAttributeDisplayName,
     );
 
     return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, {

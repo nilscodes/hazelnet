@@ -2871,6 +2871,21 @@ components:
           description: The (optional) minimum value in Lovelace that is required for the listing, sale or offer to be displayed
           type: integer
           format: int64
+        filters:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/MetadataFilter'
+        aggregationType:
+          $ref: '#/components/schemas/TokenOwnershipAggregationType'
+        highlightAttributeName:
+          type: string
+          minLength: 1
+          maxLength: 64
+        highlightAttributeDisplayName:
+          type: string
+          minLength: 1
+          maxLength: 64
     Whitelist:
       type: object
       required:

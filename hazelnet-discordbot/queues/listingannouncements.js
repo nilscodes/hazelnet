@@ -15,7 +15,7 @@ module.exports = {
         const announceChannel = await guild.channels.fetch(listingAnnouncement.channelId);
         if (announceChannel) {
           const announceChannelPermissions = announceChannel.permissionsFor(client.application.id);
-          if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL')) {
+          if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
             const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createListingAnnouncementFields(listingAnnouncement, locale);

@@ -21,6 +21,7 @@ module.exports = {
             .setRequired(true))
           .addIntegerOption((option) => option.setName('minimum-price').setDescription(ci18n.option('minimum-price')).setRequired(true))
           .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+          .addStringOption((option) => option.setName('highlight-attribute').setDescription(ci18n.option('highlight-attribute')).setRequired(false))
           .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand
           .setName('list')
@@ -41,6 +42,7 @@ module.exports = {
             .setRequired(true))
           .addIntegerOption((option) => option.setName('minimum-price').setDescription(ci18n.option('minimum-price')).setRequired(true))
           .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+          .addStringOption((option) => option.setName('highlight-attribute').setDescription(ci18n.option('highlight-attribute')).setRequired(false))
           .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand
           .setName('list')
@@ -55,6 +57,7 @@ module.exports = {
           .setName('add')
           .setDescription(ci18n.subDescription('mint-add'))
           .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+          .addStringOption((option) => option.setName('highlight-attribute').setDescription(ci18n.option('highlight-attribute')).setRequired(false))
           .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand
           .setName('list')

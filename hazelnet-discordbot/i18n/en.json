@@ -8,6 +8,7 @@
 			"verify-list": "List all staking addresses and link status associated with this Discord user and server",
 			"verify-remove": "Removes a verified wallet address",
 			"verify-unlink": "Unlink your verified addresses from this server (verifications will remain)",
+			"whois": "Find out info about an ADA Handle or address.",
 			"policyid": "Lists all policy IDs and projects associated with this server.",
 			"info": "Shows info and stakepools for this server.",
 			"whitelist": "View and register for whitelist events in this Discord.",
@@ -107,6 +108,9 @@
 				"address-or-handle": "Enter the Cardano wallet address or $handle to verify.",
 				"address": "Enter the Cardano wallet address to remove from the verified address list."
 			},
+			"whois": {
+				"address-or-handle": "Enter the Cardano wallet address or $handle to get information on."
+			},
 			"profile": {
 				"option": "The configuration option to change."
 			},
@@ -186,7 +190,8 @@
 				"tracker-id": "The ID of the sales/mint/listings tracker",
 				"attribute-path": "Metadata attribute to check (case sensitive!)",
 				"operator": "Comparison operator to use",
-				"attribute-value": "Value to check for (case sensitive!)"
+				"attribute-value": "Value to check for (case sensitive!)",
+				"highlight-attribute": "commands.options.configure-marketplace.highlight-attribute"
 			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
@@ -301,6 +306,18 @@
 		"noProjectName": "No official policies",
 		"noPolicies": "*Currently, this server has no token policies listed.*",
 		"projectPolicyId": "The policy ID for this project is **{{policyId}}**"
+	},
+	"whois": {
+		"messageTitle": "Whois Info",
+		"noHandleFound": "⚠ The Handle **{{handle}}** is not currently in circulation.",
+		"noHandleFoundMintTitle": "Mint it here ✨",
+		"noHandleFoundMintText": "https://adahandle.com/mint",
+		"noValidHandleOrAddress": "⚠ **{{addressOrHandle}}** is not a valid Handle or Cardano address and could not be resolved. Valid Handles start with a dollar sign and are followed by one to fifteen alphanumeric characters, periods, dashes or underscores. No other characters are allowed. Cardano addresses start with *addr1*.",
+		"handleResolvedSuccess": "✅ The Handle **{{handle}}** was successfully resolved to the Cardano address *{{resolvedAddress}}*\n\n⚠ Be careful sending funds or tokens to Handles you do not know or if the resolved address does not look like what you expected.",
+		"handleFoundTitle": "View on handle.me 👀",
+		"handleFoundText": "https://handle.me/{{handleWithoutPrefix}}",
+		"handleOnSale": "💡 The Handle **{{handle}}** is currently on sale at *{{marketplaceName}}*. If you are interested, this is your chance to snag it!",
+		"handleOnSaleTitle": "Find on marketplace 🛒"
 	},
 	"vote": {
 		"messageTitle": "Current polls and decisions on this Discord",
@@ -592,7 +609,7 @@
 				"publicSuccess": "You can verify your wallet here, or quickly link your already verified wallets with this Discord by clicking the below button.",
 				"welcomeMessage": "Welcome Message",
 				"publish": "Create announcement",
-				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for verification announcements."
 			}
 		},
@@ -630,7 +647,7 @@
 				"auditChannelTitle": "Auditing of potential scam messages and events"
 			},
 			"addressremove": {
-				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing Cardano *addr1* addresses or Etherum *0x* addresses. These messages will be automatically removed in all channels where this bot has permissions to view and manage messages.",
+				"protectionOn": "✅ Your server is protected from scams based on users sending messages containing Cardano *addr1* addresses or Ethereum *0x* addresses. These messages will be automatically removed in all channels where this bot has permissions to view and manage messages.",
 				"protectionOff": "⚠ You have turned off the autoremoval of text messags that contain Cardano or ETH addresses, for protection of your users from address-based scams."
 			},
 			"auditchannel": {
@@ -839,7 +856,7 @@
 				"success": "✅ Results successfully published in <#{{currentChannel}}>.",
 				"publicSuccess": "🗳 The team shared the following poll with you.",
 				"choosePoll": "Pick the poll you'd like to announce the results for",
-				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
 			},
 			"remove": {
@@ -889,7 +906,7 @@
 				"publicSuccessNoAddress": "The following whitelist is available to this community. If you fulfill the conditions, register via the button below!",
 				"detailsDescription": "Whitelist details",
 				"noWhitelistsDetail": "⚠ There are currently no open whitelists on this server that can be announced.",
-				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
 			},
 			"share": {
@@ -933,7 +950,7 @@
 					"success": "A sales tracker for the project **{{projectName}}** has been added! Announcements for any sales from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any sales.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
-					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 					"errorWrongChannelType": "This channel cannot be used for sales announcements.",
 					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} sales trackers to your server.",
 					"otherError": "⚠ Error while adding a sales tracking channel.",
@@ -982,7 +999,7 @@
 					"success": "A listings tracker for the project **{{projectName}}** has been added! Announcements for listings from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any listings.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
-					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 					"errorWrongChannelType": "This channel cannot be used for listing announcements.",
 					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} listing trackers to your server.",
 					"otherError": "⚠ Error while adding a listing tracking channel.",
@@ -1028,7 +1045,7 @@
 					"success": "A mint tracker for the project **{{projectName}}** has been added! Announcements for mints of the projects policy will be posted in <#{{channel}}>.",
 					"noPoliciesDetail": "*This server has no official projects added and cannot track any mints.*\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
 					"noProjectFound": "⚠ No project with the given policy ID was found.\nℹ Make sure to run **/configure-policy add** to add official projects to your Discord before running this command.",
-					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel** and **Send Messages** permission for the bot to allow announcing in it.",
+					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 					"errorWrongChannelType": "This channel cannot be used for mint announcements.",
 					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} mint trackers to your server.",
 					"otherError": "⚠ Error while adding a mint tracking channel.",
@@ -1243,6 +1260,7 @@
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
+		"CNFTIO": "CNFT.io",
 		"MINT_ONCHAIN": "Minting"
 	},
 	"generic": {
