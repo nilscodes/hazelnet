@@ -191,7 +191,7 @@
 				"attribute-path": "Metadata attribute to check (case sensitive!)",
 				"operator": "Comparison operator to use",
 				"attribute-value": "Value to check for (case sensitive!)",
-				"highlight-attribute": "commands.options.configure-marketplace.highlight-attribute"
+				"highlight-attribute": "Metadata attribute to highlight in tracker embeds"
 			},
 			"configure-premium": {
 				"refill-amount": "The ADA amount you would like to top off your subscription balance with (200 ADA or less only)."
@@ -944,7 +944,8 @@
 			"sales": {
 				"add": {
 					"purpose": "You are about to add a sales tracker for a project. Announcements for any sales from **{{marketplaceNames}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
-					"minimumPriceAddon": " Only sales above the price of **₳{{minimumPriceAda}}** will be announced.",
+					"minimumPriceAddon": " Only sales above or equal to the price of **₳{{minimumPriceAda}}** will be announced.",
+					"maximumPriceAddon": " Only sales below or equal the price of **₳{{maximumPriceAda}}** will be announced.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
 					"success": "A sales tracker for the project **{{projectName}}** has been added! Announcements for any sales from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
@@ -986,6 +987,7 @@
 					"entry": "{{marketplaceNames}}, #{{channelName}}",
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
+					"maximumPriceAddon": "This affects any sales with a maximum price of **₳{{maximumPriceAda}}**",
 					"deletedChannel": "#deleted",
 					"otherError": "⚠ Error while removing a sales tracking channel."
 				}
@@ -993,7 +995,8 @@
 			"listings": {
 				"add": {
 					"purpose": "You are about to add a listings tracker for a project. Announcements for listings on **{{marketplaceNames}}** will be posted in <#{{channel}}>.\n\nℹ Select the project you want to track below. If your project is missing, make sure to add it via **/configure-policy add**. If you have more than 25 official policies on this server, you can use the optional policy-id parameter on this command to select the project directly.",
-					"minimumPriceAddon": " Only listings above the asking price of **₳{{minimumPriceAda}}** will be announced.",
+					"minimumPriceAddon": " Only listings above or equal to the asking price of **₳{{minimumPriceAda}}** will be announced.",
+					"maximumPriceAddon": " Only listings below or equal to the asking price of **₳{{maximumPriceAda}}** will be announced.",
 					"chooseProject": "Select project/policy",
 					"policyId": "Policy ID: {{policyId}}",
 					"success": "A listings tracker for the project **{{projectName}}** has been added! Announcements for listings from **{{marketplaceNames}}** will be posted in <#{{channel}}>.",
@@ -1033,6 +1036,7 @@
 					"entry": "{{marketplaceNames}}, #{{channelName}}",
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any listings with a minimum asking price of **₳{{minimumPriceAda}}**",
+					"maximumPriceAddon": "This affects any listings with a maximum asking price of **₳{{maximumPriceAda}}**",
 					"deletedChannel": "#deleted",
 					"otherError": "⚠ Error while removing a listing tracking channel."
 				}

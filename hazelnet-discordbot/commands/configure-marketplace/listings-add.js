@@ -30,6 +30,7 @@ module.exports = {
                   const content = await this.createMarketplaceListingsChannel(interaction, {
                     channelId: announceChannel.id,
                     minimumPriceAda,
+                    maximumPriceAda: null,
                     marketplace,
                     highlightAttributeName,
                     highlightAttributeDisplayName: highlightAttributeName,
@@ -116,6 +117,7 @@ module.exports = {
   async createMarketplaceListingsChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer) {
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
     const minimumValue = marketplaceChannelData.minimumPriceAda * 1000000;
+    const maximumValue = marketplaceChannelData.maximumPriceAda ? marketplaceChannelData.maximumPriceAda * 1000000 : null;
 
     await interaction.client.services.discordserver.createMarketplaceChannel(
       interaction.guild.id,
@@ -124,7 +126,8 @@ module.exports = {
       marketplaceChannelData.channelId,
       policyIdToTrack,
       marketplaceChannelData.marketplace,
-      marketplaceChannelData.minimumPriceAda * 1000000,
+      minimumValue,
+      maximumValue,
       marketplaceChannelData.highlightAttributeName,
       marketplaceChannelData.highlightAttributeDisplayName,
     );
@@ -133,6 +136,7 @@ module.exports = {
       channelId: marketplaceChannelData.channelId,
       marketplaces: [marketplaceChannelData.marketplace],
       minimumValue,
+      maximumValue,
       policyId: policyIdToTrack,
       type: 'LISTINGS',
     }, 'add.success', 'add').value;

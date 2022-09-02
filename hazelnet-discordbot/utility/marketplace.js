@@ -103,8 +103,13 @@ module.exports = {
     const projectName = this.getProjectName(discordServer, marketplaceChannel);
     const marketplaceNames = marketplaceChannel.marketplaces?.map((marketplace) => i18n.__({ phrase: `marketplaces.${marketplace}`, locale })).join(', ');
     let content = i18n.__({ phrase: `configure.marketplace.${subcommand}.${mainTextSubAttribute}`, locale }, { projectName, marketplaceNames, channel: marketplaceChannel.channelId });
-    if (marketplaceChannel.type !== 'MINT' && marketplaceChannel.minimumValue) {
-      content += ` ${i18n.__({ phrase: `configure.marketplace.${subcommand}.${priceAddonSubCommand}.minimumPriceAddon`, locale }, { minimumPriceAda: discordServer.formatNumber(Math.floor(marketplaceChannel.minimumValue / 1000000)) })}`;
+    if (marketplaceChannel.type !== 'MINT') {
+      if (marketplaceChannel.minimumValue) {
+        content += ` ${i18n.__({ phrase: `configure.marketplace.${subcommand}.${priceAddonSubCommand}.minimumPriceAddon`, locale }, { minimumPriceAda: discordServer.formatNumber(Math.floor(marketplaceChannel.minimumValue / 1000000)) })}`;
+      }
+      if (marketplaceChannel.maximumValue) {
+        content += ` ${i18n.__({ phrase: `configure.marketplace.${subcommand}.${priceAddonSubCommand}.maximumPriceAddon`, locale }, { maximumPriceAda: discordServer.formatNumber(Math.floor(marketplaceChannel.maximumValue / 1000000)) })}`;
+      }
     }
     if (marketplaceChannel.filters?.length) {
       content += cardanotoken.buildMetadataFilterContentText(marketplaceChannel.filters, marketplaceChannel.aggregationType, locale);

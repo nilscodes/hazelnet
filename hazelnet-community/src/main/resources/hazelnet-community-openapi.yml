@@ -2871,6 +2871,10 @@ components:
           description: The (optional) minimum value in Lovelace that is required for the listing, sale or offer to be displayed
           type: integer
           format: int64
+        maximumValue:
+          description: The (optional) maximum value in Lovelace that is allowed for the listing, sale or offer to be displayed
+          type: integer
+          format: int64
         filters:
           readOnly: true
           type: array
