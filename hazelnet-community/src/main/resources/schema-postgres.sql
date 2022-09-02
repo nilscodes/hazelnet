@@ -399,6 +399,7 @@ CREATE TABLE "discord_marketplace_channels"
     "marketplace_channel_creation"     timestamp   NOT NULL,
     "discord_channel_id"               bigint      NOT NULL,
     "minimum_value"                    bigint,
+    "maximum_value"                    bigint,
     "aggregation_type"                 int         NOT NULL DEFAULT 0,
     "highlight_attribute_name"         varchar(64),
     "highlight_attribute_display_name" varchar(64)

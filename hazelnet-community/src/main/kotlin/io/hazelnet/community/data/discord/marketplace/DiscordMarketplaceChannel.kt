@@ -62,6 +62,11 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
     @field:JsonSerialize(using = ToStringSerializer::class)
     var minimumValue: Long?,
 
+    @Column(name = "maximum_value")
+    @field:Min(1)
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    var maximumValue: Long?,
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "marketplace_channel_id")
     @field:Valid
@@ -123,6 +128,7 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
         if (createTime != other.createTime) return false
         if (channelId != other.channelId) return false
         if (minimumValue != other.minimumValue) return false
+        if (maximumValue != other.maximumValue) return false
         if (filters != other.filters) return false
         if (aggregationType != other.aggregationType) return false
         if (highlightAttributeName != other.highlightAttributeName) return false
@@ -141,6 +147,7 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
         result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + channelId.hashCode()
         result = 31 * result + (minimumValue?.hashCode() ?: 0)
+        result = 31 * result + (maximumValue?.hashCode() ?: 0)
         result = 31 * result + filters.hashCode()
         result = 31 * result + aggregationType.hashCode()
         result = 31 * result + (highlightAttributeName?.hashCode() ?: 0)
@@ -149,7 +156,7 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordMarketplaceChannel(id=$id, discordServerId=$discordServerId, creator=$creator, type=$type, policyId='$policyId', marketplaces=$marketplaces, createTime=$createTime, channelId=$channelId, minimumValue=$minimumValue, filters=$filters, aggregationType=$aggregationType, highlightAttributeName=$highlightAttributeName, highlightAttributeDisplayName=$highlightAttributeDisplayName)"
+        return "DiscordMarketplaceChannel(id=$id, discordServerId=$discordServerId, creator=$creator, type=$type, policyId='$policyId', marketplaces=$marketplaces, createTime=$createTime, channelId=$channelId, minimumValue=$minimumValue, maximumValue=$maximumValue, filters=$filters, aggregationType=$aggregationType, highlightAttributeName=$highlightAttributeName, highlightAttributeDisplayName=$highlightAttributeDisplayName)"
     }
 
 }

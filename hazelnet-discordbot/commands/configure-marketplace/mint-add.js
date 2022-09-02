@@ -116,6 +116,7 @@ module.exports = {
       policyIdToTrack,
       'MINT_ONCHAIN',
       null,
+      null,
       marketplaceChannelData.highlightAttributeName,
       marketplaceChannelData.highlightAttributeDisplayName,
     );
