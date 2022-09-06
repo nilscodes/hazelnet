@@ -20,7 +20,7 @@ class TokenOwnershipRole @JsonCreator constructor(
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "discord_token_role_policies", joinColumns = [JoinColumn(name = "discord_token_role_id")])
     @field:Valid
-    @field:Size(min = 1, max = 50)
+    @field:Size(min = 1, max = 200)
     var acceptedAssets: MutableSet<TokenRoleAssetInfo> = mutableSetOf(),
 
     @Column(name = "minimum_token_quantity")
