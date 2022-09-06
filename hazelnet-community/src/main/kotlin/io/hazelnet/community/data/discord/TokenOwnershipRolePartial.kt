@@ -9,7 +9,7 @@ import javax.validation.constraints.Size
 
 data class TokenOwnershipRolePartial @JsonCreator constructor(
     @field:Valid
-    @field:Size(min = 1, max = 50)
+    @field:Size(min = 1, max = 200)
     val acceptedAssets: MutableSet<TokenRoleAssetInfo>?,
 
     @field:JsonSerialize(using = ToStringSerializer::class)
