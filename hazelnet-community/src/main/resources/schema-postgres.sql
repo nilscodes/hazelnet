@@ -478,7 +478,7 @@ ALTER TABLE "discord_spo_roles" ADD FOREIGN KEY ("discord_server_id") REFERENCES
 
 ALTER TABLE "discord_token_roles" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
-ALTER TABLE "discord_token_role_policies" ADD FOREIGN KEY ("discord_token_role_id") REFERENCES "discord_token_roles" ("discord_token_role_id");
+ALTER TABLE "discord_token_role_policies" ADD FOREIGN KEY ("discord_token_role_id") REFERENCES "discord_token_roles" ("discord_token_role_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_token_role_filters" ADD FOREIGN KEY ("discord_token_role_id") REFERENCES "discord_token_roles" ("discord_token_role_id") ON DELETE CASCADE;
 

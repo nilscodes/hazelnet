@@ -1,5 +1,6 @@
 const i18n = require('i18n');
 const cardanotoken = require('./cardanotoken');
+const discordstring = require('./discordstring');
 
 module.exports = {
   getTokenRoleDetailsText(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
@@ -37,11 +38,16 @@ module.exports = {
       metadataFilters = cardanotoken.buildMetadataFilterContentText(tokenRole.filters, tokenRole.aggregationType, locale);
 
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
-        const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint: acceptedAsset.assetFingerprint }) : '';
-        const policyId = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || acceptedAsset.policyId;
+        const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint: discordstring.ensureLength(acceptedAsset.assetFingerprint, 15) }) : '';
+        const policyId = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || discordstring.ensureLength(acceptedAsset.policyId, 10);
         return i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContentEntry', locale }, { policyId, fingerprintInfo });
-      }).join('\n');
-      acceptedPolicies = `\n${i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesTitle', locale })}\n${policyInfo}`;
+      });
+      if (policyInfo.length > 5) {
+        policyInfo.splice(5);
+        policyInfo.push(i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContentAndMore', locale }, { additionalPolicyCount: tokenRole.acceptedAssets.length - 5 }));
+      }
+      const policyInfoText = policyInfo.join('\n');
+      acceptedPolicies = `\n${i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesTitle', locale })}\n${policyInfoText}`;
     }
     return {
       name: title,

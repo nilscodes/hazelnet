@@ -713,6 +713,7 @@
 				"add": {
 					"policiesTitle": "**Accepted Policies**",
 					"policiesContentEntry": "• {{policyId}} {{{fingerprintInfo}}}",
+					"policiesContentAndMore": "• and {{additionalPolicyCount}} more...",
 					"policiesContent": "{{policyId}} {{{fingerprintInfo}}}",
 					"fingerprintInfo": "with the asset fingerprint *{{assetFingerprint}}* ",
 					"fingerprintInfoShort": " ({{assetFingerprint}})",
