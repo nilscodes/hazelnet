@@ -14,7 +14,7 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       const tokenRoleToAddPolicyTo = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToAddPolicyTo) {
-        const maxPoliciesPerTokenRole = await interaction.client.services.globalsettings.getGlobalSetting('MAX_POLICIES_PER_TOKEN_ROLE') || 50;
+        const maxPoliciesPerTokenRole = discordServer.settings?.MAX_POLICIES_PER_TOKEN_ROLE ?? 50;
         if (!tokenRoleToAddPolicyTo.acceptedAssets || tokenRoleToAddPolicyTo.acceptedAssets.length < maxPoliciesPerTokenRole) {
           if (cardanotoken.isValidPolicyId(policyId)) {
             if (assetFingerprint === null || cardanotoken.isValidAssetFingerprint(assetFingerprint)) {
