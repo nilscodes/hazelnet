@@ -14,6 +14,7 @@ data class MintAnnouncement @JsonCreator constructor(
     val channelId: Long,
 
     val policyId: String,
+    val assetFingerprint: String,
     val assetNameHex: String,
     val assetName: String,
     val displayName: String,

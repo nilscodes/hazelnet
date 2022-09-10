@@ -43,6 +43,18 @@ class ConnectService(
             .block()!!
     }
 
+    fun findHandlesForStakeAddress(
+        stakeAddresses: List<String>,
+    ): List<Handle> {
+        return Flux.fromIterable(stakeAddresses)
+            .flatMap {
+                connectClient.get()
+                    .uri("/token/stake/{stakeAddress}/handles", it)
+                    .retrieve()
+                    .bodyToFlux(Handle::class.java)
+            }.collectList().block()!!
+    }
+
     fun getWalletForAsset(assetFingerprint: String): AddressDetails {
         return connectClient.get()
             .uri("/token/fingerprints/$assetFingerprint")

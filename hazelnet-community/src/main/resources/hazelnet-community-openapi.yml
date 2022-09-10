@@ -134,6 +134,21 @@ paths:
       responses:
         '204':
           description: 'Successful deletion'
+  /accounts/{accountId}/handles:
+    get:
+      summary: Get all ADA Handles available to external accounts linked to this account
+      operationId: getHandlesForAccount
+      tags:
+        - account
+      parameters:
+        - $ref: '#/components/parameters/AccountIdPathParameter'
+      responses:
+        '200':
+          description: 'List of assets'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Handle'
   /externalaccounts:
     post:
       summary: 'Create External Account'
@@ -3128,6 +3143,15 @@ components:
           $ref: '#/components/schemas/DiscordUser'
         roleId:
           $ref: '#/components/schemas/DiscordRole'
+    Handle:
+      type: object
+      properties:
+        handle:
+          $ref: '#/components/schemas/HandleName'
+        address:
+          $ref: '#/components/schemas/WalletAddress'
+        resolved:
+          type: boolean
     DiscordServerId:
       readOnly: true
       type: integer
@@ -3182,6 +3206,10 @@ components:
       description: The fingerprint of an asset
       example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
       pattern: '^asset1[A-Za-z-0-9]{38}$'
+    HandleName:
+      type: string
+      example: hazelnet
+      pattern: '^[-._a-zA-Z0-9]{1,15}$'
     HandleWithPrefix:
       type: string
       example: $hazelnet

@@ -14,9 +14,13 @@ class TokenController(
     @ResponseStatus(HttpStatus.OK)
     fun getMultiAssetCountsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetCountsForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
 
-    @GetMapping("/stake/{stakeAddress}/handle")
+    @GetMapping("/stake/{stakeAddress}/besthandle")
     @ResponseStatus(HttpStatus.OK)
     fun findBestHandleForStakeAddress(@PathVariable stakeAddress: String) = tokenService.findBestHandleForStakeAddress(stakeAddress)
+
+    @GetMapping("/stake/{stakeAddress}/handles")
+    @ResponseStatus(HttpStatus.OK)
+    fun findHandlesForStakeAddress(@PathVariable stakeAddress: String) = tokenService.findHandlesForStakeAddress(stakeAddress)
 
     @PostMapping("/stake/{stakeAddress}/assets")
     @ResponseStatus(HttpStatus.OK)

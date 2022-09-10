@@ -43,4 +43,8 @@ class AccountController(
     @DeleteMapping("/{accountId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteSetting(@PathVariable accountId: Long, @PathVariable settingName: String) = accountService.deleteSettings(accountId, settingName)
+
+    @GetMapping("/{accountId}/handles")
+    @ResponseStatus(HttpStatus.OK)
+    fun getHandlesForAccount(@PathVariable accountId: Long) = accountService.getHandlesForAccount(accountId)
 }

@@ -1,6 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.CommunityApplicationConfiguration
+import io.hazelnet.community.data.Account
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.ExternalAccountPremiumInfo
 import io.hazelnet.community.data.Verification
@@ -30,6 +31,9 @@ class ExternalAccountService(
     }
 
     fun getExternalAccount(externalAccountId: Long): ExternalAccount = externalAccountRepository.findById(externalAccountId).orElseThrow()
+
+    fun getExternalAccountsForAccount(account: Account): List<ExternalAccount> = externalAccountRepository.findByAccount(account)
+
     fun setExternalAccountForDiscordUser(externalAccount: ExternalAccount, discordUserId: Long): ExternalAccount {
         val existingExternalAccount = externalAccountRepository.findByReferenceId(discordUserId.toString())
         if(existingExternalAccount.isEmpty || existingExternalAccount.get().type != ExternalAccountType.DISCORD)

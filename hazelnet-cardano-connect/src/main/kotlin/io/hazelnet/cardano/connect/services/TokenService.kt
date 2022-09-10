@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-@CacheConfig(cacheNames = ["tokenmetadata", "handleforstake"])
+@CacheConfig(cacheNames = ["tokenmetadata", "besthandleforstake"])
 class TokenService(
     @Value("\${io.hazelnet.connect.cardano.handlepolicy}")
     private val handlePolicy: String,
@@ -112,7 +112,7 @@ class TokenService(
     }
 
 
-    @Cacheable(cacheNames = ["handleforstake"])
+    @Cacheable(cacheNames = ["besthandleforstake"])
     fun findBestHandleForStakeAddress(stakeAddress: String): Handle {
         val shortestHandle = getMultiAssetListForStakeAddress(stakeAddress, listOf(handlePolicy))
             .find { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
@@ -122,6 +122,14 @@ class TokenService(
         } else {
             Handle(handle = "", resolved = false)
         }
+    }
+
+    fun findHandlesForStakeAddress(stakeAddress: String): List<Handle> {
+        return getMultiAssetListForStakeAddress(stakeAddress, listOf(handlePolicy))
+            .filter { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
+            .map { it.assetList }
+            .flatten()
+            .map { Handle(handle = it, resolved = false) }
     }
 
     private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Pair<List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
@@ -147,7 +155,7 @@ class TokenService(
     }
 
     @Scheduled(fixedDelay = 60 * 60 * 1000)
-    @CacheEvict(allEntries = true, cacheNames = ["handleforstake"], )
+    @CacheEvict(allEntries = true, cacheNames = ["besthandleforstake"], )
     fun clearHandleToStakeAddressCache() {
         // Annotation-based cache clearing of handle info every hour in case handle moves
     }
