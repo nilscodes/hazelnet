@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import com.bloxbean.cardano.client.util.AssetUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.hazelnet.cardano.connect.data.token.AssetFingerprint
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
@@ -90,11 +91,11 @@ class OuraEventService(
                     val assetName = mintToProcess.assetNameHex.decodeHex()
                     val metadataOfAsset = metadataOfPolicy[assetName] as Map<String, Any>?
                     if (metadataOfAsset is Map<String, Any>) {
+
                         val combinedAssetInfo = MultiAssetInfo(
                             policyId = PolicyId(mintToProcess.policyId),
                             assetName = assetName,
-                            // TODO Should not be a hardcoded fingerprint
-                            assetFingerprint = AssetFingerprint("asset1sffpcjr0es7zu6dxrhnz3lqppq66ceacknufwy"),
+                            assetFingerprint = AssetFingerprint(AssetUtil.calculateFingerPrint(mintToProcess.policyId, mintToProcess.assetNameHex)),
                             metadata = ObjectMapper().writeValueAsString(metadataOfAsset),
                             mintTransaction = mintToProcess.transactionHash,
                             quantity = mintToProcess.quantity,
@@ -108,10 +109,11 @@ class OuraEventService(
                                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                                     channelId = it.channelId,
                                     policyId = mintToProcess.policyId,
+                                    assetFingerprint = combinedAssetInfo.assetFingerprint.assetFingerprint,
                                     assetNameHex = mintToProcess.assetNameHex,
                                     assetName = combinedAssetInfo.assetName,
                                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),
-                                    assetImageUrl = getImageUrlFromAssetInfo(config, combinedAssetInfo),
+                                    assetImageUrl = getImageUrlFromAssetInfo(config.ipfslink!!, combinedAssetInfo),
                                     mintDate = mintToProcess.date,
                                     rarityRank = 0,
                                     highlightAttributeDisplayName = it.highlightAttributeDisplayName,

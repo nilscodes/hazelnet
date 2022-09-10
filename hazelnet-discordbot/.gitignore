@@ -90,3 +90,4 @@ typings/
 # HAZELnet dev
 .env
 .vscode
+dist

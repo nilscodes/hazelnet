@@ -5,10 +5,10 @@ import com.jayway.jsonpath.PathNotFoundException
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 
-fun getImageUrlFromAssetInfo(config: CommunityApplicationConfiguration, assetInfo: MultiAssetInfo): String? {
+fun getImageUrlFromAssetInfo(ipfslink: String, assetInfo: MultiAssetInfo): String? {
     return try {
         val ipfsLink = JsonPath.read<String>(assetInfo.metadata, "$.image").replace("ipfs://", "", true)
-        String.format(config.ipfslink ?: "%s", ipfsLink)
+        String.format(ipfslink ?: "%s", ipfsLink)
     } catch(pnfe: PathNotFoundException) {
         null
     }

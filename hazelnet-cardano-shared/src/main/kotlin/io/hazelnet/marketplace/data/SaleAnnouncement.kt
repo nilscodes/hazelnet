@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
+import io.hazelnet.cardano.connect.data.token.AssetFingerprint
 import java.util.*
 
 data class SaleAnnouncement @JsonCreator constructor(
@@ -14,6 +15,7 @@ data class SaleAnnouncement @JsonCreator constructor(
     val channelId: Long,
 
     val policyId: String,
+    val assetFingerprint: String,
     val assetNameHex: String,
     val assetName: String,
     val displayName: String,

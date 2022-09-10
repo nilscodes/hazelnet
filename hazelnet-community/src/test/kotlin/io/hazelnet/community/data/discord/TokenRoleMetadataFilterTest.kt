@@ -145,6 +145,21 @@ const val METADATA_ADAGOTCHI_1 = """{
         "name": "Adagotchi #0662"
       }"""
 
+const val METADATA_HANDLE_1 = """{
+        "augmentations": [],
+        "core": {
+          "handleEncoding": "utf-8",
+          "og": 0,
+          "prefix": "${'$'}",
+          "termsofuse": "https://adahandle.com/tou",
+          "version": 0
+        },
+        "description": "The Handle Standard",
+        "image": "ipfs://QmczJUxq6FqURyHv5UGAKDaXchZoneoU2jUuvQfAUmAzBv",
+        "name": "${'$'}1982",
+        "website": "https://adahandle.com"
+      }"""
+
 internal class TokenRoleMetadataFilterTest {
     @Test
     fun testEquals() {
@@ -281,6 +296,8 @@ internal class TokenRoleMetadataFilterTest {
     fun testRegex() {
         val matchingSampleFilter = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.REGEX, "[0-9]{4}$")
         assertTrue(matchingSampleFilter.apply(METADATA_DEADPXLZ_2))
+        val matchingSampleFilterHandle = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.REGEX, "^\\$[0-9]{1,4}$")
+        assertTrue(matchingSampleFilterHandle.apply(METADATA_HANDLE_1))
         val nonMatchingSampleFilter = TokenRoleMetadataFilter(0, "name", AttributeOperatorType.REGEX, "[0-9]{4}$")
         assertFalse(nonMatchingSampleFilter.apply(METADATA_DEADPXLZ_1))
     }

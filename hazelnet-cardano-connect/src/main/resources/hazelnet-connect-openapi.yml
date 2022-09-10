@@ -227,7 +227,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /token/stake/{stakeAddress}/handle:
+  /token/stake/{stakeAddress}/besthandle:
     get:
       summary: 'Find the most distinctive handle belonging to a stake address'
       operationId: findBestHandleForStakeAddress
@@ -244,6 +244,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Handle'
+  /token/stake/{stakeAddress}/handles:
+    get:
+      summary: 'Find all handles belonging to a stake address. Does not resolve the handles for the list!'
+      operationId: findHandlesForStakeAddress
+      tags:
+        - handles
+        - addresses
+        - token
+      parameters:
+        - $ref: '#/components/parameters/StakeAddressPathParameter'
+      responses:
+        '200':
+          description: 'Handle details'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Handle'
   /token/stake/{stakeAddress}/assets:
     post:
       summary: Get the policy IDs and token names that currently reside in a stake address, filtered by the policy IDs in the body (or all, if empty list)

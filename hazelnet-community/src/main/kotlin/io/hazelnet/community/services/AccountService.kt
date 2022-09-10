@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.community.data.Account
 import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.persistence.AccountRepository
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service
 class AccountService(
     private val accountRepository: AccountRepository,
     private val externalAccountService: ExternalAccountService,
+    private val connectService: ConnectService,
 ) {
     fun createAccount(account: Account): Account = accountRepository.save(account)
 
@@ -40,6 +42,14 @@ class AccountService(
             return newAccount
         }
         return externalAccount.account!!
+    }
+
+    fun getHandlesForAccount(accountId: Long): List<Handle> {
+        val account = getAccount(accountId)
+        val verifiedStakeAddresses = externalAccountService.getExternalAccountsForAccount(account)
+            .map { externalAccountService.getVerifiedStakeAddressesForExternalAccount(it.id!!) }
+            .flatten()
+        return connectService.findHandlesForStakeAddress(verifiedStakeAddresses)
     }
 
 }
