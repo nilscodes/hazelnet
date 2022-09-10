@@ -43,7 +43,7 @@ module.exports = {
     return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentBuy', locale }, saleAnnouncement);
   },
   getSaleAnnouncementComponents(discordServer, mintAnnouncement) {
-    const componentsToAdd = discordServer.settings.SALES_TRACKER_BUTTONS?.split(',') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
+    const componentsToAdd = discordServer.settings.SALES_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, mintAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new MessageActionRow().addComponents(components)];
@@ -76,7 +76,7 @@ module.exports = {
     return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, listingAnnouncement);
   },
   getListingAnnouncementComponents(discordServer, listingAnnouncement) {
-    const componentsToAdd = discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
+    const componentsToAdd = discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, listingAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new MessageActionRow().addComponents(components)];
@@ -131,7 +131,7 @@ module.exports = {
     return i18n.__({ phrase: 'configure.marketplace.mint.announce.itemContentMint', locale }, mintAnnouncement);
   },
   getMintAnnouncementComponents(discordServer, mintAnnouncement) {
-    const componentsToAdd = discordServer.settings.MINT_TRACKER_BUTTONS?.split(',') ?? ['PIXLPAGE', 'CNFTJUNGLE'];
+    const componentsToAdd = discordServer.settings.MINT_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, mintAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new MessageActionRow().addComponents(components)];
