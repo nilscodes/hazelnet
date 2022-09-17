@@ -1,16 +1,24 @@
-const i18n = require('i18n');
+import { DiscordEvent } from "src/utility/commandtypes";
+
+import i18n from 'i18n';
+import { ChannelType, Message, TextBasedChannel } from "discord.js";
+import { AugmentedMessage } from "src/utility/hazelnetclient";
 const adahandle = require('../utility/adahandle');
 const cardanoaddress = require('../utility/cardanoaddress');
 const embedBuilder = require('../utility/embedbuilder');
 const ethereumaddress = require('../utility/ethereumaddress');
 
-module.exports = {
+interface MessageCreateDiscordEvent extends DiscordEvent {
+  execute(message: AugmentedMessage): void
+}
+
+export default <MessageCreateDiscordEvent> {
   name: 'messageCreate',
   async execute(message) {
-    const isSentByHazelnet = message.author.id === message.client.application.id;
+    const isSentByHazelnet = message.author.id === message.client.application?.id;
     if (!isSentByHazelnet) {
-      if (message.channel.type === 'DM') {
-        const claimCommand = message.client.commands.get('claim');
+      if (message.channel.type === ChannelType.DM) {
+        const claimCommand: any = message.client.commands.get('claim');
         await claimCommand.processDirectMessage(message);
       } else if (message.content) {
         const containsCardanoAddress = cardanoaddress.containsWalletOrEnterpriseAddress(message.content);
@@ -29,7 +37,7 @@ module.exports = {
               ) {
                 if (discordServer?.settings?.PROTECTION_AUDIT_CHANNEL !== '') {
                   try {
-                    const channel = await message.guild.channels.fetch(discordServer.settings.PROTECTION_AUDIT_CHANNEL);
+                    const channel = await message.guild?.channels.fetch(discordServer.settings.PROTECTION_AUDIT_CHANNEL) as TextBasedChannel;
                     if (channel && channel.send) {
                       const useLocale = discordServer.getBotLanguage();
 

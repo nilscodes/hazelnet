@@ -26,7 +26,7 @@ module.exports = {
                 });
                 await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleToAddPolicyTo.id, tokenRoleToAddPolicyTo.acceptedAssets);
                 const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles policies add', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }), 'configure-tokenroles-policies-add', [
-                  tokenroles.getTokenRoleDetailsText(tokenRoleToAddPolicyTo, discordServer, locale, true),
+                  tokenroles.getTokenRoleDetailsFields(tokenRoleToAddPolicyTo, discordServer, locale, true),
                 ]);
                 await interaction.editReply({ embeds: [embed], ephemeral: true });
               } else {

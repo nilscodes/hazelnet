@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 
@@ -25,12 +25,12 @@ module.exports = {
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('configure-premium/refill/canceloutstanding')
               .setLabel(i18n.__({ phrase: 'configure.premium.refill.cancelOutstanding', locale }))
-              .setStyle('DANGER'),
+              .setStyle(ButtonStyle.Danger),
           ),
         ];
         const expirationDateTimestamp = Math.floor(new Date(existingIncomingPayment.validBefore).getTime() / 1000);

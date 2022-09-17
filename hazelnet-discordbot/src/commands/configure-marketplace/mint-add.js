@@ -1,6 +1,11 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const {
+  ActionRowBuilder,
+  SelectMenuBuilder,
+  ChannelType,
+  PermissionsBitField,
+} = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const marketplaceUtil = require('../../utility/marketplace');
 
@@ -19,9 +24,9 @@ module.exports = {
           .filter((channel) => channel.type === 'MINT');
         const maxMintTrackerCount = discordServer.settings?.MAXIMUM_MINT_TRACKERS ?? 1;
         if (marketplaceChannels.length < maxMintTrackerCount) {
-          if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
+          if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
             const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-            if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
+            if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
               if (policyIdToTrack) {
                 const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
                 if (officialProjectForPolicy) {
@@ -50,9 +55,9 @@ module.exports = {
                     highlightAttributeName,
                     highlightAttributeDisplayName: highlightAttributeName,
                   });
-                  const components = [new MessageActionRow()
+                  const components = [new ActionRowBuilder()
                     .addComponents(
-                      new MessageSelectMenu()
+                      new SelectMenuBuilder()
                         .setCustomId('configure-marketplace/mint-add/add')
                         .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.mint.add.chooseProject', locale }))
                         .addOptions(officialProjects.slice(0, 25)),

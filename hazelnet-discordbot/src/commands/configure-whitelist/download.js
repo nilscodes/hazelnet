@@ -1,5 +1,5 @@
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu, MessageAttachment } = require('discord.js');
+const { ActionRowBuilder, SelectMenuBuilder, AttachmentBuilder } = require('discord.js');
 const csvStringify = require('csv-stringify/sync');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
@@ -20,9 +20,9 @@ module.exports = {
       }));
       const whitelistOptions = [...localWhitelistOptions, ...sharedWhitelists];
       if (whitelistOptions.length) {
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
               .setCustomId('configure-whitelist/download/complete')
               .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale }))
               .addOptions(whitelistOptions),
@@ -104,7 +104,7 @@ module.exports = {
     const csvList = this.getCsvContent(whitelist, signups);
     const csv = csvStringify.stringify(csvList);
     const csvBuffer = Buffer.from(csv, 'utf8');
-    const fileToDownload = new MessageAttachment(csvBuffer, `hazelnet-${guildId}-whitelist-${whitelistName}.csv`);
+    const fileToDownload = new AttachmentBuilder(csvBuffer, { name: `hazelnet-${guildId}-whitelist-${whitelistName}.csv` });
     fileToDownload.setDescription('HAZELnet Whitelist Signups Download');
     return fileToDownload;
   },

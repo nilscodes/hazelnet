@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageSelectMenu } from "discord.js";
+import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
 import { BotSubcommand } from "src/utility/commandtypes";
 import i18n from 'i18n';
 const embedBuilder = require('../../utility/embedbuilder');
@@ -10,7 +10,7 @@ type ToggleSetting = {
 
 interface ToggleCommand extends BotSubcommand {
   getProfileFields(accountSettings: any, locale: string): object
-  getSelectMenu(accountSettings: any, locale: string): MessageActionRow[]
+  getSelectMenu(accountSettings: any, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
   getToggleSettings(): ToggleSetting[]
 }
 
@@ -47,9 +47,9 @@ export default <ToggleCommand> {
     }];
   },
   getSelectMenu(accountSettings, locale) {
-    return [new MessageActionRow()
+    return [new ActionRowBuilder()
       .addComponents(
-        new MessageSelectMenu()
+        new SelectMenuBuilder()
           .setCustomId('profile/toggle/complete')
           .setPlaceholder(i18n.__({ phrase: 'profile.toggle.chooseSetting', locale }))
           .addOptions(this.getToggleSettings().map((setting) => {

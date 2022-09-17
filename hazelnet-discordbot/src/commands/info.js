@@ -1,7 +1,7 @@
 const i18n = require('i18n');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, ButtonStyle } = require('discord.js');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder,
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
@@ -53,13 +53,13 @@ module.exports = {
           try {
             const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS);
             if (buttonData.length) {
-              components = [new MessageActionRow()
+              components = [new ActionRowBuilder()
                 .addComponents(
                   buttonData.map((button) => (
-                    new MessageButton()
+                    new ButtonBuilder()
                       .setLabel(button.label)
                       .setURL(button.url)
-                      .setStyle('LINK')
+                      .setStyle(ButtonStyle.Link)
                   )),
                 )];
             }

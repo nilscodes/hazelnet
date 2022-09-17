@@ -11,9 +11,13 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }), 'configure-tokenroles-details', [
-          tokenroles.getTokenRoleDetailsText(tokenRoleToShow, discordServer, locale, true),
-        ]);
+        const embed = embedBuilder.buildForAdmin(
+          discordServer,
+          '/configure-tokenroles details',
+          i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
+          'configure-tokenroles-details',
+          tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, discordServer, locale, true),
+        );
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles details', i18n.__({ phrase: 'configure.tokenroles.list.errorNotFound', locale }, { tokenRoleId }), 'configure-tokenroles-details');

@@ -1,5 +1,5 @@
 const i18n = require('i18n');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
   buildForUserWithAd(externalAccount, discordServer, title, message, commandId, fields, image) {
@@ -35,7 +35,7 @@ module.exports = {
     }, image, footer);
   },
   buildFullyCustom(color, thumbnail, title, message, fields, author, image, footer) {
-    const baseEmbed = new MessageEmbed()
+    const baseEmbed = new EmbedBuilder()
       .setColor(color)
       .setTitle(title)
       .setAuthor(author)

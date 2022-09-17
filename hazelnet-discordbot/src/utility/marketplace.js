@@ -1,5 +1,5 @@
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const i18n = require('i18n');
 const cardanotoken = require('./cardanotoken');
@@ -46,7 +46,7 @@ module.exports = {
     const componentsToAdd = discordServer.settings.SALES_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, mintAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
-      return [new MessageActionRow().addComponents(components)];
+      return [new ActionRowBuilder().addComponents(components)];
     }
     return [];
   },
@@ -79,38 +79,38 @@ module.exports = {
     const componentsToAdd = discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['MARKETPLACE', 'PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, listingAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
-      return [new MessageActionRow().addComponents(components)];
+      return [new ActionRowBuilder().addComponents(components)];
     }
     return [];
   },
   generateLink(linkType, linkData, locale) {
     switch (linkType) {
       case 'MARKETPLACE':
-        return new MessageButton()
+        return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnMarketplace', locale }))
           .setURL(linkData.marketplaceAssetUrl)
-          .setStyle('LINK');
+          .setStyle(ButtonStyle.Link);
       case 'PIXLPAGE':
-        return new MessageButton()
+        return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnPixlPage', locale }))
           .setURL(`https://pixl.page/asset/${linkData.policyId}${linkData.assetNameHex}`)
-          .setStyle('LINK');
+          .setStyle(ButtonStyle.Link);
       case 'CNFTJUNGLE':
-        return new MessageButton()
+        return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnCnftJungle', locale }))
           .setURL(`https://www.cnftjungle.io/collections/${linkData.policyId}?assetId=${linkData.policyId}.${encodeURIComponent(linkData.assetName)}`)
-          .setStyle('LINK');
+          .setStyle(ButtonStyle.Link);
       case 'POOLPMHANDLE':
-        return new MessageButton()
+        return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnPoolPm', locale }))
           .setURL(`https://pool.pm/$${linkData.assetName}`)
-          .setStyle('LINK');
+          .setStyle(ButtonStyle.Link);
       case 'POOLPM':
       default:
-        return new MessageButton()
+        return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnPoolPm', locale }))
           .setURL(`https://pool.pm/${linkData.assetFingerprint}`)
-          .setStyle('LINK');
+          .setStyle(ButtonStyle.Link);
     }
   },
   createMintAnnouncementFields(mintAnnouncement, locale) {
@@ -134,7 +134,7 @@ module.exports = {
     const componentsToAdd = discordServer.settings.MINT_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? ['PIXLPAGE', 'CNFTJUNGLE'];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, mintAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
-      return [new MessageActionRow().addComponents(components)];
+      return [new ActionRowBuilder().addComponents(components)];
     }
     return [];
   },

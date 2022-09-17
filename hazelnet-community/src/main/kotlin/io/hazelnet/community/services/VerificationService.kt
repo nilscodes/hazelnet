@@ -4,6 +4,8 @@ import io.hazelnet.community.data.*
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationImportRepository
 import io.hazelnet.community.persistence.VerificationRepository
+import io.micrometer.core.instrument.Gauge
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -25,7 +27,23 @@ class VerificationService(
     private val accountService: AccountService,
     private val globalCommunityService: GlobalCommunityService,
     private val roleAssignmentService: RoleAssignmentService,
+    meterRegistry: MeterRegistry,
 ) {
+
+    init {
+        Gauge.builder("lifetime_verification_count", verificationRepository) {
+            it.count().toDouble()
+        }
+            .description("Lifetime number of verification attempts")
+            .register(meterRegistry)
+
+        Gauge.builder("active_verification_count", verificationRepository) {
+            it.countByConfirmedEqualsAndObsoleteEquals(confirmed = true, obsolete = false).toDouble()
+        }
+            .description("Currently active verified stake addresses")
+            .register(meterRegistry)
+    }
+
     @Transactional
     fun createVerificationRequest(verificationRequest: VerificationRequest): Verification {
         val associatedExternalAccount = externalAccountRepository.findById(verificationRequest.externalAccountId)

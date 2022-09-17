@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 
@@ -31,16 +31,16 @@ module.exports = {
               roleId: role.id,
             });
 
-            const components = [new MessageActionRow()
+            const components = [new ActionRowBuilder()
               .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                   .setCustomId('configure-delegatorroles/add/confirm')
                   .setLabel(i18n.__({ phrase: 'configure.delegatorroles.add.confirmRole', locale }))
-                  .setStyle('PRIMARY'),
-                new MessageButton()
+                  .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
                   .setCustomId('configure-delegatorroles/add/cancel')
                   .setLabel(i18n.__({ phrase: 'generic.cancel', locale }))
-                  .setStyle('SECONDARY'),
+                  .setStyle(ButtonStyle.Secondary),
               )];
 
             const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseWarning', locale }), i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseDetails', locale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-delegatorroles-add');

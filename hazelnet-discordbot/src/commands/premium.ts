@@ -1,13 +1,26 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const i18n = require('i18n');
-const {
-  MessageActionRow, MessageButton,
-} = require('discord.js');
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder } from 'discord.js';
+import i18n from 'i18n';
+import { BotCommand } from 'src/utility/commandtypes';
+import { AugmentedButtonInteraction, AugmentedCommandInteraction } from 'src/utility/hazelnetclient';
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+type InterfaceInfo = {
+  image: string
+  text: string
+}
+type EmbedParts = {
+  embed: any
+  components: ActionRowBuilder<MessageActionRowComponentBuilder>[]
+}
+
+interface PremiumCommand extends BotCommand {
+  getGiveawayInfo(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction): Promise<InterfaceInfo>
+  showPremiumEmbed(externalAccount: any, discordMemberInfo: any, premiumInfo: any, locale: string, discordServer: any, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
+}
+
+export default <PremiumCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('premium', locale);
     return new SlashCommandBuilder()
@@ -19,10 +32,10 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
       const useLocale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild.id, externalAccount.id);
+      const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild?.id, externalAccount.id);
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
@@ -33,10 +46,10 @@ module.exports = {
       }
 
       const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
-      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
+      await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
   async getGiveawayInfo(interaction) {
@@ -53,25 +66,25 @@ module.exports = {
       name: i18n.__({ phrase: 'premium.premiumStatus', locale }),
       value: i18n.__({ phrase: (premiumInfo.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink }),
     }];
-    let components = [];
+    let components: ActionRowBuilder<AnyComponentBuilder>[] = [];
     if (premiumInfo.premium) {
       let serverSupport = i18n.__({ phrase: 'premium.serverSupportNo', locale });
       const pledgedServerCount = premiumInfo.discordServers.length;
       if (pledgedServerCount) {
         const stakeAmountPerServer = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / pledgedServerCount / 1000000));
-        serverSupport = i18n.__({ phrase: 'premium.serverSupportYes', locale }, { stakeAmountPerServer }) + premiumInfo.discordServers.map((serverName) => i18n.__({ phrase: 'premium.serverSupportEntry', locale }, { serverName })).join('\n');
+        serverSupport = i18n.__({ phrase: 'premium.serverSupportYes', locale }, { stakeAmountPerServer }) + premiumInfo.discordServers.map((serverName: string) => i18n.__({ phrase: 'premium.serverSupportEntry', locale }, { serverName })).join('\n');
       }
       premiumFields.push({
         name: i18n.__({ phrase: 'premium.serverSupport', locale }),
         value: serverSupport,
       });
       if (discordMemberInfo) {
-        components = [new MessageActionRow()
+        components = [new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId(`premium/${discordMemberInfo.premiumSupport ? 'disable' : 'enable'}`)
               .setLabel(i18n.__({ phrase: (discordMemberInfo.premiumSupport ? 'premium.pledgeButtonNo' : 'premium.pledgeButtonYes'), locale }, discordServer))
-              .setStyle(discordMemberInfo.premiumSupport ? 'DANGER' : 'PRIMARY'),
+              .setStyle(discordMemberInfo.premiumSupport ? ButtonStyle.Danger : ButtonStyle.Primary),
           ),
         ];
       } else {
@@ -99,17 +112,17 @@ module.exports = {
   async executeButton(interaction) {
     if (interaction.customId === 'premium/disable' || interaction.customId === 'premium/enable') {
       await interaction.deferUpdate();
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
       const useLocale = discordServer.getBotLanguage();
       const premiumSupport = (interaction.customId === 'premium/enable');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild.id, externalAccount.id, { premiumSupport });
+      const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild?.id, externalAccount.id, { premiumSupport });
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
 
       const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
-      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
+      await interaction.editReply({ embeds: [embed], components });
     }
   },
 };

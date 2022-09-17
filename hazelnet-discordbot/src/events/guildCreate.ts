@@ -1,6 +1,8 @@
+import { GuildDiscordEvent } from "src/utility/commandtypes";
+
 const commandRegistration = require('../utility/commandregistration');
 
-module.exports = {
+export default <GuildDiscordEvent> {
   name: 'guildCreate',
   async execute(guild) {
     try {
@@ -10,7 +12,7 @@ module.exports = {
         discordServer = await guild.client.services.discordserver.getDiscordServer(guild.id);
         discordServer.active = true;
         await guild.client.services.discordserver.updateDiscordServer(guild.id, { active: true });
-      } catch (getDiscordServerError) {
+      } catch (getDiscordServerError: any) {
         switch (getDiscordServerError.response?.status) {
           case 404:
             await guild.client.services.discordserver.registerDiscordServer(guild.id, guild.name, guild.ownerId, guild.memberCount);
@@ -20,7 +22,7 @@ module.exports = {
         }
       }
       if (discordServer?.settings?.BOT_NAME) {
-        const botObject = await guild.members.fetch(guild.client.application.id);
+        const botObject = await guild.members.fetch(guild.client.application?.id as string);
         await botObject.setNickname(discordServer.settings.BOT_NAME);
       }
     } catch (e) {

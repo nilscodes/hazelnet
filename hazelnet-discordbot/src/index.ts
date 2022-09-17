@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 import * as fs from 'fs';
 const path = require('path');
-import { Client, Collection, Intents } from 'discord.js';
+import { Collection, GatewayIntentBits, Partials } from 'discord.js';
 const i18n = require('i18n');
 const cron = require('node-cron');
 import express from 'express';
@@ -14,6 +14,12 @@ import amqplib from 'amqplib'
 import services from './services'
 import metrics from './utility/metrics';
 import HazelnetClient from './utility/hazelnetclient';
+import guildCreate from './events/guildCreate';
+import guildDelete from './events/guildDelete';
+import interactionCreate from './events/interactionCreate';
+import messageCreate from './events/messageCreate';
+import ready from './events/ready';
+import { DiscordEvent } from './utility/commandtypes';
 const commandbase = require('./utility/commandbase');
 
 // Configure localization singleton
@@ -29,8 +35,8 @@ const client = new HazelnetClient(
   pino(),
   new Collection(),
   metrics.setup(prometheus.register), {
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES],
-  partials: ['CHANNEL'],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
+  partials: [Partials.Channel],
 });
 
 const commandFiles = fs.readdirSync(__dirname + '/commands').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
@@ -64,17 +70,15 @@ commandFiles.forEach(async (file) => {
   }
 });
 
-const eventFiles = fs.readdirSync(__dirname + '/events').filter((file) => file.endsWith('.js'));
+const eventFiles = [guildCreate, guildDelete, interactionCreate, messageCreate, ready];
 
-eventFiles.forEach((file) => {
-  const event = require(`./events/${file}`);
-
+eventFiles.forEach((event: DiscordEvent) => {
   if (event.once) {
     client.logger.info(`Registering event ${event.name} (once-type)`);
-    client.once(event.name, (...args) => event.execute(...args));
+    client.once(event.name, event.execute);
   } else {
     client.logger.info(`Registering event ${event.name} (on-type)`);
-    client.on(event.name, (...args) => event.execute(...args));
+    client.on(event.name, event.execute);
   }
 });
 

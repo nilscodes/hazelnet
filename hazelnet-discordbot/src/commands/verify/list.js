@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const cardanoaddress = require('../../utility/cardanoaddress');
@@ -46,12 +46,12 @@ module.exports = {
             name: i18n.__({ phrase: 'verify.list.outstandingVerifications', locale }),
             value: outstandingVerifications.map((verification) => i18n.__({ phrase: 'verify.list.outstandingData', locale }, { verification, amount: verification.amount / 1000000 })).join('\n\n'),
           });
-          components.push(new MessageActionRow()
+          components.push(new ActionRowBuilder()
             .addComponents(
-              new MessageButton()
+              new ButtonBuilder()
                 .setCustomId('verify/list/canceloutstanding')
                 .setLabel(i18n.__({ phrase: 'verify.list.cancelOutstanding', locale }))
-                .setStyle('DANGER'),
+                .setStyle(ButtonStyle.Danger),
             ));
         }
         const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'verify.list.messageTitle', locale }), i18n.__({ phrase: 'verify.list.listVerificationsInfo', locale }), 'verify-list', verificationInfoFields);

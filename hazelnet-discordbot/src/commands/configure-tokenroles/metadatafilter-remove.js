@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu,
+  ActionRowBuilder, SelectMenuBuilder,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const tokenroles = require('../../utility/tokenroles');
@@ -14,9 +14,7 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       const tokenRoleToRemoveFilterFrom = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToRemoveFilterFrom) {
-        const tokenRoleInfo = [
-          tokenroles.getTokenRoleDetailsText(tokenRoleToRemoveFilterFrom, discordServer, locale, true),
-        ];
+        const tokenRoleInfo = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, discordServer, locale, true);
         const components = this.createRemoveDropdown(discordServer, tokenRoleToRemoveFilterFrom);
         if (!components.length) {
           tokenRoleInfo.push({
@@ -38,9 +36,9 @@ module.exports = {
   createRemoveDropdown(discordServer, tokenRole) {
     if (tokenRole.filters?.length) {
       const locale = discordServer.getBotLanguage();
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-tokenroles/metadatafilter-remove/remove')
             .setPlaceholder(i18n.__({ phrase: 'configure.tokenroles.metadatafilter.remove.chooseRemove', locale }))
             .addOptions(tokenRole.filters.map((filter) => {
@@ -68,7 +66,7 @@ module.exports = {
         const filterId = +ids[1];
         await interaction.client.services.discordserver.deleteTokenRoleMetadataFilter(interaction.guild.id, tokenRoleToRemoveFilterFrom.id, filterId);
         tokenRoleToRemoveFilterFrom.filters = tokenRoleToRemoveFilterFrom.filters.filter((metadataFilter) => metadataFilter.id !== filterId);
-        const tokenRoleFields = [tokenroles.getTokenRoleDetailsText(tokenRoleToRemoveFilterFrom, discordServer, locale, true)];
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, discordServer, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter remove', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.remove.success', locale }), 'configure-tokenroles-metadatafilter-remove', tokenRoleFields);
         interaction.editReply({ components: [], ephemeral: true });
         await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });

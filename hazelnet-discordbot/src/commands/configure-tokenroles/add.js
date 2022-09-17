@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const cardanotoken = require('../../utility/cardanotoken');
@@ -42,16 +42,16 @@ module.exports = {
                       assetFingerprint,
                     });
 
-                    const components = [new MessageActionRow()
+                    const components = [new ActionRowBuilder()
                       .addComponents(
-                        new MessageButton()
+                        new ButtonBuilder()
                           .setCustomId('configure-tokenroles/add/confirm')
                           .setLabel(i18n.__({ phrase: 'configure.tokenroles.add.confirmRole', locale }))
-                          .setStyle('PRIMARY'),
-                        new MessageButton()
+                          .setStyle(ButtonStyle.Primary),
+                        new ButtonBuilder()
                           .setCustomId('configure-tokenroles/add/cancel')
                           .setLabel(i18n.__({ phrase: 'generic.cancel', locale }))
-                          .setStyle('SECONDARY'),
+                          .setStyle(ButtonStyle.Secondary),
                       )];
 
                     const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-tokenroles-add');
@@ -92,7 +92,7 @@ module.exports = {
     const tokenRole = newTokenRolePromise.data;
 
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale }), 'configure-tokenroles-add', [
-      tokenroles.getTokenRoleDetailsText(tokenRole, discordServer, locale),
+      tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale),
     ]);
     return embed;
   },

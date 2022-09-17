@@ -1,5 +1,5 @@
-const i18n = require('i18n');
-import { ContextMenuCommandBuilder, SlashCommandBuilder } from "@discordjs/builders";
+import i18n from 'i18n';
+import { ApplicationCommandType, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
 import { BotCommand } from "src/utility/commandtypes";
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
@@ -21,10 +21,9 @@ export default <WhoisCommand> {
     return builder;
   },
   getContextMenuData(locale) {
-    const ci18n = new CommandTranslations('whois', locale);
     return new ContextMenuCommandBuilder()
       .setName('Show ADA Handle')
-      .setType(2); // ApplicationCommandType.User does not work work due to TypeScript being weird
+      .setType(ApplicationCommandType.User);
   },
   commandTags: ['handle'],
   augmentPermissions: commandbase.augmentPermissionsUser,
@@ -35,7 +34,7 @@ export default <WhoisCommand> {
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const knownMarketplaces = JSON.parse(await interaction.client.services.globalsettings.getGlobalSetting('KNOWN_MARKETPLACE_ADDRESSES')) ?? {};
-      const addressOrHandle = interaction.options.getString('address-or-handle');
+      const addressOrHandle = interaction.options.getString('address-or-handle', true);
       let resolvedAddress = null;
       let handle = null;
       let resolvedHandle = null;
@@ -84,8 +83,7 @@ export default <WhoisCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while getting poll list. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while getting whois information. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
   async executeUserContextMenu(interaction) {

@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 const i18n = require('i18n');
 const commandbase = require('../utility/commandbase');
 const embedBuilder = require('../utility/embedbuilder');
@@ -80,7 +80,7 @@ module.exports = {
       try {
         const auditChannelObject = await interaction.guild.channels.fetch(auditChannel);
         const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application.id);
-        if (!auditChannelPermissions.has('SEND_MESSAGES') || !auditChannelPermissions.has('VIEW_CHANNEL') || !auditChannelPermissions.has('EMBED_LINKS')) {
+        if (!auditChannelPermissions.has(PermissionsBitField.Flags.SendMessages) || !auditChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) || !auditChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
           problems = true;
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),

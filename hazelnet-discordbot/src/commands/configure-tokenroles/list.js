@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu,
+  ActionRowBuilder, SelectMenuBuilder,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const tokenroles = require('../../utility/tokenroles');
@@ -20,7 +20,8 @@ module.exports = {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortSelect';
       }
 
-      const tokenRoleFields = discordServer.tokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsText(tokenRole, discordServer, locale, false, customTokenRoleMessage));
+      const tokenRoleFieldsNested = discordServer.tokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale, false, customTokenRoleMessage));
+      const tokenRoleFields = tokenRoleFieldsNested.flat();
       if (!tokenRoleFields.length) {
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
       }
@@ -43,9 +44,9 @@ module.exports = {
   createDetailsDropdown(discordServer, maxForDropdown) {
     if (discordServer.tokenRoles.length > 0 && discordServer.tokenRoles.length <= maxForDropdown) {
       const locale = discordServer.getBotLanguage();
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-tokenroles/list/details')
             .setPlaceholder(i18n.__({ phrase: 'configure.tokenroles.list.chooseDetails', locale }))
             .addOptions(discordServer.tokenRoles.map((tokenRole) => ({
@@ -65,7 +66,7 @@ module.exports = {
       const tokenRoleId = +interaction.values[0].replace('token-role-id-', '');
       const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const tokenRoleFields = [tokenroles.getTokenRoleDetailsText(tokenRoleToShow, discordServer, locale, true)];
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, discordServer, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.detailsPurpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
         await interaction.followUp({ embeds: [embed], ephemeral: true });
       } else {

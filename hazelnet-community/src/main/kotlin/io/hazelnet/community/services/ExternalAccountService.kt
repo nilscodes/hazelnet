@@ -10,6 +10,8 @@ import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationRepository
 import io.hazelnet.shared.data.ExternalAccountType
+import io.micrometer.core.instrument.Gauge
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
@@ -24,7 +26,22 @@ class ExternalAccountService(
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
     private val connectService: ConnectService,
+    meterRegistry: MeterRegistry,
 ) {
+    init {
+        Gauge.builder("discord_lifetime_unique_user_count", externalAccountRepository) {
+            it.countByType(ExternalAccountType.DISCORD).toDouble()
+        }
+            .description("Lifetime number of unique Discord users interacting with the bot")
+            .register(meterRegistry)
+
+        Gauge.builder("discord_current_premium_user_count", externalAccountRepository) {
+            it.countByTypeAndPremium(ExternalAccountType.DISCORD, true).toDouble()
+        }
+            .description("Current number of premium Discord users")
+            .register(meterRegistry)
+    }
+
     fun createExternalAccount(externalAccount: ExternalAccount): ExternalAccount {
         externalAccount.registrationTime = Date.from(ZonedDateTime.now().toInstant())
         return externalAccountRepository.save(externalAccount)

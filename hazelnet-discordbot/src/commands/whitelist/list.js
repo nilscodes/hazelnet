@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
@@ -17,12 +17,12 @@ module.exports = {
       const components = [];
       if (signups.length) {
         components.push(
-          new MessageActionRow()
+          new ActionRowBuilder()
             .addComponents(
-              new MessageButton()
+              new ButtonBuilder()
                 .setCustomId('whitelist/list/withaddress')
                 .setLabel(i18n.__({ phrase: 'whitelist.list.showWithAddresses', locale }))
-                .setStyle('PRIMARY'),
+                .setStyle(ButtonStyle.Primary),
             ),
         );
       }

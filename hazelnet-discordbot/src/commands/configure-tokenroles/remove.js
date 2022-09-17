@@ -12,9 +12,8 @@ module.exports = {
       const tokenRoleToRemove = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleIdToRemove);
       if (tokenRoleToRemove) {
         await interaction.client.services.discordserver.deleteTokenRole(interaction.guild.id, tokenRoleToRemove.id);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale }), 'configure-tokenroles-remove', [
-          tokenroles.getTokenRoleDetailsText(tokenRoleToRemove, discordServer, locale, true),
-        ]);
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemove, discordServer, locale, true);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale }), 'configure-tokenroles-remove', tokenRoleFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.errorNotFound', locale }, { tokenRoleId: tokenRoleIdToRemove }), 'configure-tokenroles-remove');

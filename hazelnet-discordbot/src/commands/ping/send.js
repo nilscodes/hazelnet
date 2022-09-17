@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const adahandle = require('../../utility/adahandle');
 const cardanoaddress = require('../../utility/cardanoaddress');
@@ -60,12 +60,12 @@ module.exports = {
             value: i18n.__({ phrase: `ping.send.${externalAccount.premium ? 'pingLimitPremium' : 'pingLimitStandard'}`, locale }),
           }];
           const components = [
-            new MessageActionRow()
+            new ActionRowBuilder()
               .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                   .setCustomId('ping/send/send')
                   .setLabel(i18n.__({ phrase: 'ping.send.pingButton', locale }))
-                  .setStyle('PRIMARY'),
+                  .setStyle(ButtonStyle.Primary),
               ),
           ];
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: 'ping.send.purpose', locale }, { targetShort: cardanoaddress.shorten(target) }), 'ping-send', pingFields);
@@ -129,12 +129,12 @@ module.exports = {
               value: i18n.__({ phrase: 'ping.send.pingRecipientAdditionalContent', locale }),
             });
             const components = [
-              new MessageActionRow()
+              new ActionRowBuilder()
                 .addComponents(
-                  new MessageButton()
+                  new ButtonBuilder()
                     .setCustomId(`ping/send/report-${pingToSend.id}-${discordServer.id}`)
                     .setLabel(i18n.__({ phrase: 'ping.send.reportPing', locale }))
-                    .setStyle('SECONDARY'),
+                    .setStyle(ButtonStyle.Secondary),
                 ),
             ];
             let targetType = 'pingTargetTypeAddress';

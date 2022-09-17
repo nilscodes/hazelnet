@@ -21,9 +21,13 @@ module.exports = {
               const newMetadataFilter = await interaction.client.services.discordserver.addTokenRoleMetadataFilter(interaction.guild.id, tokenRoleToAddFilterTo.id, attributeName, operator, attributeValue);
               const effectiveFilters = [...(tokenRoleToAddFilterTo.filters ?? []), newMetadataFilter];
               tokenRoleToAddFilterTo.filters = effectiveFilters;
-              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter add', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }), 'configure-tokenroles-metadatafilter-add', [
-                tokenroles.getTokenRoleDetailsText(tokenRoleToAddFilterTo, discordServer, locale, true),
-              ]);
+              const embed = embedBuilder.buildForAdmin(
+                discordServer,
+                '/configure-tokenroles metadatafilter add',
+                i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
+                'configure-tokenroles-metadatafilter-add',
+                tokenroles.getTokenRoleDetailsFields(tokenRoleToAddFilterTo, discordServer, locale, true),
+              );
               await interaction.editReply({ embeds: [embed], ephemeral: true });
             } else {
               const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter add', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.errorAttributeValueLength', locale }, { maxLength: 128 }), 'configure-tokenroles-metadatafilter-add');

@@ -1,3 +1,4 @@
+const { ChannelType, PermissionsBitField } = require('discord.js');
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const embedBuilder = require('../../utility/embedbuilder');
@@ -12,9 +13,9 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
+      if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
+        if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
           const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
           const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
           this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, `${announceChannel.id}-${publishResults ? 1 : 0}`);

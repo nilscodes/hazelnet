@@ -1,10 +1,10 @@
 const i18n = require('i18n');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const commandPermissions = require('./commandpermissions');
 const embedBuilder = require('./embedbuilder');
 
 module.exports = {
-  typescriptCommands: ['whois', 'profile'],
+  typescriptCommands: ['whois', 'profile', 'premium', 'somersault', 'configure-api'],
   async executeSubcommandIfAdmin(interaction) {
     const subcommandGroup = interaction.options.getSubcommandGroup(false);
     const subcommand = interaction.options.getSubcommand(true);
@@ -97,12 +97,12 @@ module.exports = {
   },
   augmentPermissionsUser(json) {
     const adjustedJson = json;
-    adjustedJson.default_member_permissions = `${Permissions.FLAGS.USE_APPLICATION_COMMANDS}`;
+    adjustedJson.default_member_permissions = `${PermissionsBitField.Flags.UseApplicationCommands}`;
     return adjustedJson;
   },
   augmentPermissionsAdmin(json) {
     const adjustedJson = json;
-    adjustedJson.default_member_permissions = `${Permissions.FLAGS.MANAGE_GUILD}`;
+    adjustedJson.default_member_permissions = `${PermissionsBitField.Flags.ManageGuild}`;
     return adjustedJson;
   },
 };

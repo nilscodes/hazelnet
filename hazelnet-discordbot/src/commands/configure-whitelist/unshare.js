@@ -1,5 +1,5 @@
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
 
@@ -20,9 +20,9 @@ module.exports = {
           };
         });
       if (whitelistOptions.length) {
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
               .setCustomId('configure-whitelist/unshare/complete')
               .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale }))
               .addOptions(whitelistOptions),
