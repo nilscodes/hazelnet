@@ -149,8 +149,8 @@ module.exports = {
         label: discordstring.ensureLength(`${idx + 1}: ${option.text}`, 100),
         value: `vote-${poll.id}-option-${option.id}`,
         emoji: {
-          id: option.reactionId,
-          name: option.reactionName,
+          id: option.reactionId ?? undefined,
+          name: option.reactionName ?? undefined,
         },
       }));
       const components = [new ActionRowBuilder()

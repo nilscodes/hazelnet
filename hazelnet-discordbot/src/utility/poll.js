@@ -99,7 +99,7 @@ module.exports = {
         return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
       }).join('\n');
   },
-  getCurrentOptions(discordServer, poll) {
+  getCurrentOptions(poll) {
     return poll.options
       .map((option, idx) => (`${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`)).join('\n');
   },
@@ -127,7 +127,7 @@ module.exports = {
     } else {
       detailFields.push({
         name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
-        value: this.getCurrentOptions(discordServer, poll),
+        value: this.getCurrentOptions(poll),
       });
     }
 

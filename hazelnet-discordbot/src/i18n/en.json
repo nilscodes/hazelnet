@@ -681,6 +681,8 @@
 				"purpose": "This is the list of Discord roles that will be automatically assigned, based on token (NFT and FT) ownership by verified users.",
 				"detailsPurpose": "Information about the token role you selected:",
 				"noTokenRolesTitle": "No token roles",
+				"moreRolesTitle": "More roles",
+				"moreRoles": "There are {{moreCount}} additional token roles we cannot display at this time.",
 				"noTokenRolesDetail": "*Currently, this server has no token-based roles configured.*",
 				"tokenRoleNameOfficial": "Project \"{{{officialProject.projectName}}}\" (Role-ID: {{tokenRole.id}})",
 				"tokenRoleNameInofficial": "{{policyIdShort}} (Role-ID: {{tokenRole.id}})",
@@ -704,7 +706,7 @@
 			"metadatafilter": {
 				"add": {
 					"metadataFiltersTitle": "**Active Filters**",
-					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
+					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{attributeValue}}}\"",
 					"metadataOperator-EQUALS": "is",
 					"metadataOperator-NOTEQUALS": "is not",
 					"metadataOperator-CONTAINS": "contains the text",
@@ -1103,7 +1105,7 @@
 				"add": {
 					"success": "✅ Successfully added a new metadata filter to the below tracker.",
 					"metadataFiltersTitle": "**Active Filters**",
-					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{filter.attributeValue}}}\"",
+					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{attributeValue}}}\"",
 					"metadataOperator-EQUALS": "is",
 					"metadataOperator-NOTEQUALS": "is not",
 					"metadataOperator-CONTAINS": "contains the text",

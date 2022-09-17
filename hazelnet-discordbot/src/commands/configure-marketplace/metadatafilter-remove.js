@@ -48,7 +48,7 @@ module.exports = {
             .addOptions(marketplaceChannel.filters.map((filter) => {
               const operatorText = i18n.__({ phrase: `configure.marketplace.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
               return {
-                label: i18n.__({ phrase: 'configure.marketplace.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText }).substring(0, 100),
+                label: i18n.__({ phrase: 'configure.marketplace.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText, attributeValue: filter.attributeValue }).substring(0, 100),
                 description: i18n.__({ phrase: 'configure.marketplace.metadatafilter.remove.valueRepeat', locale }, { attributeValue: filter.attributeValue }).substring(0, 100),
                 value: `metadata-filter-id-${marketplaceChannel.id}-${filter.id}`,
               };

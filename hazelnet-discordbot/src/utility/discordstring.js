@@ -5,4 +5,7 @@ module.exports = {
     }
     return text;
   },
+  escapeBackslashes(text) {
+    return text.replace('\\', '\\\\');
+  },
 };

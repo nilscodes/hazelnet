@@ -270,13 +270,13 @@ module.exports = {
       label: i18n.__({ phrase: `configure.poll.add.${yesLabel}`, locale }).substring(0, 100),
       description: i18n.__({ phrase: `configure.poll.add.${yesDescription}`, locale }).substring(0, 100),
       value: 'yes',
-      emoji: { id: null, name: yesEmoji },
+      emoji: { name: yesEmoji },
       default: yesIsSelected,
     }, {
       label: i18n.__({ phrase: `configure.poll.add.${noLabel}`, locale }).substring(0, 100),
       description: i18n.__({ phrase: `configure.poll.add.${noDescription}`, locale }).substring(0, 100),
       value: 'no',
-      emoji: { id: null, name: noEmoji },
+      emoji: { name: noEmoji },
       default: !yesIsSelected,
     }];
   },
@@ -285,19 +285,19 @@ module.exports = {
       label: i18n.__({ phrase: 'configure.poll.add.tokenTypeNone', locale }).substring(0, 100),
       description: i18n.__({ phrase: 'configure.poll.add.tokenTypeNoneDescription', locale }).substring(0, 100),
       value: 'no',
-      emoji: { id: null, name: '🔓' },
+      emoji: { name: '🔓' },
       default: tokenType === 'no',
     }, {
       label: i18n.__({ phrase: 'configure.poll.add.tokenTypeHolderOnly', locale }).substring(0, 100),
       description: i18n.__({ phrase: 'configure.poll.add.tokenTypeHolderOnlyDescription', locale }).substring(0, 100),
       value: 'token',
-      emoji: { id: null, name: '📃' },
+      emoji: { name: '📃' },
       default: tokenType === 'token',
     }, {
       label: i18n.__({ phrase: 'configure.poll.add.tokenTypeHolderWeighted', locale }).substring(0, 100),
       description: i18n.__({ phrase: 'configure.poll.add.tokenTypeHolderWeightedDescription', locale }).substring(0, 100),
       value: 'tokenweighted',
-      emoji: { id: null, name: '⚖' },
+      emoji: { name: '⚖' },
       default: tokenType === 'tokenweighted',
     }];
   },
