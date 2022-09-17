@@ -14,6 +14,7 @@ module.exports = {
       const maxDetailedRolesOnOnePage = 5;
       const maxForDropdown = 25;
       let customTokenRoleMessage = false;
+
       if (discordServer.tokenRoles.length > maxForDropdown) {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortCommand';
       } else if (discordServer.tokenRoles.length > maxDetailedRolesOnOnePage) {
@@ -24,6 +25,10 @@ module.exports = {
       const tokenRoleFields = tokenRoleFieldsNested.flat();
       if (!tokenRoleFields.length) {
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
+      } else if (tokenRoleFields.length > 25) {
+        const moreCount = tokenRoleFields.length - 24;
+        tokenRoleFields.splice(24);
+        tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.moreRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.moreRoles', locale }, { moreCount }) });
       }
       if (!discordServer.premium && discordServer.tokenRoles.length > 1) {
         const lowestTokenRoleId = Math.min(...discordServer.tokenRoles.map((tokenRole) => +tokenRole.id));

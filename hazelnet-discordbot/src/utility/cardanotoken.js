@@ -1,4 +1,5 @@
 const i18n = require('i18n');
+const discordstring = require('./discordstring');
 
 module.exports = {
   isValidAssetFingerprint(assetFingerprint) {
@@ -26,7 +27,7 @@ module.exports = {
   getMetadataFilterContentList(filters, locale) {
     return filters.map((filter) => {
       const operatorText = i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
-      return i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText });
+      return i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText, attributeValue: discordstring.escapeBackslashes(filter.attributeValue) });
     });
   },
   getJoinPhraseTextForAggregationType(aggregationType, locale) {
