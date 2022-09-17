@@ -25,9 +25,13 @@ module.exports = {
                   assetFingerprint,
                 });
                 await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleToAddPolicyTo.id, tokenRoleToAddPolicyTo.acceptedAssets);
-                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles policies add', i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }), 'configure-tokenroles-policies-add', [
+                const embed = embedBuilder.buildForAdmin(
+                  discordServer,
+                  '/configure-tokenroles policies add',
+                  i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
+                  'configure-tokenroles-policies-add', 
                   tokenroles.getTokenRoleDetailsFields(tokenRoleToAddPolicyTo, discordServer, locale, true),
-                ]);
+                );
                 await interaction.editReply({ embeds: [embed], ephemeral: true });
               } else {
                 const fingerprintInfo = assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint }) : '';

@@ -91,9 +91,13 @@ module.exports = {
     const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild.id, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint);
     const tokenRole = newTokenRolePromise.data;
 
-    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles add', i18n.__({ phrase: 'configure.tokenroles.add.success', locale }), 'configure-tokenroles-add', [
+    const embed = embedBuilder.buildForAdmin(
+      discordServer,
+      '/configure-tokenroles add',
+      i18n.__({ phrase: 'configure.tokenroles.add.success', locale }),
+      'configure-tokenroles-add',
       tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale),
-    ]);
+    );
     return embed;
   },
   async executeButton(interaction) {
