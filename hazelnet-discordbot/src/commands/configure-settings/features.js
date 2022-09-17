@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu, MessageButton,
+  ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const botfeatures = require('../../utility/botfeatures');
@@ -29,21 +29,21 @@ module.exports = {
 
     const featureOptions = botfeatures.getFeatureOptions(discordServer);
     const components = [
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-settings/features/change')
             .setPlaceholder(i18n.__({ phrase: 'start.chooseFeatures', locale: useLocale }))
             .addOptions(featureOptions)
             .setMinValues(1)
             .setMaxValues(featureOptions.length),
         ),
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('configure-settings/features/confirm')
             .setLabel(i18n.__({ phrase: 'configure.settings.features.saveSettings', locale: useLocale }))
-            .setStyle('PRIMARY'),
+            .setStyle(ButtonStyle.Primary),
         ),
     ];
 

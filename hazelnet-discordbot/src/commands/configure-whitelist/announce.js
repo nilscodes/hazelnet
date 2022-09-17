@@ -1,5 +1,10 @@
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const {
+  ActionRowBuilder,
+  SelectMenuBuilder,
+  ChannelType,
+  PermissionsBitField,
+} = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
 
@@ -10,16 +15,16 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
+      if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
+        if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
           const whitelistOptions = discordServer.whitelists
             .filter((whitelist) => !whitelist.closed)
             .map((whitelist) => ({ label: whitelist.displayName, value: `${announceChannel.id}-${whitelist.id}` }));
           if (whitelistOptions.length) {
-            const components = [new MessageActionRow()
+            const components = [new ActionRowBuilder()
               .addComponents(
-                new MessageSelectMenu()
+                new SelectMenuBuilder()
                   .setCustomId('configure-whitelist/announce/publish')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale }))
                   .addOptions(whitelistOptions),

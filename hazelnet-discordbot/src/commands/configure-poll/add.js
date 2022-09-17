@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu, MessageButton,
+  ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const datetime = require('../../utility/datetime');
 const embedBuilder = require('../../utility/embedbuilder');
@@ -143,16 +143,16 @@ module.exports = {
         const content = this.buildContent(locale, interaction.channel.id, phase2PollObject, 2);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
         this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, phase2PollObject);
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('configure-poll/add/startphase3')
               .setLabel(i18n.__({ phrase: 'configure.poll.add.startPhase3', locale }))
-              .setStyle('PRIMARY'),
-            new MessageButton()
+              .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
               .setCustomId('configure-poll/add/redophase2')
               .setLabel(i18n.__({ phrase: 'configure.poll.add.redoPhase2', locale }))
-              .setStyle('SECONDARY'),
+              .setStyle(ButtonStyle.Secondary),
           ),
         ];
         await interaction.editReply({ embeds: [embed], components, ephemeral: true });
@@ -209,18 +209,18 @@ module.exports = {
   },
   getVoteOptionComponents(locale, phase3PollObject) {
     const buttons = [
-      new MessageButton()
+      new ButtonBuilder()
         .setCustomId('configure-poll/add/redophase3')
         .setLabel(i18n.__({ phrase: 'configure.poll.add.redoPhase3', locale }))
-        .setStyle('SECONDARY'),
+        .setStyle(ButtonStyle.Secondary),
     ];
     if (this.validateOptions(phase3PollObject.options)) {
-      buttons.unshift(new MessageButton()
+      buttons.unshift(new ButtonBuilder()
         .setCustomId('configure-poll/add/startphase4')
         .setLabel(i18n.__({ phrase: 'configure.poll.add.startPhase4', locale }))
-        .setStyle('PRIMARY'));
+        .setStyle(ButtonStyle.Primary));
     }
-    return [new MessageActionRow().addComponents(...buttons)];
+    return [new ActionRowBuilder().addComponents(...buttons)];
   },
   validateOptions(options) {
     return options.every((option) => option.text.length && (option.reactionId || option.reactionName)) && options.length >= 2;
@@ -231,23 +231,23 @@ module.exports = {
     const content = this.buildContent(locale, interaction.channel.id, pollObject, 5);
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
     const components = [
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-poll/add/resultsvisible')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isPublicVote', locale }).substring(0, 100))
             .addOptions(this.getYesNoOptions(locale, pollObject.resultsVisible ?? true, 'publicVoteYes', 'publicVoteYesDescription', '👁', 'publicVoteNo', 'publicVoteNoDescription', '🔐')),
         ),
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-poll/add/multiplevotes')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isMultipleVotes', locale }).substring(0, 100))
             .addOptions(this.getYesNoOptions(locale, pollObject.multipleVotes ?? false, 'multipleVoteYes', 'multipleVoteYesDescription', '🖐', 'multipleVoteNo', 'multipleVoteNoDescription', '1️⃣')),
         ),
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-poll/add/tokentype')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isTokenOwnershipRequired', locale }).substring(0, 100))
             .addOptions(this.getTokenOwnershipOptions(locale, pollObject.tokenType)),
@@ -256,11 +256,11 @@ module.exports = {
 
     if (pollObject.tokenType) {
       const finish = pollObject.tokenType === 'no';
-      components.push(new MessageActionRow()
-        .addComponents(new MessageButton()
+      components.push(new ActionRowBuilder()
+        .addComponents(new ButtonBuilder()
           .setCustomId(finish ? 'configure-poll/add/finish' : 'configure-poll/add/startphase5')
           .setLabel(i18n.__({ phrase: finish ? 'configure.poll.add.finish' : 'configure.poll.add.startPhase5', locale }))
-          .setStyle('PRIMARY')));
+          .setStyle(ButtonStyle.Primary)));
     }
 
     await interaction.update({ embeds: [embed], components, ephemeral: true });
@@ -314,12 +314,12 @@ module.exports = {
     this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, phase5PollObject);
     const content = this.buildContent(locale, interaction.channel.id, phase5PollObject, 6);
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
-    const components = [new MessageActionRow()
+    const components = [new ActionRowBuilder()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('configure-poll/add/redophase5')
           .setLabel(i18n.__({ phrase: 'configure.poll.add.redoPhase5', locale }))
-          .setStyle('SECONDARY'),
+          .setStyle(ButtonStyle.Secondary),
       ),
     ];
     await interaction.update({ embeds: [embed], components, ephemeral: true });
@@ -333,16 +333,16 @@ module.exports = {
           this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, phase5PollObject);
           const contentAfterPolicy = this.buildContent(locale, interaction.channel.id, phase5PollObject, 6);
           const embedAfterPolicy = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', contentAfterPolicy.join('\n\n'), 'configure-poll-add');
-          const componentsAfterPolicy = [new MessageActionRow()
+          const componentsAfterPolicy = [new ActionRowBuilder()
             .addComponents(
-              new MessageButton()
+              new ButtonBuilder()
                 .setCustomId('configure-poll/add/finish')
                 .setLabel(i18n.__({ phrase: 'configure.poll.add.finish', locale }))
-                .setStyle('PRIMARY'),
-              new MessageButton()
+                .setStyle(ButtonStyle.Primary),
+              new ButtonBuilder()
                 .setCustomId('configure-poll/add/redophase5')
                 .setLabel(i18n.__({ phrase: 'configure.poll.add.redoPhase5', locale }))
-                .setStyle('SECONDARY'),
+                .setStyle(ButtonStyle.Secondary),
             ),
           ];
           await interaction.editReply({ embeds: [embedAfterPolicy], components: componentsAfterPolicy, ephemeral: true });

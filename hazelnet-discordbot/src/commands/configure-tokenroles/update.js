@@ -1,7 +1,7 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const tokenroles = require('../../utility/tokenroles');
@@ -40,16 +40,16 @@ module.exports = {
               aggregationType,
             });
 
-            const components = [new MessageActionRow()
+            const components = [new ActionRowBuilder()
               .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                   .setCustomId('configure-tokenroles/update/confirm')
                   .setLabel(i18n.__({ phrase: 'configure.tokenroles.add.confirmRole', locale }))
-                  .setStyle('PRIMARY'),
-                new MessageButton()
+                  .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
                   .setCustomId('configure-tokenroles/update/cancel')
                   .setLabel(i18n.__({ phrase: 'generic.cancel', locale }))
-                  .setStyle('SECONDARY'),
+                  .setStyle(ButtonStyle.Secondary),
               )];
 
             const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.tokenroles.add.roleInUseWarning', locale }), i18n.__({ phrase: 'configure.tokenroles.add.roleInUseDetails', locale }, { roleId: role.id, memberCount: usersWithRole.size }), 'configure-tokenroles-update');
@@ -71,10 +71,8 @@ module.exports = {
   async updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType) {
     const locale = discordServer.getBotLanguage();
     const tokenRole = await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleId, null, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType);
-
-    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles update', i18n.__({ phrase: 'configure.tokenroles.update.success', locale }), 'configure-tokenroles-update', [
-      tokenroles.getTokenRoleDetailsText(tokenRole, discordServer, locale),
-    ]);
+    const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale);
+    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles update', i18n.__({ phrase: 'configure.tokenroles.update.success', locale }), 'configure-tokenroles-update', tokenRoleFields);
     return embed;
   },
   async executeButton(interaction) {

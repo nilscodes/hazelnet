@@ -1,6 +1,8 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionsBitField,
+} = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 
 module.exports = {
@@ -12,9 +14,9 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      if (announceChannel.type === 'GUILD_TEXT' || announceChannel.type === 'GUILD_NEWS') {
+      if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-        if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
+        if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
           const welcomeTextToUse = welcomeText.substring(0, 1000);
           this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
             announceChannelId: announceChannel.id,
@@ -22,12 +24,12 @@ module.exports = {
           });
 
           const components = [
-            new MessageActionRow()
+            new ActionRowBuilder()
               .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                   .setCustomId('configure-verify/announce/confirm')
                   .setLabel(i18n.__({ phrase: 'configure.verify.announce.publish', locale }))
-                  .setStyle('PRIMARY'),
+                  .setStyle(ButtonStyle.Primary),
               ),
           ];
 
@@ -74,12 +76,12 @@ module.exports = {
   },
   getVerifyComponents(locale) {
     return [
-      new MessageActionRow()
+      new ActionRowBuilder()
         .addComponents(
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId('verify/add/widgetverify')
             .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
-            .setStyle('PRIMARY'),
+            .setStyle(ButtonStyle.Primary),
         ),
     ];
   },

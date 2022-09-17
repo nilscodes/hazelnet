@@ -1,8 +1,8 @@
 const NodeCache = require('node-cache');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, ButtonStyle } = require('discord.js');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu, MessageButton,
+  ActionRowBuilder, SelectMenuBuilder, ButtonBuilder,
 } = require('discord.js');
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
@@ -46,9 +46,9 @@ module.exports = {
           });
         }
 
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
               .setCustomId('claim/start')
               .setPlaceholder(i18n.__({ phrase: 'claim.chooseClaimList', locale }))
               .addOptions(claimLists.map((claimList) => ({
@@ -178,16 +178,16 @@ module.exports = {
           const { cartField } = this.getProductChoices(currentOrder, locale, availableProducts);
           fields.push(cartField);
           components.push(
-            new MessageActionRow()
+            new ActionRowBuilder()
               .addComponents(
-                new MessageButton()
+                new ButtonBuilder()
                   .setCustomId('claim/finish')
                   .setLabel(i18n.__({ phrase: 'claim.submitOrder', locale }))
-                  .setStyle('PRIMARY'),
-                new MessageButton()
+                  .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
                   .setCustomId('claim/reset')
                   .setLabel(i18n.__({ phrase: 'claim.clearShoppingCart', locale }))
-                  .setStyle('DANGER'),
+                  .setStyle(ButtonStyle.Danger),
               ),
           );
         }
@@ -286,9 +286,9 @@ module.exports = {
     const currentOrder = this.getCurrentOrder(interaction.user.id);
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(currentOrder.guildId);
     const locale = discordServer.getBotLanguage();
-    const components = [new MessageActionRow()
+    const components = [new ActionRowBuilder()
       .addComponents(
-        new MessageSelectMenu()
+        new SelectMenuBuilder()
           .setCustomId('claim/chooseshippingmethod')
           .setPlaceholder(i18n.__({ phrase: 'claim.chooseShippingType', locale }))
           .addOptions([{
@@ -397,16 +397,16 @@ module.exports = {
         await interaction.update({ embeds: [embed], components: productChoices, ephemeral: true });
       } else {
         const finish = [
-          new MessageActionRow()
+          new ActionRowBuilder()
             .addComponents(
-              new MessageButton()
+              new ButtonBuilder()
                 .setCustomId('claim/enteraddress')
                 .setLabel(i18n.__({ phrase: 'claim.enterShippingData', locale }))
-                .setStyle('PRIMARY'),
-              new MessageButton()
+                .setStyle(ButtonStyle.Primary),
+              new ButtonBuilder()
                 .setCustomId('claim/reset')
                 .setLabel(i18n.__({ phrase: 'claim.clearShoppingCart', locale }))
-                .setStyle('DANGER'),
+                .setStyle(ButtonStyle.Danger),
             ),
         ];
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'claim.checkoutTitle', locale }), i18n.__({ phrase: 'claim.checkout', locale }), 'claim', productFields);
@@ -452,9 +452,9 @@ module.exports = {
     availableProducts.forEach((availableProduct) => {
       const remaining = availableProduct.available - (productsInCart.get(availableProduct.id) ?? 0);
       if (!productChoices.length && remaining > 0) {
-        productChoices.push(new MessageActionRow()
+        productChoices.push(new ActionRowBuilder()
           .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
               .setCustomId('claim/addtocart')
               .setPlaceholder(i18n.__({ phrase: 'claim.chooseClaimList', locale }))
               .addOptions(this.getProductOptions(availableProduct)),

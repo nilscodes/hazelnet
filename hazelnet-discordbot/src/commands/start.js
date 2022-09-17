@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, ButtonStyle } = require('discord.js');
 const i18n = require('i18n');
 const {
-  Permissions, MessageActionRow, MessageSelectMenu, MessageButton,
+  PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder,
 } = require('discord.js');
 const embedbuilder = require('../utility/embedbuilder');
 const commandregistration = require('../utility/commandregistration');
@@ -22,7 +22,7 @@ module.exports = {
     const serverWhitelist = serverWhitelistString?.split(',') ?? [];
     if (serverWhitelist.length && !serverWhitelist.includes(interaction.guild.id)) {
       await this.editReplyWithNotWhitelistedMessage(interaction, discordServer);
-    } else if (interaction.member.permissions.has(Permissions.FLAGS.MANAGE_GUILD)) {
+    } else if (interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
       await this.editReplyWithSetupMessage(interaction);
     } else {
       await interaction.editReply({ content: i18n.__({ phrase: 'errors.permissionDeniedChanges', locale: discordServer.getBotLanguage() }), ephemeral: true });
@@ -63,9 +63,9 @@ module.exports = {
     let disabled = false;
     if (!discordServer.settings?.BOT_LANGUAGE || !discordServer.settings?.BOT_LANGUAGE.length) {
       disabled = true;
-      components.push(new MessageActionRow()
+      components.push(new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('start/language')
             .setPlaceholder(i18n.__({ phrase: 'start.chooseLanguage', locale: useLocale }))
             .addOptions(languageOptions),
@@ -78,9 +78,9 @@ module.exports = {
     const adminRoleIds = (discordServer?.settings?.ADMIN_ROLES?.split(',')) ?? [];
     if (!adminRoleIds.length) {
       disabled = true;
-      components.push(new MessageActionRow()
+      components.push(new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('start/adminRole')
             .setPlaceholder(i18n.__({ phrase: 'start.chooseAdminRole', locale: useLocale }))
             .addOptions(roleOptions),
@@ -92,9 +92,9 @@ module.exports = {
     if (!discordServer.settings?.ENABLED_COMMAND_TAGS || !discordServer.settings?.ENABLED_COMMAND_TAGS.length) {
       disabled = true;
       const featureOptions = botfeatures.getFeatureOptions(discordServer);
-      components.push(new MessageActionRow()
+      components.push(new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('start/features')
             .setPlaceholder(i18n.__({ phrase: 'start.chooseFeatures', locale: useLocale }))
             .addOptions(featureOptions)
@@ -106,17 +106,17 @@ module.exports = {
       const selectedFeatureList = selectedCommandTagsPhrases.map((phrase) => (i18n.__({ phrase: 'start.selectedFeatureItem', locale: useLocale }, { feature: i18n.__({ phrase, locale: useLocale }) }))).join('\n');
       selectedFeatures = `\n\n${i18n.__({ phrase: 'start.selectedFeatures', locale: useLocale }, { selectedFeatureList })}`;
     }
-    components.push(new MessageActionRow()
+    components.push(new ActionRowBuilder()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('start/complete')
           .setDisabled(disabled)
           .setLabel(i18n.__({ phrase: 'start.finishSetupButton', locale: useLocale }))
-          .setStyle('PRIMARY'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
           .setCustomId('start/reset')
           .setLabel(i18n.__({ phrase: 'start.resetSetupButton', locale: useLocale }))
-          .setStyle('SECONDARY'),
+          .setStyle(ButtonStyle.Secondary),
       ));
     const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), message, 'start', [
       { name: i18n.__({ phrase: 'start.configureLanguageTitle', locale: useLocale }), value: i18n.__({ phrase: 'start.configureLanguageText', locale: useLocale }) + selectedLanguage },
@@ -176,10 +176,10 @@ module.exports = {
   },
   async isBotLackingRequiredPermissions(interaction) {
     const botMember = await interaction.guild.members.fetch(interaction.applicationId);
-    const hasManageRolesPermission = botMember.roles.cache.some((role) => role.permissions.has(Permissions.FLAGS.MANAGE_ROLES));
-    const hasSendMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(Permissions.FLAGS.SEND_MESSAGES));
-    const hasManageMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES));
-    const hasReadMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(Permissions.FLAGS.READ_MESSAGE_HISTORY));
+    const hasManageRolesPermission = botMember.roles.cache.some((role) => role.permissions.has(PermissionsBitField.Flags.ManageRoles));
+    const hasSendMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(PermissionsBitField.Flags.SendMessages));
+    const hasManageMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(PermissionsBitField.Flags.ManageMessages));
+    const hasReadMessagesPermission = botMember.roles.cache.some((role) => role.permissions.has(PermissionsBitField.Flags.ReadMessageHistory));
     return !(hasManageRolesPermission && hasSendMessagesPermission && hasManageMessagesPermission && hasReadMessagesPermission);
   },
   async resetSetup(interaction) {
@@ -192,16 +192,16 @@ module.exports = {
   async editReplyWithNotWhitelistedMessage(interaction, discordServer) {
     const useLocale = discordServer.getBotLanguage();
     const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.welcomeTitle', locale: useLocale }), i18n.__({ phrase: 'errors.notWhitelisted', locale: useLocale }), 'start');
-    const components = [new MessageActionRow()
+    const components = [new ActionRowBuilder()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'about.twitter.bot', locale: useLocale }))
           .setURL('https://twitter.com/HAZELnet_io')
-          .setStyle('LINK'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Link),
+        new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'about.twitter.author', locale: useLocale }))
           .setURL('https://twitter.com/NilsCodes')
-          .setStyle('LINK'),
+          .setStyle(ButtonStyle.Link),
       )];
     await interaction.editReply({ embeds: [embed], components, ephemeral: true });
   },

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const i18n = require('i18n');
 const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');

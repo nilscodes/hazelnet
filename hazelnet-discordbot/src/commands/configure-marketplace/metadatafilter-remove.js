@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu,
+  ActionRowBuilder, SelectMenuBuilder,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const marketplace = require('../../utility/marketplace');
@@ -40,9 +40,9 @@ module.exports = {
   createRemoveDropdown(discordServer, marketplaceChannel) {
     if (marketplaceChannel.filters?.length) {
       const locale = discordServer.getBotLanguage();
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-marketplace/metadatafilter-remove/remove')
             .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.metadatafilter.remove.chooseRemove', locale }))
             .addOptions(marketplaceChannel.filters.map((filter) => {

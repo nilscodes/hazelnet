@@ -1,4 +1,6 @@
-module.exports = {
+import { GuildDiscordEvent } from "src/utility/commandtypes";
+
+export default <GuildDiscordEvent> {
   name: 'guildDelete',
   async execute(guild) {
     try {

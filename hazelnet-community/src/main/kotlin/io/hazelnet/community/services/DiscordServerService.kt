@@ -10,6 +10,9 @@ import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
+import io.hazelnet.community.persistence.data.TokenOwnershipRoleRepository
+import io.micrometer.core.instrument.Gauge
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
@@ -42,8 +45,38 @@ class DiscordServerService(
     private val claimListService: ClaimListService,
     private val globalCommunityService: GlobalCommunityService,
     private val roleAssignmentService: RoleAssignmentService,
+    private val tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
+    meterRegistry: MeterRegistry,
 ) {
     private val lastManualUserLinking: MutableMap<Long, Date> = mutableMapOf()
+
+    init {
+        Gauge.builder("discord_lifetime_server_count", discordServerRepository) {
+            it.count().toDouble()
+        }
+            .description("Lifetime number of Discord servers")
+            .register(meterRegistry)
+        Gauge.builder("discord_active_server_count", discordServerRepository) {
+            it.countByActive(true).toDouble()
+        }
+            .description("Number of currently active Discord servers")
+            .register(meterRegistry)
+        Gauge.builder("discord_premium_server_count", discordServerRepository) {
+            it.countByPremiumUntilAfter(Date()).toDouble()
+        }
+            .description("Number of currently active premium Discord servers")
+            .register(meterRegistry)
+        Gauge.builder("discord_server_user_count_total", discordServerRepository) {
+            it.sumGuildMemberCountForActiveServers().toDouble()
+        }
+            .description("Total member count across all Discord servers (with duplicates)")
+            .register(meterRegistry)
+        Gauge.builder("discord_token_role_count_total", tokenOwnershipRoleRepository) {
+            it.count().toDouble()
+        }
+            .description("Total active token roles")
+            .register(meterRegistry)
+    }
 
     @Transactional
     fun addDiscordServer(discordServer: DiscordServer): DiscordServer {

@@ -2,6 +2,7 @@ package io.hazelnet.community.persistence
 
 import io.hazelnet.community.data.Account
 import io.hazelnet.community.data.ExternalAccount
+import io.hazelnet.shared.data.ExternalAccountType
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -10,6 +11,9 @@ import java.util.*
 
 @Repository
 interface ExternalAccountRepository : CrudRepository<ExternalAccount, Long> {
+    fun countByType(type: ExternalAccountType): Long
+    fun countByTypeAndPremium(type: ExternalAccountType, premium: Boolean): Long
+
     fun findByReferenceId(referenceId: String): Optional<ExternalAccount>
     fun findByPremium(premium: Boolean): List<ExternalAccount>
     fun findByAccount(account: Account): List<ExternalAccount>

@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu,
+  ActionRowBuilder, SelectMenuBuilder,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const discordemoji = require('../../utility/discordemoji');
@@ -59,9 +59,9 @@ module.exports = {
     }
   },
   getPollChoices(useLocale, polls) {
-    return [new MessageActionRow()
+    return [new ActionRowBuilder()
       .addComponents(
-        new MessageSelectMenu()
+        new SelectMenuBuilder()
           .setCustomId('configure-poll/remove/complete')
           .setPlaceholder(i18n.__({ phrase: 'configure.poll.remove.choosePollDetails', locale: useLocale }))
           .addOptions(polls.map((poll) => ({

@@ -19,12 +19,15 @@ module.exports = {
     return assetFingerprintA?.indexOf(assetFingerprintB) === 0;
   },
   buildMetadataFilterContentText(filters, aggregationType, locale) {
-    const metadataFiltersList = filters.map((filter) => {
+    const metadataFiltersList = this.getMetadataFilterContentList(filters, locale);
+    const joinPhraseText = this.getJoinPhraseTextForAggregationType(aggregationType, locale);
+    return metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhraseText)}` : '';
+  },
+  getMetadataFilterContentList(filters, locale) {
+    return filters.map((filter) => {
       const operatorText = i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
       return i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText });
     });
-    const joinPhraseText = this.getJoinPhraseTextForAggregationType(aggregationType, locale);
-    return metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhraseText)}` : '';
   },
   getJoinPhraseTextForAggregationType(aggregationType, locale) {
     let joinPhrase;

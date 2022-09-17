@@ -1,6 +1,6 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const whitelistUtil = require('../../utility/whitelist');
 const adahandle = require('../../utility/adahandle');
@@ -42,9 +42,9 @@ module.exports = {
             // Register address in cache, as we cannot send it along with the menu data.
             this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, addressToWhitelist);
 
-            const components = [new MessageActionRow()
+            const components = [new ActionRowBuilder()
               .addComponents(
-                new MessageSelectMenu()
+                new SelectMenuBuilder()
                   .setCustomId('whitelist/register/complete')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseWhitelist', locale: useLocale }))
                   .addOptions(whitelistOptions),
@@ -178,9 +178,9 @@ module.exports = {
               };
             });
 
-            const components = !userQualifiesForWhitelist ? [] : [new MessageActionRow()
+            const components = !userQualifiesForWhitelist ? [] : [new ActionRowBuilder()
               .addComponents(
-                new MessageSelectMenu()
+                new SelectMenuBuilder()
                   .setCustomId('whitelist/register/widget')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseAddressToWhitelist', locale }))
                   .addOptions(registerOptions),

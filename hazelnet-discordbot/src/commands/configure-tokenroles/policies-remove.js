@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu,
+  ActionRowBuilder, SelectMenuBuilder,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const tokenroles = require('../../utility/tokenroles');
@@ -15,9 +15,7 @@ module.exports = {
       const locale = discordServer.getBotLanguage();
       const tokenRoleToRemovePolicyFrom = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToRemovePolicyFrom) {
-        const tokenRoleInfo = [
-          tokenroles.getTokenRoleDetailsText(tokenRoleToRemovePolicyFrom, discordServer, locale, true),
-        ];
+        const tokenRoleInfo = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemovePolicyFrom, discordServer, locale, true);
         const components = this.createRemoveDropdown(discordServer, tokenRoleToRemovePolicyFrom);
         if (!components.length) {
           tokenRoleInfo.push({
@@ -39,9 +37,9 @@ module.exports = {
   createRemoveDropdown(discordServer, tokenRole) {
     if (tokenRole.acceptedAssets.length > 1) {
       const locale = discordServer.getBotLanguage();
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('configure-tokenroles/policies-remove/remove')
             .setPlaceholder(i18n.__({ phrase: 'configure.tokenroles.policies.remove.chooseRemove', locale }))
             .addOptions(tokenRole.acceptedAssets.map((acceptedAsset) => {
@@ -71,7 +69,7 @@ module.exports = {
         tokenRoleToRemovePolicyFrom.acceptedAssets = tokenRoleToRemovePolicyFrom.acceptedAssets
           .filter((acceptedAsset) => !cardanotoken.isSamePolicyAndAsset(acceptedAsset.policyId, acceptedAsset.assetFingerprint, policyIdToRemove, assetFingerprintToRemove));
         const updatedTokenRole = await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleToRemovePolicyFrom.id, tokenRoleToRemovePolicyFrom.acceptedAssets);
-        const tokenRoleFields = [tokenroles.getTokenRoleDetailsText(updatedTokenRole, discordServer, locale, true)];
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(updatedTokenRole, discordServer, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles policies remove', i18n.__({ phrase: 'configure.tokenroles.policies.remove.success', locale }), 'configure-tokenroles-policies-remove', tokenRoleFields);
         await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
       } else {

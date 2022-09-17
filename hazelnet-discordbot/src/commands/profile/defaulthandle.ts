@@ -1,18 +1,13 @@
-import { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
 import { BotSubcommand } from "src/utility/commandtypes";
 import i18n from 'i18n';
-import { AugmentedInteraction, AugmentedSelectMenuInteraction } from "src/utility/hazelnetclient";
+import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "src/utility/hazelnetclient";
 const adahandle = require('../../utility/adahandle');
 const embedBuilder = require('../../utility/embedbuilder');
 
-type defaulthandleSetting = {
-  name: string
-  default: boolean
-}
-
 interface DefaultHandleCommand extends BotSubcommand {
-  getInteractionComponents(availableHandles: string[], currentDefaultHandle: string, locale: string): MessageActionRow[]
-  setNewDefaultHandle(interaction: AugmentedInteraction, mainAccount: any, newDefaultHandle: string, discordServer: any): Promise<MessageEmbed>
+  getInteractionComponents(availableHandles: string[], currentDefaultHandle: string, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
+  setNewDefaultHandle(interaction: AugmentedSelectMenuInteraction | AugmentedCommandInteraction, mainAccount: any, newDefaultHandle: string, discordServer: any): Promise<EmbedBuilder>
 }
 
 interface Handle {
@@ -75,9 +70,9 @@ export default <DefaultHandleCommand> {
   getInteractionComponents(availableHandles, currentDefaultHandle, locale) {
     const actions = [];
     if (availableHandles.length) {
-      actions.push(new MessageActionRow()
+      actions.push(new ActionRowBuilder()
       .addComponents(
-        new MessageSelectMenu()
+        new SelectMenuBuilder()
           .setCustomId('profile/defaulthandle/complete')
           .setPlaceholder(i18n.__({ phrase: 'profile.defaulthandle.chooseHandle', locale }))
           .addOptions(availableHandles.map((handle) => {
@@ -89,12 +84,12 @@ export default <DefaultHandleCommand> {
       ));
     }
     if (currentDefaultHandle) {
-      actions.push(new MessageActionRow()
+      actions.push(new ActionRowBuilder()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('profile/defaulthandle/reset')
           .setLabel(i18n.__({ phrase: 'profile.defaulthandle.removeDefaultHandle', locale }))
-          .setStyle('DANGER')
+          .setStyle(ButtonStyle.Danger)
       ));
     }
     return actions;

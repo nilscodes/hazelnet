@@ -3,7 +3,7 @@ const cardanotoken = require('./cardanotoken');
 const discordstring = require('./discordstring');
 
 module.exports = {
-  getTokenRoleDetailsText(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
+  getTokenRoleDetailsFields(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
     let useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetails';
     if (tokenRole.filters?.length) {
       if (tokenRole.aggregationType === 'ANY_POLICY_FILTERED_ONE_EACH') {
@@ -32,13 +32,16 @@ module.exports = {
     }
 
     const maximumInfo = tokenRole.maximumTokenQuantity ? i18n.__({ phrase: 'configure.tokenroles.list.maximumInfo', locale }, { tokenRole }) : '';
-    let metadataFilters = '';
-    let acceptedPolicies = '';
+    const detailFields = [{
+      name: title,
+      value: i18n.__({ phrase: useTokenRoleMessage, locale }, {
+        tokenRole,
+        maximumInfo,
+      }),
+    }];
     if (includeAllDetails) {
-      metadataFilters = cardanotoken.buildMetadataFilterContentText(tokenRole.filters, tokenRole.aggregationType, locale);
-
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
-        const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, { assetFingerprint: discordstring.ensureLength(acceptedAsset.assetFingerprint, 15) }) : '';
+        const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, acceptedAsset) : '';
         const policyId = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || discordstring.ensureLength(acceptedAsset.policyId, 10);
         return i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContentEntry', locale }, { policyId, fingerprintInfo });
       });
@@ -47,14 +50,25 @@ module.exports = {
         policyInfo.push(i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContentAndMore', locale }, { additionalPolicyCount: tokenRole.acceptedAssets.length - 5 }));
       }
       const policyInfoText = policyInfo.join('\n');
-      acceptedPolicies = `\n${i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesTitle', locale })}\n${policyInfoText}`;
+      detailFields.push({
+        name: i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesTitle', locale }),
+        value: policyInfoText,
+      });
+
+      const metadataFilterContentList = cardanotoken.getMetadataFilterContentList(tokenRole.filters, locale);
+      if (metadataFilterContentList.length) {
+        const chunkSize = 10;
+        const joinPhraseText = metadataFilterContentList.length < 25 ? cardanotoken.getJoinPhraseTextForAggregationType(tokenRole.aggregationType, locale) : ' **+** ';
+        for (let i = 0; i < metadataFilterContentList.length; i += chunkSize) {
+          const chunk = metadataFilterContentList.slice(i, i + chunkSize);
+          const metadataSegmentTitle = (i === 0 ? i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale }) : joinPhraseText);
+          detailFields.push({
+            name: metadataSegmentTitle,
+            value: chunk.join(joinPhraseText),
+          });
+        }
+      }
     }
-    return {
-      name: title,
-      value: i18n.__({ phrase: useTokenRoleMessage, locale }, {
-        tokenRole,
-        maximumInfo,
-      }) + acceptedPolicies + metadataFilters,
-    };
+    return detailFields;
   },
 };

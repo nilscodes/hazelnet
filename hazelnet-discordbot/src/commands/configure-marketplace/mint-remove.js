@@ -1,6 +1,6 @@
 const NodeCache = require('node-cache');
 const i18n = require('i18n');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const marketplaceUtil = require('../../utility/marketplace');
 
@@ -19,9 +19,9 @@ module.exports = {
       const marketplaceChannelOptions = await Promise.all(marketplaceChannelOptionsPromise);
 
       if (marketplaceChannels.length) {
-        const components = [new MessageActionRow()
+        const components = [new ActionRowBuilder()
           .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
               .setCustomId('configure-marketplace/mint-remove/remove')
               .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.mint.remove.chooseMarketplaceChannel', locale }))
               .addOptions(marketplaceChannelOptions),

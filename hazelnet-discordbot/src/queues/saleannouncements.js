@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+const { PermissionsBitField } = require('discord.js');
 const i18n = require('i18n');
 const embedBuilder = require('../utility/embedbuilder');
 const marketplace = require('../utility/marketplace');
@@ -12,7 +13,7 @@ module.exports = {
         const announceChannel = await guild.channels.fetch(saleAnnouncement.channelId);
         if (announceChannel) {
           const announceChannelPermissions = announceChannel.permissionsFor(client.application.id);
-          if (announceChannelPermissions.has('SEND_MESSAGES') && announceChannelPermissions.has('VIEW_CHANNEL') && announceChannelPermissions.has('EMBED_LINKS')) {
+          if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
             const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createSaleAnnouncementFields(saleAnnouncement, locale);

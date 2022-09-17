@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('./embedbuilder');
 const datetime = require('./datetime');
@@ -149,18 +149,18 @@ module.exports = {
   getSignupComponents(discordServer, whitelist) {
     const locale = discordServer.getBotLanguage();
     const buttons = [
-      new MessageButton()
+      new ButtonBuilder()
         .setCustomId(`whitelist/register/widgetsignup-${whitelist.id}`)
         .setLabel(i18n.__({ phrase: 'whitelist.register.registerButton', locale }))
-        .setStyle('PRIMARY'),
+        .setStyle(ButtonStyle.Primary),
     ];
     if (whitelist.type === 'CARDANO_ADDRESS') {
-      buttons.push(new MessageButton()
+      buttons.push(new ButtonBuilder()
         .setCustomId('verify/add/widgetverify')
         .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
-        .setStyle('SECONDARY'));
+        .setStyle(ButtonStyle.Secondary));
     }
-    return [new MessageActionRow().addComponents(buttons)];
+    return [new ActionRowBuilder().addComponents(buttons)];
   },
   getWhitelistErrorEmbed(discordServer, commandTitle, commandId, signupAfter, signupUntil, launchDate, logoUrl) {
     const locale = discordServer.getBotLanguage();

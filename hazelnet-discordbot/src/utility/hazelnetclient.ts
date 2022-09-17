@@ -1,8 +1,8 @@
-import { CommandInteraction, Client, ClientOptions, Collection, SelectMenuInteraction, ButtonInteraction, Interaction, UserContextMenuInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, Client, ClientOptions, Collection, SelectMenuInteraction, ButtonInteraction, UserContextMenuCommandInteraction, Message, Guild } from 'discord.js';
 import { CommandMetrics } from './metrics';
 import { Logger } from 'pino'
 
-export interface AugmentedCommandInteraction extends CommandInteraction {
+export interface AugmentedCommandInteraction extends ChatInputCommandInteraction {
   client: HazelnetClient
 }
 
@@ -14,11 +14,15 @@ export interface AugmentedSelectMenuInteraction extends SelectMenuInteraction {
   client: HazelnetClient
 }
 
-export interface AugmentedInteraction extends Interaction {
+export interface AugmentedUserContextMenuInteraction extends UserContextMenuCommandInteraction {
   client: HazelnetClient
 }
 
-export interface AugmentedUserContextMenuInteraction extends UserContextMenuInteraction {
+export interface AugmentedMessage extends Message {
+  client: HazelnetClient
+}
+
+export interface AugmentedGuild extends Guild {
   client: HazelnetClient
 }
 

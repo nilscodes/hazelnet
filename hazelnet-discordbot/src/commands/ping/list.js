@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageButton,
+  ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const embedBuilder = require('../../utility/embedbuilder');
 const cardanoaddress = require('../../utility/cardanoaddress');
@@ -46,12 +46,12 @@ module.exports = {
         });
       }
       const components = [
-        new MessageActionRow()
+        new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId('ping/list/test')
               .setLabel(i18n.__({ phrase: 'ping.list.testPingReceive', locale }))
-              .setStyle('PRIMARY'),
+              .setStyle(ButtonStyle.Primary),
           ),
       ];
       const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.list.messageTitle', locale }), i18n.__({ phrase: 'ping.list.purpose', locale }), 'ping-list', pingFields);

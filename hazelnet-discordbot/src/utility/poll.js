@@ -1,6 +1,6 @@
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu, MessageButton,
+  ActionRowBuilder, SelectMenuBuilder, MessageButton, ButtonStyle,
 } = require('discord.js');
 const discordemoji = require('./discordemoji');
 
@@ -77,9 +77,9 @@ module.exports = {
   },
   getPollChoices(locale, polls, customId, selectionPhrase) {
     if (polls.length) {
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId(customId)
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(polls.map((poll) => ({
@@ -147,21 +147,21 @@ module.exports = {
         buttons.push(new MessageButton()
           .setCustomId(`vote/widgetvote/${poll.id}`)
           .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
-          .setStyle('PRIMARY'));
+          .setStyle(ButtonStyle.Primary));
       } else {
         buttons.push(new MessageButton()
           .setURL(this.getVoteaireVoteUrl(poll.voteaireUUID))
           .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
-          .setStyle('LINK'));
+          .setStyle(ButtonStyle.Link));
       }
 
       if (poll.snapshotId) {
         buttons.push(new MessageButton()
           .setCustomId('verify/add/widgetverify')
           .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))
-          .setStyle('SECONDARY'));
+          .setStyle(ButtonStyle.Secondary));
       }
-      components.push(new MessageActionRow().addComponents(buttons));
+      components.push(new ActionRowBuilder().addComponents(buttons));
     }
     return { detailFields, components };
   },

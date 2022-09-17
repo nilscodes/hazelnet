@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder, ButtonStyle } = require('discord.js');
 const i18n = require('i18n');
 const {
-  MessageActionRow, MessageSelectMenu, MessageButton,
+  ActionRowBuilder, SelectMenuBuilder, ButtonBuilder,
 } = require('discord.js');
 const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');
@@ -153,9 +153,9 @@ module.exports = {
           name: option.reactionName,
         },
       }));
-      const components = [new MessageActionRow()
+      const components = [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('vote/vote')
             .setPlaceholder(i18n.__({ phrase: hasVoted ? 'vote.changeVoteOption' : 'vote.chooseVoteOption', locale }))
             .setMaxValues(poll.multipleVotes ? Math.min(totalVotingPower, poll.options.length) : 1)
@@ -163,12 +163,12 @@ module.exports = {
         ),
       ];
       if (hasVoted) {
-        components.push(new MessageActionRow()
+        components.push(new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setCustomId(`vote/abstain/${poll.id}`)
               .setLabel(i18n.__({ phrase: 'vote.abstainVote', locale }))
-              .setStyle('DANGER'),
+              .setStyle(ButtonStyle.Danger),
           ));
       }
       return components;
@@ -177,9 +177,9 @@ module.exports = {
   },
   getPollChoices(locale, polls) {
     if (polls.length) {
-      return [new MessageActionRow()
+      return [new ActionRowBuilder()
         .addComponents(
-          new MessageSelectMenu()
+          new SelectMenuBuilder()
             .setCustomId('vote/details')
             .setPlaceholder(i18n.__({ phrase: 'vote.choosePoll', locale }))
             .addOptions(polls.map((poll) => ({
@@ -282,12 +282,12 @@ module.exports = {
         value: pollutil.getCurrentOptions(discordServer, poll),
       });
       if (pollUtil.userCanVoteInPoll(member, poll, 1)) {
-        components.push(new MessageActionRow()
+        components.push(new ActionRowBuilder()
           .addComponents(
-            new MessageButton()
+            new ButtonBuilder()
               .setURL(pollutil.getVoteaireVoteUrl(poll.voteaireUUID))
               .setLabel(i18n.__({ phrase: 'vote.voteButton', locale }))
-              .setStyle('LINK'),
+              .setStyle(ButtonStyle.Link),
           ));
       }
     }

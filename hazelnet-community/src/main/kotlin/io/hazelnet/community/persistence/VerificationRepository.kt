@@ -14,6 +14,7 @@ import javax.transaction.Transactional
 
 @Repository
 interface VerificationRepository : CrudRepository<Verification, Long> {
+    fun countByConfirmedEqualsAndObsoleteEquals(confirmed: Boolean, obsolete: Boolean): Long
 
     @Transactional
     @Modifying
