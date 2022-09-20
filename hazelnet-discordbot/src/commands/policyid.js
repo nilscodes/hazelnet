@@ -3,6 +3,7 @@ const i18n = require('i18n');
 const CommandTranslations = require('../utility/commandtranslations');
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
+const { ensureLength } = require('../utility/discordstring');
 
 module.exports = {
   getCommandData(locale) {
@@ -19,13 +20,18 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const tokenPolicies = discordServer.tokenPolicies
-        .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
-        .map((tokenPolicy) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: tokenPolicy.policyId }) }));
-      if (!tokenPolicies.length) {
+      const sortedPolicies = discordServer.tokenPolicies.sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName));
+      let policyContent = '';
+      let tokenPolicies = [];
+      if (!sortedPolicies.length) {
         tokenPolicies.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale }) });
+      } else if (sortedPolicies.length <= 25) {
+        tokenPolicies = sortedPolicies.map((tokenPolicy) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: tokenPolicy.policyId }) }));
+      } else {
+        const policyString = ensureLength(sortedPolicies.map((tokenPolicy) => `**${tokenPolicy.projectName}**: ${tokenPolicy.policyId}`).join('\n'), 3500);
+        policyContent = i18n.__({ phrase: 'policyid.totalPolicies', locale }, { policyCount: sortedPolicies.length, policyString });
       }
-      const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'policyid.messageTitle', locale }), i18n.__({ phrase: 'policyid.purpose', locale }), 'policyid', tokenPolicies);
+      const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'policyid.messageTitle', locale }), i18n.__({ phrase: 'policyid.purpose', locale }) + policyContent, 'policyid', tokenPolicies);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

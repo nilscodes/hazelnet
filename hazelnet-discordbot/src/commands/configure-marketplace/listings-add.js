@@ -22,74 +22,79 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
-        const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
-          .filter((channel) => channel.type === 'LISTINGS');
-        const maxListingsTrackerCount = discordServer.settings?.MAXIMUM_LISTINGS_TRACKERS ?? 5;
-        if (marketplaceChannels.length < maxListingsTrackerCount) {
-          if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
-            const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
-            if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
-              if (policyIdToTrack) {
-                const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
-                if (officialProjectForPolicy) {
-                  const content = await this.createMarketplaceListingsChannel(interaction, {
-                    channelId: announceChannel.id,
-                    minimumPriceAda,
-                    maximumPriceAda: null,
-                    marketplace,
-                    highlightAttributeName,
-                    highlightAttributeDisplayName: highlightAttributeName,
-                  }, policyIdToTrack, discordServer);
-                  const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', content, 'configure-marketplace-listings-add');
-                  await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+        if (minimumPriceAda >= 1) {
+          const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
+            .filter((channel) => channel.type === 'LISTINGS');
+          const maxListingsTrackerCount = discordServer.settings?.MAXIMUM_LISTINGS_TRACKERS ?? 5;
+          if (marketplaceChannels.length < maxListingsTrackerCount) {
+            if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
+              const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
+              if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+                if (policyIdToTrack) {
+                  const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
+                  if (officialProjectForPolicy) {
+                    const content = await this.createMarketplaceListingsChannel(interaction, {
+                      channelId: announceChannel.id,
+                      minimumPriceAda,
+                      maximumPriceAda: null,
+                      marketplace,
+                      highlightAttributeName,
+                      highlightAttributeDisplayName: highlightAttributeName,
+                    }, policyIdToTrack, discordServer);
+                    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', content, 'configure-marketplace-listings-add');
+                    await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+                  } else {
+                    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.noProjectFound', locale }), 'configure-marketplace-listings-add');
+                    await interaction.editReply({ embeds: [embed], ephemeral: true });
+                  }
                 } else {
-                  const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.noProjectFound', locale }), 'configure-marketplace-listings-add');
-                  await interaction.editReply({ embeds: [embed], ephemeral: true });
+                  const officialProjects = discordServer.tokenPolicies
+                    .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
+                    .map((tokenPolicy) => ({
+                      label: tokenPolicy.projectName,
+                      description: i18n.__({ phrase: 'configure.marketplace.listings.add.policyId', locale }, { policyId: tokenPolicy.policyId }),
+                      value: tokenPolicy.policyId,
+                    }));
+                  if (officialProjects.length) {
+                    this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
+                      channelId: announceChannel.id,
+                      minimumPriceAda,
+                      marketplace,
+                      highlightAttributeName,
+                      highlightAttributeDisplayName: highlightAttributeName,
+                    });
+                    const components = [new ActionRowBuilder()
+                      .addComponents(
+                        new SelectMenuBuilder()
+                          .setCustomId('configure-marketplace/listings-add/add')
+                          .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.listings.add.chooseProject', locale }))
+                          .addOptions(officialProjects.slice(0, 25)),
+                      )];
+
+                    const marketplaceNames = [marketplace].map((marketplaceKey) => i18n.__({ phrase: `marketplaces.${marketplaceKey}`, locale })).join(', ');
+                    const content = i18n.__({ phrase: 'configure.marketplace.listings.add.purpose', locale }, { marketplaceNames, channel: announceChannel.id })
+                      + (minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.listings.add.minimumPriceAddon', locale }, { minimumPriceAda }) : '');
+                    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', content, 'configure-marketplace-listings-add');
+                    await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+                  } else {
+                    const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.noPoliciesDetail', locale }), 'configure-marketplace-listings-add');
+                    await interaction.editReply({ embeds: [embed], ephemeral: true });
+                  }
                 }
               } else {
-                const officialProjects = discordServer.tokenPolicies
-                  .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
-                  .map((tokenPolicy) => ({
-                    label: tokenPolicy.projectName,
-                    description: i18n.__({ phrase: 'configure.marketplace.listings.add.policyId', locale }, { policyId: tokenPolicy.policyId }),
-                    value: tokenPolicy.policyId,
-                  }));
-                if (officialProjects.length) {
-                  this.cache.set(`${interaction.guild.id}-${interaction.user.id}`, {
-                    channelId: announceChannel.id,
-                    minimumPriceAda,
-                    marketplace,
-                    highlightAttributeName,
-                    highlightAttributeDisplayName: highlightAttributeName,
-                  });
-                  const components = [new ActionRowBuilder()
-                    .addComponents(
-                      new SelectMenuBuilder()
-                        .setCustomId('configure-marketplace/listings-add/add')
-                        .setPlaceholder(i18n.__({ phrase: 'configure.marketplace.listings.add.chooseProject', locale }))
-                        .addOptions(officialProjects.slice(0, 25)),
-                    )];
-
-                  const marketplaceNames = [marketplace].map((marketplaceKey) => i18n.__({ phrase: `marketplaces.${marketplaceKey}`, locale })).join(', ');
-                  const content = i18n.__({ phrase: 'configure.marketplace.listings.add.purpose', locale }, { marketplaceNames, channel: announceChannel.id })
-                    + (minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.listings.add.minimumPriceAddon', locale }, { minimumPriceAda }) : '');
-                  const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', content, 'configure-marketplace-listings-add');
-                  await interaction.editReply({ components, embeds: [embed], ephemeral: true });
-                } else {
-                  const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.noPoliciesDetail', locale }), 'configure-marketplace-listings-add');
-                  await interaction.editReply({ embeds: [embed], ephemeral: true });
-                }
+                const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-marketplace-listings-add');
+                await interaction.editReply({ embeds: [embedAdmin], components: [], ephemeral: true });
               }
             } else {
-              const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-marketplace-listings-add');
-              await interaction.editReply({ embeds: [embedAdmin], components: [], ephemeral: true });
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorWrongChannelType', locale }), 'configure-marketplace-listings-add');
+              await interaction.editReply({ embeds: [embed], ephemeral: true });
             }
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorWrongChannelType', locale }), 'configure-marketplace-listings-add');
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorLimitReached', locale }, { maxCount: maxListingsTrackerCount }), 'configure-marketplace-listings-add');
             await interaction.editReply({ embeds: [embed], ephemeral: true });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorLimitReached', locale }, { maxCount: maxListingsTrackerCount }), 'configure-marketplace-listings-add');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace listings add', i18n.__({ phrase: 'configure.marketplace.listings.add.errorMinimumValue', locale }), 'configure-marketplace-listings-add');
           await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
