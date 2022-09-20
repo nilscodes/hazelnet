@@ -306,8 +306,9 @@
 		"messageTitle": "Official policy IDs associated with this Discord",
 		"purpose": "This is the official list of projects that are related to this server. This does not mean that this is the official Discord for the respective projects, but that the administrators of this server added them as policies here.\n💡 Please verify on the respective project website, if you are on their official Discord server before following any buy links etc.",
 		"noProjectName": "No official policies",
+		"totalPolicies": "\n\nThis server has **{{policyCount}}** active token policies:\n\n{{{policyString}}}",
 		"noPolicies": "*Currently, this server has no token policies listed.*",
-		"projectPolicyId": "The policy ID for this project is **{{policyId}}**"
+		"projectPolicyId": "The policy ID for this project is *{{policyId}}*"
 	},
 	"whois": {
 		"messageTitle": "Whois Info",
@@ -983,6 +984,7 @@
 					"errorWrongChannelType": "This channel cannot be used for sales announcements.",
 					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} sales trackers to your server.",
 					"otherError": "⚠ Error while adding a sales tracking channel.",
+					"errorMinimumValue": "⚠ Please use a minimum value of at least 1 ADA.",
 					"noPremium": "🙀 You currently can not add any sales trackers as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 				},
 				"list": {
@@ -1030,6 +1032,7 @@
 					"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 					"errorWrongChannelType": "This channel cannot be used for listing announcements.",
 					"errorLimitReached": "⚠ You cannot add more than {{maxCount}} listing trackers to your server.",
+					"errorMinimumValue": "⚠ Please use a minimum value of at least 1 ADA.",
 					"otherError": "⚠ Error while adding a listing tracking channel.",
 					"noPremium": "🙀 You currently can not add any listing trackers as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 				},
