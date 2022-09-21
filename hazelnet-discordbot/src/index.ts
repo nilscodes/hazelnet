@@ -98,25 +98,35 @@ client.login(process.env.TOKEN);
 const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.endsWith('.js'));
 
 if (queueFiles.length) {
-  (async () => {
+  const connectToAmqp = async () => {
     const rabbitPw = process.env.RABBITMQ_PASSWORD as string;
-    const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}`);
-    queueFiles.forEach(async (file) => {
-      const queue = require(`./queues/${file}`);
-      if (queue.name && queue.consume) {
-        const queueChannel = await conn.createChannel();
-        await queueChannel.assertQueue(queue.name);
-        queueChannel.consume(queue.name, (msg) => {
-          if (msg !== null) {
-            queue.consume(client, JSON.parse(msg.content.toString()));
-            queueChannel.ack(msg);
-          } else {
-            client.logger.error({ msg: `Consumer for queue ${queue.name} cancelled by server` });
-          }
-        });
-      }
-    });
-  })();
+    try {
+      const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}`);
+      queueFiles.forEach(async (file) => {
+        const queue = require(`./queues/${file}`);
+        if (queue.name && queue.consume) {
+          const queueChannel = await conn.createChannel();
+          await queueChannel.assertQueue(queue.name);
+          queueChannel.consume(queue.name, (msg) => {
+            if (msg !== null) {
+              queue.consume(client, JSON.parse(msg.content.toString()));
+              queueChannel.ack(msg);
+            } else {
+              client.logger.error({ msg: `Consumer for queue ${queue.name} cancelled by server` });
+            }
+          });
+        }
+      });
+      conn.on('close', (e) => {
+        client.logger.error({ msg: `Connection to AMQP server was closed. Reconnecting in 10 seconds...` });
+        setTimeout(connectToAmqp, 10000);
+      });
+    } catch (e) {
+      client.logger.error({ msg: `Connection to AMQP server could not be established. Reconnecting in 10 seconds...` });
+      setTimeout(connectToAmqp, 10000);
+    }
+  };
+  connectToAmqp();
 }
 
 // Start express server to expose prometheus metrics
