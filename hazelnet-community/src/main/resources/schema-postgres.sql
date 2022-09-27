@@ -343,10 +343,11 @@ CREATE TABLE "discord_claim_lists"
 CREATE TABLE "claim_lists"
 (
     "claim_list_id"          SERIAL PRIMARY KEY,
-    "claim_list_name"        varchar(30)  NOT NULL,
-    "claim_list_displayname" varchar(256) NOT NULL,
+    "claim_list_name"        varchar(30)   NOT NULL,
+    "claim_list_displayname" varchar(256)  NOT NULL,
     "claim_list_description" varchar(2000) NULL,
-    "claim_list_creation"    timestamp    NOT NULL
+    "claim_list_creation"    timestamp     NOT NULL,
+    "claim_list_url"         varchar(1024)
 );
 
 CREATE TABLE "physical_orders"
