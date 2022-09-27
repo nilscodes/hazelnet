@@ -53,7 +53,7 @@ module.exports = {
               .setPlaceholder(i18n.__({ phrase: 'claim.chooseClaimList', locale }))
               .addOptions(claimLists.map((claimList) => ({
                 label: claimList.displayName,
-                description: (claimList.description ? (claimList.description.substr(0, 90) + (claimList.description.length > 90 ? '...' : '')) : ''),
+                description: (claimList.description ? (claimList.description.substr(0, 90) + (claimList.description.length > 90 ? '...' : '')) : '-'),
                 value: `claimlist-${claimList.id}`,
               }))),
           ),
