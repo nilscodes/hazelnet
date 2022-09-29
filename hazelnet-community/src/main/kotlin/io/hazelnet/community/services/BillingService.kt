@@ -176,7 +176,9 @@ class BillingService(
                 .forEach { discordServer ->
                     val premiumInfo = getPremiumInfoForServer(discordServer, false)
                     val serverIsSponsored = discordServer.settings.any { it.name == "SPONSORED_BY" }
-                    if (!serverIsSponsored && premiumInfo.remainingBalance <= 0 && premiumInfo.actualMonthlyCost > 0) {
+                    val premiumUntil = discordServer.premiumUntil?.toInstant()?.atZone(ZoneId.of("UTC")) ?: currentTime
+                    val remainingPremiumDays = ChronoUnit.DAYS.between(currentTime, premiumUntil)
+                    if (remainingPremiumDays < 20 && !serverIsSponsored && premiumInfo.remainingBalance <= 0 && premiumInfo.actualMonthlyCost > 0) {
                         rabbitTemplate.convertAndSend("adminannouncements", AdminAnnouncement(discordServer.guildId, AdminAnnouncementType.PREMIUM_REFILL))
                         discordServer.premiumReminder = Date.from(currentTime.plusDays(14).toInstant())
                         discordServerRepository.save(discordServer)
