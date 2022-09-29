@@ -23,6 +23,7 @@ internal class BillingServiceTest {
         guildMemberUpdateTime = null,
         ownerAccount = null,
         premiumUntil = null,
+        premiumReminder = null,
         tokenPolicies = mutableSetOf(),
         stakepools = mutableSetOf(),
         delegatorRoles = mutableSetOf(),
@@ -86,6 +87,7 @@ internal class BillingServiceTest {
             discordServerRepository,
             mockk(),
             mockk(),
+            mockk(),
         )
 
         assertEquals(91074524911L, billingService.getBotFunding(testServer.guildId))
@@ -115,7 +117,7 @@ internal class BillingServiceTest {
 
     @Test
     fun calculateMonthlyActualCostInLovelace() {
-        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
+        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
         assertEquals(10000000, getCost(billingService, 50, 0))
         assertEquals(8000000, getCost(billingService, 50, 100))
         assertEquals(4000000, getCost(billingService, 50, 300))
@@ -164,7 +166,7 @@ internal class BillingServiceTest {
 
     @Test
     fun calculateMaximumDelegationDiscountAmountInLovelace() {
-        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
+        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
         assertEquals(500000000, billingService.calculateMaximumDelegationDiscountAmountInLovelace(50))
         assertEquals(1000000000, billingService.calculateMaximumDelegationDiscountAmountInLovelace(100))
         assertEquals(2500000000, billingService.calculateMaximumDelegationDiscountAmountInLovelace(250))
@@ -181,7 +183,7 @@ internal class BillingServiceTest {
 
     @Test
     fun calculateMonthlyTotalCostInLovelace() {
-        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
+        val billingService = BillingService(mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk())
         assertEquals(10000000, billingService.calculateMonthlyTotalCostInLovelace(50))
         assertEquals(10000000, billingService.calculateMonthlyTotalCostInLovelace(999))
         assertEquals(20000000, billingService.calculateMonthlyTotalCostInLovelace(1000))

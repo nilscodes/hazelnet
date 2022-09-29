@@ -30,6 +30,7 @@ internal class RoleAssignmentServiceTest {
         null,
         null,
         Date(System.currentTimeMillis() + 60000000L),
+        null,
         mutableSetOf(),
         mutableSetOf(
             Stakepool("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", null),
