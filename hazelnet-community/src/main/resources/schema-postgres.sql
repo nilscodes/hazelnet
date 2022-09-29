@@ -136,6 +136,7 @@ CREATE TABLE "discord_servers"
     "guild_member_update" timestamp,
     "owner_account_id"    bigint,
     "premium_until"       timestamp,
+    "premium_reminder"    timestamp,
     "active"              boolean       NOT NULL DEFAULT true
 );
 

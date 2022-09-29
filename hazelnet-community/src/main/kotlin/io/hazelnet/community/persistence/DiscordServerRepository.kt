@@ -2,6 +2,7 @@ package io.hazelnet.community.persistence
 
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.DiscordServerMemberStake
+import io.hazelnet.community.data.discord.polls.DiscordPollUpdateProjection
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -26,4 +27,7 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
 
     @Query(value = "SELECT DISTINCT ds.* FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId", nativeQuery = true)
     fun getDiscordServersForMember(@Param("externalAccountId") externalAccountId: Long): List<DiscordServer>
+
+    @Query(value = "SELECT ds FROM DiscordServer ds WHERE ds.active=true AND ds.premiumUntil>:now AND (ds.premiumReminder<:now OR ds.premiumReminder IS NULL)")
+    fun getDiscordServersThatNeedReminder(@Param("now") now: Date): List<DiscordServer>
 }

@@ -60,6 +60,10 @@ class DiscordServer @JsonCreator constructor(
     @Column(name = "premium_until")
     var premiumUntil: Date?,
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "premium_reminder")
+    var premiumReminder: Date? = null,
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
     @field:Valid
@@ -117,6 +121,7 @@ class DiscordServer @JsonCreator constructor(
         if (guildMemberUpdateTime != other.guildMemberUpdateTime) return false
         if (ownerAccount != other.ownerAccount) return false
         if (premiumUntil != other.premiumUntil) return false
+        if (premiumReminder != other.premiumReminder) return false
         if (tokenPolicies != other.tokenPolicies) return false
         if (stakepools != other.stakepools) return false
         if (delegatorRoles != other.delegatorRoles) return false
@@ -139,6 +144,7 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + (guildMemberUpdateTime?.hashCode() ?: 0)
         result = 31 * result + (ownerAccount?.hashCode() ?: 0)
         result = 31 * result + (premiumUntil?.hashCode() ?: 0)
+        result = 31 * result + (premiumReminder?.hashCode() ?: 0)
         result = 31 * result + tokenPolicies.hashCode()
         result = 31 * result + stakepools.hashCode()
         result = 31 * result + delegatorRoles.hashCode()
@@ -151,7 +157,7 @@ class DiscordServer @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active)"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, premiumReminder=$premiumReminder, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active)"
     }
 
 }

@@ -1,0 +1,16 @@
+package io.hazelnet.community.data
+
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
+
+data class AdminAnnouncement @JsonCreator constructor(
+    @field:JsonSerialize(using = ToStringSerializer::class)
+    val guildId: Long,
+
+    val type: AdminAnnouncementType,
+)
+
+enum class AdminAnnouncementType {
+    PREMIUM_REFILL
+}

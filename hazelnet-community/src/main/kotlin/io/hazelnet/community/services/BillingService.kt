@@ -2,6 +2,8 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
 import io.hazelnet.community.CommunityApplicationConfiguration
+import io.hazelnet.community.data.AdminAnnouncement
+import io.hazelnet.community.data.AdminAnnouncementType
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.premium.DiscordBilling
 import io.hazelnet.community.data.premium.DiscordPayment
@@ -10,10 +12,12 @@ import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import io.hazelnet.community.persistence.DiscordBillingRepository
 import io.hazelnet.community.persistence.DiscordPaymentRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.*
 import javax.transaction.Transactional
@@ -27,7 +31,8 @@ class BillingService(
     private val discordServerService: DiscordServerService,
     private val discordServerRepository: DiscordServerRepository,
     private val billingRepository: DiscordBillingRepository,
-    private val paymentRepository: DiscordPaymentRepository
+    private val paymentRepository: DiscordPaymentRepository,
+    private val rabbitTemplate: RabbitTemplate,
 ) {
 
     /**
@@ -49,16 +54,12 @@ class BillingService(
         val discordServers = discordServerService.getDiscordServers()
         discordServers.forEach { discordServer ->
             if (discordServer.premiumUntil == null || currentTime.isAfter(ZonedDateTime.ofInstant(discordServer.premiumUntil!!.toInstant(), ZoneId.of("UTC")))) {
-                val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer.guildMemberCount)
-                val currentDelegation = getBotFunding(discordServer.guildId)
-                val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
-                val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
-                val proratedCost = ((1 - percentageOfMonthCompleted) * actualMonthlyCost).toLong()
-                val currentBalance = getCurrentBalance(discordServer).orElse(0)
+                val premiumInfo = getPremiumInfoForServer(discordServer, false)
+                val proratedCost = ((1 - percentageOfMonthCompleted) * premiumInfo.actualMonthlyCost).toLong()
                 val serverIsSponsored = discordServer.settings.any { it.name == "SPONSORED_BY" }
-                if (serverIsSponsored || currentBalance > 0 || (proratedCost == 0L && currentBalance >= 0)) {
+                if (serverIsSponsored || premiumInfo.remainingBalance > 0 || (proratedCost == 0L && premiumInfo.remainingBalance >= 0)) {
                     val bill = billingRepository.save(
-                        DiscordBilling(null, discordServer, Date.from(currentTime.toInstant()), proratedCost, discordServer.guildMemberCount, maxDelegation, currentDelegation )
+                        DiscordBilling(null, discordServer, Date.from(currentTime.toInstant()), proratedCost, discordServer.guildMemberCount, premiumInfo.maxDelegation, premiumInfo.totalDelegation )
                     )
                     paymentRepository.save(
                         DiscordPayment(null, discordServer, null, Date.from(currentTime.toInstant()), -proratedCost, bill)
@@ -72,19 +73,23 @@ class BillingService(
 
     fun getPremiumInfo(guildId: Long): DiscordServerPremiumInfo {
         val discordServer = discordServerService.getDiscordServer(guildId)
+        return getPremiumInfoForServer(discordServer, true)
+    }
+
+    private fun getPremiumInfoForServer(discordServer: DiscordServer, includeLastBilling: Boolean): DiscordServerPremiumInfo {
         val monthlyCost = calculateMonthlyTotalCostInLovelace(discordServer.guildMemberCount)
         val currentDelegation = getBotFunding(discordServer.guildId)
         val maxDelegation = calculateMaximumDelegationDiscountAmountInLovelace(discordServer.guildMemberCount)
         val actualMonthlyCost = calculateMonthlyActualCostInLovelace(monthlyCost, currentDelegation, maxDelegation)
-        val currentBalance = getCurrentBalance(discordServer)
-        val lastBilling = billingRepository.findFirstByDiscordServerIdOrderByBillingTimeDesc(discordServer.id!!)
+        val currentBalance = getCurrentBalance(discordServer).orElse(0)
+        val lastBilling = if (includeLastBilling) billingRepository.findFirstByDiscordServerIdOrderByBillingTimeDesc(discordServer.id!!) else Optional.empty()
         return DiscordServerPremiumInfo(
             currentDelegation,
             maxDelegation,
             monthlyCost,
             actualMonthlyCost,
             discordServer.guildMemberCount,
-            currentBalance.orElse(0),
+            currentBalance,
             if (lastBilling.isPresent) lastBilling.get().memberCount else 0,
             if (lastBilling.isPresent) lastBilling.get().billingTime else null,
             if (lastBilling.isPresent) lastBilling.get().amount else 0,
@@ -158,5 +163,25 @@ class BillingService(
             incomingDiscordPayment.amount,
             null
         ))
+    }
+
+    @Scheduled(fixedDelay = 3600000, initialDelay = 600000)
+    fun remindersForRefills() {
+        val currentTime = ZonedDateTime.now(ZoneId.of("UTC"))
+        val endOfMonth = ZonedDateTime.now(ZoneId.of("UTC"))
+            .with(TemporalAdjusters.lastDayOfMonth())
+            .withHour(23).withMinute(59).withSecond(59)
+        if (ChronoUnit.DAYS.between(currentTime, endOfMonth) <= 3) {
+            discordServerRepository.getDiscordServersThatNeedReminder(Date())
+                .forEach { discordServer ->
+                    val premiumInfo = getPremiumInfoForServer(discordServer, false)
+                    val serverIsSponsored = discordServer.settings.any { it.name == "SPONSORED_BY" }
+                    if (!serverIsSponsored && premiumInfo.remainingBalance <= 0 && premiumInfo.actualMonthlyCost > 0) {
+                        rabbitTemplate.convertAndSend("adminannouncements", AdminAnnouncement(discordServer.guildId, AdminAnnouncementType.PREMIUM_REFILL))
+                        discordServer.premiumReminder = Date.from(currentTime.plusDays(14).toInstant())
+                        discordServerRepository.save(discordServer)
+                    }
+                }
+        }
     }
 }
