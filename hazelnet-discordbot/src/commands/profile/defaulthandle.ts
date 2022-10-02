@@ -27,10 +27,10 @@ export default <DefaultHandleCommand> {
       let newDefaultHandle = interaction.options.getString('handle');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
-      const availableHandles: string[] = (await interaction.client.services.accounts.getHandlesForAccount(mainAccount.id))
+      const allAvailableHandles: string[] = (await interaction.client.services.accounts.getHandlesForAccount(mainAccount.id))
         .map((handleData: Handle) => `\$${handleData.handle}`)
-        .sort((handleA: string, handleB: string) => handleA.length - handleB.length)
-        .slice(0, 25);
+        .sort((handleA: string, handleB: string) => handleA.length - handleB.length);
+      const availableHandles = allAvailableHandles.slice(0, 25);
       const handleFields = [];
       if (newDefaultHandle !== null && newDefaultHandle[0] !== '$') {
         newDefaultHandle = `$${newDefaultHandle}`;
@@ -38,7 +38,7 @@ export default <DefaultHandleCommand> {
       const currentDefaultHandle = mainAccount.settings[DEFAULT_HANDLE_SETTING];
       if (newDefaultHandle) {
         if (adahandle.isHandle(newDefaultHandle)) {
-          if (availableHandles.includes(newDefaultHandle)) {
+          if (allAvailableHandles.includes(newDefaultHandle)) {
             const embed = await this.setNewDefaultHandle(interaction, mainAccount, newDefaultHandle, discordServer)
             await interaction.editReply({ embeds: [embed] });
           } else {
