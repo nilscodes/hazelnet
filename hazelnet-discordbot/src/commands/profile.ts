@@ -11,13 +11,11 @@ export default <BotCommand> {
       .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('toggle')
-        .setDescription(ci18n.subDescription('toggle')));
-    if (!commandsToEnable || commandsToEnable.includes('handle')) {
-      builder.addSubcommand((subcommand) => subcommand
+        .setDescription(ci18n.subDescription('toggle')))
+      .addSubcommand((subcommand) => subcommand
         .setName('defaulthandle')
         .setDescription(ci18n.subDescription('defaulthandle'))
         .addStringOption((option) => option.setName('handle').setDescription(ci18n.option('handle')).setRequired(false)));
-    }
     return builder;
   },
   augmentPermissions: commandbase.augmentPermissionsUser,

@@ -268,24 +268,24 @@ internal class RoleAssignmentServiceTest {
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
-                setOf("Tavern1")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
+                assetList = setOf("Tavern1")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
-                setOf("Tavern2")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
+                assetList = setOf("Tavern2")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL1", "PXL2")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL1", "PXL2")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL3", "PXL4")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL3", "PXL4")
             ),
         )
         every {
@@ -351,14 +351,14 @@ internal class RoleAssignmentServiceTest {
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL1", "PXL2")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL1", "PXL2")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL3", "PXL4")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL3", "PXL4")
             ),
         )
         every {
@@ -421,14 +421,14 @@ internal class RoleAssignmentServiceTest {
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL1", "PXL2", "PXL3")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL1", "PXL2", "PXL3")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL4", "PXL5", "PXL6")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL4", "PXL5", "PXL6")
             ),
         )
         every {
@@ -494,29 +494,29 @@ internal class RoleAssignmentServiceTest {
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL1", "PXL2")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL1", "PXL2")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc2_kaizn",
-                "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
-                setOf("Tavern1")
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
+                assetList = setOf("Tavern1")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
-                setOf("PXL3")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL3")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
-                setOf("Tavern2")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "2d01b3496fd22b1a61e6227c27250225b1186e5ebae7360b1fc5392c",
+                assetList = setOf("Tavern2")
             ),
             TokenOwnershipInfoWithAssetList(
-                "acc1_hazel",
-                "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04",
-                setOf("Gotchi")
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04",
+                assetList = setOf("Gotchi")
             ),
         )
         every {

@@ -3,6 +3,7 @@
     "@discordjs/rest": "^0.4.0",
     "amqplib": "^0.10.2",
     "axios": "^0.24.0",
+    "cids": "^1.1.9",
     "csv-stringify": "^6.1.0",
     "discord-api-types": "^0.23.1",
     "discord.js": "^14.3.0",

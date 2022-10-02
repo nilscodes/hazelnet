@@ -12,14 +12,7 @@ paths:
       tags:
         - wallets
       parameters:
-        - name: walletAddress
-          in: path
-          description: The wallet address (Byron or Shelley era) to retrieve details for
-          required: true
-          style: simple
-          schema:
-            type: string
-            example: 1
+        - $ref: '#/components/parameters/WalletAddressPathParameter'
       responses:
         '200':
           description: 'Address details'
@@ -33,6 +26,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /wallets/{walletAddress}/assets/{policyId}:
+    get:
+      summary: 'Returns all assets of a policy in a specific wallet address'
+      operationId: walletAssets
+      tags:
+        - wallets
+        - token
+      parameters:
+        - $ref: '#/components/parameters/WalletAddressPathParameter'
+        - $ref: '#/components/parameters/PolicyIdPathParameter'
+      responses:
+        '200':
+          description: 'A filtered list of token policies and associated asset names currently owned by the wallet address'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenOwnershipInfoWithAssetList'
+  /wallets/{walletAddress}/handles:
+    get:
+      summary: 'Returns all handles in a specific wallet address'
+      operationId: walletHandles
+      tags:
+        - wallets
+        - handles
+      parameters:
+        - $ref: '#/components/parameters/WalletAddressPathParameter'
+      responses:
+        '200':
+          description: 'A list of handles currently owned by the wallet address'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Handle'
   /handles/{handleName}:
     get:
       summary: 'Resolve a an ADA handle to an address, if possible'
@@ -346,6 +376,16 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   parameters:
+    WalletAddressPathParameter:
+      name: walletAddress
+      in: path
+      description: The wallet address (Byron or Shelley era) to retrieve details for
+      required: true
+      style: simple
+      example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
+      schema:
+        type: string
+        example: 1
     PoolHashPathParameter:
       name: poolHash
       in: path
@@ -465,12 +505,13 @@ components:
     TokenOwnershipInfoWithAssetList:
       type: object
       required:
-        - stakeAddress
         - policyId
         - assetCount
       properties:
         stakeAddress:
           $ref: '#/components/schemas/StakeAddressView'
+        walletAddress:
+          $ref: '#/components/schemas/WalletAddress'
         policyId:
           $ref: '#/components/schemas/TokenPolicyId'
         assetList:
@@ -522,6 +563,9 @@ components:
       pattern: '^[-._a-zA-Z0-9]{1,15}$'
     WalletAddress:
       type: string
+      description: The wallet address (non-enterprise)
+      example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
+      pattern: '^addr1[A-Za-z-0-9]{98}$'
     StakepoolHash:
       type: string
       description: The Stakepool hash

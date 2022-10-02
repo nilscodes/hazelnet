@@ -9,7 +9,7 @@ module.exports = {
   },
   async getHandleMapFromStakeAddresses(cardanoinfo, stakeAddresses) {
     const resolvedHandles = stakeAddresses.map(async (stakeAddress) => {
-      const handle = await cardanoinfo.handleForStakeAddress(stakeAddress);
+      const handle = await cardanoinfo.bestHandleForStakeAddress(stakeAddress);
       return {
         stakeAddress,
         handle,
