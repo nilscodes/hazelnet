@@ -322,6 +322,11 @@
 		"handleFoundText": "https://handle.me/{{handleWithoutPrefix}}",
 		"handleOnSale": "💡 The Handle **{{handle}}** is currently on sale at *{{marketplaceName}}*. If you are interested, this is your chance to snag it!",
 		"handleOnSaleTitle": "Find on marketplace 🛒",
+		"handlesForStake": "✅ The stake address **{{address}}** is currently associated with the following ADA Handles:\n\n",
+		"handlesForWalletAddress": "✅ The wallet address **{{address}}** is currently associated with the following ADA Handles:\n\n",
+		"handlesEntry": "   • **$**{{handle}}",
+		"handlesForStakeNone": "❌ The stake address **{{address}}** is currently not associated with any ADA Handles.",
+		"handlesForWalletAddressNone": "❌ The wallet address **{{address}}** is currently not associated with any ADA Handles.",
 		"noDefaultHandle": "⚠ The user <@{{user}}> does not have a default ADA Handle configured."
 	},
 	"vote": {
@@ -1241,7 +1246,7 @@
 				"errorAmountToSmall": "⚠ The submitted amount of **{{refillAmount}} ADA** is too small. The minimum refill amount is **{{minimumAmount}} ADA**.\n\n😻 Thank you for supporting HAZELnet!",
 				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{existingIncomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting HAZELnet!",
 				"reminderTitle": "Black Edition Info",
-				"reminder": "Hello **{{{tag}}}***!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
+				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
 			}
 		}
 	},

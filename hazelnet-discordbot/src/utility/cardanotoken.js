@@ -19,6 +19,9 @@ module.exports = {
     }
     return assetFingerprintA?.indexOf(assetFingerprintB) === 0;
   },
+  toHex(assetName) {
+    return assetName.split('').map((c) => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+  },
   buildMetadataFilterContentText(filters, aggregationType, locale) {
     const metadataFiltersList = this.getMetadataFilterContentList(filters, locale);
     const joinPhraseText = this.getJoinPhraseTextForAggregationType(aggregationType, locale);

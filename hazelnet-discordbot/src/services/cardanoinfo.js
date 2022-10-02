@@ -8,9 +8,21 @@ module.exports = {
     const handleAddress = await axios.get(`${hazelCardanoConnectUrl}/handles/${handleToResolve}`);
     return handleAddress.data;
   },
-  async handleForStakeAddress(stakeAddress) {
-    const handle = await axios.get(`${hazelCardanoConnectUrl}/token/stake/${stakeAddress}/besthandle`);
-    return handle.data;
+  async bestHandleForStakeAddress(stakeAddress) {
+    const bestHandlePromise = await axios.get(`${hazelCardanoConnectUrl}/token/stake/${stakeAddress}/besthandle`);
+    return bestHandlePromise.data;
+  },
+  async handlesForStakeAddress(stakeAddress) {
+    const handlesPromise = await axios.get(`${hazelCardanoConnectUrl}/token/stake/${stakeAddress}/handles`);
+    return handlesPromise.data;
+  },
+  async handlesForWalletAddress(walletAddress) {
+    const handlesPromise = await axios.get(`${hazelCardanoConnectUrl}/wallets/${walletAddress}/handles`);
+    return handlesPromise.data;
+  },
+  async multiAssetInfo(policyId, assetNameHex) {
+    const assetPromise = await axios.get(`${hazelCardanoConnectUrl}/token/assets/${policyId}/${assetNameHex}`);
+    return assetPromise.data;
   },
   async walletInfo(address) {
     try {

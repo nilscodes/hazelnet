@@ -1,13 +1,20 @@
 package io.hazelnet.cardano.connect.services
 
 import io.hazelnet.cardano.connect.data.address.AddressDetails
+import io.hazelnet.cardano.connect.data.address.Handle
+import io.hazelnet.cardano.connect.data.token.PolicyId
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.cardano.connect.persistence.address.AddressDaoCardanoDbSync
+import io.hazelnet.cardano.connect.persistence.token.TokenDao
 import io.hazelnet.cardano.connect.util.Bech32
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val addressDao: AddressDaoCardanoDbSync
+    @Value("\${io.hazelnet.connect.cardano.handlepolicy}")
+    private val handlePolicy: String,
+    private val tokenDao: TokenDao,
 ) {
 
     fun getAddress(address: String): AddressDetails {
@@ -18,6 +25,18 @@ class AddressService(
             AddressDetails(null)
         }
     }
+
+    fun getAssetsFromPolicyAtAddress(address: String, policyId: String): List<TokenOwnershipInfoWithAssetList> {
+        return tokenDao.getMultiAssetListWithPolicyIdForWalletAddress(
+            address,
+            listOf(PolicyId(policyId))
+        )
+    }
+
+    fun getHandlesAtAddress(address: String) = getAssetsFromPolicyAtAddress(address, handlePolicy)
+        .map { it.assetList }
+        .flatten()
+        .map { Handle(handle = it, resolved = false) }
 
     companion object {
         fun getStakeKeyViewFromAddress(address: String): String? {

@@ -19,6 +19,8 @@ const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES =
     "SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) GROUP BY policy"
 const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES =
     "SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s)"
+const val GET_ALL_MULTI_ASSET_NAMES_IN_WALLET_ADDRESS_FOR_POLICIES =
+    "SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id WHERE u.address=? AND ma.policy IN (%s)"
 const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT =
     "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint"
 const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT =
@@ -85,7 +87,7 @@ class TokenDaoCardanoDbSync(
             val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
             assetNameList.add(rs.getString("name").decodeHex())
         }, stakeAddress)
-        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress, it.key, it.value) }
+        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
 
     override fun getMultiAssetListWithPolicyIdForStakeAddress(
@@ -102,7 +104,7 @@ class TokenDaoCardanoDbSync(
             val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
             assetNameList.add(rs.getString("name").decodeHex())
         }
-        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress, it.key, it.value) }
+        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
 
     override fun getMultiAssetListWithPolicyIdAndAssetFingerprintForStakeAddress(
@@ -120,18 +122,34 @@ class TokenDaoCardanoDbSync(
                 policiesToAssets.computeIfAbsent(rs.getString("policy") + rs.getString("fingerprint")) { mutableSetOf() }
             assetNameList.add(rs.getString("name").decodeHex())
         }
-        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress, it.key, it.value) }
+        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
 
+    override fun getMultiAssetListWithPolicyIdForWalletAddress(
+        walletAddress: String,
+        policyIds: List<PolicyId>
+    ): List<TokenOwnershipInfoWithAssetList> {
+        val (sql, sqlParameters, sqlParameterTypes) = getPartsForPolicyIdBasedQuery(
+            GET_ALL_MULTI_ASSET_NAMES_IN_WALLET_ADDRESS_FOR_POLICIES,
+            policyIds,
+            walletAddress
+        )
+        val policiesToAssets = mutableMapOf<String, MutableSet<String>>()
+        jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
+            val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
+            assetNameList.add(rs.getString("name").decodeHex())
+        }
+        return policiesToAssets.map { TokenOwnershipInfoWithAssetList(walletAddress = walletAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
+    }
 
     private fun getPartsForPolicyIdBasedQuery(
         sqlBase: String,
         policyIds: List<PolicyId>,
-        stakeAddress: String
+        address: String
     ): Triple<String, MutableList<String>, IntArray> {
         val policyIdInClause = Collections.nCopies(policyIds.size, "decode(?, 'hex')").joinToString(",")
         val sql = String.format(sqlBase, policyIdInClause)
-        val sqlParameters = mutableListOf(stakeAddress)
+        val sqlParameters = mutableListOf(address)
         sqlParameters.addAll(policyIds.map { it.policyId })
         val sqlParameterTypes = Collections.nCopies(policyIds.size + 1, Types.VARCHAR).toIntArray()
         return Triple(sql, sqlParameters, sqlParameterTypes)
