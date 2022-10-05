@@ -18,7 +18,8 @@ module.exports = {
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createMintAnnouncementFields(mintAnnouncement, locale);
             const title = marketplace.getMintAnnouncementTitle(mintAnnouncement, locale);
-            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.mint.announce.title', locale }), title, 'policyid', detailFields, mintAnnouncement.assetImageUrl);
+            const image = marketplace.prepareImageUrl(mintAnnouncement.assetImageUrl);
+            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.mint.announce.title', locale }), title, 'policyid', detailFields, image);
             const components = marketplace.getMintAnnouncementComponents(discordServer, mintAnnouncement);
             await announceChannel.send({ embeds: [embedPublic], components });
           } else {
