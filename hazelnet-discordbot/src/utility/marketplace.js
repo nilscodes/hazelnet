@@ -2,6 +2,7 @@ const {
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
 const i18n = require('i18n');
+const CID = require('cids');
 const cardanotoken = require('./cardanotoken');
 
 module.exports = {
@@ -82,6 +83,13 @@ module.exports = {
       return [new ActionRowBuilder().addComponents(components)];
     }
     return [];
+  },
+  prepareImageUrl(imageUrl) {
+    if (imageUrl.indexOf('https://nftstorage.link/ipfs/') === 0) {
+      const ipfsV0 = imageUrl.substring('https://nftstorage.link/ipfs/'.length);
+      return process.env.IPFS_LINK?.replaceAll('%s', new CID(ipfsV0).toV1().toString('base32'));
+    }
+    return imageUrl;
   },
   generateLink(linkType, linkData, locale) {
     switch (linkType) {
