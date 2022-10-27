@@ -41,6 +41,9 @@
 			"configure-poll-add-onchain": "Registers a new Voteaire onchain vote with the bot for users to discover and vote on.",
 			"configure-poll-announce": "Announce the current results of a poll to the channel this command is run in.",
 			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
+			"configure-poll-update": "Change advanced options on your existing poll.",
+			"configure-poll-update-addrole": "Adds a new eligible role that can vote to an existing poll.",
+			"configure-poll-update-removerole": "Removes a currently eligible role from an existing poll.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
 			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
@@ -834,7 +837,7 @@
 				"previewPhase1NoChannel": "You have not selected a channel for the bot to post a voting announcement in at poll open time.",
 				"previewPhase1Channel": "The bot will post a voting announcement in <#{{publishChannel}}> once the poll opens.",
 				"previewPhase1NoRequiredRole": "No role requirements are in effect - everybody will be able to see the poll.",
-				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll manage* command later.",
+				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll update* command later.",
 				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for you poll that you would like to use:",
 				"startPhase3": "Use this description",
 				"redoPhase2": "Change description",
@@ -892,6 +895,23 @@
 				"purpose": "Select the poll to remove from your Discord server.\n\n⚠ **ALL REGISTERED VOTES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE POLL**.\n\nOnly do this after you have processed this poll.",
 				"errorNotFound": "⚠ No poll with the ID **{{pollId}}** was found for this server. Nothing was removed.",
 				"choosePollDetails": "Choose the poll you want to irrevocably delete"
+			},
+			"update": {
+				"addrole": {
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to vote the poll **{{poll.displayName}}**.",
+					"purpose": "Select the poll you would like the role <@&{{roleId}}> to be able to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"choosePoll": "Choose the poll you want to allow this role to vote in",
+					"tooManyRoles": "⚠ Cannot add more than 20 roles to a poll.",
+					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to vote in this poll and was not added again."
+				},
+				"removerole": {
+					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to vote on the poll **{{poll.displayName}}**.",
+					"purpose": "Select the poll you would like to remove a role froming being allowed to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"choosePoll": "Choose the poll you want to remove this role from",
+					"chooseRolePurpose": "Choose which role you would like to remove from the poll {{displayName}}:",
+					"chooseRole": "Choose role to remove",
+					"noRoles": "⚠ No roles to remove exist on this poll."
+				}
 			}
 		},
 		"whitelist": {
@@ -1248,6 +1268,11 @@
 				"reminderTitle": "Black Edition Info",
 				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
 			}
+		},
+		"manage": {
+			"addrole": {
+				"choosePoll": "configure.manage.addrole.choosePoll"
+			}
 		}
 	},
 	"start": {
@@ -1291,7 +1316,8 @@
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
 		"cardolphins": "Cardolphins Special",
-		"handle": "ADA Handle Integration"
+		"handle": "ADA Handle Integration",
+		"giveaway": "features.giveaway"
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
@@ -1326,5 +1352,6 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	}
+	},
+	"": ""
 }

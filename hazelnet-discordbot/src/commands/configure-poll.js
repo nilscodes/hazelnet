@@ -18,7 +18,17 @@ module.exports = {
         .addBooleanOption((option) => option.setName('publishresults').setDescription(ci18n.option('publishresults')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
-        .setDescription(ci18n.subDescription('remove')));
+        .setDescription(ci18n.subDescription('remove')))
+      .addSubcommandGroup((group) => group
+        .setName('update')
+        .setDescription(ci18n.subDescription('update'))
+        .addSubcommand((subcommand) => subcommand
+          .setName('addrole')
+          .setDescription(ci18n.subDescription('update-addrole'))
+          .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('removerole')
+          .setDescription(ci18n.subDescription('update-removerole'))));
 
     if (!commandsToEnable || commandsToEnable.includes('poll')) {
       commandBuilder.addSubcommand((subcommand) => subcommand
