@@ -1,4 +1,4 @@
-package io.hazelnet.community.data.discord.polls
+package io.hazelnet.community.data.discord.giveaways
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import io.hazelnet.community.data.discord.DiscordRequiredRole
@@ -6,7 +6,7 @@ import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.Size
 
-data class DiscordPollPartial @JsonCreator constructor(
+data class DiscordGiveawayPartial @JsonCreator constructor(
     val channelId: Long?,
     val messageId: Long?,
     @field:Size(min = 1, max = 256)
@@ -15,7 +15,6 @@ data class DiscordPollPartial @JsonCreator constructor(
     val description: String?,
     val openAfter: Date?,
     val openUntil: Date?,
-    val resultsVisible: Boolean?,
     val archived: Boolean?,
     @field:Valid
     val requiredRoles: MutableSet<DiscordRequiredRole>?,

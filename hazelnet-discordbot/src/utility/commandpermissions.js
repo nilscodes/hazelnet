@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 module.exports = {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck', 'configure-giveaway'],
   async setSlashCommandPermissions(client, guildId, discordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {

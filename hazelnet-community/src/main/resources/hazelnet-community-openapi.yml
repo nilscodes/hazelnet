@@ -1371,6 +1371,98 @@ paths:
                     $ref: '#/components/schemas/VoteData'
                   poll:
                     $ref: '#/components/schemas/VoteData'
+  /discord/servers/{guildId}/giveaways:
+    get:
+      summary: 'Get giveaways for this Discord server'
+      operationId: listGiveaways
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      responses:
+        '200':
+          description: 'All giveaways for this server'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscordGiveaway'
+    post:
+      summary: Create a giveaway on this server
+      operationId: addGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordGiveaway'
+      responses:
+        '201':
+          description: 'Poll'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordGiveaway'
+          headers:
+            Location:
+              $ref: '#/components/schemas/CreatedResponseHeader'
+  /discord/servers/{guildId}/giveaways/{giveawayId}:
+    get:
+      summary: 'Get specific giveaway for this Discord server'
+      operationId: getGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/GiveawayIdPathParameter'
+      responses:
+        '200':
+          description: 'The giveaway with the specified ID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordGiveaway'
+    patch:
+      summary: Update the settings and dates for this giveaway
+      operationId: updateGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/GiveawayIdPathParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscordGiveawayPartial'
+      responses:
+        '200':
+          description: 'Giveaway with updated details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscordGiveaway'
+
+    delete:
+      summary: Remove a giveaway from this Discord server, including all entries, drawn winners etc
+      operationId: deleteGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: '#/components/parameters/GiveawayIdPathParameter'
+      responses:
+        '204':
+          description: Successful deletion
   /discord/servers/{guildId}/marketplaces/channels:
     get:
       summary: 'Get marketplace channels for this Discord server'
@@ -1872,6 +1964,16 @@ components:
       required: true
       style: simple
       example: 6121
+      schema:
+        type: integer
+        format: int64
+    GiveawayIdPathParameter:
+      name: giveawayId
+      in: path
+      description: The ID of this giveaway
+      required: true
+      style: simple
+      example: 5124
       schema:
         type: integer
         format: int64
@@ -2733,7 +2835,7 @@ components:
         requiredRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordPollRequiredRole'
+            $ref: '#/components/schemas/DiscordRequiredRole'
         options:
           type: array
           items:
@@ -2772,8 +2874,94 @@ components:
         requiredRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordPollRequiredRole'
-    DiscordPollRequiredRole:
+            $ref: '#/components/schemas/DiscordRequiredRole'
+    DiscordGiveaway:
+      type: object
+      required:
+        - creator
+        - name
+        - displayName
+        - description
+        - openAfter
+        - openUntil
+        - options
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        name:
+          type: string
+          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        archived:
+          type: boolean
+          default: false
+        snapshotIds:
+          type: array
+          items:
+            format: int64
+        requiredRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordRequiredRole'
+    DiscordGiveawayPartial:
+      type: object
+      properties:
+        channelId:
+          $ref: '#/components/schemas/DiscordChannel'
+        messageId:
+          $ref: '#/components/schemas/DiscordMessage'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        archived:
+          type: boolean
+        requiredRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscordRequiredRole'
+    DiscordRequiredRole:
       type: object
       required:
         - roleId
@@ -3092,6 +3280,11 @@ components:
           $ref: '#/components/schemas/TokenPolicyId'
         assetFingerprint:
           $ref: '#/components/schemas/AssetFingerprint'
+        tokenWeight:
+          description: The amount of weight each owned token from the respective snapshot has
+          type: number
+          default: 1.0
+          example: 2.0
         taken:
           readOnly: true
           type: boolean

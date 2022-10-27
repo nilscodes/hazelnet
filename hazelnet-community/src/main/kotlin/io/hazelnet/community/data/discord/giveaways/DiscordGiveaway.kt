@@ -1,4 +1,4 @@
-package io.hazelnet.community.data.discord.polls
+package io.hazelnet.community.data.discord.giveaways
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -15,11 +15,11 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 @Entity
-@Table(name = "discord_polls")
-class DiscordPoll @JsonCreator constructor(
+@Table(name = "discord_giveaways")
+class DiscordGiveaway @JsonCreator constructor(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "discord_poll_id")
+    @Column(name = "discord_giveaway_id")
     var id: Int?,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,71 +40,58 @@ class DiscordPoll @JsonCreator constructor(
     @field:JsonSerialize(using = ToStringSerializer::class)
     var messageId: Long?,
 
-    @Column(name = "poll_name")
+    @Column(name = "giveaway_name")
     @field:NonNull
     @field:Size(min = 1, max = 30)
     @field:Pattern(regexp = "^[A-Za-z][-A-Za-z0-9]{0,29}$")
     var name: String,
 
-    @Column(name = "poll_displayname")
+    @Column(name = "giveaway_displayname")
     @field:NonNull
     @field:Size(min = 1, max = 256)
     var displayName: String,
 
-    @Column(name = "poll_description")
+    @Column(name = "giveaway_description")
     @field:NonNull
     @field:Size(min = 1, max = 4096)
     var description: String,
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "poll_creation", updatable = false)
+    @Column(name = "giveaway_creation", updatable = false)
     var createTime: Date?,
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "poll_open_after")
+    @Column(name = "giveaway_open_after")
     @field:NonNull
     var openAfter: Date,
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "poll_open_until")
+    @Column(name = "giveaway_open_until")
     @field:NonNull
     var openUntil: Date,
 
-    @Column(name = "poll_results_visible")
-    var resultsVisible: Boolean = true,
-
-    @Column(name = "poll_weighted")
-    var weighted: Boolean = false,
-
-    @Column(name = "poll_multiple_votes")
-    var multipleVotes: Boolean = false,
-
-    @Column(name = "poll_archived")
+    @Column(name = "giveaway_archived")
     var archived: Boolean = false,
 
-    @Column(name = "poll_snapshot_id")
-    var snapshotId: Int?,
+    @Column(name = "giveaway_winner_count")
+    @field:Min(1)
+    var winnerCount: Int = 1,
+
+    @Column(name = "giveaway_snapshot_id")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_giveaway_snapshots", joinColumns = [JoinColumn(name = "discord_giveaway_id")])
+    var snapshotIds: Set<Int> = mutableSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "discord_poll_required_roles", joinColumns = [JoinColumn(name = "discord_poll_id")])
+    @CollectionTable(name = "discord_giveaway_required_roles", joinColumns = [JoinColumn(name = "discord_giveaway_id")])
     @field:Valid
     var requiredRoles: MutableSet<DiscordRequiredRole> = mutableSetOf(),
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "discord_poll_id")
-    @field:Valid
-    var options: MutableSet<DiscordPollOption> = mutableSetOf(),
-
-    @Column(name = "poll_voteaire_id")
-    var voteaireUUID: UUID?,
-
     ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as DiscordPoll
+        other as DiscordGiveaway
 
         if (id != other.id) return false
         if (discordServer != other.discordServer) return false
@@ -117,14 +104,10 @@ class DiscordPoll @JsonCreator constructor(
         if (createTime != other.createTime) return false
         if (openAfter != other.openAfter) return false
         if (openUntil != other.openUntil) return false
-        if (resultsVisible != other.resultsVisible) return false
-        if (weighted != other.weighted) return false
-        if (multipleVotes != other.multipleVotes) return false
+        if (winnerCount != other.winnerCount) return false
         if (archived != other.archived) return false
-        if (snapshotId != other.snapshotId) return false
+        if (snapshotIds != other.snapshotIds) return false
         if (requiredRoles != other.requiredRoles) return false
-        if (options != other.options) return false
-        if (voteaireUUID != other.voteaireUUID) return false
 
         return true
     }
@@ -141,18 +124,15 @@ class DiscordPoll @JsonCreator constructor(
         result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + openAfter.hashCode()
         result = 31 * result + openUntil.hashCode()
-        result = 31 * result + resultsVisible.hashCode()
-        result = 31 * result + weighted.hashCode()
-        result = 31 * result + multipleVotes.hashCode()
+        result = 31 * result + winnerCount.hashCode()
         result = 31 * result + archived.hashCode()
-        result = 31 * result + (snapshotId ?: 0)
+        result = 31 * result + snapshotIds.hashCode()
         result = 31 * result + requiredRoles.hashCode()
-        result = 31 * result + options.hashCode()
-        result = 31 * result + voteaireUUID.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordPoll(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, resultsVisible=$resultsVisible, weighted=$weighted, multipleVotes=$multipleVotes, archived=$archived, snapshotId=$snapshotId, requiredRoles=$requiredRoles, options=$options, voteaireUUID=$voteaireUUID)"
+        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles)"
     }
+
 }

@@ -1,4 +1,4 @@
-package io.hazelnet.community.data.discord.polls
+package io.hazelnet.community.data.discord
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -9,7 +9,7 @@ import javax.persistence.Embeddable
 import javax.validation.constraints.Min
 
 @Embeddable
-class DiscordPollRequiredRole @JsonCreator constructor(
+class DiscordRequiredRole @JsonCreator constructor(
     @Column(name = "discord_role_id")
     @field:NonNull
     @field:Min(1)
@@ -20,7 +20,7 @@ class DiscordPollRequiredRole @JsonCreator constructor(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as DiscordPollRequiredRole
+        other as DiscordRequiredRole
 
         if (roleId != other.roleId) return false
 
@@ -32,6 +32,6 @@ class DiscordPollRequiredRole @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordPollRequiredRole(roleId=$roleId)"
+        return "DiscordRequiredRole(roleId=$roleId)"
     }
 }

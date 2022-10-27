@@ -35,6 +35,9 @@ class MultiAssetSnapshot @JsonCreator constructor(
     @field:Pattern(regexp = "^asset1[a-zA-Z0-9]{38}$")
     var assetFingerprint: String?,
 
+    @Column(name = "token_weight")
+    var tokenWeight: Double = 1.0,
+
     @Column(name = "snapshot_taken")
     var taken: Boolean = false,
 
@@ -54,7 +57,9 @@ class MultiAssetSnapshot @JsonCreator constructor(
         if (snapshotTime != other.snapshotTime) return false
         if (policyId != other.policyId) return false
         if (assetFingerprint != other.assetFingerprint) return false
+        if (tokenWeight != other.tokenWeight) return false
         if (taken != other.taken) return false
+        if (data != other.data) return false
 
         return true
     }
@@ -65,13 +70,14 @@ class MultiAssetSnapshot @JsonCreator constructor(
         result = 31 * result + snapshotTime.hashCode()
         result = 31 * result + policyId.hashCode()
         result = 31 * result + (assetFingerprint?.hashCode() ?: 0)
+        result = 31 * result + tokenWeight.hashCode()
         result = 31 * result + taken.hashCode()
+        result = 31 * result + data.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "MultiAssetSnapshot(id=$id, createTime=$createTime, snapshotTime=$snapshotTime, policyId='$policyId', assetFingerprint=$assetFingerprint, taken=$taken)"
+        return "MultiAssetSnapshot(id=$id, createTime=$createTime, snapshotTime=$snapshotTime, policyId='$policyId', assetFingerprint=$assetFingerprint, tokenWeight=$tokenWeight, taken=$taken, data.size=${data.size})"
     }
-
 
 }

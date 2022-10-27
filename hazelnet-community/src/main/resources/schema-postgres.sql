@@ -317,6 +317,43 @@ CREATE TABLE "discord_poll_votes"
     "vote_time"              timestamp NOT NULL
 );
 
+CREATE TABLE "discord_giveaways"
+(
+    "discord_giveaway_id"   SERIAL PRIMARY KEY,
+    "discord_server_id"     int,
+    "external_account_id"   bigint,
+    "discord_channel_id"    bigint,
+    "discord_message_id"    bigint,
+    "giveaway_name"         varchar(30)   NOT NULL,
+    "giveaway_displayname"  varchar(256)  NOT NULL,
+    "giveaway_description"  varchar(4096) NOT NULL,
+    "giveaway_creation"     timestamp     NOT NULL,
+    "giveaway_open_after"   timestamp     NOT NULL,
+    "giveaway_open_until"   timestamp     NOT NULL,
+    "giveaway_winner_count" smallint      NOT NULL DEFAULT 1,
+    "giveaway_archived"     boolean       NOT NULL DEFAULT false,
+    UNIQUE ("discord_server_id", "giveaway_name")
+);
+
+CREATE TABLE "discord_giveaway_required_roles"
+(
+    "discord_giveaway_id" int,
+    "discord_role_id"     bigint NOT NULL
+);
+
+CREATE TABLE "discord_giveaway_snapshots"
+(
+    "discord_giveaway_id"  int,
+    "giveaway_snapshot_id" int
+);
+
+CREATE TABLE "discord_giveaway_entries"
+(
+    "external_account_id" bigint,
+    "entry_weight"        bigint    NOT NULL,
+    "entry_time"          timestamp NOT NULL
+);
+
 CREATE TABLE "stake_snapshot_cardano"
 (
     "snapshot_id"                SERIAL PRIMARY KEY,
@@ -324,6 +361,7 @@ CREATE TABLE "stake_snapshot_cardano"
     "snapshot_time"              timestamp   NOT NULL,
     "snapshot_policy_id"         varchar(56) NOT NULL,
     "snapshot_asset_fingerprint" varchar,
+    "token_weight"               decimal     NOT NULL DEFAULT 1,
     "snapshot_taken"             boolean     NOT NULL DEFAULT false
 );
 
@@ -519,6 +557,18 @@ ALTER TABLE "discord_poll_options" ADD FOREIGN KEY ("discord_poll_id") REFERENCE
 ALTER TABLE "discord_poll_votes" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
 
 ALTER TABLE "discord_poll_votes" ADD FOREIGN KEY ("discord_poll_option_id") REFERENCES "discord_poll_options" ("discord_poll_option_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_giveaways" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_giveaways" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_giveaway_required_roles" ADD FOREIGN KEY ("discord_giveaway_id") REFERENCES "discord_giveaways" ("discord_giveaway_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_giveaway_snapshots" ADD FOREIGN KEY ("discord_giveaway_id") REFERENCES "discord_giveaways" ("discord_giveaway_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_giveaway_snapshots" ADD FOREIGN KEY ("giveaway_snapshot_id") REFERENCES "stake_snapshot_cardano" ("snapshot_id") ON DELETE RESTRICT;
+
+ALTER TABLE "discord_giveaway_entries" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE RESTRICT;
 
 ALTER TABLE "stake_snapshot_data_cardano" ADD FOREIGN KEY ("snapshot_id") REFERENCES "stake_snapshot_cardano" ("snapshot_id") ON DELETE CASCADE;
 

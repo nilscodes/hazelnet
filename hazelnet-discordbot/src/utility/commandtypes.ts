@@ -6,6 +6,7 @@ export interface BotCommand {
   getCommandData(locale: string, commandsToEnable?: string[]): SlashCommandBuilder
   getContextMenuData?(locale: string): ContextMenuCommandBuilder
   augmentPermissions(): void
+  commandTags?: string[],
   execute(interaction: AugmentedCommandInteraction): void
   executeSelectMenu?(interaction: AugmentedSelectMenuInteraction): void
   executeButton?(interaction: AugmentedButtonInteraction): void
