@@ -82,6 +82,7 @@
 			"configure-policy-add": "Add a Cardano policy ID and associated project name to the list of official projects on this server.",
 			"configure-policy-list": "List all Cardano policy IDs configured as official policies for projects on this server.",
 			"configure-policy-remove": "Remove the Cardano policy ID from this server's official policy list.",
+			"configure-policy-announce": "Announce all your official policies and associated project names.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
 			"configure-marketplace": "Configure marketplace integrations.",
 			"configure-marketplace-sales": "Configure your sales trackers.",
@@ -105,7 +106,9 @@
 			"configure-adminaccess": "Configure roles that can administer the bot",
 			"configure-adminaccess-add": "Adds a role that is allowed to administer the bot.",
 			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
-			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot."
+			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
+			"configure-social": "Commands to manage various Discord and social media features and integrations.",
+			"configure-social-announce": "Create custom branded announcements."
 		},
 		"options": {
 			"verify": {
@@ -144,7 +147,9 @@
 			},
 			"configure-policy": {
 				"policy-id": "Policy ID to add/remove as an official token policy on this server",
-				"project-name": "The project name to list this policy ID under"
+				"project-name": "The project name to list this policy ID under",
+				"channel": "Channel to post the announcement to.",
+				"info-text": "A text included in your announcement that contains additional information."
 			},
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
@@ -204,6 +209,10 @@
 			"configure-settings": {
 				"element": "The bot UI element to customize",
 				"customization-value": "The new style (color, text or image link, depending on the select element)"
+			},
+			"configure-social": {
+				"channel": "Channel to post the announcement to.",
+				"title": "The title/headline of your announcement."
 			}
 		},
 		"choices": {
@@ -652,6 +661,27 @@
 			"remove": {
 				"success": "🗑️ Removed the following token policy from the official token policy list of this server:",
 				"errorNotFound": "⚠ No policy with the ID **{{policyId}}** was found for this server. Nothing was removed."
+			},
+			"announce": {
+				"purpose": "You are about to create a policy ID widget and announcement in the channel <#{{channel}}>. The widget will contain your provided info text as shown below, as well as a list of all the official project names and corresponding policy IDs of this server. Please confirm below if you want to continue.",
+				"success": "✅ Policy ID widget successfully published in <#{{channel}}>.",
+				"publicSuccessTitle": "📃 Project & Policy ID list",
+				"publicSuccess": "Here is the list of supported policy IDs of this server.\n\n💡 Keep in mind, that a policy ID being listed here does not mean that this the official server of this project. Always verify with other sources before making a purchase or trading.",
+				"infoMessage": "Info Message",
+				"publicSuccessTitleContinued": "📃 Project & Policy ID list (continued)",
+				"publish": "Create announcement",
+				"projectName": "Project: {{{projectName}}}",
+				"policyId": "*{{policyId}}*",
+				"errorNoPolicies": "⚠ You currently have not set any project names and policy IDs for this server. Please add a project first by using the command **/configure-policy add**.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for policy ID announcements."
+			}
+		},
+		"social": {
+			"announce": {
+				"purpose": "You are about to create a announcement in the channel <#{{channel}}>. The announcement will contain the text you send as the next message in this channel in the next five minutes. You can use any Discord markdown you want and will receive a preview of your announcement before submitting it.",
+				"success": "✅ Announcement successfully published in <#{{channel}}>.",
+				"publish": "Create announcement"
 			}
 		},
 		"stakepool": {
@@ -1195,7 +1225,7 @@
 			"features": {
 				"purpose": "Change the currently enabled feature set for the bot on this Discord server.",
 				"chooseFeatures": "Choose all features you want to continue by using the below selection list:",
-				"saveSettings": "Save Settings",
+				"saveSettings": "Save current settings",
 				"success": "✅ Your feature changes have been successfully applied! It may take a few minutes for the commands to become available."
 			},
 			"customize": {
@@ -1268,11 +1298,6 @@
 				"reminderTitle": "Black Edition Info",
 				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
 			}
-		},
-		"manage": {
-			"addrole": {
-				"choosePoll": "configure.manage.addrole.choosePoll"
-			}
 		}
 	},
 	"start": {
@@ -1289,7 +1314,7 @@
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",
 		"chooseUserRole": "Choose your user role",
-		"chooseFeatures": "Choose the features you want to use",
+		"chooseFeatures": "Choose all of the features you want to use",
 		"selectedLanguage": "Your selected language is **{{language}}**.",
 		"selectedAdminRoles": "The users with the following roles will be able to configure the bot:",
 		"selectedUserRoles": "The users with the following roles will be able to verify their wallets and interact with the bot:",
