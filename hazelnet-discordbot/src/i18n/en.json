@@ -1070,7 +1070,7 @@
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any sales with a maximum price of **₳{{maximumPriceAda}}**",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a sales tracking channel."
 				}
 			},
@@ -1117,7 +1117,7 @@
 					"entryAddon": ", > ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any listings with a minimum asking price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any listings with a maximum asking price of **₳{{maximumPriceAda}}**",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a listing tracking channel."
 				}
 			},
@@ -1155,7 +1155,7 @@
 					"chooseMarketplaceChannel": "Choose a mint tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
 					"entry": "#{{channelName}}",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a mint tracking channel."
 				}
 			},

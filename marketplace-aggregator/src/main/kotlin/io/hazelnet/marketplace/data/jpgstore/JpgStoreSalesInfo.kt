@@ -18,10 +18,10 @@ data class JpgStoreSalesInfo @JsonCreator constructor(
     val transactionHash: String,
 
     @JsonProperty("listing_id")
-    val listingId: Long,
+    val listingId: Long?,
 
     @JsonProperty("confirmed_at")
-    val saleDate: Date,
+    val saleDate: Date?,
 
     @JsonProperty("price_lovelace")
     val price: Long,
@@ -32,7 +32,7 @@ data class JpgStoreSalesInfo @JsonCreator constructor(
         source = Marketplace.JPGSTORE,
         marketplaceAssetUrl = "https://jpg.store/asset/$assetId",
         price = price,
-        saleDate = saleDate,
+        saleDate = saleDate!!,
         type = SalesType.BUY,
     )
 }

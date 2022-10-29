@@ -62,7 +62,6 @@ export default <DefaultHandleCommand> {
         await interaction.editReply({ components, embeds: [embed] });
       }
     } catch (error) {
-      console.log(error);
       interaction.client.logger.error({ guildId: interaction.guild?.id, error });
       await interaction.editReply({ content: 'Error while setting default handle for user. Please contact your bot admin via https://www.hazelnet.io.' });
     }

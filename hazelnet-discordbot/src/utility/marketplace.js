@@ -149,7 +149,12 @@ module.exports = {
   async getMarketplaceChannelOption(discordServer, marketplaceChannel, interaction, subcommand) {
     const locale = discordServer.getBotLanguage();
     const projectName = this.getProjectName(discordServer, marketplaceChannel);
-    const announceChannel = await interaction.guild.channels.fetch(marketplaceChannel.channelId);
+    let announceChannel = null;
+    try {
+      announceChannel = await interaction.guild.channels.fetch(marketplaceChannel.channelId);
+    } catch (error) {
+      // Channel deleted
+    }
     const marketplaceNames = marketplaceChannel.marketplaces?.map((marketplace) => i18n.__({ phrase: `marketplaces.${marketplace}`, locale })).join(', ');
     const channelName = announceChannel ? announceChannel.name : i18n.__({ phrase: `configure.marketplace.${subcommand}.remove.deletedChannel`, locale });
     let description = i18n.__({ phrase: `configure.marketplace.${subcommand}.remove.entry`, locale }, { channelName, marketplaceNames });
