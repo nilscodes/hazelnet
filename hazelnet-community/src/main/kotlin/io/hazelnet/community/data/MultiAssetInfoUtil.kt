@@ -8,7 +8,7 @@ import io.hazelnet.community.CommunityApplicationConfiguration
 fun getImageUrlFromAssetInfo(ipfslink: String, assetInfo: MultiAssetInfo): String? {
     return try {
         val ipfsLink = JsonPath.read<String>(assetInfo.metadata, "$.image").replace("ipfs://", "", true)
-        String.format(ipfslink ?: "%s", ipfsLink)
+        String.format(ipfslink, ipfsLink)
     } catch(pnfe: PathNotFoundException) {
         null
     }
