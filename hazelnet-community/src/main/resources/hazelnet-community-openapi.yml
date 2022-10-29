@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  version: '0.0.1'
-  title: 'HazelNet Community'
+  version: "0.0.1"
+  title: "HazelNet Community"
 servers:
-  - url: 'localhost:8085'
+  - url: "localhost:8085"
 
 paths:
   /settings:
@@ -13,8 +13,8 @@ paths:
       tags:
         - global
       responses:
-        '200':
-          description: 'All Global Settings'
+        "200":
+          description: "All Global Settings"
           content:
             application/json:
               schema:
@@ -26,7 +26,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /settings/{settingName}:
     put:
       summary: Create or update a setting
@@ -34,44 +34,44 @@ paths:
       tags:
         - global
       parameters:
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GlobalSetting'
+              $ref: "#/components/schemas/GlobalSetting"
       responses:
-        '200':
-          description: 'Updated setting'
+        "200":
+          description: "Updated setting"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GlobalSetting'
+                $ref: "#/components/schemas/GlobalSetting"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
-      summary: 'Delete Global Setting by Name'
+      summary: "Delete Global Setting by Name"
       operationId: deleteGlobalSetting
       tags:
         - global
       parameters:
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /accounts:
     post:
-      summary: 'Create an Account'
+      summary: "Create an Account"
       operationId: createAccount
       tags:
         - account
@@ -79,14 +79,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Account'
+              $ref: "#/components/schemas/Account"
       responses:
-        '201':
-          description: 'Account data'
+        "201":
+          description: "Account data"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account'
+                $ref: "#/components/schemas/Account"
   /accounts/{accountId}:
     get:
       summary: Get account info
@@ -94,14 +94,14 @@ paths:
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: "#/components/parameters/AccountIdPathParameter"
       responses:
-        '200':
-          description: 'Account data'
+        "200":
+          description: "Account data"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account'
+                $ref: "#/components/schemas/Account"
   /accounts/{accountId}/settings/{settingName}:
     put:
       summary: Create or update an account setting with the provided value
@@ -109,31 +109,31 @@ paths:
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/AccountIdPathParameter'
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/AccountIdPathParameter"
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EmbeddableSetting'
+              $ref: "#/components/schemas/EmbeddableSetting"
       responses:
-        '200':
-          description: 'Account Setting'
+        "200":
+          description: "Account Setting"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmbeddableSetting'
+                $ref: "#/components/schemas/EmbeddableSetting"
     delete:
-      summary: 'Delete account setting by Name'
+      summary: "Delete account setting by Name"
       operationId: deleteSetting
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/AccountIdPathParameter'
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/AccountIdPathParameter"
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
   /accounts/{accountId}/handles:
     get:
       summary: Get all ADA Handles available to external accounts linked to this account
@@ -141,17 +141,17 @@ paths:
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/AccountIdPathParameter'
+        - $ref: "#/components/parameters/AccountIdPathParameter"
       responses:
-        '200':
-          description: 'List of assets'
+        "200":
+          description: "List of assets"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Handle'
+                $ref: "#/components/schemas/Handle"
   /externalaccounts:
     post:
-      summary: 'Create External Account'
+      summary: "Create External Account"
       operationId: createExternalAccount
       tags:
         - account
@@ -159,188 +159,188 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalAccount'
+              $ref: "#/components/schemas/ExternalAccount"
       responses:
-        '201':
-          description: 'External account data'
+        "201":
+          description: "External account data"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccount'
+                $ref: "#/components/schemas/ExternalAccount"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/{externalAccountId}:
     get:
-      summary: 'Get Account'
+      summary: "Get Account"
       operationId: getExternalAccount
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'External Account Info'
+        "200":
+          description: "External Account Info"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccount'
+                $ref: "#/components/schemas/ExternalAccount"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/{externalAccountId}/verifications:
     get:
-      summary: 'Get Verifications for this specific account'
+      summary: "Get Verifications for this specific account"
       operationId: getExternalAccountVerifications
       tags:
         - account
         - verification
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'List of all completed and outstanding verifications for this user'
+        "200":
+          description: "List of all completed and outstanding verifications for this user"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Verification'
+                  $ref: "#/components/schemas/Verification"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/{externalAccountId}/pings:
     get:
-      summary: 'Get pings for this specific account (sent and received)'
+      summary: "Get pings for this specific account (sent and received)"
       operationId: getExternalAccountPings
       tags:
         - account
         - ping
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'List of all pings (sent and received) for this user'
+        "200":
+          description: "List of all pings (sent and received) for this user"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ExternalAccountPing'
+                  $ref: "#/components/schemas/ExternalAccountPing"
   /externalaccounts/{externalAccountId}/pings/{pingId}:
     patch:
-      summary: 'Update a specific ping the user is a sender or recipient of'
+      summary: "Update a specific ping the user is a sender or recipient of"
       operationId: updateExternalAccountPing
       tags:
         - account
         - ping
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
-        - $ref: '#/components/parameters/PingIdPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - $ref: "#/components/parameters/PingIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalAccountPingPartial'
+              $ref: "#/components/schemas/ExternalAccountPingPartial"
       responses:
-        '200':
-          description: 'The updated ping object'
+        "200":
+          description: "The updated ping object"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccountPing'
+                $ref: "#/components/schemas/ExternalAccountPing"
   /externalaccounts/{externalAccountId}/whitelists:
     get:
-      summary: 'Get whitelists this specific account is signed up for'
+      summary: "Get whitelists this specific account is signed up for"
       operationId: getExternalAccountWhitelists
       tags:
         - account
         - ping
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'List of all whitelists this user is signed up for'
+        "200":
+          description: "List of all whitelists this user is signed up for"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SummarizedWhitelistSignup'
+                  $ref: "#/components/schemas/SummarizedWhitelistSignup"
   /externalaccounts/{externalAccountId}/premium:
     get:
-      summary: 'Get Premium data for this specific account'
+      summary: "Get Premium data for this specific account"
       operationId: getPremiumInfo
       tags:
         - account
         - premium
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'List of premium status, total delegation etc.'
+        "200":
+          description: "List of premium status, total delegation etc."
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ExternalAccountPremiumInfo'
+                  $ref: "#/components/schemas/ExternalAccountPremiumInfo"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/{externalAccountId}/import:
     post:
-      summary: 'Import any outstanding verifications from other systems for this user'
+      summary: "Import any outstanding verifications from other systems for this user"
       operationId: importExternalVerifications
       tags:
         - account
         - verification
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'List of imported verifications, if any, empty list otherwise.'
+        "200":
+          description: "List of imported verifications, if any, empty list otherwise."
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/VerificationImport'
+                  $ref: "#/components/schemas/VerificationImport"
   /externalaccounts/{externalAccountId}/account:
     put:
-      summary: 'Get or create a main account for this external account'
+      summary: "Get or create a main account for this external account"
       operationId: setAccountForExternalAccount
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'The existing account associated with this external account, or the newly created account'
+        "200":
+          description: "The existing account associated with this external account, or the newly created account"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Account'
+                  $ref: "#/components/schemas/Account"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/discord/{discordUserId}:
     get:
       summary: Get external account matching a Discord user ID
@@ -348,55 +348,55 @@ paths:
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/DiscordUserIdPathParameter'
+        - $ref: "#/components/parameters/DiscordUserIdPathParameter"
       responses:
-        '200':
-          description: 'External Account Info that was created or matching existing external account'
+        "200":
+          description: "External Account Info that was created or matching existing external account"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccount'
-        '404':
+                $ref: "#/components/schemas/ExternalAccount"
+        "404":
           description: No external account found for this Discord user ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     put:
-      summary: 'Create/Retrieve External account for Discord user'
+      summary: "Create/Retrieve External account for Discord user"
       operationId: setExternalAccountForDiscordUser
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/DiscordUserIdPathParameter'
+        - $ref: "#/components/parameters/DiscordUserIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalAccount'
+              $ref: "#/components/schemas/ExternalAccount"
       responses:
-        '200':
-          description: 'External Account Info that was created or matching existing external account'
+        "200":
+          description: "External Account Info that was created or matching existing external account"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccount'
+                $ref: "#/components/schemas/ExternalAccount"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /verifications:
     post:
-      summary: 'Request Verification for an External Account'
+      summary: "Request Verification for an External Account"
       operationId: requestVerification
       tags:
         - verification
@@ -404,23 +404,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerificationRequest'
+              $ref: "#/components/schemas/VerificationRequest"
       responses:
-        '201':
-          description: 'Verification details'
+        "201":
+          description: "Verification details"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verification'
+                $ref: "#/components/schemas/Verification"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /snapshots/stake:
     post:
-      summary: 'Schedule a token snapshot'
+      summary: "Schedule a token snapshot"
       operationId: scheduleSnapshot
       tags:
         - snapshot
@@ -429,57 +429,57 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MultiAssetSnapshot'
+              $ref: "#/components/schemas/MultiAssetSnapshot"
       responses:
-        '201':
-          description: 'Snapshot details'
+        "201":
+          description: "Snapshot details"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MultiAssetSnapshot'
+                $ref: "#/components/schemas/MultiAssetSnapshot"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /verifications/{verificationId}:
     get:
-      summary: 'Get Verification Info'
+      summary: "Get Verification Info"
       operationId: getVerification
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/VerificationPathParameter'
+        - $ref: "#/components/parameters/VerificationPathParameter"
       responses:
-        '200':
-          description: 'Verification Details'
+        "200":
+          description: "Verification Details"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verification'
+                $ref: "#/components/schemas/Verification"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
-      summary: 'Delete Verification Info by ID'
+      summary: "Delete Verification Info by ID"
       operationId: deleteVerification
       tags:
         - account
       parameters:
-        - $ref: '#/components/parameters/VerificationPathParameter'
+        - $ref: "#/components/parameters/VerificationPathParameter"
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /pings:
     post:
       summary: Ping another user
@@ -491,17 +491,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExternalAccountPing'
+              $ref: "#/components/schemas/ExternalAccountPing"
       responses:
-        '201':
-          description: 'The ping created'
+        "201":
+          description: "The ping created"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExternalAccountPing'
+                $ref: "#/components/schemas/ExternalAccountPing"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists:
     post:
       summary: Add Claim List
@@ -512,17 +512,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClaimList'
+              $ref: "#/components/schemas/ClaimList"
       responses:
-        '201':
-          description: 'Claim List'
+        "201":
+          description: "Claim List"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimList'
+                $ref: "#/components/schemas/ClaimList"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists/{claimListId}:
     get:
       summary: Get Claim List
@@ -530,14 +530,14 @@ paths:
       tags:
         - claims
       parameters:
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
       responses:
-        '200':
-          description: 'Claim List'
+        "200":
+          description: "Claim List"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimList'
+                $ref: "#/components/schemas/ClaimList"
   /claimlists/{claimListId}/orders/physical:
     get:
       summary: Get physical orders for this claim list
@@ -545,38 +545,38 @@ paths:
       tags:
         - claims
       parameters:
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
       responses:
-        '200':
-          description: 'Physical order'
+        "200":
+          description: "Physical order"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PhysicalOrder'
+                  $ref: "#/components/schemas/PhysicalOrder"
     post:
       summary: Add a physical order for this claim list
       operationId: addPhysicalOrder
       tags:
         - claims
       parameters:
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PhysicalOrder'
+              $ref: "#/components/schemas/PhysicalOrder"
       responses:
-        '201':
-          description: 'Physical order'
+        "201":
+          description: "Physical order"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhysicalOrder'
+                $ref: "#/components/schemas/PhysicalOrder"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists/{claimListId}/orders/physical/{orderId}:
     get:
       summary: Get physical order by order ID
@@ -584,15 +584,15 @@ paths:
       tags:
         - claims
       parameters:
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
-        - $ref: '#/components/parameters/OrderIdPathParameter'
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
+        - $ref: "#/components/parameters/OrderIdPathParameter"
       responses:
-        '200':
-          description: 'Physical order'
+        "200":
+          description: "Physical order"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhysicalOrder'
+                $ref: "#/components/schemas/PhysicalOrder"
   /products:
     post:
       summary: Add Product
@@ -604,17 +604,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PhysicalProduct'
+              $ref: "#/components/schemas/PhysicalProduct"
       responses:
-        '201':
-          description: 'Physical product'
+        "201":
+          description: "Physical product"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhysicalProduct'
+                $ref: "#/components/schemas/PhysicalProduct"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /products/{productId}:
     get:
       summary: Get Product Info
@@ -623,14 +623,14 @@ paths:
         - claims
         - products
       parameters:
-        - $ref: '#/components/parameters/ProductIdPathParameter'
+        - $ref: "#/components/parameters/ProductIdPathParameter"
       responses:
-        '200':
-          description: 'Physical Product'
+        "200":
+          description: "Physical Product"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhysicalProduct'
+                $ref: "#/components/schemas/PhysicalProduct"
   /discord/servers:
     get:
       summary: Get all Discord servers
@@ -638,14 +638,14 @@ paths:
       tags:
         - discord
       responses:
-        '201':
-          description: 'List of Discord servers'
+        "201":
+          description: "List of Discord servers"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordServer'
+                  $ref: "#/components/schemas/DiscordServer"
     post:
       summary: Add Discord Server
       operationId: addDiscordServer
@@ -655,17 +655,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordServer'
+              $ref: "#/components/schemas/DiscordServer"
       responses:
-        '201':
-          description: 'Discord Server'
+        "201":
+          description: "Discord Server"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordServer'
+                $ref: "#/components/schemas/DiscordServer"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}:
     get:
       summary: Get Discord Server Details
@@ -673,33 +673,33 @@ paths:
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Discord Server'
+        "200":
+          description: "Discord Server"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordServer'
+                $ref: "#/components/schemas/DiscordServer"
     patch:
       summary: Update Discord Server
       operationId: updateDiscordServer
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordServerPartial'
+              $ref: "#/components/schemas/DiscordServerPartial"
       responses:
-        '200':
-          description: 'Updated Discord Server'
+        "200":
+          description: "Updated Discord Server"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordServer'
+                $ref: "#/components/schemas/DiscordServer"
   /discord/servers/{guildId}/roleassignments/delegatorroles:
     get:
       summary: Get the current set of delegator role assignments for this server
@@ -707,16 +707,16 @@ paths:
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Role assignment list for delegation roles'
+        "200":
+          description: "Role assignment list for delegation roles"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordRoleAssignment'
+                  $ref: "#/components/schemas/DiscordRoleAssignment"
   /discord/servers/{guildId}/roleassignments/tokenroles:
     get:
       summary: Get the current set of token role assignments for this server
@@ -724,16 +724,16 @@ paths:
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Role assignment list for token roles'
+        "200":
+          description: "Role assignment list for token roles"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordRoleAssignment'
+                  $ref: "#/components/schemas/DiscordRoleAssignment"
   /discord/servers/{guildId}/members:
     get:
       summary: Get the list of external accounts that are members of this discord server
@@ -742,16 +742,16 @@ paths:
         - discord
         - account
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Discord Member List'
+        "200":
+          description: "Discord Member List"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordMember'
+                  $ref: "#/components/schemas/DiscordMember"
     post:
       summary: Connect an external account to this discord server
       operationId: connectExternalAccount
@@ -759,19 +759,19 @@ paths:
         - discord
         - account
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordMember'
+              $ref: "#/components/schemas/DiscordMember"
       responses:
-        '201':
-          description: 'Added discord member'
+        "201":
+          description: "Added discord member"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordMember'
+                $ref: "#/components/schemas/DiscordMember"
   /discord/servers/{guildId}/members/{externalAccountId}:
     get:
       summary: Get your association details for this Discord
@@ -780,15 +780,15 @@ paths:
         - discord
         - account
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
+        "200":
           description: Discord member details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordMember'
+                $ref: "#/components/schemas/DiscordMember"
     patch:
       summary: Update your association details for this Discord
       operationId: updateExternalAccountOnDiscord
@@ -796,20 +796,20 @@ paths:
         - discord
         - account
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordMemberPartial'
+              $ref: "#/components/schemas/DiscordMemberPartial"
       responses:
-        '200':
+        "200":
           description: Updated discord member details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordMember'
+                $ref: "#/components/schemas/DiscordMember"
     delete:
       summary: Unlink an external account from this discord server
       operationId: disconnectExternalAccount
@@ -817,8 +817,8 @@ paths:
         - discord
         - account
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
         - name: skipRoleUpdates
           in: query
           description: Set to true if no role updates should be triggered as part of this unlinking
@@ -827,8 +827,8 @@ paths:
             type: boolean
             default: false
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
   /discord/servers/{guildId}/members/{externalAccountId}/claimlists:
     get:
       summary: Get the claim lists this user is eligible for on this Discord server, and include product information they can claim
@@ -837,57 +837,57 @@ paths:
         - discord
         - claims
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'All claim lists this user is eligible for, including the products associated with their claims'
+        "200":
+          description: "All claim lists this user is eligible for, including the products associated with their claims"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimListsWithProducts'
-  /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders:
-    get:
-      summary: Get any order this user might have had for the given claim list
-      operationId: getOrderOfUserForClaimList
-      tags:
-        - discord
-        - claims
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
-      responses:
-        '200':
-          description: 'This users order for this claim list'
+                $ref: "#/components/schemas/ClaimListsWithProducts"
+  ? /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders
+    : get:
+        summary: Get any order this user might have had for the given claim list
+        operationId: getOrderOfUserForClaimList
+        tags:
+          - discord
+          - claims
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/ExternalAccountPathParameter"
+          - $ref: "#/components/parameters/ClaimListIdPathParameter"
+        responses:
+          "200":
+            description: "This users order for this claim list"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/PhysicalOrder"
+          "404":
+            description: "No order found for this claim list and user"
+      post:
+        summary: Submit a new order for this claim list
+        description: This will overwrite any existing orders for this claim list/user combination
+        operationId: setOrderOfUserForClaimList
+        tags:
+          - discord
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/ExternalAccountPathParameter"
+          - $ref: "#/components/parameters/ClaimListIdPathParameter"
+        requestBody:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PhysicalOrder'
-        '404':
-          description: 'No order found for this claim list and user'
-    post:
-      summary: Submit a new order for this claim list
-      description: This will overwrite any existing orders for this claim list/user combination
-      operationId: setOrderOfUserForClaimList
-      tags:
-        - discord
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
-        - $ref: '#/components/parameters/ClaimListIdPathParameter'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PhysicalOrder'
-      responses:
-        '200':
-          description: 'The created order for this claim list'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PhysicalOrder'
+                $ref: "#/components/schemas/PhysicalOrder"
+        responses:
+          "200":
+            description: "The created order for this claim list"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/PhysicalOrder"
   /discord/servers/{guildId}/premium:
     get:
       summary: Get the information about the premium status of this server
@@ -896,16 +896,16 @@ paths:
         - discord
         - premium
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Premium Info'
+        "200":
+          description: "Premium Info"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordServerPremiumInfo'
+                  $ref: "#/components/schemas/DiscordServerPremiumInfo"
   /discord/servers/{guildId}/payment:
     get:
       summary: Get the current outstanding payment request, if any
@@ -914,16 +914,16 @@ paths:
         - discord
         - premium
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'Incoming payment info'
+        "200":
+          description: "Incoming payment info"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/IncomingDiscordPayment'
+                  $ref: "#/components/schemas/IncomingDiscordPayment"
     post:
       summary: Submit a new incoming payment request
       operationId: requestIncomingPayment
@@ -931,19 +931,19 @@ paths:
         - discord
         - premium
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IncomingDiscordPaymentRequest'
+              $ref: "#/components/schemas/IncomingDiscordPaymentRequest"
       responses:
-        '200':
-          description: 'The created incoming payment'
+        "200":
+          description: "The created incoming payment"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IncomingDiscordPayment'
+                $ref: "#/components/schemas/IncomingDiscordPayment"
     delete:
       summary: Cancel an outstanding payment request
       operationId: cancelIncomingPayment
@@ -951,10 +951,10 @@ paths:
         - discord
         - premium
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
   /discord/servers/{guildId}/claimlists/{claimListIdOrName}/orders:
     get:
       summary: Get all orders for this claim list
@@ -963,17 +963,17 @@ paths:
         - discord
         - claims
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ClaimListIdOrNamePathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdOrNamePathParameter"
       responses:
-        '200':
-          description: 'List of orders'
+        "200":
+          description: "List of orders"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PhysicalOrder'
+                  $ref: "#/components/schemas/PhysicalOrder"
   /discord/servers/{guildId}/claimlists/{claimListIdOrName}/products:
     get:
       summary: Get all available products for this claim list
@@ -982,17 +982,17 @@ paths:
         - discord
         - claims
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/ClaimListIdOrNamePathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdOrNamePathParameter"
       responses:
-        '200':
-          description: 'List of products'
+        "200":
+          description: "List of products"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PhysicalProduct'
+                  $ref: "#/components/schemas/PhysicalProduct"
   /discord/servers/{guildId}/tokenpolicies:
     post:
       summary: Add an official token policy to this discord server
@@ -1001,22 +1001,22 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenPolicy'
+              $ref: "#/components/schemas/TokenPolicy"
       responses:
-        '201':
-          description: 'Token Policy'
+        "201":
+          description: "Token Policy"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenPolicy'
+                $ref: "#/components/schemas/TokenPolicy"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/tokenpolicies/{policyId}:
     delete:
       summary: Remove an official token policy from this discord server
@@ -1025,10 +1025,10 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PolicyIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PolicyIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/stakepools:
     post:
@@ -1038,22 +1038,22 @@ paths:
         - discord
         - stakepool
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Stakepool'
+              $ref: "#/components/schemas/Stakepool"
       responses:
-        '201':
-          description: 'Details of added stakepool'
+        "201":
+          description: "Details of added stakepool"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Stakepool'
+                $ref: "#/components/schemas/Stakepool"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/stakepools/{poolHash}:
     delete:
       summary: Remove an official stakepool from this discord server
@@ -1062,10 +1062,10 @@ paths:
         - discord
         - stakepool
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PoolHashPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PoolHashPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/delegatorroles:
     post:
@@ -1075,22 +1075,22 @@ paths:
         - discord
         - stakepool
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordDelegatorRole'
+              $ref: "#/components/schemas/DiscordDelegatorRole"
       responses:
-        '201':
-          description: 'Newly created Delegator Role'
+        "201":
+          description: "Newly created Delegator Role"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordDelegatorRole'
+                $ref: "#/components/schemas/DiscordDelegatorRole"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/delegatorroles/{delegatorRoleId}:
     delete:
       summary: Remove a delegator role assignment from this discord server
@@ -1099,10 +1099,10 @@ paths:
         - discord
         - stakepool
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/DelegatorRoleIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/DelegatorRoleIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/tokenroles:
     post:
@@ -1112,22 +1112,22 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordTokenRole'
+              $ref: "#/components/schemas/DiscordTokenRole"
       responses:
-        '201':
-          description: 'Newly created token role'
+        "201":
+          description: "Newly created token role"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordTokenRole'
+                $ref: "#/components/schemas/DiscordTokenRole"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}:
     patch:
       summary: Update a token role
@@ -1136,20 +1136,20 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/TokenRoleIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordTokenRolePartial'
+              $ref: "#/components/schemas/DiscordTokenRolePartial"
       responses:
-        '200':
-          description: 'Updated token role'
+        "200":
+          description: "Updated token role"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordTokenRole'
+                $ref: "#/components/schemas/DiscordTokenRole"
     delete:
       summary: Remove a token role assignment from this discord server
       operationId: deleteTokenOwnershipRole
@@ -1157,10 +1157,10 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/TokenRoleIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters:
     post:
@@ -1170,61 +1170,61 @@ paths:
         - discord
         - token
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/TokenRoleIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MetadataFilter'
+              $ref: "#/components/schemas/MetadataFilter"
       responses:
-        '201':
-          description: 'The newly added metadata filter for this token role'
+        "201":
+          description: "The newly added metadata filter for this token role"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MetadataFilter'
+                $ref: "#/components/schemas/MetadataFilter"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
-  /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}:
-    delete:
-      summary: Remove a metadata filter from the designated token role
-      operationId: deleteMetadataFilterFromTokenRole
-      tags:
-        - discord
-        - token
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/TokenRoleIdPathParameter'
-        - $ref: '#/components/parameters/TokenRoleFilterIdPathParameter'
-      responses:
-        '204':
-          description: Successful deletion
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  ? /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}
+    : delete:
+        summary: Remove a metadata filter from the designated token role
+        operationId: deleteMetadataFilterFromTokenRole
+        tags:
+          - discord
+          - token
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/TokenRoleIdPathParameter"
+          - $ref: "#/components/parameters/TokenRoleFilterIdPathParameter"
+        responses:
+          "204":
+            description: Successful deletion
   /discord/servers/{guildId}/polls:
     get:
-      summary: 'Get polls for this Discord server'
+      summary: "Get polls for this Discord server"
       operationId: listPolls
       tags:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'All polls for this server'
+        "200":
+          description: "All polls for this server"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordPoll'
+                  $ref: "#/components/schemas/DiscordPoll"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Create a poll on this server
       operationId: addPoll
@@ -1232,39 +1232,39 @@ paths:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordPoll'
+              $ref: "#/components/schemas/DiscordPoll"
       responses:
-        '201':
-          description: 'Poll'
+        "201":
+          description: "Poll"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordPoll'
+                $ref: "#/components/schemas/DiscordPoll"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/polls/{pollId}:
     get:
-      summary: 'Get specific poll for this Discord server'
+      summary: "Get specific poll for this Discord server"
       operationId: getPoll
       tags:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
       responses:
-        '200':
-          description: 'The poll with the specified ID'
+        "200":
+          description: "The poll with the specified ID"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordPoll'
+                $ref: "#/components/schemas/DiscordPoll"
     patch:
       summary: Update the settings and dates for this poll
       operationId: updatePoll
@@ -1272,20 +1272,20 @@ paths:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordPollPartial'
+              $ref: "#/components/schemas/DiscordPollPartial"
       responses:
-        '200':
-          description: 'Poll with updated details'
+        "200":
+          description: "Poll with updated details"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordPoll'
+                $ref: "#/components/schemas/DiscordPoll"
 
     delete:
       summary: Remove a poll from this Discord server, including all verified votes, options etc.
@@ -1294,36 +1294,36 @@ paths:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/polls/{pollId}/votes:
     get:
-      summary: 'Get votes for this poll'
+      summary: "Get votes for this poll"
       operationId: getVotesInPoll
       tags:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
       responses:
-        '200':
-          description: 'All votes for this poll'
+        "200":
+          description: "All votes for this poll"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/VoteData'
+                  $ref: "#/components/schemas/VoteData"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /discord/servers/{guildId}/polls/{pollId}/votes/{externalAccountId}:
     get:
       summary: Get voting power and votes for this poll for a specific account
@@ -1332,16 +1332,16 @@ paths:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
-        '200':
-          description: 'Vote'
+        "200":
+          description: "Vote"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VoteData'
+                $ref: "#/components/schemas/VoteData"
     post:
       summary: Vote for a specific option
       operationId: setVoteForUser
@@ -1349,26 +1349,26 @@ paths:
         - discord
         - poll
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/PollIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
       requestBody:
         content:
           application/json:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/DiscordPollOptionId'
+                $ref: "#/components/schemas/DiscordPollOptionId"
       responses:
-        '200':
-          description: 'Vote data for the user and the poll'
+        "200":
+          description: "Vote data for the user and the poll"
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   user:
-                    $ref: '#/components/schemas/VoteData'
+                    $ref: "#/components/schemas/VoteData"
                   poll:
                     $ref: '#/components/schemas/VoteData'
   /discord/servers/{guildId}/giveaways:
@@ -1465,22 +1465,114 @@ paths:
           description: Successful deletion
   /discord/servers/{guildId}/marketplaces/channels:
     get:
-      summary: 'Get marketplace channels for this Discord server'
-      operationId: listMarketplaceChannels
+      summary: "Get giveaways for this Discord server"
+      operationId: listGiveaways
       tags:
         - discord
-        - marketplace
+        - giveaway
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '200':
-          description: 'All marketplace channels for this server'
+        "200":
+          description: "All giveaways for this server"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordMarketplaceChannel'
+                  $ref: "#/components/schemas/DiscordGiveaway"
+    post:
+      summary: Create a giveaway on this server
+      operationId: addGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordGiveaway"
+      responses:
+        "201":
+          description: "Poll"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordGiveaway"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/giveaways/{giveawayId}:
+    get:
+      summary: "Get specific giveaway for this Discord server"
+      operationId: getGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "200":
+          description: "The giveaway with the specified ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordGiveaway"
+    patch:
+      summary: Update the settings and dates for this giveaway
+      operationId: updateGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordGiveawayPartial"
+      responses:
+        "200":
+          description: "Giveaway with updated details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordGiveaway"
+
+    delete:
+      summary: Remove a giveaway from this Discord server, including all entries, drawn winners etc
+      operationId: deleteGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+  /discord/servers/{guildId}/marketplaces/channels:
+    get:
+      summary: "Get marketplace channels for this Discord server"
+      operationId: listMarketplaceChannels
+      tags:
+        - discord
+        - marketplace
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "All marketplace channels for this server"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordMarketplaceChannel"
     post:
       summary: Create a marketplace channel on this server
       operationId: addMarketplaceChannel
@@ -1488,39 +1580,39 @@ paths:
         - discord
         - marketplace
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscordMarketplaceChannel'
+              $ref: "#/components/schemas/DiscordMarketplaceChannel"
       responses:
-        '201':
-          description: 'A new marketplace channel object'
+        "201":
+          description: "A new marketplace channel object"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordMarketplaceChannel'
+                $ref: "#/components/schemas/DiscordMarketplaceChannel"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}:
     get:
-      summary: 'Get specific marketplace channel for this Discord server'
+      summary: "Get specific marketplace channel for this Discord server"
       operationId: getMarketplaceChannel
       tags:
         - discord
         - marketplace
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/MarketplaceChannelIdPathParameter"
       responses:
-        '200':
-          description: 'The poll with the specified ID'
+        "200":
+          description: "The poll with the specified ID"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscordMarketplaceChannel'
+                $ref: "#/components/schemas/DiscordMarketplaceChannel"
     delete:
       summary: Remove a marketplace channel from this Discord server
       operationId: deleteMarketplaceChannel
@@ -1528,50 +1620,50 @@ paths:
         - discord
         - marketplace
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/MarketplaceChannelIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
-  /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters:
-    post:
-      summary: Add a metadata filter to the designated marketplace channel
-      operationId: addMetadataFilterToMarketplaceChannel
-      tags:
-        - discord
-        - token
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MetadataFilter'
-      responses:
-        '201':
-          description: 'The newly added metadata filter for this marketplace channel'
+  ? /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters
+    : post:
+        summary: Add a metadata filter to the designated marketplace channel
+        operationId: addMetadataFilterToMarketplaceChannel
+        tags:
+          - discord
+          - token
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/MarketplaceChannelIdPathParameter"
+        requestBody:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MetadataFilter'
-          headers:
-            Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
-  /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters/{filterId}:
-    delete:
-      summary: Remove a metadata filter from the designated marketplace channel
-      operationId: deleteMetadataFilterFromMarketplaceChannel
-      tags:
-        - discord
-        - token
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/MarketplaceChannelIdPathParameter'
-        - $ref: '#/components/parameters/TrackerFilterIdPathParameter'
-      responses:
-        '204':
-          description: Successful deletion
+                $ref: "#/components/schemas/MetadataFilter"
+        responses:
+          "201":
+            description: "The newly added metadata filter for this marketplace channel"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/MetadataFilter"
+            headers:
+              Location:
+                $ref: "#/components/schemas/CreatedResponseHeader"
+  ? /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters/{filterId}
+    : delete:
+        summary: Remove a metadata filter from the designated marketplace channel
+        operationId: deleteMetadataFilterFromMarketplaceChannel
+        tags:
+          - discord
+          - token
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/MarketplaceChannelIdPathParameter"
+          - $ref: "#/components/parameters/TrackerFilterIdPathParameter"
+        responses:
+          "204":
+            description: Successful deletion
   /discord/servers/{guildId}/whitelists:
     post:
       summary: Add a whitelist for owners of a specific role to this server
@@ -1580,22 +1672,22 @@ paths:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Whitelist'
+              $ref: "#/components/schemas/Whitelist"
       responses:
-        '201':
-          description: 'Whitelist'
+        "201":
+          description: "Whitelist"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Whitelist'
+                $ref: "#/components/schemas/Whitelist"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/whitelists/shared:
     get:
       summary: Get external whitelists shared with this Discord server
@@ -1604,7 +1696,7 @@ paths:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
         - name: withSignups
           in: query
           description: If signups should be included
@@ -1613,14 +1705,14 @@ paths:
             type: boolean
             default: false
       responses:
-        '200':
+        "200":
           description: All whitelists shared with this server
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SharedWhitelist'
+                  $ref: "#/components/schemas/SharedWhitelist"
   /discord/servers/{guildId}/whitelists/{whitelistId}:
     patch:
       summary: Update a whitelist on this discord server
@@ -1629,20 +1721,20 @@ paths:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WhitelistPartial'
+              $ref: "#/components/schemas/WhitelistPartial"
       responses:
-        '200':
+        "200":
           description: Successful update, new whitelist content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Whitelist'
+                $ref: "#/components/schemas/Whitelist"
     delete:
       summary: Remove a whitelist from this discord server
       operationId: deleteWhitelist
@@ -1650,36 +1742,36 @@ paths:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/servers/{guildId}/whitelists/{whitelistId}/signups:
     get:
-      summary: 'Get signups for a whitelist'
+      summary: "Get signups for a whitelist"
       operationId: getWhitelistSignups
       tags:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdOrNamePathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdOrNamePathParameter"
       responses:
-        '200':
-          description: 'All signups for this whitelist'
+        "200":
+          description: "All signups for this whitelist"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WhitelistSignup'
+                  $ref: "#/components/schemas/WhitelistSignup"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Sign up for a whitelist
       operationId: addWhitelistSignup
@@ -1687,72 +1779,72 @@ paths:
         - discord
         - whitelist
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WhitelistSignup'
+              $ref: "#/components/schemas/WhitelistSignup"
       responses:
-        '201':
-          description: 'Whitelist signup information'
+        "201":
+          description: "Whitelist signup information"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WhitelistSignup'
+                $ref: "#/components/schemas/WhitelistSignup"
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
-        '400':
-          description: 'Failed signup due to conditions not being met'
+              $ref: "#/components/schemas/CreatedResponseHeader"
+        "400":
+          description: "Failed signup due to conditions not being met"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}:
-    get:
-      summary: Get the whitelist signup for a specific external account for this Discord server
-      operationId: getWhitelistSignup
-      tags:
-        - discord
-        - whitelist
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
-      responses:
-        '200':
-          description: 'Whitelist signup information'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WhitelistSignup'
-        '404':
-          description: 'No whitelist signup for this external account present'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      summary: Remove a whitelist signup from this discord server
-      operationId: deleteWhitelistSignup
-      tags:
-        - discord
-        - whitelist
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/WhitelistIdPathParameter'
-        - $ref: '#/components/parameters/ExternalAccountPathParameter'
-      responses:
-        '204':
-          description: Successful deletion
+                $ref: "#/components/schemas/ErrorResponse"
+  ? /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}
+    : get:
+        summary: Get the whitelist signup for a specific external account for this Discord server
+        operationId: getWhitelistSignup
+        tags:
+          - discord
+          - whitelist
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/WhitelistIdPathParameter"
+          - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        responses:
+          "200":
+            description: "Whitelist signup information"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/WhitelistSignup"
+          "404":
+            description: "No whitelist signup for this external account present"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ErrorResponse"
+          default:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ErrorResponse"
+      delete:
+        summary: Remove a whitelist signup from this discord server
+        operationId: deleteWhitelistSignup
+        tags:
+          - discord
+          - whitelist
+        parameters:
+          - $ref: "#/components/parameters/GuildIdPathParameter"
+          - $ref: "#/components/parameters/WhitelistIdPathParameter"
+          - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        responses:
+          "204":
+            description: Successful deletion
   /discord/servers/{guildId}/settings/{settingName}:
     put:
       summary: Create or update a guild setting with the provided value
@@ -1760,31 +1852,31 @@ paths:
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EmbeddableSetting'
+              $ref: "#/components/schemas/EmbeddableSetting"
       responses:
-        '200':
-          description: 'Token Policy'
+        "200":
+          description: "Token Policy"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmbeddableSetting'
+                $ref: "#/components/schemas/EmbeddableSetting"
     delete:
-      summary: 'Delete guild setting by Name'
+      summary: "Delete guild setting by Name"
       operationId: deleteSetting
       tags:
         - discord
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/SettingNamePathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/SettingNamePathParameter"
       responses:
-        '204':
-          description: 'Successful deletion'
+        "204":
+          description: "Successful deletion"
   /discord/servers/{guildId}/accesstoken:
     post:
       summary: Generate (or regenerate) the API access token for this Discord server for the external HAZELnet API
@@ -1793,17 +1885,17 @@ paths:
         - discord
         - security
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '201':
-          description: 'Access token to use with authorization header in external API'
+        "201":
+          description: "Access token to use with authorization header in external API"
           content:
             application/json:
               schema:
                 type: string
           headers:
             Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
+              $ref: "#/components/schemas/CreatedResponseHeader"
     delete:
       summary: Delete the currently active access token for this Discord server
       operationId: deleteAccessToken
@@ -1811,9 +1903,9 @@ paths:
         - discord
         - security
       parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
+        - $ref: "#/components/parameters/GuildIdPathParameter"
       responses:
-        '204':
+        "204":
           description: Successful deletion
   /discord/polls/announcements:
     get:
@@ -1823,14 +1915,14 @@ paths:
         - discord
         - polls
       responses:
-        '200':
-          description: 'List of servers and corresponding polls to announce'
+        "200":
+          description: "List of servers and corresponding polls to announce"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordPollUpdate'
+                  $ref: "#/components/schemas/DiscordPollUpdate"
   /discord/polls/resultupdates:
     get:
       summary: Get all polls that have result updates to edit existing messages
@@ -1839,14 +1931,14 @@ paths:
         - discord
         - polls
       responses:
-        '200':
-          description: 'List of servers and corresponding polls to update the results for'
+        "200":
+          description: "List of servers and corresponding polls to update the results for"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DiscordPollUpdate'
+                  $ref: "#/components/schemas/DiscordPollUpdate"
   /oura:
     post:
       summary: Publish an event from Oura to the community service (to react to mint events)
@@ -1858,10 +1950,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OuraEvent'
+              $ref: "#/components/schemas/OuraEvent"
       responses:
-        '200':
-          description: 'Empty response body and 200 response (as prescribed by Oura)'
+        "200":
+          description: "Empty response body and 200 response (as prescribed by Oura)"
 
 components:
   parameters:
@@ -1882,7 +1974,7 @@ components:
       required: true
       style: simple
       schema:
-        $ref: '#/components/schemas/DiscordGuild'
+        $ref: "#/components/schemas/DiscordGuild"
     DiscordUserIdPathParameter:
       name: discordUserId
       in: path
@@ -1890,7 +1982,7 @@ components:
       required: true
       style: simple
       schema:
-        $ref: '#/components/schemas/DiscordUser'
+        $ref: "#/components/schemas/DiscordUser"
     PingIdPathParameter:
       name: pingId
       in: path
@@ -1908,7 +2000,7 @@ components:
       required: true
       style: simple
       schema:
-        $ref: '#/components/schemas/TokenPolicyId'
+        $ref: "#/components/schemas/TokenPolicyId"
     PoolHashPathParameter:
       name: poolHash
       in: path
@@ -1916,7 +2008,7 @@ components:
       required: true
       style: simple
       schema:
-        $ref: '#/components/schemas/StakepoolHash'
+        $ref: "#/components/schemas/StakepoolHash"
     DelegatorRoleIdPathParameter:
       name: delegatorRoleId
       in: path
@@ -2092,19 +2184,19 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[_A-Za-z0-9]+$'
+          pattern: "^[_A-Za-z0-9]+$"
         value:
           type: string
       example:
         name: WHITELISTED_GUILDS
-        value: '717264144759390238'
+        value: "717264144759390238"
     Account:
       type: object
       required:
         - id
       properties:
         id:
-          $ref: '#/components/schemas/AccountId'
+          $ref: "#/components/schemas/AccountId"
         settings:
           type: object
           additionalProperties:
@@ -2116,14 +2208,14 @@ components:
         - referenceId
       properties:
         id:
-          $ref: '#/components/schemas/ExternalAccountId'
+          $ref: "#/components/schemas/ExternalAccountId"
         registrationTime:
           readOnly: true
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
         type:
-          $ref: '#/components/schemas/ExternalAccountType'
+          $ref: "#/components/schemas/ExternalAccountType"
         referenceId:
           type: string
           minLength: 1
@@ -2168,13 +2260,13 @@ components:
           example: 162
           format: int64
         type:
-          $ref: '#/components/schemas/ExternalAccountType'
+          $ref: "#/components/schemas/ExternalAccountType"
         referenceId:
           type: string
           minLength: 1
           maxLength: 200
         address:
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         source:
           type: string
           minLength: 1
@@ -2187,9 +2279,9 @@ components:
         - externalAccountId
       properties:
         blockchain:
-          $ref: '#/components/schemas/BlockchainType'
+          $ref: "#/components/schemas/BlockchainType"
         address:
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         externalAccountId:
           type: integer
           format: int64
@@ -2211,9 +2303,9 @@ components:
           example: 1249010
           format: int64
         blockchain:
-          $ref: '#/components/schemas/BlockchainType'
+          $ref: "#/components/schemas/BlockchainType"
         address:
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         externalAccountId:
           type: integer
           format: int64
@@ -2267,7 +2359,7 @@ components:
           format: int64
         receivingAddress:
           readOnly: true
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         amount:
           readOnly: true
           type: integer
@@ -2293,23 +2385,23 @@ components:
           type: integer
           format: int64
         sender:
-          $ref: '#/components/schemas/ExternalAccountId'
+          $ref: "#/components/schemas/ExternalAccountId"
         senderLocal:
           type: string
           description: The senders ID in the format corresponding to the senders original channel (for example Discord)
         sentFromServer:
-          $ref: '#/components/schemas/DiscordServerId'
+          $ref: "#/components/schemas/DiscordServerId"
         recipient:
-          $ref: '#/components/schemas/AccountId'
+          $ref: "#/components/schemas/AccountId"
         recipientLocal:
           type: string
           description: The recipient ID in the format corresponding to the senders current channel (for example Discord), if a recipient in the same realm is available.
         recipientAddress:
           oneOf:
-            - $ref: '#/components/schemas/WalletAddress'
-            - $ref: '#/components/schemas/StakeAddressView'
-            - $ref: '#/components/schemas/AssetFingerprint'
-            - $ref: '#/components/schemas/HandleWithPrefix'
+            - $ref: "#/components/schemas/WalletAddress"
+            - $ref: "#/components/schemas/StakeAddressView"
+            - $ref: "#/components/schemas/AssetFingerprint"
+            - $ref: "#/components/schemas/HandleWithPrefix"
         senderMessage:
           type: string
           maxLength: 320
@@ -2346,7 +2438,7 @@ components:
           format: int64
         name:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
         displayName:
           type: string
           minLength: 1
@@ -2362,7 +2454,7 @@ components:
         claims:
           type: array
           items:
-            $ref: '#/components/schemas/ClaimListSnapshotEntry'
+            $ref: "#/components/schemas/ClaimListSnapshotEntry"
     ClaimListSnapshotEntry:
       type: object
       required:
@@ -2371,7 +2463,7 @@ components:
         - claimableCount
       properties:
         stakeAddress:
-          $ref: '#/components/schemas/StakeAddressView'
+          $ref: "#/components/schemas/StakeAddressView"
         claimableProduct:
           type: integer
           format: int64
@@ -2424,7 +2516,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/PhysicalOrderItem'
+            $ref: "#/components/schemas/PhysicalOrderItem"
         processed:
           type: boolean
           readOnly: true
@@ -2471,11 +2563,11 @@ components:
         claimLists:
           type: array
           items:
-            $ref: '#/components/schemas/ClaimList'
+            $ref: "#/components/schemas/ClaimList"
         claimableProducts:
           type: array
           items:
-            $ref: '#/components/schemas/PhysicalProduct'
+            $ref: "#/components/schemas/PhysicalProduct"
     DiscordServer:
       type: object
       required:
@@ -2485,14 +2577,14 @@ components:
         - guildMemberCount
       properties:
         id:
-          $ref: '#/components/schemas/DiscordServerId'
+          $ref: "#/components/schemas/DiscordServerId"
         guildId:
-          $ref: '#/components/schemas/DiscordGuild'
+          $ref: "#/components/schemas/DiscordGuild"
         guildName:
           type: string
           example: Guild Name
         guildOwner:
-          $ref: '#/components/schemas/DiscordUser'
+          $ref: "#/components/schemas/DiscordUser"
         joinTime:
           readOnly: true
           type: string
@@ -2526,19 +2618,19 @@ components:
         tokenPolicies:
           type: array
           items:
-            $ref: '#/components/schemas/TokenPolicy'
+            $ref: "#/components/schemas/TokenPolicy"
         stakepools:
           type: array
           items:
-            $ref: '#/components/schemas/Stakepool'
+            $ref: "#/components/schemas/Stakepool"
         delegatorRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordDelegatorRole'
+            $ref: "#/components/schemas/DiscordDelegatorRole"
         tokenRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordTokenRole'
+            $ref: "#/components/schemas/DiscordTokenRole"
         settings:
           type: object
           additionalProperties:
@@ -2550,7 +2642,7 @@ components:
           type: string
           example: Guild Name
         guildOwner:
-          $ref: '#/components/schemas/DiscordUser'
+          $ref: "#/components/schemas/DiscordUser"
         guildMemberCount:
           type: integer
           format: int32
@@ -2614,7 +2706,7 @@ components:
         - projectName
       properties:
         policyId:
-          $ref: '#/components/schemas/TokenPolicyId'
+          $ref: "#/components/schemas/TokenPolicyId"
         projectName:
           type: string
           example: My First CNFT
@@ -2624,9 +2716,9 @@ components:
         - poolHash
       properties:
         poolHash:
-          $ref: '#/components/schemas/StakepoolHash'
+          $ref: "#/components/schemas/StakepoolHash"
         info:
-          $ref: '#/components/schemas/StakepoolInfo'
+          $ref: "#/components/schemas/StakepoolInfo"
     StakepoolInfo:
       type: object
       required:
@@ -2636,7 +2728,7 @@ components:
         - name
       properties:
         hash:
-          $ref: '#/components/schemas/StakepoolHash'
+          $ref: "#/components/schemas/StakepoolHash"
         view:
           type: string
         ticker:
@@ -2662,14 +2754,14 @@ components:
           type: integer
           format: int64
         poolHash:
-          $ref: '#/components/schemas/StakepoolHash'
+          $ref: "#/components/schemas/StakepoolHash"
         minimumStake:
           type: integer
           description: Minimum stake in Lovelace
           format: int64
           example: 1000000000
         roleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
     DiscordTokenRole:
       type: object
       required:
@@ -2686,7 +2778,7 @@ components:
           minItems: 1
           maxItems: 200
           items:
-            $ref: '#/components/schemas/TokenRoleAssetInfo'
+            $ref: "#/components/schemas/TokenRoleAssetInfo"
         minimumTokenQuantity:
           type: integer
           format: int64
@@ -2696,14 +2788,14 @@ components:
           format: int64
           example: 10
         aggregationType:
-          $ref: '#/components/schemas/TokenOwnershipAggregationType'
+          $ref: "#/components/schemas/TokenOwnershipAggregationType"
         filters:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/MetadataFilter'
+            $ref: "#/components/schemas/MetadataFilter"
         roleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
     DiscordTokenRolePartial:
       type: object
       properties:
@@ -2712,7 +2804,7 @@ components:
           minItems: 1
           maxItems: 200
           items:
-            $ref: '#/components/schemas/TokenRoleAssetInfo'
+            $ref: "#/components/schemas/TokenRoleAssetInfo"
         minimumTokenQuantity:
           type: integer
           format: int64
@@ -2722,9 +2814,9 @@ components:
           format: int64
           example: 10
         aggregationType:
-          $ref: '#/components/schemas/TokenOwnershipAggregationType'
+          $ref: "#/components/schemas/TokenOwnershipAggregationType"
         roleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
     TokenOwnershipAggregationType:
       type: string
       default: ANY_POLICY_FILTERED_AND
@@ -2739,9 +2831,9 @@ components:
         - policyId
       properties:
         policyId:
-          $ref: '#/components/schemas/TokenPolicyId'
+          $ref: "#/components/schemas/TokenPolicyId"
         assetFingerprint:
-          $ref: '#/components/schemas/AssetFingerprint'
+          $ref: "#/components/schemas/AssetFingerprint"
     MetadataFilter:
       type: object
       required:
@@ -2790,16 +2882,16 @@ components:
           type: integer
           format: int64
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         messageId:
-          $ref: '#/components/schemas/DiscordMessage'
+          $ref: "#/components/schemas/DiscordMessage"
         displayName:
           type: string
           minLength: 1
           maxLength: 256
         name:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
         description:
           type: string
           minLength: 1
@@ -2834,12 +2926,13 @@ components:
           format: int64
         requiredRoles:
           type: array
+          maxItems: 20
           items:
-            $ref: '#/components/schemas/DiscordRequiredRole'
+            $ref: "#/components/schemas/DiscordRequiredRole"
         options:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordPollOption'
+            $ref: "#/components/schemas/DiscordPollOption"
         voteaireUUID:
           type: string
           example: a7fbd4ca-950d-4d02-82fd-f9c6cc9e2165
@@ -2848,9 +2941,9 @@ components:
       type: object
       properties:
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         messageId:
-          $ref: '#/components/schemas/DiscordMessage'
+          $ref: "#/components/schemas/DiscordMessage"
         displayName:
           type: string
           minLength: 1
@@ -2873,8 +2966,9 @@ components:
           type: boolean
         requiredRoles:
           type: array
+          maxItems: 20
           items:
-            $ref: '#/components/schemas/DiscordRequiredRole'
+            $ref: "#/components/schemas/DiscordRequiredRole"
     DiscordGiveaway:
       type: object
       required:
@@ -2884,7 +2978,6 @@ components:
         - description
         - openAfter
         - openUntil
-        - options
       properties:
         id:
           readOnly: true
@@ -2894,16 +2987,16 @@ components:
           type: integer
           format: int64
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         messageId:
-          $ref: '#/components/schemas/DiscordMessage'
+          $ref: "#/components/schemas/DiscordMessage"
         displayName:
           type: string
           minLength: 1
           maxLength: 256
         name:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
         description:
           type: string
           minLength: 1
@@ -2921,24 +3014,30 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T12:21:43Z
+        winnerCount:
+          type: integer
+          format: int32
+          description: Number of winners to draw at the end of the giveaway
+          example: 2
         archived:
           type: boolean
           default: false
         snapshotIds:
           type: array
           items:
+            type: integer
             format: int64
         requiredRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordRequiredRole'
+            $ref: "#/components/schemas/DiscordRequiredRole"
     DiscordGiveawayPartial:
       type: object
       properties:
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         messageId:
-          $ref: '#/components/schemas/DiscordMessage'
+          $ref: "#/components/schemas/DiscordMessage"
         displayName:
           type: string
           minLength: 1
@@ -2960,14 +3059,14 @@ components:
         requiredRoles:
           type: array
           items:
-            $ref: '#/components/schemas/DiscordRequiredRole'
+            $ref: "#/components/schemas/DiscordRequiredRole"
     DiscordRequiredRole:
       type: object
       required:
         - roleId
       properties:
         roleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
     DiscordPollOptionId:
       type: integer
       readOnly: true
@@ -2979,15 +3078,15 @@ components:
         - text
       properties:
         id:
-          $ref: '#/components/schemas/DiscordPollOptionId'
+          $ref: "#/components/schemas/DiscordPollOptionId"
         text:
           type: string
-          example: 'Vote for the better one'
+          example: "Vote for the better one"
         reactionId:
-          $ref: '#/components/schemas/DiscordEmoji'
+          $ref: "#/components/schemas/DiscordEmoji"
         reactionName:
           type: string
-          example: '🔥'
+          example: "🔥"
     VoteData:
       type: object
       required:
@@ -3009,7 +3108,7 @@ components:
           type: integer
           format: int64
         optionId:
-          $ref: '#/components/schemas/DiscordPollOptionId'
+          $ref: "#/components/schemas/DiscordPollOptionId"
         time:
           readOnly: true
           type: string
@@ -3026,15 +3125,15 @@ components:
         - channelId
       properties:
         guildId:
-          $ref: '#/components/schemas/DiscordGuild'
+          $ref: "#/components/schemas/DiscordGuild"
         pollId:
           readOnly: true
           type: integer
           format: int64
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         messageId:
-          $ref: '#/components/schemas/DiscordMessage'
+          $ref: "#/components/schemas/DiscordMessage"
     DiscordMarketplaceChannel:
       type: object
       required:
@@ -3057,11 +3156,11 @@ components:
             - SALES
             - MINT
         policyId:
-          $ref: '#/components/schemas/TokenPolicyId'
+          $ref: "#/components/schemas/TokenPolicyId"
         marketplaces:
           type: array
           items:
-            $ref: '#/components/schemas/Marketplace'
+            $ref: "#/components/schemas/Marketplace"
           minItems: 1
         createTime:
           readOnly: true
@@ -3069,7 +3168,7 @@ components:
           format: date-time
           example: 2021-11-10T12:21:43Z
         channelId:
-          $ref: '#/components/schemas/DiscordChannel'
+          $ref: "#/components/schemas/DiscordChannel"
         minimumValue:
           description: The (optional) minimum value in Lovelace that is required for the listing, sale or offer to be displayed
           type: integer
@@ -3082,9 +3181,9 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/MetadataFilter'
+            $ref: "#/components/schemas/MetadataFilter"
         aggregationType:
-          $ref: '#/components/schemas/TokenOwnershipAggregationType'
+          $ref: "#/components/schemas/TokenOwnershipAggregationType"
         highlightAttributeName:
           type: string
           minLength: 1
@@ -3119,7 +3218,7 @@ components:
           maxLength: 256
         name:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
         signupAfter:
           type: string
           format: date-time
@@ -3136,7 +3235,7 @@ components:
           type: boolean
           default: false
         requiredRoleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
         sharedWithServer:
           type: integer
           format: int64
@@ -3183,7 +3282,7 @@ components:
         - externalAccountId
       properties:
         address:
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         externalAccountId:
           type: integer
           format: int64
@@ -3202,7 +3301,7 @@ components:
         - signups
       properties:
         guildId:
-          $ref: '#/components/schemas/DiscordGuild'
+          $ref: "#/components/schemas/DiscordGuild"
         guildName:
           type: string
           example: Guild Name
@@ -3212,11 +3311,11 @@ components:
           maxLength: 256
         whitelistName:
           type: string
-          pattern: '^[A-Za-z][-A-Za-z0-9]{0,29}$'
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
         signups:
           type: array
           items:
-            $ref: '#/components/schemas/WhitelistSignup'
+            $ref: "#/components/schemas/WhitelistSignup"
     SummarizedWhitelistSignup:
       type: object
       required:
@@ -3232,7 +3331,7 @@ components:
           format: int64
         guildId:
           readOnly: true
-          $ref: '#/components/schemas/DiscordGuild'
+          $ref: "#/components/schemas/DiscordGuild"
         guildName:
           readOnly: true
           type: string
@@ -3277,9 +3376,9 @@ components:
           format: date-time
           example: 2022-11-10T13:20:57Z
         policyId:
-          $ref: '#/components/schemas/TokenPolicyId'
+          $ref: "#/components/schemas/TokenPolicyId"
         assetFingerprint:
-          $ref: '#/components/schemas/AssetFingerprint'
+          $ref: "#/components/schemas/AssetFingerprint"
         tokenWeight:
           description: The amount of weight each owned token from the respective snapshot has
           type: number
@@ -3296,12 +3395,12 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[_A-Za-z0-9]+$'
+          pattern: "^[_A-Za-z0-9]+$"
         value:
           type: string
       example:
         name: PROTECTION_ADDR_REMOVAL
-        value: 'true'
+        value: "true"
     DiscordMember:
       type: object
       required:
@@ -3331,18 +3430,18 @@ components:
         - roleId
       properties:
         guildId:
-          $ref: '#/components/schemas/DiscordGuild'
+          $ref: "#/components/schemas/DiscordGuild"
         userId:
-          $ref: '#/components/schemas/DiscordUser'
+          $ref: "#/components/schemas/DiscordUser"
         roleId:
-          $ref: '#/components/schemas/DiscordRole'
+          $ref: "#/components/schemas/DiscordRole"
     Handle:
       type: object
       properties:
         handle:
-          $ref: '#/components/schemas/HandleName'
+          $ref: "#/components/schemas/HandleName"
         address:
-          $ref: '#/components/schemas/WalletAddress'
+          $ref: "#/components/schemas/WalletAddress"
         resolved:
           type: boolean
     DiscordServerId:
@@ -3383,26 +3482,26 @@ components:
       type: string
       description: The staking address of a wallet, in viewable format
       example: stake1uyhvepgdsd7s07q5cdx9vdemnar4axpe0e9edw2chyd8dpgqnsffq
-      pattern: '^stake1[a-zA-Z0-9]{53}$'
+      pattern: "^stake1[a-zA-Z0-9]{53}$"
     StakepoolHash:
       type: string
       description: The Stakepool hash
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
-      pattern: '^[A-Za-z0-9]{56}$'
+      pattern: "^[A-Za-z0-9]{56}$"
     TokenPolicyId:
       type: string
       description: The Policy ID
       example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
-      pattern: '^[A-Za-z0-9]{56}$'
+      pattern: "^[A-Za-z0-9]{56}$"
     AssetFingerprint:
       type: string
       description: The fingerprint of an asset
       example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
-      pattern: '^asset1[A-Za-z-0-9]{38}$'
+      pattern: "^asset1[A-Za-z-0-9]{38}$"
     HandleName:
       type: string
       example: hazelnet
-      pattern: '^[-._a-zA-Z0-9]{1,15}$'
+      pattern: "^[-._a-zA-Z0-9]{1,15}$"
     HandleWithPrefix:
       type: string
       example: $hazelnet
@@ -3411,12 +3510,12 @@ components:
       type: string
       description: The wallet address (non-enterprise)
       example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
-      pattern: '^addr1[A-Za-z-0-9]{98}$'
+      pattern: "^addr1[A-Za-z-0-9]{98}$"
     TransactionHash:
       type: string
       description: A cardano transaction hash
       example: 20de8b6406e66e3d3f18d4fd788d30146cacbd6a08ba6529b4406156d31d278e
-      pattern: '^[A-Za-z-0-9]{54}$'
+      pattern: "^[A-Za-z-0-9]{54}$"
     Marketplace:
       type: string
       enum:
@@ -3450,11 +3549,11 @@ components:
             - Mint
             - Metadata
         context:
-          $ref: '#/components/schemas/OuraEventContext'
+          $ref: "#/components/schemas/OuraEventContext"
         mint:
-          $ref: '#/components/schemas/OuraMintEvent'
+          $ref: "#/components/schemas/OuraMintEvent"
         metadata:
-          $ref: '#/components/schemas/OuraMetadataEvent'
+          $ref: "#/components/schemas/OuraMetadataEvent"
     OuraEventContext:
       type: object
       required:
@@ -3467,7 +3566,7 @@ components:
           description: Timestamp in milliseconds since 1/1/1970 0:00
           format: int64
         tx_hash:
-          $ref: '#/components/schemas/TransactionHash'
+          $ref: "#/components/schemas/TransactionHash"
     OuraMintEvent:
       type: object
       required:
@@ -3476,7 +3575,7 @@ components:
         - quantity
       properties:
         policy:
-          $ref: '#/components/schemas/TokenPolicyId'
+          $ref: "#/components/schemas/TokenPolicyId"
         asset:
           type: string
           description: The hex-encoded name of the minted asset
@@ -3497,7 +3596,7 @@ components:
           description: The root key of the metadata event (721 for NFT metadata for example)
         map_json:
           type: object
-          description: 'The raw map for the metadata of this the associated mint transaction'
+          description: "The raw map for the metadata of this the associated mint transaction"
     CreatedResponseHeader:
       type: string
       format: uri
@@ -3512,7 +3611,7 @@ components:
         messages:
           type: array
           items:
-            $ref: '#/components/schemas/ErrorMessage'
+            $ref: "#/components/schemas/ErrorMessage"
         httpStatus:
           type: string
         httpStatusCode:

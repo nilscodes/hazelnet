@@ -41,6 +41,9 @@
 			"configure-poll-add-onchain": "Registers a new Voteaire onchain vote with the bot for users to discover and vote on.",
 			"configure-poll-announce": "Announce the current results of a poll to the channel this command is run in.",
 			"configure-poll-remove": "Select and remove an existing poll. ⚠ This will also remove all votes and previous results.",
+			"configure-poll-update": "Change advanced options on your existing poll.",
+			"configure-poll-update-addrole": "Adds a new eligible role that can vote to an existing poll.",
+			"configure-poll-update-removerole": "Removes a currently eligible role from an existing poll.",
 			"configure-giveaway": "Manage giveaways for people to participate in",
 			"configure-giveaway-list": "List all giveaways that are set up on this Discord server.",
 			"configure-giveaway-add": "Adds a new giveaway to the server. You will be able to determine conditions.",
@@ -84,6 +87,7 @@
 			"configure-policy-add": "Add a Cardano policy ID and associated project name to the list of official projects on this server.",
 			"configure-policy-list": "List all Cardano policy IDs configured as official policies for projects on this server.",
 			"configure-policy-remove": "Remove the Cardano policy ID from this server's official policy list.",
+			"configure-policy-announce": "Announce all your official policies and associated project names.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
 			"configure-marketplace": "Configure marketplace integrations.",
 			"configure-marketplace-sales": "Configure your sales trackers.",
@@ -107,7 +111,9 @@
 			"configure-adminaccess": "Configure roles that can administer the bot",
 			"configure-adminaccess-add": "Adds a role that is allowed to administer the bot.",
 			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
-			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot."
+			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
+			"configure-social": "Commands to manage various Discord and social media features and integrations.",
+			"configure-social-announce": "Create custom branded announcements."
 		},
 		"options": {
 			"verify": {
@@ -146,7 +152,9 @@
 			},
 			"configure-policy": {
 				"policy-id": "Policy ID to add/remove as an official token policy on this server",
-				"project-name": "The project name to list this policy ID under"
+				"project-name": "The project name to list this policy ID under",
+				"channel": "Channel to post the announcement to.",
+				"info-text": "A text included in your announcement that contains additional information."
 			},
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
@@ -214,6 +222,10 @@
 			"configure-settings": {
 				"element": "The bot UI element to customize",
 				"customization-value": "The new style (color, text or image link, depending on the select element)"
+			},
+			"configure-social": {
+				"channel": "Channel to post the announcement to.",
+				"title": "The title/headline of your announcement."
 			}
 		},
 		"choices": {
@@ -662,6 +674,27 @@
 			"remove": {
 				"success": "🗑️ Removed the following token policy from the official token policy list of this server:",
 				"errorNotFound": "⚠ No policy with the ID **{{policyId}}** was found for this server. Nothing was removed."
+			},
+			"announce": {
+				"purpose": "You are about to create a policy ID widget and announcement in the channel <#{{channel}}>. The widget will contain your provided info text as shown below, as well as a list of all the official project names and corresponding policy IDs of this server. Please confirm below if you want to continue.",
+				"success": "✅ Policy ID widget successfully published in <#{{channel}}>.",
+				"publicSuccessTitle": "📃 Project & Policy ID list",
+				"publicSuccess": "Here is the list of supported policy IDs of this server.\n\n💡 Keep in mind, that a policy ID being listed here does not mean that this the official server of this project. Always verify with other sources before making a purchase or trading.",
+				"infoMessage": "Info Message",
+				"publicSuccessTitleContinued": "📃 Project & Policy ID list (continued)",
+				"publish": "Create announcement",
+				"projectName": "Project: {{{projectName}}}",
+				"policyId": "*{{policyId}}*",
+				"errorNoPolicies": "⚠ You currently have not set any project names and policy IDs for this server. Please add a project first by using the command **/configure-policy add**.",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for policy ID announcements."
+			}
+		},
+		"social": {
+			"announce": {
+				"purpose": "You are about to create a announcement in the channel <#{{channel}}>. The announcement will contain the text you send as the next message in this channel in the next five minutes. You can use any Discord markdown you want and will receive a preview of your announcement before submitting it.",
+				"success": "✅ Announcement successfully published in <#{{channel}}>.",
+				"publish": "Create announcement"
 			}
 		},
 		"stakepool": {
@@ -847,7 +880,7 @@
 				"previewPhase1NoChannel": "You have not selected a channel for the bot to post a voting announcement in at poll open time.",
 				"previewPhase1Channel": "The bot will post a voting announcement in <#{{publishChannel}}> once the poll opens.",
 				"previewPhase1NoRequiredRole": "No role requirements are in effect - everybody will be able to see the poll.",
-				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll manage* command later.",
+				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll update* command later.",
 				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for you poll that you would like to use:",
 				"startPhase3": "Use this description",
 				"redoPhase2": "Change description",
@@ -905,6 +938,23 @@
 				"purpose": "Select the poll to remove from your Discord server.\n\n⚠ **ALL REGISTERED VOTES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE POLL**.\n\nOnly do this after you have processed this poll.",
 				"errorNotFound": "⚠ No poll with the ID **{{pollId}}** was found for this server. Nothing was removed.",
 				"choosePollDetails": "Choose the poll you want to irrevocably delete"
+			},
+			"update": {
+				"addrole": {
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to vote the poll **{{poll.displayName}}**.",
+					"purpose": "Select the poll you would like the role <@&{{roleId}}> to be able to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"choosePoll": "Choose the poll you want to allow this role to vote in",
+					"tooManyRoles": "⚠ Cannot add more than 20 roles to a poll.",
+					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to vote in this poll and was not added again."
+				},
+				"removerole": {
+					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to vote on the poll **{{poll.displayName}}**.",
+					"purpose": "Select the poll you would like to remove a role froming being allowed to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"choosePoll": "Choose the poll you want to remove this role from",
+					"chooseRolePurpose": "Choose which role you would like to remove from the poll {{displayName}}:",
+					"chooseRole": "Choose role to remove",
+					"noRoles": "⚠ No roles to remove exist on this poll."
+				}
 			}
 		},
 		"whitelist": {
@@ -1033,7 +1083,7 @@
 					"entryAddon": ", >= ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any sales with a maximum price of **₳{{maximumPriceAda}}**",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a sales tracking channel."
 				}
 			},
@@ -1080,7 +1130,7 @@
 					"entryAddon": ", >= ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any listings with a minimum asking price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any listings with a maximum asking price of **₳{{maximumPriceAda}}**",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a listing tracking channel."
 				}
 			},
@@ -1118,7 +1168,7 @@
 					"chooseMarketplaceChannel": "Choose a mint tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
 					"entry": "#{{channelName}}",
-					"deletedChannel": "#deleted",
+					"deletedChannel": "deleted",
 					"otherError": "⚠ Error while removing a mint tracking channel."
 				}
 			},
@@ -1188,7 +1238,7 @@
 			"features": {
 				"purpose": "Change the currently enabled feature set for the bot on this Discord server.",
 				"chooseFeatures": "Choose all features you want to continue by using the below selection list:",
-				"saveSettings": "Save Settings",
+				"saveSettings": "Save current settings",
 				"success": "✅ Your feature changes have been successfully applied! It may take a few minutes for the commands to become available."
 			},
 			"customize": {
@@ -1277,7 +1327,7 @@
 		"chooseLanguage": "Choose your bot language",
 		"chooseAdminRole": "Choose your admin role",
 		"chooseUserRole": "Choose your user role",
-		"chooseFeatures": "Choose the features you want to use",
+		"chooseFeatures": "Choose all of the features you want to use",
 		"selectedLanguage": "Your selected language is **{{language}}**.",
 		"selectedAdminRoles": "The users with the following roles will be able to configure the bot:",
 		"selectedUserRoles": "The users with the following roles will be able to verify their wallets and interact with the bot:",
@@ -1306,7 +1356,8 @@
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
 		"cardolphins": "Cardolphins Special",
-		"handle": "ADA Handle Integration"
+		"handle": "ADA Handle Integration",
+		"giveaway": "features.giveaway"
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
@@ -1341,5 +1392,6 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	}
+	},
+	"": ""
 }

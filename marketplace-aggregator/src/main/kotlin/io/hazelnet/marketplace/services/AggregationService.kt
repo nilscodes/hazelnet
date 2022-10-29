@@ -41,7 +41,7 @@ class AggregationService(
                     .register(meterRegistry)
                     .increment()
             }
-            .filter { it.saleDate.after(lastSyncTimeBeforeCall) }
+            .filter { it.saleDate != null && it.saleDate.after(lastSyncTimeBeforeCall) }
             .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo()) }
         jpgStoreService.getTransactionsForCollection(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
