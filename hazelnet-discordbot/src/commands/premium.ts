@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
-import { BotCommand } from 'src/utility/commandtypes';
-import { AugmentedButtonInteraction, AugmentedCommandInteraction } from 'src/utility/hazelnetclient';
+import { BotCommand } from '../utility/commandtypes';
+import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../utility/hazelnetclient';
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');

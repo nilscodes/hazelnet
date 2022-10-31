@@ -274,6 +274,17 @@ module.exports = {
     const votingData = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`, votes);
     return votingData.data;
   },
+  async getGiveaways(guildId) {
+    const giveaways = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways`);
+    return giveaways.data;
+  },
+  async getGiveaway(guildId, giveawayId) {
+    const giveaway = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}`);
+    return giveaway.data;
+  },
+  async deleteGiveaway(guildId, giveawayId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}`);
+  },
   async getPremiumInfo(guildId) {
     const premiumInfo = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/premium`);
     return premiumInfo.data;

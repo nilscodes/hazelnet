@@ -1,4 +1,4 @@
-import { BotCommand } from "src/utility/commandtypes";
+import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
@@ -12,10 +12,11 @@ export default <BotCommand> {
     .addSubcommand((subcommand) => subcommand
       .setName('add')
       .setDescription(ci18n.subDescription('add'))
-      .addStringOption((option) => option.setName('giveaway-displayname').setDescription(ci18n.option('poll-displayname')).setRequired(true))
-      .addStringOption((option) => option.setName('giveaway-name').setDescription(ci18n.option('poll-name')).setRequired(true))
-      .addStringOption((option) => option.setName('giveaway-opentime').setDescription(ci18n.option('poll-opentime')).setRequired(false))
-      .addStringOption((option) => option.setName('giveaway-closetime').setDescription(ci18n.option('poll-closetime')).setRequired(false))
+      .addStringOption((option) => option.setName('giveaway-displayname').setDescription(ci18n.option('giveaway-displayname')).setRequired(true))
+      .addStringOption((option) => option.setName('giveaway-name').setDescription(ci18n.option('giveaway-name')).setRequired(true))
+      .addStringOption((option) => option.setName('giveaway-opentime').setDescription(ci18n.option('giveaway-opentime')).setRequired(false))
+      .addStringOption((option) => option.setName('giveaway-closetime').setDescription(ci18n.option('giveaway-closetime')).setRequired(false))
+      .addIntegerOption((option) => option.setName('winner-count').setDescription(ci18n.option('winner-count')).setRequired(false))
       .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(false))
       .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(false)))
     .addSubcommand((subcommand) => subcommand

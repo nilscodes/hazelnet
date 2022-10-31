@@ -113,7 +113,8 @@
 			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
 			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
 			"configure-social": "Commands to manage various Discord and social media features and integrations.",
-			"configure-social-announce": "Create custom branded announcements."
+			"configure-social-announce": "Create custom branded announcements.",
+			"configure-giveaway-end": "commands.descriptions.configure-giveaway-end"
 		},
 		"options": {
 			"verify": {
@@ -178,7 +179,8 @@
 				"required-role": "Role that is required for a user to have, to be able to participate in this giveaway",
 				"giveaway-opentime": "The UTC time after which signup is possible (Format: 2022-01-01T15:00:00Z)",
 				"giveaway-closetime": "The UTC time until which signup is possible (Format: 2022-01-31T15:00:00Z)",
-				"channel": "The channel to send the giveaway announcement and participation widget to."
+				"channel": "The channel to send the giveaway announcement and participation widget to.",
+				"winner-count": "The number of winners drawn at the end of the giveaway."
 			},
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
@@ -547,6 +549,7 @@
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
+			"errorNoAddress": "⚠ You have to provide an ADA Handle or wallet address for this whitelist type. If you did provide one, ensure to complete the whitelist registration process in under 10 minutes.",
 			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
 			"widgetNotVerified": "⚠ You currently have no verified wallets. You can use the command **/whitelist register** in a channel that allows bot commands to register any address (*addr1…*) or *$handle* for this whitelist.\n\n💡 **Better**: We recommend verifying a wallet via **/verify add** and then registering it with the whitelist by clicking the same button again.",
 			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at <t:{{signupTime}}> with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
@@ -927,7 +930,7 @@
 				"purpose": "👇 Pick a poll from the list of available polls to announce. If the poll is still open, a vote button will also be added to the widget.\n\n{{{resultsPublishingInfo}}}\n\n💡 You can only have one announcement for each poll at a time. The announcement will automatically be updated with the current results every 5 minutes if your poll has public results.",
 				"resultsPublishYes": "📢 The (current) results will be published along with the poll announcement.",
 				"resultsPublishMaybe": "🔐 The results will remain hidden for non-public polls until you explicit publish them via **/configure-poll announce** with the *publishresults* parameter set to *True*.",
-				"success": "✅ Results successfully published in <#{{currentChannel}}>.",
+				"success": "✅ Results successfully published in <#{{channel}}>.",
 				"publicSuccess": "🗳 The team shared the following poll with you.",
 				"choosePoll": "Pick the poll you'd like to announce the results for",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
@@ -1311,6 +1314,34 @@
 				"reminderTitle": "Black Edition Info",
 				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
 			}
+		},
+		"giveaway": {
+			"list": {
+				"purpose": "This is the list of all existing giveaways for this Discord server.",
+				"noGiveawaysTitle": "No giveaways",
+				"noGiveaways": "Currently, no available giveaways were found for this server.",		
+				"giveawayInfo": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n{{{resultsVisible}}}",
+				"pollInfoVoteaire": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n[Voteaire ID {{voteaireUUID}}]({{{voteaireLink}}})",
+				"chooseGiveawayDetails": "Choose the poll you want more details on",
+				"details": "Poll Details",
+				"detailsName": "Display name (Internal name)",
+				"detailsDescription": "Description/Question",
+				"detailsDescriptionEmpty": "N/A",
+				"detailsCreation": "Created at",
+				"creationDate": "<t:{{createTime}}>",
+				"detailsDates": "Opens/Closes",
+				"detailsChoices": "Poll voting choices",
+				"detailsVoteaireLink": "Link to on-chain ballot",
+				"detailsConfiguration": "Poll configuration",
+				"optionList": "Public results: {{resultsVisible}}\nMultiple options allowed: {{multipleVotes}}\nToken-based vote: {{tokenBased}}\nWeighted vote: {{weighted}}",
+				"detailsRoles": "User has to have one of the following roles",
+				"requiredRoleEntry": "• <@&{{role.roleId}}>",
+				"detailsChannel": "Announcement info",
+				"announcementNone": "No voting announcement will be made by the bot and the results will not be automatically published when the vote ends.",
+				"announcementChannel": "A voting announcement with info on how to vote will be posted in <#{{poll.channelId}}> when the poll opens.",
+				"adminName": "{{{poll.displayName}}} ({{poll.name}})",
+				"noPremium": "🙀 Users currently can not vote in or view any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+			}
 		}
 	},
 	"start": {
@@ -1350,14 +1381,13 @@
 		"pollVoteaireTitle": "Voteaire Polls",
 		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
 		"giveawayTitle": "Giveaways (Black Edition only)",
-		"giveaway": "Raffles and Giveaways based on roles or token-ownership",
+		"giveaway": "features.giveaway",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
 		"cardolphins": "Cardolphins Special",
-		"handle": "ADA Handle Integration",
-		"giveaway": "features.giveaway"
+		"handle": "ADA Handle Integration"
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
@@ -1392,6 +1422,5 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	},
-	"": ""
+	}
 }

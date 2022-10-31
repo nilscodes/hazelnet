@@ -84,7 +84,7 @@ module.exports = {
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(polls.map((poll) => ({
               label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-              description: (poll.description.trim().length ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale })),
+              description: (poll.description.trim().length ? (poll.description.substring(0, 90) + (poll.description.length > 90 ? '...' : '')) : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale })),
               value: `configure-poll-${poll.id}`,
             }))),
         ),
