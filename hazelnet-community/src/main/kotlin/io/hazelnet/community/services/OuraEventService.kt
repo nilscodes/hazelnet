@@ -113,7 +113,7 @@ class OuraEventService(
                                     assetNameHex = mintToProcess.assetNameHex,
                                     assetName = combinedAssetInfo.assetName,
                                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),
-                                    assetImageUrl = getImageUrlFromAssetInfo(config.ipfslink!!, combinedAssetInfo),
+                                    assetImageUrl = getImageUrlFromAssetInfo(config.mintIpfslink!!, combinedAssetInfo),
                                     mintDate = mintToProcess.date,
                                     rarityRank = 0,
                                     highlightAttributeDisplayName = it.highlightAttributeDisplayName,
