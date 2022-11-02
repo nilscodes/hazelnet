@@ -78,7 +78,11 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))
-        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)));
+        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('test')
+        .setDescription(ci18n.subDescription('test'))
+        .addUserOption((option) => option.setName('user').setDescription(ci18n.option('user')).setRequired(true)));
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['token'],
