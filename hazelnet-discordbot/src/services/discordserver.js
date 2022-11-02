@@ -62,6 +62,20 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}?skipRoleUpdates=${!!skipRoleUpdates}`);
     this.clearCacheEntry(guildId);
   },
+  async getEligibleTokenRolesOfUser(guildId, externalAccountId) {
+    const memberPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/tokenroles`);
+    return memberPromise.data;
+  },
+  async getEligibleDelegatorRolesOfUser(guildId, externalAccountId) {
+    const memberPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/delegatorroles`);
+    return memberPromise.data;
+  },
+  async queueTokenRoleAssignments(guildId, externalAccountId) {
+    await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/tokenroles`);
+  },
+  async queueDelegatorRoleAssignments(guildId, externalAccountId) {
+    await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/delegatorroles`);
+  },
   async updateDiscordServerSetting(guildId, settingName, settingValue) {
     await axios.put(`${hazelCommunityUrl}/discord/servers/${guildId}/settings/${settingName}`, {
       name: settingName,

@@ -205,6 +205,22 @@ class DiscordServerController(
         @RequestParam(required = false, defaultValue = "false") skipRoleUpdates: Boolean,
     ) = discordServerService.removeMember(guildId, externalAccountId, skipRoleUpdates)
 
+    @GetMapping("/{guildId}/members/{externalAccountId}/roleassignments/tokenroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun getEligibleTokenRoles(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.getEligibleTokenRolesOfUser(guildId, externalAccountId)
+
+    @GetMapping("/{guildId}/members/{externalAccountId}/roleassignments/delegatorroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun getEligibleDelegatorRoles(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.getEligibleDelegatorRolesOfUser(guildId, externalAccountId)
+
+    @PostMapping("/{guildId}/members/{externalAccountId}/roleassignments/tokenroles")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun queueTokenRoleAssignments(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.queueRoleAssignments(guildId, externalAccountId)
+
+    @PostMapping("/{guildId}/members/{externalAccountId}/roleassignments/delegatorroles")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun queueDelegatorRoleAssignments(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.queueRoleAssignments(guildId, externalAccountId)
+
     @GetMapping("/{guildId}/members/{externalAccountId}/claimlists")
     @ResponseStatus(HttpStatus.OK)
     fun getEligibleClaimListsOfUser(@PathVariable guildId: Long, @PathVariable externalAccountId: Long) = discordServerService.getEligibleClaimListsOfUser(guildId, externalAccountId)

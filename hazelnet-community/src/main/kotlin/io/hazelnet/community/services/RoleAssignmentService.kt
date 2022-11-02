@@ -291,6 +291,27 @@ class RoleAssignmentService(
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() }
     }
 
+    fun getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        return if (discordServer.tokenRoles.isNotEmpty()) {
+            val allVerificationsOfMember =
+                externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
+            getAllCurrentTokenRoleAssignmentsForVerifications(allVerificationsOfMember, discordServer)
+        } else {
+            emptySet()
+        }
+    }
+
+    fun getAllCurrentDelegatorRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        return if (discordServer.delegatorRoles.isNotEmpty()) {
+            val allVerificationsOfMember =
+                externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
+            val allDelegationToAllowedPools = getDelegationIfNeeded(discordServer)
+            getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedPools, discordServer)
+        } else {
+            emptySet()
+        }
+    }
+
     @Async
     fun publishRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long) {
         if (discordServer.tokenRoles.isNotEmpty() || discordServer.delegatorRoles.isNotEmpty()) {

@@ -846,48 +846,106 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClaimListsWithProducts"
-  ? /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders
-    : get:
-        summary: Get any order this user might have had for the given claim list
-        operationId: getOrderOfUserForClaimList
-        tags:
-          - discord
-          - claims
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-          - $ref: "#/components/parameters/ClaimListIdPathParameter"
-        responses:
-          "200":
-            description: "This users order for this claim list"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/PhysicalOrder"
-          "404":
-            description: "No order found for this claim list and user"
-      post:
-        summary: Submit a new order for this claim list
-        description: This will overwrite any existing orders for this claim list/user combination
-        operationId: setOrderOfUserForClaimList
-        tags:
-          - discord
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-          - $ref: "#/components/parameters/ClaimListIdPathParameter"
-        requestBody:
+  /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/tokenroles:
+    get:
+      summary: Get the token roles this user is eligible for on this server, if linked
+      operationId: getEligibleTokenRoles
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "All token roles this user is eligible for on this server"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordRoleAssignment"
+    post:
+      summary: Queue assigning all token roles this user is currently eligible for on this server, if linked
+      operationId: queueTokenRoleAssignment
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "Token role assignments successfully queued"
+  /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/delegatorroles:
+    get:
+      summary: Get the delegator roles this user is eligible for on this server, if linked
+      operationId: getEligibleDelegatorRoles
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "All delegator roles this user is eligible for on this server"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordRoleAssignment"
+    post:
+      summary: Queue assigning all delegator roles this user is currently eligible for on this server, if linked
+      operationId: queueDelegationRoleAssignment
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "Delegator role assignments successfully queued"
+  /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders:
+    get:
+      summary: Get any order this user might have had for the given claim list
+      operationId: getOrderOfUserForClaimList
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
+      responses:
+        "200":
+          description: "This users order for this claim list"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhysicalOrder"
-        responses:
-          "200":
-            description: "The created order for this claim list"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/PhysicalOrder"
+        "404":
+          description: "No order found for this claim list and user"
+    post:
+      summary: Submit a new order for this claim list
+      description: This will overwrite any existing orders for this claim list/user combination
+      operationId: setOrderOfUserForClaimList
+      tags:
+        - discord
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhysicalOrder"
+      responses:
+        "200":
+          description: "The created order for this claim list"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhysicalOrder"
   /discord/servers/{guildId}/premium:
     get:
       summary: Get the information about the premium status of this server

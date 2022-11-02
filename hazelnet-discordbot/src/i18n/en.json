@@ -70,10 +70,12 @@
 			"configure-tokenroles-policies-add": "Adds an accepted policy to your existing token role.",
 			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
+			"configure-tokenroles-test": "Test what token roles a user is currently eligible for.",
 			"configure-delegatorroles": "Configure delegator-roles",
 			"configure-delegatorroles-add": "Adds an auto-assignment for the given role.",
 			"configure-delegatorroles-list": "List all auto-assigned roles for delegators of the pools configured for this server.",
 			"configure-delegatorroles-remove": "Remove all auto-assignments (for all stake amounts) for the given role for delegators.",
+			"configure-delegatorroles-test": "Test what delegator roles a user is currently eligible for.",
 			"configure-stakepool": "Configure stakepools",
 			"configure-stakepool-add": "Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.",
 			"configure-stakepool-list": "List all Cardano stakepool IDs for which this Discord server is assigning auto-roles for delegators.",
@@ -154,7 +156,8 @@
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
 				"minimum-stake": "The minimum stake (in ADA) required for this role (0 for any amount).",
-				"pool-id": "Pool ID (not ticker) required to be delegating to, or ignore for all pools of this server."
+				"pool-id": "Pool ID (not ticker) required to be delegating to, or ignore for all pools of this server.",
+				"user": "The user to check delegator roles for"
 			},
 			"configure-poll": {
 				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
@@ -190,7 +193,8 @@
 				"attribute-path": "Metadata attribute to check (case sensitive!)",
 				"operator": "Comparison operator to use",
 				"attribute-value": "Value to check for (case sensitive!)",
-				"aggregation-type": "The method with which to calculate if someone qualifies for a token role"
+				"aggregation-type": "The method with which to calculate if someone qualifies for a token role",
+				"user": "The user to check token roles for"
 			},
 			"configure-marketplace": {
 				"policy-id": "Policy ID (Needs to be an official policy of this server)",
@@ -808,6 +812,16 @@
 			"remove": {
 				"success": "🗑️ Removed the following token role auto-assignment from this server:",
 				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server. Nothing was removed."
+			},
+			"test": {
+				"purpose": "The user <@{{user.id}}> is eligible for the following token roles on this Discord server:\n\n{{{roleData}}}",
+				"roleEntry": "   • <@&{{roleId}}>",
+				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
+				"blacklistedError": "🛑 The user is currently banned from any use of the Discord server service. Please contact your support team for further details.",
+				"missingRolesTitle": "Missing roles",
+				"missingRoles": "⚠ The user is currently not assigned the following roles that they are eligible for:\n\n{{{roleData}}}\n\n💡 They can either run **/verify unlink** and immediately **/verify link** once a day to get their roles assigned, or wait for up to two hours for automatic assignments to kick in. Alternatively, click the button below to assign their roles (be warned that this will make it you will be asked to do this for your end users manually constantly).",
+				"assignRoles": "Assign missing roles",
+				"queueSuccess": "✅ Successfully queued role assignments for the user. Their roles should appear within the next minutes."
 			}
 		},
 		"delegatorroles": {
@@ -833,6 +847,16 @@
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
 				"errorNotFound": "⚠ No delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
+			},
+			"test": {
+				"purpose": "The user <@{{user.id}}> is eligible for the following delegator roles on this Discord server:\n\n{{{roleData}}}",
+				"roleEntry": "   • <@&{{roleId}}>",
+				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
+				"blacklistedError": "🛑 The user is currently banned from any use of the Discord server service. Please contact your support team for further details.",
+				"missingRolesTitle": "Missing roles",
+				"missingRoles": "⚠ The user is currently not assigned the following roles that they are eligible for:\n\n{{{roleData}}}\n\n💡 They can either run **/verify unlink** and immediately **/verify link** once a day to get their roles assigned, or wait for up to two hours for automatic assignments to kick in. Alternatively, click the button below to assign their roles (be warned that this will make it you will be asked to do this for your end users manually constantly).",
+				"assignRoles": "Assign missing roles",
+				"queueSuccess": "✅ Successfully queued role assignments for the user. Their roles should appear within the next minutes."
 			}
 		},
 		"poll": {

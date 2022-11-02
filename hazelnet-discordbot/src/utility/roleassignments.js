@@ -1,3 +1,5 @@
+const i18n = require('i18n');
+
 /* eslint-disable no-await-in-loop */
 module.exports = {
   async ensureRoleAssignments(client, discordServer, roleProperty, expectedRoleAssignments, removeInvalid) {
@@ -116,5 +118,18 @@ module.exports = {
         client.logger.info(`No role with ID ${roleId} found on discord server ${discordServer.guildName}`);
       }
     }
+  },
+  getEligibleAndMissingRoles(roleAssignments, member, locale, phraseComponent) {
+    const missingRoleAssignments = roleAssignments.filter((roleAssignment) => !member.roles.cache.some((role) => role.id === roleAssignment.roleId));
+    let missingRoleField = null;
+    if (missingRoleAssignments.length) {
+      const missingRoleData = missingRoleAssignments.map((roleAssignment) => i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntry`, locale }, { roleId: roleAssignment.roleId })).join('\n');
+      missingRoleField = {
+        name: i18n.__({ phrase: `configure.${phraseComponent}.test.missingRolesTitle`, locale }),
+        value: i18n.__({ phrase: `configure.${phraseComponent}.test.missingRoles`, locale }, { roleData: missingRoleData }),
+      };
+    }
+    const roleData = roleAssignments.map((roleAssignment) => i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntry`, locale }, { roleId: roleAssignment.roleId })).join('\n');
+    return { roleData, missingRoleField };
   },
 };
