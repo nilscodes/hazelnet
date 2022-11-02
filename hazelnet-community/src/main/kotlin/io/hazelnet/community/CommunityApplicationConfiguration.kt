@@ -11,7 +11,8 @@ data class CommunityApplicationConfiguration(
         val cnftjungle: CnftJungleConfiguration,
         val fundedpool: String?,
         val fundedhandle: String?,
-        val ipfslink: String?,
+        val salesIpfslink: String?,
+        val mintIpfslink: String?,
 )
 
 data class ConnectConfiguration(

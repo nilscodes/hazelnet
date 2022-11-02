@@ -3,12 +3,11 @@ package io.hazelnet.community.data
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
-import io.hazelnet.community.CommunityApplicationConfiguration
 
 fun getImageUrlFromAssetInfo(ipfslink: String, assetInfo: MultiAssetInfo): String? {
     return try {
-        val ipfsLink = JsonPath.read<String>(assetInfo.metadata, "$.image").replace("ipfs://", "", true)
-        String.format(ipfslink, ipfsLink)
+        val ipfsHashv0 = JsonPath.read<String>(assetInfo.metadata, "$.image").replace("ipfs://", "", true)
+        ipfslink.replace("%ipfs", ipfsHashv0).replace("%fp", assetInfo.assetFingerprint.assetFingerprint)
     } catch(pnfe: PathNotFoundException) {
         null
     }
