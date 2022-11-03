@@ -48,6 +48,10 @@ class TokenOwnershipRole @JsonCreator constructor(
     @Column(name = "aggregation_type")
     @Enumerated(EnumType.ORDINAL)
     var aggregationType: TokenOwnershipAggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
+
+    @Column(name = "staking_type")
+    @Enumerated(EnumType.ORDINAL)
+    var stakingType: TokenStakingType = TokenStakingType.NONE,
 ) {
 
     fun meetsFilterCriteria(metadata: String): Boolean {

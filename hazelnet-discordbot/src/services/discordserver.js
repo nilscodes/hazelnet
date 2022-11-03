@@ -135,13 +135,14 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newTokenRolePromise;
   },
-  async updateTokenRole(guildId, tokenRoleId, acceptedAssets, minimumTokenQuantity, maximumTokenQuantity, discordRoleId, aggregationType) {
+  async updateTokenRole(guildId, tokenRoleId, acceptedAssets, minimumTokenQuantity, maximumTokenQuantity, discordRoleId, aggregationType, stakingType) {
     const updatedTokenRolePromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}`, {
       acceptedAssets,
       minimumTokenQuantity,
       maximumTokenQuantity,
       roleId: discordRoleId,
       aggregationType,
+      stakingType,
     });
     this.clearCacheEntry(guildId);
     return updatedTokenRolePromise.data;

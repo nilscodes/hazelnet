@@ -14,6 +14,7 @@ module.exports = {
     const minimumTokenQuantity = interaction.options.getString('count');
     const maximumTokenQuantity = interaction.options.getString('max-count');
     const aggregationType = interaction.options.getString('aggregation-type');
+    const stakingType = interaction.options.getString('staking-type');
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
@@ -28,7 +29,7 @@ module.exports = {
             usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
           }
           if (usersWithRole === null || usersWithRole.size === 0) {
-            const embed = await this.updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, role?.id, aggregationType);
+            const embed = await this.updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, role?.id, aggregationType, stakingType);
             await interaction.editReply({ embeds: [embed], ephemeral: true });
           } else {
             // Register add data in cache, as we cannot send it along with the button data.
@@ -38,6 +39,7 @@ module.exports = {
               maximumTokenQuantity,
               roleId: role?.id,
               aggregationType,
+              stakingType,
             });
 
             const components = [new ActionRowBuilder()
@@ -68,9 +70,9 @@ module.exports = {
       await interaction.editReply({ content: 'Error while adding automatic token-role assignment to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
-  async updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType) {
+  async updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType, stakingType) {
     const locale = discordServer.getBotLanguage();
-    const tokenRole = await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleId, null, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType);
+    const tokenRole = await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleId, null, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType, stakingType);
     const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale);
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles update', i18n.__({ phrase: 'configure.tokenroles.update.success', locale }), 'configure-tokenroles-update', tokenRoleFields);
     return embed;
@@ -89,7 +91,7 @@ module.exports = {
     }
   },
   async confirm(interaction, discordServer, roleToUpdate) {
-    const embed = await this.updateTokenRole(interaction, discordServer, roleToUpdate.tokenRoleId, roleToUpdate.minimumTokenQuantity, roleToUpdate.maximumTokenQuantity, roleToUpdate.roleId, roleToUpdate.aggregationType);
+    const embed = await this.updateTokenRole(interaction, discordServer, roleToUpdate.tokenRoleId, roleToUpdate.minimumTokenQuantity, roleToUpdate.maximumTokenQuantity, roleToUpdate.roleId, roleToUpdate.aggregationType, roleToUpdate.stakingType);
     await interaction.update({ embeds: [embed], components: [] });
   },
   async cancel(interaction, discordServer, roleToUpdate) {

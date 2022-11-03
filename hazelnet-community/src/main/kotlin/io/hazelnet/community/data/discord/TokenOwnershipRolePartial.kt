@@ -25,4 +25,5 @@ data class TokenOwnershipRolePartial @JsonCreator constructor(
     val roleId: Long?,
 
     val aggregationType: TokenOwnershipAggregationType?,
+    val stakingType: TokenStakingType?
 )

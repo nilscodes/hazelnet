@@ -865,7 +865,7 @@ paths:
                 $ref: "#/components/schemas/DiscordRoleAssignment"
     post:
       summary: Queue assigning all token roles this user is currently eligible for on this server, if linked
-      operationId: queueTokenRoleAssignment
+      operationId: queueTokenRoleAssignments
       tags:
         - discord
         - stakepool
@@ -894,7 +894,7 @@ paths:
                 $ref: "#/components/schemas/DiscordRoleAssignment"
     post:
       summary: Queue assigning all delegator roles this user is currently eligible for on this server, if linked
-      operationId: queueDelegationRoleAssignment
+      operationId: queueDelegatorRoleAssignments
       tags:
         - discord
         - stakepool
@@ -2755,6 +2755,8 @@ components:
           example: 10
         aggregationType:
           $ref: "#/components/schemas/TokenOwnershipAggregationType"
+        stakingType:
+          $ref: "#/components/schemas/TokenStakingType"
         filters:
           readOnly: true
           type: array
@@ -2781,6 +2783,8 @@ components:
           example: 10
         aggregationType:
           $ref: "#/components/schemas/TokenOwnershipAggregationType"
+        stakingType:
+          $ref: "#/components/schemas/TokenStakingType"
         roleId:
           $ref: "#/components/schemas/DiscordRole"
     TokenOwnershipAggregationType:
@@ -2791,6 +2795,12 @@ components:
         - ANY_POLICY_FILTERED_OR
         - ANY_POLICY_FILTERED_ONE_EACH
         - EVERY_POLICY_FILTERED_OR
+    TokenStakingType:
+      type: string
+      default: NONE
+      enum:
+        - NONE
+        - MUTANT_STAKING
     TokenRoleAssetInfo:
       type: object
       required:

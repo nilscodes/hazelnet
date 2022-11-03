@@ -194,6 +194,7 @@
 				"operator": "Comparison operator to use",
 				"attribute-value": "Value to check for (case sensitive!)",
 				"aggregation-type": "The method with which to calculate if someone qualifies for a token role",
+				"staking-type": "If set to a staking provider, include staked assets in role assignments",
 				"user": "The user to check token roles for"
 			},
 			"configure-marketplace": {
@@ -236,7 +237,9 @@
 				"ANY_POLICY_FILTERED_AND": "Any policy of the role, each NFT must match all filters",
 				"ANY_POLICY_FILTERED_OR": "Any policy of the role, each NFT must match at least one filter",
 				"ANY_POLICY_FILTERED_ONE_EACH": "Any policy of the role, one NFT matching each filter is required",
-				"EVERY_POLICY_FILTERED_OR": "At least one NFT of each defined policy is required"
+				"EVERY_POLICY_FILTERED_OR": "At least one NFT of each defined policy is required",
+				"STAKING_NONE": "No staking",
+				"MUTANT_STAKING": "Mutant Staking"
 			},
 			"configure-settings": {
 				"THEME_TOP_LOGO": "Main logo URL",
@@ -737,6 +740,7 @@
 				"tokenRoleDetailsEveryPolicyWithFilters": "All verified users that own at least one token from every configured policy/asset fingerprint combination will be assigned the role <@&{{tokenRole.roleId}}>. A token will be considered if one of the added metadata filters matches.",
 				"tokenRoleDetailsShortSelect": "Role <@&{{tokenRole.roleId}}> - Select below for more info.",
 				"tokenRoleDetailsShortCommand": "Role <@&{{tokenRole.roleId}}> - Run */configure-tokenroles details {{tokenRole.id}}* for more info.",
+				"withStakingProvider": "\nℹ Tokens that are staked with **{{stakingProviderName}}** will also be included in the assets owned by each member.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
 				"chooseDetails": "Choose the token role you want to get details on",
 				"chooseText": "Role-ID: {{tokenRole.id}}",
@@ -1372,6 +1376,9 @@
 		"JPGSTORE": "JPG.store",
 		"CNFTIO": "CNFT.io",
 		"MINT_ONCHAIN": "Minting"
+	},
+	"stakingProviders": {
+		"MUTANT_STAKING": "Mutant Staking"
 	},
 	"generic": {
 		"cancel": "Cancel",
