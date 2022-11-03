@@ -11,6 +11,7 @@ import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
 import io.hazelnet.community.persistence.data.TokenOwnershipRoleRepository
+import io.hazelnet.community.services.external.MutantStakingService
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.cache.annotation.Cacheable
@@ -46,6 +47,7 @@ class DiscordServerService(
     private val globalCommunityService: GlobalCommunityService,
     private val roleAssignmentService: RoleAssignmentService,
     private val tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
+    private val mutantStakingService: MutantStakingService,
     meterRegistry: MeterRegistry,
 ) {
     private val lastManualUserLinking: MutableMap<Long, Date> = mutableMapOf()
@@ -214,6 +216,9 @@ class DiscordServerService(
         }
         if (tokenOwnershipRolePartial.roleId != null) {
             tokenOwnershipRole.roleId = tokenOwnershipRolePartial.roleId
+        }
+        if (tokenOwnershipRolePartial.stakingType != null) {
+            tokenOwnershipRole.stakingType = tokenOwnershipRolePartial.stakingType
         }
         discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
         return tokenOwnershipRole

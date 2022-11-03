@@ -29,7 +29,7 @@ module.exports = {
                   discordServer,
                   '/configure-tokenroles policies add',
                   i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
-                  'configure-tokenroles-policies-add', 
+                  'configure-tokenroles-policies-add',
                   tokenroles.getTokenRoleDetailsFields(tokenRoleToAddPolicyTo, discordServer, locale, true),
                 );
                 await interaction.editReply({ embeds: [embed], ephemeral: true });
