@@ -277,6 +277,10 @@ module.exports = {
   async deletePoll(guildId, pollId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
   },
+  async getPollTokenMetadata(guildId, pollId) {
+    const pollTokenMetadata = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/tokenmetadata`);
+    return pollTokenMetadata.data;
+  },
   async getPollResults(guildId, pollId) {
     const pollResults = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes`);
     return pollResults.data;

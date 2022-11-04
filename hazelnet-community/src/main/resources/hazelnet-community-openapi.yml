@@ -1429,6 +1429,23 @@ paths:
                     $ref: "#/components/schemas/VoteData"
                   poll:
                     $ref: "#/components/schemas/VoteData"
+  /discord/servers/{guildId}/polls/{pollId}/tokenmetadata:
+    get:
+      summary: "Get metadata for fungible tokens used in this poll, if available"
+      operationId: getTokenRegistryMetadataForPoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
+      responses:
+        "200":
+          description: "The token metadata to be used in this poll, or null if no applicable metadata is found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenMetadata"
   /discord/servers/{guildId}/giveaways:
     get:
       summary: "Get giveaways for this Discord server"
@@ -3110,6 +3127,48 @@ components:
           $ref: "#/components/schemas/DiscordChannel"
         messageId:
           $ref: "#/components/schemas/DiscordMessage"
+    TokenMetadata:
+      type: object
+      required:
+        - subject
+        - policyScript
+      properties:
+        subject:
+          type: string
+        policyScript:
+          type: string
+        name:
+          type: object
+          properties:
+            value:
+              type: string
+        description:
+          type: object
+          properties:
+            value:
+              type: string
+        url:
+          type: object
+          properties:
+            value:
+              type: string
+        ticker:
+          type: object
+          properties:
+            value:
+              type: string
+        decimals:
+          type: object
+          properties:
+            value:
+              type: integer
+              format: int32
+        logo:
+          type: object
+          properties:
+            value:
+              type: string
+
     DiscordMarketplaceChannel:
       type: object
       required:

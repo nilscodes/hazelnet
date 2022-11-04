@@ -23,7 +23,8 @@ module.exports = {
                 const locale = discordServer.getBotLanguage();
                 const poll = await client.services.discordserver.getPoll(pollUpdateInfo.guildId, pollUpdateInfo.pollId);
                 const results = poll.resultsVisible ? await client.services.discordserver.getPollResults(guild.id, poll.id) : null;
-                const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, false);
+                const tokenMetadata = await pollutil.getTokenMetadataFromRegistry(guild.id, poll, client);
+                const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, false, tokenMetadata);
                 const embedPublic = embedBuilder.buildForUser(discordServer, poll.displayName, i18n.__({ phrase: 'configure.poll.announce.publicSuccess', locale }), 'vote', detailFields);
                 try {
                   await announceChannel.messages.fetch(pollUpdateInfo.messageId);

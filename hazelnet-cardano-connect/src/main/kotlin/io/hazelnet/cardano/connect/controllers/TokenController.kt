@@ -36,6 +36,10 @@ class TokenController(
 
     @GetMapping("/fingerprints/{assetFingerprint}")
     @ResponseStatus(HttpStatus.OK)
+    fun getMultiAssetInfoForAssetFingerprint(@PathVariable assetFingerprint: String) = tokenService.getMultiAssetInfoForAssetFingerprint(assetFingerprint)
+
+    @GetMapping("/fingerprints/{assetFingerprint}/wallet")
+    @ResponseStatus(HttpStatus.OK)
     fun getWalletForAsset(@PathVariable assetFingerprint: String) = tokenService.getWalletForAsset(assetFingerprint)
 
 }

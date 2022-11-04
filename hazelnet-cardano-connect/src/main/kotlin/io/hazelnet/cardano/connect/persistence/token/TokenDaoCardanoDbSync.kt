@@ -8,6 +8,7 @@ import io.hazelnet.shared.decodeHex
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import java.sql.Types
 import java.util.*
 
@@ -36,6 +37,8 @@ const val GET_STAKE_ADDRESS_BY_ASSET_FINGERPRINT =
 
 const val GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME =
     "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash, tm.json FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx_metadata tm ON mtm.tx_id = tm.tx_id JOIN tx ON mtm.tx_id = tx.id WHERE policy=DECODE(?, 'hex') AND name=cast(? as asset32type) AND key=? AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
+const val GET_ASSET_MINT_METADATA_BY_ASSET_FINGERPRINT =
+    "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx ON mtm.tx_id = tx.id WHERE ma.fingerprint=? AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
 
 const val NFT_METADATA_KEY = 721
 
@@ -208,24 +211,42 @@ class TokenDaoCardanoDbSync(
     override fun getMultiAssetInfo(policyId: String, assetName: String): MultiAssetInfo {
         return try {
             jdbcTemplate.queryForObject(GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME, { rs, _ ->
-                val objectMapper = ObjectMapper()
-                val mintMetadata =
-                    objectMapper.readValue(rs.getString("json"), object : TypeReference<Map<String, Any>>() {})
-                val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
-                val metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
-                MultiAssetInfo(
-                    PolicyId(rs.getString("policy")),
-                    rs.getString("name").decodeHex(),
-                    AssetFingerprint(rs.getString("fingerprint")),
-                    objectMapper.writeValueAsString(metadataOfAsset),
-                    rs.getString("hash"),
-                    rs.getLong("quantity"),
-                )
+                mapMultiAssetInfo(rs, true)
             }, policyId, assetName, NFT_METADATA_KEY)!!
         } catch (erdae: EmptyResultDataAccessException) {
             // TODO should be changed to return null and a 404 on the controller, but need to adjust connectService on the community end to deal with that in a healthy way
             MultiAssetInfo(PolicyId(policyId), assetName, AssetFingerprint("asset1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), "", "", 0)
         }
+    }
+
+    override fun getMultiAssetInfoForAssetFingerprint(assetFingerprint: AssetFingerprint): MultiAssetInfo {
+        return jdbcTemplate.queryForObject(GET_ASSET_MINT_METADATA_BY_ASSET_FINGERPRINT, { rs, _ ->
+            mapMultiAssetInfo(rs, false)
+        }, assetFingerprint.assetFingerprint)!!
+    }
+
+    private fun mapMultiAssetInfo(
+        rs: ResultSet,
+        includeMetadata: Boolean,
+    ): MultiAssetInfo {
+        val policyId = rs.getString("policy")
+        val assetName = rs.getString("name").decodeHex()
+        val objectMapper = ObjectMapper()
+        var metadataOfAsset = emptyMap<String, Any>()
+        if (includeMetadata) {
+            val mintMetadata =
+                objectMapper.readValue(rs.getString("json"), object : TypeReference<Map<String, Any>>() {})
+            val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
+            metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
+        }
+        return MultiAssetInfo(
+            PolicyId(policyId),
+            assetName,
+            AssetFingerprint(rs.getString("fingerprint")),
+            objectMapper.writeValueAsString(metadataOfAsset),
+            rs.getString("hash"),
+            rs.getLong("quantity"),
+        )
     }
 
     override fun getWalletForAsset(assetFingerprint: AssetFingerprint): AddressDetails {
