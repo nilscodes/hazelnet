@@ -10,39 +10,44 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const externalAccountOfOtherUser = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccountOfOtherUser.id);
-      if (mainAccount.settings?.BLACKLISTED !== 'true') {
-        const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild.id);
-        const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccountOfOtherUser.id);
-        if (currentMemberData) {
-          const roleAssignments = await interaction.client.services.discordserver.getEligibleTokenRolesOfUser(interaction.guild.id, externalAccountOfOtherUser.id);
-          const member = await interaction.guild.members.fetch(user.id);
-          const { roleData, missingRoleField } = roleassignments.getEligibleAndMissingRoles(roleAssignments, member, locale, 'tokenroles');
-          const components = [];
-          if (missingRoleField !== null) {
-            components.push(new ActionRowBuilder()
-              .addComponents(
-                new ButtonBuilder()
-                  .setCustomId(`configure-tokenroles/test/assignroles.${externalAccountOfOtherUser.id}`)
-                  .setLabel(i18n.__({ phrase: 'configure.tokenroles.test.assignRoles', locale }))
-                  .setStyle(ButtonStyle.Primary),
-              ));
+      const externalAccountOfOtherUser = await interaction.client.services.externalaccounts.getExternalDiscordAccount(user.id);
+      if (externalAccountOfOtherUser) {
+        const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccountOfOtherUser.id);
+        if (mainAccount.settings?.BLACKLISTED !== 'true') {
+          const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild.id);
+          const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccountOfOtherUser.id);
+          if (currentMemberData) {
+            const roleAssignments = await interaction.client.services.discordserver.getEligibleTokenRolesOfUser(interaction.guild.id, externalAccountOfOtherUser.id);
+            const member = await interaction.guild.members.fetch(user.id);
+            const { roleData, missingRoleField } = roleassignments.getEligibleAndMissingRoles(roleAssignments, member, locale, 'tokenroles');
+            const components = [];
+            if (missingRoleField !== null) {
+              components.push(new ActionRowBuilder()
+                .addComponents(
+                  new ButtonBuilder()
+                    .setCustomId(`configure-tokenroles/test/assignroles.${externalAccountOfOtherUser.id}`)
+                    .setLabel(i18n.__({ phrase: 'configure.tokenroles.test.assignRoles', locale }))
+                    .setStyle(ButtonStyle.Primary),
+                ));
+            }
+            const embed = embedBuilder.buildForAdmin(
+              discordServer,
+              '/configure-tokenroles test',
+              i18n.__({ phrase: 'configure.tokenroles.test.purpose', locale }, { user, roleData }),
+              'configure-tokenroles-test',
+              missingRoleField,
+            );
+            await interaction.editReply({ embeds: [embed], components });
+          } else {
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles test', i18n.__({ phrase: 'configure.tokenroles.test.notLinkedError', locale }), 'configure-tokenroles-test');
+            await interaction.editReply({ embeds: [embed] });
           }
-          const embed = embedBuilder.buildForAdmin(
-            discordServer,
-            '/configure-tokenroles test',
-            i18n.__({ phrase: 'configure.tokenroles.test.purpose', locale }, { user, roleData }),
-            'configure-tokenroles-test',
-            missingRoleField,
-          );
-          await interaction.editReply({ embeds: [embed], components });
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles test', i18n.__({ phrase: 'configure.tokenroles.test.notLinkedError', locale }), 'configure-tokenroles-test');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles test', i18n.__({ phrase: 'configure.tokenroles.test.blacklistedError', locale }), 'configure-tokenroles-test');
           await interaction.editReply({ embeds: [embed] });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles test', i18n.__({ phrase: 'configure.tokenroles.test.blacklistedError', locale }), 'configure-tokenroles-test');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles test', i18n.__({ phrase: 'configure.tokenroles.test.notLinkedError', locale }), 'configure-tokenroles-test');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
