@@ -37,6 +37,12 @@ class ConnectivityConfiguration {
             .build()
 
     @Bean
+    fun tokenRegistryClient(config: CommunityApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.tokenregistry.url)
+            .build()
+
+    @Bean
     fun mutantStakingClient(config: CommunityApplicationConfiguration) =
         WebClient.builder()
             .baseUrl(config.mutantstaking.url)

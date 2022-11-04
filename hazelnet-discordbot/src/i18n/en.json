@@ -358,7 +358,7 @@
 		"currentResults": "Current results",
 		"resultsNotVisible": "The results of this poll are hidden until the team publishes them.",
 		"yourVotingPower": "Your voting power",
-		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of {{totalVotingPower}} in your verified wallets.",
+		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of **{{totalVotingPower}}{{unit}}** in your verified wallets.",
 		"votingPowerSingleNoToken": "This poll is not token-based and as such you have a voting power of one.",
 		"votingPowerSingleToken": "Based on the token ownership snapshot you have one vote in this poll.",
 		"votingPowerNone": "You do not have any verified wallets that had contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",

@@ -148,6 +148,10 @@ class TokenService(
         return tokenDao.getMultiAssetInfo(policyId, assetNameHex.decodeHex());
     }
 
+    fun getMultiAssetInfoForAssetFingerprint(assetFingerprint: String): MultiAssetInfo {
+        return tokenDao.getMultiAssetInfoForAssetFingerprint(AssetFingerprint(assetFingerprint));
+    }
+
     @Scheduled(fixedDelay = 6 * 60 * 60 * 1000)
     @CacheEvict(allEntries = true, cacheNames = ["tokenmetadata"], )
     fun clearMultiAssetInfoCache() {

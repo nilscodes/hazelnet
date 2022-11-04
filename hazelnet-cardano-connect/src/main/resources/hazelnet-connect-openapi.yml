@@ -341,6 +341,21 @@ paths:
                 $ref: '#/components/schemas/MultiAssetInfo'
   /token/fingerprints/{assetFingerprint}:
     get:
+      summary: Get the information and metadata for a multi asset by fingerprint
+      operationId: getMultiAssetInfoForAssetFingerprint
+      tags:
+        - token
+      parameters:
+        - $ref: '#/components/parameters/AssetFingerprintPathParameter'
+      responses:
+        '200':
+          description: 'The data and metadata for this asset'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiAssetInfo'
+  /token/fingerprints/{assetFingerprint}/wallet:
+    get:
       summary: Get the wallet this multi asset resides in
       operationId: getWalletForAsset
       tags:

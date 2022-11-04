@@ -10,6 +10,7 @@ data class CommunityApplicationConfiguration(
         val voteaire: VoteaireConfiguration,
         val cnftjungle: CnftJungleConfiguration,
         val mutantstaking: MutantStakingConfiguration,
+        val tokenregistry: TokenRegistryConfiguration,
         val fundedpool: String?,
         val fundedhandle: String?,
         val salesIpfslink: String?,
@@ -29,5 +30,9 @@ data class CnftJungleConfiguration(
 )
 
 data class MutantStakingConfiguration(
+        val url: String
+)
+
+data class TokenRegistryConfiguration(
         val url: String
 )

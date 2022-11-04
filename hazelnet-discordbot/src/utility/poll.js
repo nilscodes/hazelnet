@@ -92,10 +92,11 @@ module.exports = {
     }
     return [];
   },
-  getCurrentResults(discordServer, poll, result) {
+  getCurrentResults(discordServer, poll, result, tokenMetadata) {
+    const decimals = tokenMetadata?.decimals?.value ?? 0;
     return poll.options
       .map((option, idx) => {
-        const formattedVotes = discordServer.formatNumber(result.votes[option.id]);
+        const formattedVotes = discordServer.formatNumber(this.calculateVotingNumber(result.votes[option.id], decimals));
         return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
       }).join('\n');
   },
@@ -103,7 +104,7 @@ module.exports = {
     return poll.options
       .map((option, idx) => (`${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`)).join('\n');
   },
-  getPollAnnouncementParts(discordServer, poll, results, forcePublishResults) {
+  getPollAnnouncementParts(discordServer, poll, results, forcePublishResults, tokenMetadata) {
     const locale = discordServer.getBotLanguage();
     const detailFields = [
       {
@@ -122,7 +123,7 @@ module.exports = {
     if (forcePublishResults || poll.resultsVisible) {
       detailFields.push({
         name: i18n.__({ phrase: 'vote.currentResults', locale }),
-        value: this.getCurrentResults(discordServer, poll, results),
+        value: this.getCurrentResults(discordServer, poll, results, tokenMetadata),
       });
     } else {
       detailFields.push({
@@ -246,5 +247,14 @@ module.exports = {
       });
     }
     return detailFields;
+  },
+  async getTokenMetadataFromRegistry(guildId, poll, client) {
+    if (poll.snapshotId) {
+      return client.services.discordserver.getPollTokenMetadata(guildId, poll.id);
+    }
+    return null;
+  },
+  calculateVotingNumber(votingPower, decimals) {
+    return Math.floor(votingPower / (10 ** decimals));
   },
 };

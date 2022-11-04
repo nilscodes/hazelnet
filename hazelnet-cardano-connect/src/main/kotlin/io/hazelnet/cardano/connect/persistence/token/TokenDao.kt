@@ -17,5 +17,6 @@ interface TokenDao {
     fun getMultiAssetCountSnapshotForPolicyIdAndAssetFingerprint(policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetCount>
 
     fun getMultiAssetInfo(policyId: String, assetName: String): MultiAssetInfo
+    fun getMultiAssetInfoForAssetFingerprint(assetFingerprint: AssetFingerprint): MultiAssetInfo
     fun getWalletForAsset(assetFingerprint: AssetFingerprint): AddressDetails
 }
