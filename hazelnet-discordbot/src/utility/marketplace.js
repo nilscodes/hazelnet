@@ -1,8 +1,10 @@
 const {
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
 } = require('discord.js');
+const crypto = require('crypto');
+const { URLSearchParams } = require('url');
 const i18n = require('i18n');
-const CID = require('cids');
+// const CID = require('cids');
 const cardanotoken = require('./cardanotoken');
 
 module.exports = {
@@ -84,12 +86,26 @@ module.exports = {
     }
     return [];
   },
-  prepareImageUrl(imageUrl) {
-    if (imageUrl.indexOf('https://nftstorage.link/ipfs/') === 0) {
-      const ipfsV0 = imageUrl.substring('https://nftstorage.link/ipfs/'.length);
-      return process.env.IPFS_LINK?.replaceAll('%s', new CID(ipfsV0).toV1().toString('base32'));
-    }
-    return imageUrl;
+  nftcdnUrl(domain, key, asset, uri = '/image', params = {}) {
+    const plainUrl = this.buildUrl(domain, asset, uri, { ...params, tk: '' });
+    const urlHash = crypto.createHmac('sha256', key).update(plainUrl).digest('base64url');
+    return this.buildUrl(domain, asset, uri, { ...params, tk: urlHash });
+  },
+  buildUrl(domain, asset, uri, params) {
+    const searchParams = new URLSearchParams(params);
+    return `https://${asset}.${domain}.nftcdn.io${uri}?${searchParams.toString()}`;
+  },
+  prepareImageUrl(assetInfo) {
+    const [domain, key] = [process.env.NFTCDN_DOMAIN, Buffer.from(process.env.NFTCDN_KEY, 'base64')];
+    return this.nftcdnUrl(domain, key, assetInfo.assetFingerprint, '/image', { size: 1024 });
+  /*
+  const imageUrl = assetInfo.assetImageUrl;
+  if (imageUrl.indexOf('https://nftstorage.link/ipfs/') === 0) {
+    const ipfsV0 = imageUrl.substring('https://nftstorage.link/ipfs/'.length);
+    return process.env.IPFS_LINK?.replaceAll('%s', new CID(ipfsV0).toV1().toString('base32'));
+  }
+  return imageUrl;
+  */
   },
   generateLink(linkType, linkData, locale) {
     switch (linkType) {

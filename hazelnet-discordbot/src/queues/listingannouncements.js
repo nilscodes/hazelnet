@@ -18,7 +18,7 @@ module.exports = {
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createListingAnnouncementFields(listingAnnouncement, locale);
             const title = marketplace.getListingAnnouncementTitle(listingAnnouncement, locale);
-            const image = marketplace.prepareImageUrl(listingAnnouncement.assetImageUrl);
+            const image = marketplace.prepareImageUrl(listingAnnouncement);
             const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.listings.announce.title', locale }), title, 'policyid', detailFields, image);
             const components = marketplace.getListingAnnouncementComponents(discordServer, listingAnnouncement);
             await announceChannel.send({ embeds: [embedPublic], components });
