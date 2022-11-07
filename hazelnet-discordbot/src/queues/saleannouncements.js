@@ -18,7 +18,7 @@ module.exports = {
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createSaleAnnouncementFields(saleAnnouncement, locale);
             const title = marketplace.getSaleAnnouncementTitle(saleAnnouncement, locale);
-            const image = marketplace.prepareImageUrl(saleAnnouncement.assetImageUrl)
+            const image = marketplace.prepareImageUrl(saleAnnouncement);
             // const ipfsV0 = metadata.image.indexOf('ipfs://') === 0 ? metadata.image.substring(7) : null;
             // if (ipfsV0) {
             //   image = process.env.IPFS_LINK?.replaceAll('%s', new CID(ipfsV0).toV1().toString('base32'));
