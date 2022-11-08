@@ -2,10 +2,13 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetCount
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordServerRepository
+import io.hazelnet.community.services.external.MutantStakingService
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -16,6 +19,7 @@ class RoleAssignmentService(
     private val externalAccountService: ExternalAccountService,
     private val rabbitTemplate: RabbitTemplate,
     private val discordServerRepository: DiscordServerRepository,
+    private val mutantStakingService: MutantStakingService,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -59,8 +63,10 @@ class RoleAssignmentService(
         val filterBasedRoleAssignments = mutableSetOf<DiscordRoleAssignment>()
         // TODO We could try to filter out all users that already received a role
         if (relevantPolicyIds.isNotEmpty()) {
-            val tokenOwnershipData =
+            val tokenStakingData = getStakingAssets(allVerifiedStakeAddresses, filterBasedRoles)
+            val tokenOwnershipDataInWallet =
                 connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+            val tokenOwnershipData = mergeOwnershipForAssetLists(tokenOwnershipDataInWallet, tokenStakingData)
             val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, MutableMap<String, MutableList<MultiAssetInfo>>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -169,8 +175,10 @@ class RoleAssignmentService(
             role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
         }.flatten().toSet()
         if (relevantPolicyIds.isNotEmpty()) {
-            val tokenOwnershipData =
+            val tokenStakingData = getStakingCounts(allVerifiedStakeAddresses, countBasedRoles)
+            val tokenOwnershipDataInWallet =
                 connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+            val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, tokenStakingData)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -210,6 +218,103 @@ class RoleAssignmentService(
             }.flatten().toSet()
         }
         return emptySet()
+    }
+
+    private fun mergeOwnershipForAssetCounts(
+        list1: List<TokenOwnershipInfoWithAssetCount>,
+        list2: List<TokenOwnershipInfoWithAssetCount>
+    ) =
+        // Add the counts up that exist in both list1 and list2
+        list1.map { it1 ->
+            TokenOwnershipInfoWithAssetCount(
+                it1.stakeAddress,
+                it1.policyIdWithOptionalAssetFingerprint,
+                it1.assetCount
+                        + (list2.filter { it2 -> it2.stakeAddress == it1.stakeAddress && it2.policyIdWithOptionalAssetFingerprint == it1.policyIdWithOptionalAssetFingerprint }
+                    .sumOf { it.assetCount })
+            )
+        } + // Then concatenate with the counts only present in list 2
+                list2.filter { it2 ->
+                    !(list1.any { it1 -> it2.stakeAddress == it1.stakeAddress && it2.policyIdWithOptionalAssetFingerprint == it1.policyIdWithOptionalAssetFingerprint })
+                }
+
+    private fun mergeOwnershipForAssetLists(
+        list1: List<TokenOwnershipInfoWithAssetList>,
+        list2: List<TokenOwnershipInfoWithAssetList>
+    ) =
+        // Add the counts up that exist in both list1 and list2
+        list1.map { it1 ->
+            TokenOwnershipInfoWithAssetList(
+                it1.stakeAddress,
+                null,
+                it1.policyIdWithOptionalAssetFingerprint,
+                it1.assetList
+                        + (list2.filter { it2 -> it2.stakeAddress == it1.stakeAddress && it2.policyIdWithOptionalAssetFingerprint == it1.policyIdWithOptionalAssetFingerprint }
+                    .map { it.assetList }.flatten())
+            )
+        } + // Then concatenate with the counts only present in list 2
+                list2.filter { it2 ->
+                    !(list1.any { it1 -> it2.stakeAddress == it1.stakeAddress && it2.policyIdWithOptionalAssetFingerprint == it1.policyIdWithOptionalAssetFingerprint })
+                }
+
+    private fun getStakingCounts(stakeAddresses: List<String>, roles: List<TokenOwnershipRole>): List<TokenOwnershipInfoWithAssetCount>
+    {
+        val policiesToRetrieveMutantInfoFor = getPoliciesToRetrieveMutantStakingInfoFor(roles)
+        if (policiesToRetrieveMutantInfoFor.isNotEmpty()) {
+            val mapForStakeAddresses = mutableMapOf<String, MutableMap<String, Long>>()
+            mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
+                .forEach { stakeEntry ->
+                    if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
+                        val mapForStakeAddress =
+                            mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
+                        stakeEntry.assets.forEach { asset ->
+                            mapForStakeAddress.compute(asset.policyId!!) { _, v -> (v ?: 0) + 1 }
+                        }
+                    }
+                }
+            return mapForStakeAddresses.map { stakeAddressEntry ->
+                stakeAddressEntry.value.map {
+                    TokenOwnershipInfoWithAssetCount(stakeAddressEntry.key, it.key, it.value)
+                }
+            }.flatten()
+        }
+        return emptyList()
+    }
+
+    private fun getStakingAssets(stakeAddresses: List<String>, roles: List<TokenOwnershipRole>): List<TokenOwnershipInfoWithAssetList> {
+        val policiesToRetrieveMutantInfoFor = getPoliciesToRetrieveMutantStakingInfoFor(roles)
+        if (policiesToRetrieveMutantInfoFor.isNotEmpty()) {
+            val mapForStakeAddresses = mutableMapOf<String, MutableMap<String, MutableSet<String>>>()
+            mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
+                .forEach { stakeEntry ->
+                    if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
+                        val mapForStakeAddress =
+                            mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
+                        stakeEntry.assets.forEach { asset ->
+                            mapForStakeAddress.computeIfAbsent(asset.policyId!!) { mutableSetOf() }.add(asset.assetName)
+                        }
+                    }
+                }
+            return mapForStakeAddresses.map { stakeAddressEntry ->
+                stakeAddressEntry.value.map {
+                    TokenOwnershipInfoWithAssetList(stakeAddressEntry.key, null, it.key, it.value)
+                }
+            }.flatten()
+        }
+        return emptyList()
+    }
+
+    private fun getPoliciesToRetrieveMutantStakingInfoFor(roles: List<TokenOwnershipRole>): Set<String> {
+        val mutantEnabledPolicies = roles
+            .filter { it.stakingType == TokenStakingType.MUTANT_STAKING }
+            .map { it.acceptedAssets.map { aa -> aa.policyId } }
+            .flatten()
+        return if (mutantEnabledPolicies.isNotEmpty()) {
+            val mutantSupportedPolicies = mutantStakingService.getStakeablePolicies()
+            mutantEnabledPolicies.intersect(mutantSupportedPolicies)
+        } else {
+            emptySet()
+        }
     }
 
     private fun calculateMatchedTokenCountForCountBased(
@@ -289,6 +394,27 @@ class RoleAssignmentService(
         val externalAccountId = verification.externalAccount.id!!
         externalAccountLookup[externalAccountId] = verification.externalAccount
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() }
+    }
+
+    fun getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        return if (discordServer.tokenRoles.isNotEmpty()) {
+            val allVerificationsOfMember =
+                externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
+            getAllCurrentTokenRoleAssignmentsForVerifications(allVerificationsOfMember, discordServer)
+        } else {
+            emptySet()
+        }
+    }
+
+    fun getAllCurrentDelegatorRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        return if (discordServer.delegatorRoles.isNotEmpty()) {
+            val allVerificationsOfMember =
+                externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
+            val allDelegationToAllowedPools = getDelegationIfNeeded(discordServer)
+            getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedPools, discordServer)
+        } else {
+            emptySet()
+        }
     }
 
     @Async

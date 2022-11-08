@@ -3,8 +3,10 @@ package io.hazelnet.community.services
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.polls.*
+import io.hazelnet.community.data.external.tokenregistry.TokenMetadata
 import io.hazelnet.community.data.external.voteaire.BallotTypePolicyId
 import io.hazelnet.community.persistence.DiscordPollRepository
+import io.hazelnet.community.services.external.CardanoTokenRegistryService
 import io.hazelnet.community.services.external.VoteaireService
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
@@ -20,6 +22,7 @@ class DiscordPollService(
     private val externalAccountService: ExternalAccountService,
     private val snapshotService: MultiAssetSnapshotService,
     private val voteaireService: VoteaireService,
+    private val cardanoTokenRegistryService: CardanoTokenRegistryService,
 ) {
     fun listPolls(guildId: Long): List<DiscordPoll> {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -145,6 +148,18 @@ class DiscordPollService(
             .sumOf { it.tokenQuantity }
     }
 
+    fun getTokenRegistryMetadataForPoll(guildId: Long, pollId: Int): TokenMetadata? {
+        val discordServer = discordServerService.getDiscordServer(guildId)
+        val poll = getPoll(discordServer, pollId)
+        if (poll.snapshotId != null) {
+            val assetFingerprint = snapshotService.getAssetFingerprintForSnapshot(poll.snapshotId!!)
+            if (assetFingerprint != null) {
+                return cardanoTokenRegistryService.getTokenMetadata(assetFingerprint)
+            }
+        }
+        return null
+    }
+
     @Transactional
     fun setVoteForUser(guildId: Long, pollId: Int, externalAccountId: Long, options: List<Long>): Map<String, VoteData> {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -177,7 +192,7 @@ class DiscordPollService(
                         }
                     }
                 }
-                discordPollRepository.save(poll);
+                discordPollRepository.save(poll)
                 return mapOf(
                     Pair("user", getExistingVoteOfUserFromPoll(poll, voter, totalVotingPower)),
                     Pair("poll", getExistingVotesFromPoll(poll))

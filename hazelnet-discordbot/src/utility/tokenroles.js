@@ -21,6 +21,12 @@ module.exports = {
     if (customTokenRoleMessage) {
       useTokenRoleMessage = customTokenRoleMessage;
     }
+    let stakingInfo = '';
+    if (tokenRole.stakingType !== 'NONE') {
+      stakingInfo = i18n.__({ phrase: 'configure.tokenroles.list.withStakingProvider', locale }, {
+        stakingProviderName: this.getStakingProviderName(tokenRole.stakingType, locale),
+      });
+    }
     let title = i18n.__({ phrase: 'configure.tokenroles.list.tokenRoleNameMultiple', locale }, { tokenRole });
     const policyIdCount = [...new Set(tokenRole.acceptedAssets.map((acceptedAsset) => acceptedAsset.policyId))].length;
     if (policyIdCount === 1) {
@@ -37,7 +43,7 @@ module.exports = {
       value: i18n.__({ phrase: useTokenRoleMessage, locale }, {
         tokenRole,
         maximumInfo,
-      }),
+      }) + stakingInfo,
     }];
     if (includeAllDetails) {
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
@@ -70,5 +76,8 @@ module.exports = {
       }
     }
     return detailFields;
+  },
+  getStakingProviderName(stakingType, locale) {
+    return i18n.__({ phrase: `stakingProviders.${stakingType}`, locale });
   },
 };

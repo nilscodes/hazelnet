@@ -21,8 +21,8 @@ class HandleService(
         val handle = handleDao.resolveHandle(handlePolicy, handleName)
         val handleInfo = tokenDao.getMultiAssetInfo(handlePolicy, handleName)
         val handleImage = try {
-            val ipfsHash = JsonPath.read<String>(handleInfo.metadata, "$.image").replace("ipfs://", "", true)
-            String.format(ipfslink, ipfsHash)
+            val ipfsHashv0 = JsonPath.read<String>(handleInfo.metadata, "$.image").replace("ipfs://", "", true)
+            ipfslink.replace("%ipfs", ipfsHashv0)
         } catch(pnfe: PathNotFoundException) {
             ""
         }

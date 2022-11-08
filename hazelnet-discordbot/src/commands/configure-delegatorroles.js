@@ -20,7 +20,11 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))
-        .addIntegerOption((option) => option.setName('delegator-role-id').setDescription(ci18n.option('role')).setRequired(true)));
+        .addIntegerOption((option) => option.setName('delegator-role-id').setDescription(ci18n.option('role')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('test')
+        .setDescription(ci18n.subDescription('test'))
+        .addUserOption((option) => option.setName('user').setDescription(ci18n.option('user')).setRequired(true)));
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['stakepool'],

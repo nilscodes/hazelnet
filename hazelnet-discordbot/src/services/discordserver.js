@@ -62,6 +62,20 @@ module.exports = {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}?skipRoleUpdates=${!!skipRoleUpdates}`);
     this.clearCacheEntry(guildId);
   },
+  async getEligibleTokenRolesOfUser(guildId, externalAccountId) {
+    const memberPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/tokenroles`);
+    return memberPromise.data;
+  },
+  async getEligibleDelegatorRolesOfUser(guildId, externalAccountId) {
+    const memberPromise = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/delegatorroles`);
+    return memberPromise.data;
+  },
+  async queueTokenRoleAssignments(guildId, externalAccountId) {
+    await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/tokenroles`);
+  },
+  async queueDelegatorRoleAssignments(guildId, externalAccountId) {
+    await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/delegatorroles`);
+  },
   async updateDiscordServerSetting(guildId, settingName, settingValue) {
     await axios.put(`${hazelCommunityUrl}/discord/servers/${guildId}/settings/${settingName}`, {
       name: settingName,
@@ -121,13 +135,14 @@ module.exports = {
     this.clearCacheEntry(guildId);
     return newTokenRolePromise;
   },
-  async updateTokenRole(guildId, tokenRoleId, acceptedAssets, minimumTokenQuantity, maximumTokenQuantity, discordRoleId, aggregationType) {
+  async updateTokenRole(guildId, tokenRoleId, acceptedAssets, minimumTokenQuantity, maximumTokenQuantity, discordRoleId, aggregationType, stakingType) {
     const updatedTokenRolePromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}`, {
       acceptedAssets,
       minimumTokenQuantity,
       maximumTokenQuantity,
       roleId: discordRoleId,
       aggregationType,
+      stakingType,
     });
     this.clearCacheEntry(guildId);
     return updatedTokenRolePromise.data;
@@ -261,6 +276,10 @@ module.exports = {
   },
   async deletePoll(guildId, pollId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`);
+  },
+  async getPollTokenMetadata(guildId, pollId) {
+    const pollTokenMetadata = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/tokenmetadata`);
+    return pollTokenMetadata.data;
   },
   async getPollResults(guildId, pollId) {
     const pollResults = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes`);

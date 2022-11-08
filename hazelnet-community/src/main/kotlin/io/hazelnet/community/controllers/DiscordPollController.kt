@@ -48,6 +48,11 @@ class DiscordPollController(
     @ResponseStatus(HttpStatus.OK)
     fun getVotesInPoll(@PathVariable guildId: Long, @PathVariable pollId: Int) = discordPollService.getVotesInPoll(guildId, pollId)
 
+    @GetMapping("/servers/{guildId}/polls/{pollId}/tokenmetadata")
+    @ResponseStatus(HttpStatus.OK)
+    fun getTokenRegistryMetadataForPoll(@PathVariable guildId: Long, @PathVariable pollId: Int) = discordPollService.getTokenRegistryMetadataForPoll(guildId, pollId)
+
+
     @GetMapping("/servers/{guildId}/polls/{pollId}/votes/{externalAccountId}")
     @ResponseStatus(HttpStatus.OK)
     fun getVoteOfUser(@PathVariable guildId: Long, @PathVariable pollId: Int, @PathVariable externalAccountId: Long) = discordPollService.getVoteOfUser(guildId, pollId, externalAccountId)

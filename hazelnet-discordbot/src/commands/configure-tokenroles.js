@@ -30,7 +30,13 @@ module.exports = {
           .setRequired(false))
         .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(false))
         .addStringOption((option) => option.setName('count').setDescription(ci18n.option('count')).setRequired(false))
-        .addStringOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false)))
+        .addStringOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false))
+        .addStringOption((option) => option.setName('staking-type').setDescription(ci18n.option('staking-type'))
+          .addChoices(
+            { name: ci18n.choice('STAKING_NONE'), value: 'NONE' },
+            { name: ci18n.choice('MUTANT_STAKING'), value: 'MUTANT_STAKING' },
+          )
+          .setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
@@ -78,7 +84,11 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))
-        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)));
+        .addIntegerOption((option) => option.setName('token-role-id').setDescription(ci18n.option('token-role-id')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('test')
+        .setDescription(ci18n.subDescription('test'))
+        .addUserOption((option) => option.setName('user').setDescription(ci18n.option('user')).setRequired(true)));
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   commandTags: ['token'],

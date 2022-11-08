@@ -846,48 +846,106 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClaimListsWithProducts"
-  ? /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders
-    : get:
-        summary: Get any order this user might have had for the given claim list
-        operationId: getOrderOfUserForClaimList
-        tags:
-          - discord
-          - claims
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-          - $ref: "#/components/parameters/ClaimListIdPathParameter"
-        responses:
-          "200":
-            description: "This users order for this claim list"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/PhysicalOrder"
-          "404":
-            description: "No order found for this claim list and user"
-      post:
-        summary: Submit a new order for this claim list
-        description: This will overwrite any existing orders for this claim list/user combination
-        operationId: setOrderOfUserForClaimList
-        tags:
-          - discord
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-          - $ref: "#/components/parameters/ClaimListIdPathParameter"
-        requestBody:
+  /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/tokenroles:
+    get:
+      summary: Get the token roles this user is eligible for on this server, if linked
+      operationId: getEligibleTokenRoles
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "All token roles this user is eligible for on this server"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordRoleAssignment"
+    post:
+      summary: Queue assigning all token roles this user is currently eligible for on this server, if linked
+      operationId: queueTokenRoleAssignments
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "Token role assignments successfully queued"
+  /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/delegatorroles:
+    get:
+      summary: Get the delegator roles this user is eligible for on this server, if linked
+      operationId: getEligibleDelegatorRoles
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "All delegator roles this user is eligible for on this server"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordRoleAssignment"
+    post:
+      summary: Queue assigning all delegator roles this user is currently eligible for on this server, if linked
+      operationId: queueDelegatorRoleAssignments
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "Delegator role assignments successfully queued"
+  /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders:
+    get:
+      summary: Get any order this user might have had for the given claim list
+      operationId: getOrderOfUserForClaimList
+      tags:
+        - discord
+        - claims
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
+      responses:
+        "200":
+          description: "This users order for this claim list"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhysicalOrder"
-        responses:
-          "200":
-            description: "The created order for this claim list"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/PhysicalOrder"
+        "404":
+          description: "No order found for this claim list and user"
+    post:
+      summary: Submit a new order for this claim list
+      description: This will overwrite any existing orders for this claim list/user combination
+      operationId: setOrderOfUserForClaimList
+      tags:
+        - discord
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - $ref: "#/components/parameters/ClaimListIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhysicalOrder"
+      responses:
+        "200":
+          description: "The created order for this claim list"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhysicalOrder"
   /discord/servers/{guildId}/premium:
     get:
       summary: Get the information about the premium status of this server
@@ -1370,7 +1428,24 @@ paths:
                   user:
                     $ref: "#/components/schemas/VoteData"
                   poll:
-                    $ref: '#/components/schemas/VoteData'
+                    $ref: "#/components/schemas/VoteData"
+  /discord/servers/{guildId}/polls/{pollId}/tokenmetadata:
+    get:
+      summary: "Get metadata for fungible tokens used in this poll, if available"
+      operationId: getTokenRegistryMetadataForPoll
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/PollIdPathParameter"
+      responses:
+        "200":
+          description: "The token metadata to be used in this poll, or null if no applicable metadata is found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenMetadata"
   /discord/servers/{guildId}/giveaways:
     get:
       summary: 'Get giveaways for this Discord server'
@@ -2789,6 +2864,8 @@ components:
           example: 10
         aggregationType:
           $ref: "#/components/schemas/TokenOwnershipAggregationType"
+        stakingType:
+          $ref: "#/components/schemas/TokenStakingType"
         filters:
           readOnly: true
           type: array
@@ -2815,6 +2892,8 @@ components:
           example: 10
         aggregationType:
           $ref: "#/components/schemas/TokenOwnershipAggregationType"
+        stakingType:
+          $ref: "#/components/schemas/TokenStakingType"
         roleId:
           $ref: "#/components/schemas/DiscordRole"
     TokenOwnershipAggregationType:
@@ -2825,6 +2904,12 @@ components:
         - ANY_POLICY_FILTERED_OR
         - ANY_POLICY_FILTERED_ONE_EACH
         - EVERY_POLICY_FILTERED_OR
+    TokenStakingType:
+      type: string
+      default: NONE
+      enum:
+        - NONE
+        - MUTANT_STAKING
     TokenRoleAssetInfo:
       type: object
       required:
@@ -3134,6 +3219,48 @@ components:
           $ref: "#/components/schemas/DiscordChannel"
         messageId:
           $ref: "#/components/schemas/DiscordMessage"
+    TokenMetadata:
+      type: object
+      required:
+        - subject
+        - policyScript
+      properties:
+        subject:
+          type: string
+        policyScript:
+          type: string
+        name:
+          type: object
+          properties:
+            value:
+              type: string
+        description:
+          type: object
+          properties:
+            value:
+              type: string
+        url:
+          type: object
+          properties:
+            value:
+              type: string
+        ticker:
+          type: object
+          properties:
+            value:
+              type: string
+        decimals:
+          type: object
+          properties:
+            value:
+              type: integer
+              format: int32
+        logo:
+          type: object
+          properties:
+            value:
+              type: string
+
     DiscordMarketplaceChannel:
       type: object
       required:

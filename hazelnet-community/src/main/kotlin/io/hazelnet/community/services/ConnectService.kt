@@ -201,6 +201,14 @@ class ConnectService(
             }.collectList().block()!!
     }
 
+    fun getMultiAssetInfoFromAssetFingerprint(assetFingerprint: String): MultiAssetInfo {
+        return connectClient.get()
+            .uri("/token/fingerprints/{fingerprint}", assetFingerprint)
+            .retrieve()
+            .bodyToMono(MultiAssetInfo::class.java)
+            .block()!!
+    }
+
     fun getMultiAssetInfoSingle(policyId: String, assetNameHex: String): Mono<MultiAssetInfo> {
         return connectClient.get()
             .uri("/token/assets/{policyId}/{assetNameHex}", policyId, assetNameHex)

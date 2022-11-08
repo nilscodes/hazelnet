@@ -37,6 +37,22 @@ class ConnectivityConfiguration {
             .build()
 
     @Bean
+    fun tokenRegistryClient(config: CommunityApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.tokenregistry.url)
+            .build()
+
+    @Bean
+    fun mutantStakingClient(config: CommunityApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.mutantstaking.url)
+            .exchangeStrategies(
+                ExchangeStrategies.builder().codecs {
+                    it.defaultCodecs().maxInMemorySize(10000000)
+                }.build())
+            .build()
+
+    @Bean
     fun salesPoliciesQueue() = Queue("salespolicies")
 
     @Bean

@@ -54,7 +54,8 @@ export default <PollAnnounceCommand> {
       if (poll) {
         const [announceChannelId, forcePublishResults] = (this.cache.take(`${guild.id}-${interaction.user.id}`) as string).split('-');
         const results = await interaction.client.services.discordserver.getPollResults(guild.id, poll.id);
-        const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, +forcePublishResults);
+        const tokenMetadata = await pollutil.getTokenMetadataFromRegistry(guild.id, poll, interaction.client);
+        const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, +forcePublishResults, tokenMetadata);
 
         try {
           const announceChannel = await guild.channels.fetch(announceChannelId);

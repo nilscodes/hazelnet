@@ -24,6 +24,7 @@ class MultiAssetSnapshotService(
     }
 
     fun getSnapshot(snapshotId: Int): MultiAssetSnapshot = multiAssetSnapshotRepository.findById(snapshotId).orElseThrow()
+    fun getAssetFingerprintForSnapshot(snapshotId: Int) = multiAssetSnapshotRepository.getAssetFingerprintForSnapshot(snapshotId)
 
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun runSnapshots() {

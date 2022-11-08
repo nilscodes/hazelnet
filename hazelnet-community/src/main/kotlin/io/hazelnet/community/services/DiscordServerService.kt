@@ -11,6 +11,8 @@ import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
 import io.hazelnet.community.persistence.data.TokenOwnershipRoleRepository
+import io.hazelnet.community.services.external.CardanoTokenRegistryService
+import io.hazelnet.community.services.external.MutantStakingService
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.cache.annotation.Cacheable
@@ -215,6 +217,9 @@ class DiscordServerService(
         if (tokenOwnershipRolePartial.roleId != null) {
             tokenOwnershipRole.roleId = tokenOwnershipRolePartial.roleId
         }
+        if (tokenOwnershipRolePartial.stakingType != null) {
+            tokenOwnershipRole.stakingType = tokenOwnershipRolePartial.stakingType
+        }
         discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
         return tokenOwnershipRole
     }
@@ -244,12 +249,15 @@ class DiscordServerService(
 
     fun getMember(guildId: Long, externalAccountId: Long): DiscordMember {
         val discordServer = getDiscordServer(guildId)
-        return discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild $guildId")
+        return getMember(discordServer, externalAccountId)
     }
+
+    private fun getMember(discordServer: DiscordServer, externalAccountId: Long)
+        = discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild ${discordServer.guildId}")
 
     fun updateMember(guildId: Long, externalAccountId: Long, discordMemberPartial: DiscordMemberPartial): DiscordMember {
         val discordServer = getDiscordServer(guildId)
-        val member = discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild $guildId")
+        val member = getMember(discordServer, externalAccountId)
         member.premiumSupport = discordMemberPartial.premiumSupport
         discordServerRepository.save(discordServer)
         return member
@@ -372,6 +380,22 @@ class DiscordServerService(
     fun deleteAccessToken(guildId: Long) {
         val discordServer = getDiscordServer(guildId)
         deleteTokenInternal(discordServer.guildId.toString())
+    }
+
+    fun getEligibleTokenRolesOfUser(guildId: Long, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        val discordServer = getDiscordServer(guildId)
+        return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer, externalAccountId)
+    }
+
+    fun getEligibleDelegatorRolesOfUser(guildId: Long, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        val discordServer = getDiscordServer(guildId)
+        return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForGuildMember(discordServer, externalAccountId)
+    }
+
+    fun queueRoleAssignments(guildId: Long, externalAccountId: Long) {
+        val discordServer = getDiscordServer(guildId)
+        val discordMember = getMember(discordServer, externalAccountId)
+        roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer, discordMember.externalAccountId)
     }
 
     fun getEligibleClaimListsOfUser(guildId: Long, externalAccountId: Long): ClaimListsWithProducts {
