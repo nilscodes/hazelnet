@@ -138,14 +138,10 @@ class DiscordPollService(
     }
 
     fun getVotingPower(poll: DiscordPoll, externalAccountId: Long): Long {
-        if (poll.snapshotId == null || !poll.weighted) {
+        if (poll.snapshotId == null) {
             return 1
         }
-        val snapshot = snapshotService.getSnapshot(poll.snapshotId!!)
-        val verifiedStakeAddresses = externalAccountService.getVerifiedStakeAddressesForExternalAccount(externalAccountId)
-        return snapshot.data
-            .filter { verifiedStakeAddresses.contains(it.stakeAddress) }
-            .sumOf { it.tokenQuantity }
+        return snapshotService.getTokenWeightOfExternalAccount(setOf(poll.snapshotId!!), externalAccountId, poll.weighted)
     }
 
     fun getTokenRegistryMetadataForPoll(guildId: Long, pollId: Int): TokenMetadata? {

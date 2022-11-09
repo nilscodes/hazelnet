@@ -62,13 +62,17 @@ class DiscordGiveaway @JsonCreator constructor(
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "giveaway_open_after")
-    @field:NonNull
-    var openAfter: Date,
+    var openAfter: Date?,
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "giveaway_open_until")
-    @field:NonNull
-    var openUntil: Date,
+    var openUntil: Date?,
+
+    @Column(name = "giveaway_weighted")
+    var weighted: Boolean = false,
+
+    @Column(name = "giveaway_unique_winners")
+    var uniqueWinners: Boolean = true,
 
     @Column(name = "giveaway_archived")
     var archived: Boolean = false,
@@ -76,6 +80,10 @@ class DiscordGiveaway @JsonCreator constructor(
     @Column(name = "giveaway_winner_count")
     @field:Min(1)
     var winnerCount: Int = 1,
+
+    @Column(name = "giveaway_draw_type")
+    @Enumerated(EnumType.ORDINAL)
+    var drawType: GiveawayDrawType = GiveawayDrawType.DISCORD_ID,
 
     @Column(name = "giveaway_snapshot_id")
     @ElementCollection(fetch = FetchType.EAGER)
@@ -86,6 +94,11 @@ class DiscordGiveaway @JsonCreator constructor(
     @CollectionTable(name = "discord_giveaway_required_roles", joinColumns = [JoinColumn(name = "discord_giveaway_id")])
     @field:Valid
     var requiredRoles: MutableSet<DiscordRequiredRole> = mutableSetOf(),
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "discord_giveaway_entries", joinColumns = [JoinColumn(name = "discord_giveaway_id")])
+    @field:JsonIgnore
+    var entries: MutableSet<DiscordGiveawayEntry> = mutableSetOf()
     ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -104,6 +117,8 @@ class DiscordGiveaway @JsonCreator constructor(
         if (createTime != other.createTime) return false
         if (openAfter != other.openAfter) return false
         if (openUntil != other.openUntil) return false
+        if (weighted != other.weighted) return false
+        if (uniqueWinners != other.uniqueWinners) return false
         if (winnerCount != other.winnerCount) return false
         if (archived != other.archived) return false
         if (snapshotIds != other.snapshotIds) return false
@@ -124,6 +139,8 @@ class DiscordGiveaway @JsonCreator constructor(
         result = 31 * result + (createTime?.hashCode() ?: 0)
         result = 31 * result + openAfter.hashCode()
         result = 31 * result + openUntil.hashCode()
+        result = 31 * result + weighted.hashCode()
+        result = 31 * result + uniqueWinners.hashCode()
         result = 31 * result + winnerCount.hashCode()
         result = 31 * result + archived.hashCode()
         result = 31 * result + snapshotIds.hashCode()
@@ -132,7 +149,7 @@ class DiscordGiveaway @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles)"
+        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles)"
     }
 
 }

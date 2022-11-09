@@ -293,6 +293,15 @@ module.exports = {
     const votingData = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}/votes/${externalAccountId}`, votes);
     return votingData.data;
   },
+  async createGiveaway(guildId, giveawayObject) {
+    const newGiveawayPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways`, giveawayObject);
+    this.clearCacheEntry(guildId);
+    return newGiveawayPromise.data;
+  },
+  async updateGiveaway(guildId, giveawayId, discordGiveawayPartial) {
+    const discordGiveawayPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}`, discordGiveawayPartial);
+    return discordGiveawayPromise.data;
+  },
   async getGiveaways(guildId) {
     const giveaways = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways`);
     return giveaways.data;
@@ -303,6 +312,37 @@ module.exports = {
   },
   async deleteGiveaway(guildId, giveawayId) {
     await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}`);
+  },
+  async getParticipationForGiveaway(guildId, giveawayId) {
+    const giveawayParticipation = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/participation`);
+    return giveawayParticipation.data;
+  },
+  async getParticipationOfUser(guildId, giveawayId, externalAccountId) {
+    const giveawayParticipation = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/participation/${externalAccountId}`);
+    return giveawayParticipation.data;
+  },
+  async participateAsUser(guildId, giveawayId, externalAccountId) {
+    const giveawayParticipation = await axios.put(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/participation/${externalAccountId}`);
+    return giveawayParticipation.data;
+  },
+  async removeParticipationAsUser(guildId, giveawayId, externalAccountId) {
+    await axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/participation/${externalAccountId}`);
+  },
+  async getWinnerList(guildId, giveawayId) {
+    try {
+      const giveawayWinners = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/winners`);
+      return giveawayWinners.data;
+    } catch (error) {
+      return null;
+    }
+  },
+  async drawWinners(guildId, giveawayId) {
+    const giveawayWinners = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/winners`);
+    return giveawayWinners.data;
+  },
+  async getGiveawayTokenMetadata(guildId, giveawayId) {
+    const giveawayTokenMetadata = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/giveaways/${giveawayId}/tokenmetadata`);
+    return giveawayTokenMetadata.data;
   },
   async getPremiumInfo(guildId) {
     const premiumInfo = await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/premium`);
@@ -341,6 +381,14 @@ module.exports = {
   async listPollResultUpdates() {
     const pollsResultUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/polls/resultupdates`);
     return pollsResultUpdatesPromise.data;
+  },
+  async listGiveawaysToBeAnnounced() {
+    const giveawaysToBeAnnouncedPromise = await axios.get(`${hazelCommunityUrl}/discord/giveaways/announcements`);
+    return giveawaysToBeAnnouncedPromise.data;
+  },
+  async listGiveawayResultUpdates() {
+    const giveawaysResultUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/giveaways/resultupdates`);
+    return giveawaysResultUpdatesPromise.data;
   },
   async regenerateAccessToken(guildId) {
     const roleAssignments = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);

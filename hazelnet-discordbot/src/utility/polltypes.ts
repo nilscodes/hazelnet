@@ -2,9 +2,9 @@ import { MessageCollector } from "discord.js"
 
 export type Poll = {
   name: string
-  displayName: string,
+  displayName: string
   id: number
-  description: string,
+  description: string
   options: PollOption[]
   requiredRoles: DiscordRequiredRole[]
   createTime: string
@@ -15,6 +15,7 @@ export type Poll = {
   creator: number
   resultsVisible: boolean
   multipleVotes: boolean
+  closed?: boolean
 }
 
 export interface PollPartial extends Omit<Poll, 'description' | 'options'> {

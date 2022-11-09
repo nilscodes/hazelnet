@@ -16,6 +16,7 @@ export default <BotCommand> {
       .addStringOption((option) => option.setName('giveaway-name').setDescription(ci18n.option('giveaway-name')).setRequired(true))
       .addStringOption((option) => option.setName('giveaway-opentime').setDescription(ci18n.option('giveaway-opentime')).setRequired(false))
       .addStringOption((option) => option.setName('giveaway-closetime').setDescription(ci18n.option('giveaway-closetime')).setRequired(false))
+      .addStringOption((option) => option.setName('snapshot-time').setDescription(ci18n.option('snapshot-time')).setRequired(false))
       .addIntegerOption((option) => option.setName('winner-count').setDescription(ci18n.option('winner-count')).setRequired(false))
       .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(false))
       .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(false)))
@@ -28,11 +29,20 @@ export default <BotCommand> {
       .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true)))
     .addSubcommand((subcommand) => subcommand
       .setName('end')
-      .setDescription(ci18n.subDescription('end'))
-      .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true)))
+      .setDescription(ci18n.subDescription('end')))
     .addSubcommand((subcommand) => subcommand
       .setName('remove')
-      .setDescription(ci18n.subDescription('remove')));
+      .setDescription(ci18n.subDescription('remove')))
+    .addSubcommandGroup((group) => group
+      .setName('update')
+      .setDescription(ci18n.subDescription('update'))
+      .addSubcommand((subcommand) => subcommand
+        .setName('addrole')
+        .setDescription(ci18n.subDescription('update-addrole'))
+        .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('removerole')
+        .setDescription(ci18n.subDescription('update-removerole'))));
   },
   commandTags: ['giveaway'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

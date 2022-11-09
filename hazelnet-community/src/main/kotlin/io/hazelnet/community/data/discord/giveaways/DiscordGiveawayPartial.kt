@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import io.hazelnet.community.data.discord.DiscordRequiredRole
 import java.util.*
 import javax.validation.Valid
+import javax.validation.constraints.Min
 import javax.validation.constraints.Size
 
 data class DiscordGiveawayPartial @JsonCreator constructor(
@@ -15,6 +16,9 @@ data class DiscordGiveawayPartial @JsonCreator constructor(
     val description: String?,
     val openAfter: Date?,
     val openUntil: Date?,
+    @field:Min(1)
+    val winnerCount: Int?,
+    val uniqueWinners: Boolean?,
     val archived: Boolean?,
     @field:Valid
     val requiredRoles: MutableSet<DiscordRequiredRole>?,

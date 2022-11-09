@@ -1376,12 +1376,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/VoteData"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /discord/servers/{guildId}/polls/{pollId}/votes/{externalAccountId}:
     get:
       summary: Get voting power and votes for this poll for a specific account
@@ -1447,98 +1441,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/TokenMetadata"
   /discord/servers/{guildId}/giveaways:
-    get:
-      summary: 'Get giveaways for this Discord server'
-      operationId: listGiveaways
-      tags:
-        - discord
-        - giveaway
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-      responses:
-        '200':
-          description: 'All giveaways for this server'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DiscordGiveaway'
-    post:
-      summary: Create a giveaway on this server
-      operationId: addGiveaway
-      tags:
-        - discord
-        - giveaway
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DiscordGiveaway'
-      responses:
-        '201':
-          description: 'Poll'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DiscordGiveaway'
-          headers:
-            Location:
-              $ref: '#/components/schemas/CreatedResponseHeader'
-  /discord/servers/{guildId}/giveaways/{giveawayId}:
-    get:
-      summary: 'Get specific giveaway for this Discord server'
-      operationId: getGiveaway
-      tags:
-        - discord
-        - giveaway
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/GiveawayIdPathParameter'
-      responses:
-        '200':
-          description: 'The giveaway with the specified ID'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DiscordGiveaway'
-    patch:
-      summary: Update the settings and dates for this giveaway
-      operationId: updateGiveaway
-      tags:
-        - discord
-        - giveaway
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/GiveawayIdPathParameter'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DiscordGiveawayPartial'
-      responses:
-        '200':
-          description: 'Giveaway with updated details'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DiscordGiveaway'
-
-    delete:
-      summary: Remove a giveaway from this Discord server, including all entries, drawn winners etc
-      operationId: deleteGiveaway
-      tags:
-        - discord
-        - giveaway
-      parameters:
-        - $ref: '#/components/parameters/GuildIdPathParameter'
-        - $ref: '#/components/parameters/GiveawayIdPathParameter'
-      responses:
-        '204':
-          description: Successful deletion
-  /discord/servers/{guildId}/marketplaces/channels:
     get:
       summary: "Get giveaways for this Discord server"
       operationId: listGiveaways
@@ -1630,6 +1532,133 @@ paths:
       responses:
         "204":
           description: Successful deletion
+  /discord/servers/{guildId}/giveaways/{giveawayId}/participation:
+    get:
+      summary: "Get participation counts for this giveaway"
+      operationId: getParticipationForGiveaway
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "200":
+          description: "All participation counts for this giveaway"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParticipationData"
+  /discord/servers/{guildId}/giveaways/{giveawayId}/participation/{externalAccountId}:
+    get:
+      summary: "Get participation info in this giveaway for this user"
+      operationId: getParticipationOfUser
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "Participation info for this user"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParticipationData"
+        "404":
+          description: "User is not participating"
+    put:
+      summary: "Join this giveaway as this user"
+      operationId: participateAsUser
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "Participation info for this user"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParticipationData"
+    delete:
+      summary: "Leave this giveaway as this user"
+      operationId: removeParticipationAsUser
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "Successful removal"
+  /discord/servers/{guildId}/giveaways/{giveawayId}/winners:
+    get:
+      summary: "Get winner list for this giveaway"
+      operationId: getWinnerList
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "200":
+          description: "All winners for this giveaway"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WinnerList"
+    post:
+      summary: "Draw or redraw winners for this giveaway"
+      operationId: drawWinners
+      tags:
+        - discord
+        - giveaway
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "200":
+          description: "All freshly drawn winners for this giveaway"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WinnerList"
+  /discord/servers/{guildId}/giveaways/{giveawayId}/tokenmetadata:
+    get:
+      summary: "Get metadata for fungible tokens used in this giveaway, if available"
+      operationId: getTokenRegistryMetadataForGiveaway
+      tags:
+        - discord
+        - poll
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/GiveawayIdPathParameter"
+      responses:
+        "200":
+          description: "The token metadata to be used in this giveaway, or null if no applicable metadata is found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenMetadata"
   /discord/servers/{guildId}/marketplaces/channels:
     get:
       summary: "Get marketplace channels for this Discord server"
@@ -1985,7 +2014,7 @@ paths:
   /discord/polls/announcements:
     get:
       summary: Get all polls that have announcements that are due to be posted
-      operationId: listAnnouncablePolls
+      operationId: listPollsToBeAnnounced
       tags:
         - discord
         - polls
@@ -2001,7 +2030,7 @@ paths:
   /discord/polls/resultupdates:
     get:
       summary: Get all polls that have result updates to edit existing messages
-      operationId: listPollsToBeAnnounced
+      operationId: listPollResultUpdates
       tags:
         - discord
         - polls
@@ -2014,6 +2043,38 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordPollUpdate"
+  /discord/giveaways/announcements:
+    get:
+      summary: Get all giveaways that have announcements that are due to be posted
+      operationId: listGiveawaysToBeAnnounced
+      tags:
+        - discord
+        - giveaways
+      responses:
+        "200":
+          description: "List of servers and corresponding giveaways to announce"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordGiveawayUpdate"
+  /discord/giveaways/resultupdates:
+    get:
+      summary: Get all giveaways that have result updates to edit existing messages
+      operationId: listGiveawayResultUpdates
+      tags:
+        - discord
+        - polls
+      responses:
+        "200":
+          description: "List of servers and corresponding giveaways to update the results for"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordGiveawayUpdate"
   /oura:
     post:
       summary: Publish an event from Oura to the community service (to react to mint events)
@@ -3063,6 +3124,7 @@ components:
         - description
         - openAfter
         - openUntil
+        - drawType
       properties:
         id:
           readOnly: true
@@ -3099,11 +3161,25 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T12:21:43Z
+        weighted:
+          type: boolean
+          default: false
+        uniqueWinners:
+          description: Set to true if every user can only be drawn at most once as winner. If set to false, a user with multiple entries can win multiple times.
+          type: boolean
+          default: true
         winnerCount:
           type: integer
           format: int32
           description: Number of winners to draw at the end of the giveaway
           example: 2
+        drawType:
+          description: What info about the winners is provided when the winners are drawn
+          type: string
+          default: DISCORD_ID
+          enum:
+            - DISCORD_ID
+            - CARDANO_ADDRESS
         archived:
           type: boolean
           default: false
@@ -3139,12 +3215,57 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T12:21:43Z
+        uniqueWinners:
+          description: Set to true if every user can only be drawn at most once as winner. If set to false, a user with multiple entries can win multiple times.
+          type: boolean
+        winnerCount:
+          type: integer
+          format: int32
+          description: Number of winners to draw at the end of the giveaway
+          example: 2
         archived:
           type: boolean
         requiredRoles:
           type: array
           items:
             $ref: "#/components/schemas/DiscordRequiredRole"
+    ParticipationData:
+      type: object
+      required:
+        - participants
+        - totalEntries
+      properties:
+        participants:
+          description: The total number of unique users participating in the giveaway
+          type: integer
+          format: int32
+        totalEntries:
+          description: The total number of entries claimed by the participants
+          type: integer
+          format: int64
+    WinnerList:
+      type: object
+      required:
+        - winners
+        - winnerCount
+        - winnerType
+      properties:
+        winners:
+          description: The winner data will depend on the winnerType property
+          type: array
+          items:
+            type: string
+        winnerCount:
+          type: integer
+          format: int32
+          description: Number of total winners to draw at the end of the giveaway (the winner list should be equal to the number of entries in the winners property, even if somebody can win more than once)
+        winnerType:
+          description: What info about the winners is provided when the winners are drawn
+          type: string
+          default: DISCORD_ID
+          enum:
+            - DISCORD_ID
+            - CARDANO_ADDRESS
     DiscordRequiredRole:
       type: object
       required:
@@ -3223,11 +3344,12 @@ components:
       type: object
       required:
         - subject
-        - policyScript
+        - policy
       properties:
         subject:
           type: string
-        policyScript:
+        policy:
+          description: Hash of the policy script (not the policy ID of the asset)
           type: string
         name:
           type: object
@@ -3339,6 +3461,12 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+        type:
+          type: string
+          default: CARDANO_ADDRESS
+          enum:
+            - CARDANO_ADDRESS
+            - DISCORD_ID
         displayName:
           type: string
           minLength: 1

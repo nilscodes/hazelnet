@@ -23,7 +23,7 @@ export default <BotSubcommand> {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const giveawayId = +interaction.values[0].substring(15);
+      const giveawayId = +interaction.values[0].substring(19);
       const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id) as Giveaway[];
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {

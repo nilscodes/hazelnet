@@ -2,7 +2,7 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { Poll, PollOption, PollPartial } from '../../utility/polltypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CollectorFilter, Message, MessageActionRowComponentBuilder, MessageCollectorOptions, MessageComponentInteraction, MessageReaction, ReactionCollectorOptions, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 const datetime = require('../../utility/datetime');
 const embedBuilder = require('../../utility/embedbuilder');

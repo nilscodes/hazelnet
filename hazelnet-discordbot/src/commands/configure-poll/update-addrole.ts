@@ -33,7 +33,7 @@ export default <PollUpdateAddRoleCommand> {
       const guildId = interaction.guild!.id;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
-      const pollId = +interaction.values[0].substr(15);
+      const pollId = +interaction.values[0].substring(15);
       const polls = await interaction.client.services.discordserver.getPolls(guildId) as Poll[];
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {

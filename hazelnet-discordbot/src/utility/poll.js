@@ -22,7 +22,7 @@ module.exports = {
     return true;
   },
   isPollArchived(poll) {
-    return !!poll.closed;
+    return !!poll.archived;
   },
   userCanSeePoll(member, poll) {
     if (!this.isPollArchived(poll)) {
@@ -93,7 +93,7 @@ module.exports = {
     return [];
   },
   getCurrentResults(discordServer, poll, result, tokenMetadata) {
-    const decimals = tokenMetadata?.decimals?.value ?? 0;
+    const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
     return poll.options
       .map((option, idx) => {
         const formattedVotes = discordServer.formatNumber(this.calculateVotingNumber(result.votes[option.id], decimals));
