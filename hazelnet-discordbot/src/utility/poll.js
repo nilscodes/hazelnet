@@ -22,7 +22,7 @@ module.exports = {
     return true;
   },
   isPollArchived(poll) {
-    return !!poll.closed;
+    return !!poll.archived;
   },
   userCanSeePoll(member, poll) {
     if (!this.isPollArchived(poll)) {
@@ -84,7 +84,7 @@ module.exports = {
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(polls.map((poll) => ({
               label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll }),
-              description: (poll.description.trim().length ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale })),
+              description: (poll.description.trim().length ? (poll.description.substring(0, 90) + (poll.description.length > 90 ? '...' : '')) : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale })),
               value: `configure-poll-${poll.id}`,
             }))),
         ),
@@ -93,7 +93,7 @@ module.exports = {
     return [];
   },
   getCurrentResults(discordServer, poll, result, tokenMetadata) {
-    const decimals = tokenMetadata?.decimals?.value ?? 0;
+    const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
     return poll.options
       .map((option, idx) => {
         const formattedVotes = discordServer.formatNumber(this.calculateVotingNumber(result.votes[option.id], decimals));

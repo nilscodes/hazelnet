@@ -2,7 +2,7 @@ import i18n from 'i18n';
 import { ApplicationCommandType, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
 import { BotCommand } from "src/utility/commandtypes";
 import CID from 'cids';
-import { AugmentedCommandInteraction } from 'src/utility/hazelnetclient';
+import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
 const cardanotoken = require('../utility/cardanotoken');
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');

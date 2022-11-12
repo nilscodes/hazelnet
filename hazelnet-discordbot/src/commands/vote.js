@@ -63,7 +63,7 @@ module.exports = {
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId && !pollForDetails.archived);
       if (poll) {
         if (interaction.customId === 'vote/details') {
-          const { detailFields, components } = await this.getVoteDetails(locale, poll, interaction, discordServer, member);
+          const { detailFields, components } = await this.getVoteDetails(poll, interaction, discordServer, member);
           const embed = embedBuilder.buildForUser(discordServer, poll.displayName, i18n.__({ phrase: 'vote.pollInfoTitle', locale }), 'vote', detailFields);
           await interaction.editReply({ embeds: [embed], components, ephemeral: true });
         } else if (isVote) {
@@ -72,7 +72,7 @@ module.exports = {
           const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild.id, poll.id, externalAccount.id, votedFor);
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           const tokenMetadata = await pollutil.getTokenMetadataFromRegistry(interaction.guild.id, poll, interaction.client);
-          const decimals = tokenMetadata?.decimals?.value ?? 0;
+          const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
           if (poll.resultsVisible) {
             resultsText = pollutil.getCurrentResults(discordServer, poll, currentVoteData.poll, tokenMetadata);
           }
@@ -136,7 +136,7 @@ module.exports = {
       if (poll) {
         const member = await interaction.guild.members.fetch(interaction.user.id);
         if (pollUtil.userCanSeePoll(member, poll)) {
-          const { detailFields, components } = await this.getVoteDetails(locale, poll, interaction, discordServer, member);
+          const { detailFields, components } = await this.getVoteDetails(poll, interaction, discordServer, member);
           const embed = embedBuilder.buildForUser(discordServer, poll.displayName, i18n.__({ phrase: 'vote.pollInfoTitle', locale }), 'vote', detailFields);
           await interaction.reply({ embeds: [embed], components, ephemeral: true });
         } else {
@@ -197,7 +197,7 @@ module.exports = {
   },
   getVotingPowerText(discordServer, poll, locale, totalVotingPower, tokenMetadata) {
     if (poll.snapshotId) {
-      const decimals = tokenMetadata?.decimals?.value ?? 0;
+      const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
       const unit = tokenMetadata?.ticker?.value ? ` ${tokenMetadata.ticker.value}` : '';
       if (totalVotingPower > 0) {
         const formattedVotingPower = discordServer.formatNumber(pollutil.calculateVotingNumber(totalVotingPower, decimals));
@@ -207,7 +207,8 @@ module.exports = {
     }
     return i18n.__({ phrase: 'vote.votingPowerSingleNoToken', locale });
   },
-  async getVoteDetails(locale, poll, interaction, discordServer, member) {
+  async getVoteDetails(poll, interaction, discordServer, member) {
+    const locale = discordServer.getBotLanguage();
     const tokenMetadata = await pollutil.getTokenMetadataFromRegistry(interaction.guild.id, poll, interaction.client);
     let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
     if (poll.resultsVisible) {
@@ -268,7 +269,7 @@ module.exports = {
         components = await this.getPollVoteOptions(locale, poll, totalVotingPower, hasVoted);
       }
       if (hasVoted) {
-        const decimals = tokenMetadata?.decimals?.value ?? 0;
+        const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
         detailFields.push({
           name: i18n.__({ phrase: 'vote.yourVote', locale }),
           value: poll.options

@@ -1,15 +1,16 @@
-const i18n = require('i18n');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
 const embedBuilder = require('../../utility/embedbuilder');
 const pollutil = require('../../utility/poll');
 
-module.exports = {
+export default <BotSubcommand> {
   async execute(interaction) {
-    const voteaireUUID = interaction.options.getString('ballot-id');
+    const voteaireUUID = interaction.options.getString('ballot-id', true);
     const publishChannel = interaction.options.getChannel('publish-channel');
 
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
 
       const pollName = `VOTEAIRE${voteaireUUID.replace('-', '').substring(0, 20)}`;
@@ -27,17 +28,17 @@ module.exports = {
           voteaireUUID,
         };
 
-        const poll = await interaction.client.services.discordserver.createPoll(interaction.guild.id, pollObject);
+        const poll = await interaction.client.services.discordserver.createPoll(interaction.guild!.id, pollObject);
         const detailFields = pollutil.getPollDetails(locale, poll);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add-onchain', i18n.__({ phrase: 'configure.poll.add-onchain.success', locale }, { poll }), 'configure-poll-add-onchain', detailFields);
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add-onchain', i18n.__({ phrase: 'configure.poll.add.invalidName', locale }, { pollName: voteaireUUID }), 'configure-poll-add-onchain');
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
 };

@@ -24,6 +24,11 @@ module.exports = {
       value: 'pollvoteaire',
       emoji: { name: '☑' },
     }, {
+      label: i18n.__({ phrase: 'features.giveawayTitle', locale }),
+      description: i18n.__({ phrase: 'features.giveaway', locale }),
+      value: 'giveaway',
+      emoji: { name: '🎁' },
+    }, {
       label: i18n.__({ phrase: 'features.whitelistTitle', locale }),
       description: i18n.__({ phrase: 'features.whitelist', locale }),
       value: 'whitelist',

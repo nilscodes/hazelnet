@@ -1,13 +1,23 @@
-const NodeCache = require('node-cache');
-import { GuildChannel, GuildTextBasedChannel, TextChannel } from 'discord.js';
+import NodeCache from 'node-cache';
+import {
+  ChannelType,
+  GuildChannel,
+  GuildTextBasedChannel,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  PermissionsBitField,
+  MessageActionRowComponentBuilder,
+} from 'discord.js';
 import i18n from 'i18n';
-const {
-  ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionsBitField,
-} = require('discord.js');
-import { BotSubcommand } from 'src/utility/commandtypes';
+import { BotSubcommand } from '../../utility/commandtypes';
 const embedBuilder = require('../../utility/embedbuilder');
 
-export default <BotSubcommand> {
+interface SocialAnnounceCommand extends BotSubcommand {
+  cache: NodeCache
+}
+
+export default <SocialAnnounceCommand> {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
     const announceChannel = interaction.options.getChannel('channel');
@@ -51,7 +61,7 @@ export default <BotSubcommand> {
                           .setLabel(i18n.__({ phrase: 'configure.social.announce.publish', locale }))
                           .setStyle(ButtonStyle.Primary),
                       ),
-                  ];
+                  ] as ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
                   const embed = embedBuilder.buildForUser(discordServer, title, announcementText);
                   await interaction.followUp({ components, embeds: [embed], ephemeral: true });

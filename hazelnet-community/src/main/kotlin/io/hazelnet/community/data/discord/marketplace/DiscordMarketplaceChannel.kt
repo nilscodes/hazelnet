@@ -94,7 +94,7 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
 
     fun extractHighlightAttribute(metadata: String): String? {
         return if (highlightAttributeName != null) {
-            return findAttribute(metadata, highlightAttributeName!!).toString()
+            return findAttribute(metadata, highlightAttributeName!!)?.toString() ?: null
         } else {
             null
         }

@@ -15,6 +15,7 @@ private val logger = KotlinLogging.logger {}
 @Service
 class MultiAssetSnapshotService(
     private val multiAssetSnapshotRepository: MultiAssetSnapshotRepository,
+    private val externalAccountService: ExternalAccountService,
     private val connectService: ConnectService
 ) {
     fun scheduleSnapshot(multiAssetSnapshot: MultiAssetSnapshot): MultiAssetSnapshot
@@ -25,6 +26,31 @@ class MultiAssetSnapshotService(
 
     fun getSnapshot(snapshotId: Int): MultiAssetSnapshot = multiAssetSnapshotRepository.findById(snapshotId).orElseThrow()
     fun getAssetFingerprintForSnapshot(snapshotId: Int) = multiAssetSnapshotRepository.getAssetFingerprintForSnapshot(snapshotId)
+
+    fun getTokenWeightOfExternalAccount(snapshotIds: Set<Int>, externalAccountId: Long, weighted: Boolean): Long {
+        val verifiedStakeAddresses =
+            externalAccountService.getVerifiedStakeAddressesForExternalAccount(externalAccountId)
+        val totalWeight = snapshotIds.sumOf { snapshotId ->
+            val snapshot = this.getSnapshot(snapshotId)
+            val totalOwnedTokens = snapshot.data
+                .filter { verifiedStakeAddresses.contains(it.stakeAddress) }
+                .sumOf { it.tokenQuantity * snapshot.tokenWeight }.toLong()
+            if (weighted) {
+                totalOwnedTokens
+            } else if (totalOwnedTokens > 0) {
+                1L
+            } else {
+                0L
+            }
+        }
+        return if (weighted) {
+            totalWeight
+        } else if (totalWeight > 0) {
+            1L
+        } else {
+            0L
+        }
+    }
 
     @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun runSnapshots() {

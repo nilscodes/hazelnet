@@ -82,10 +82,17 @@ eventFiles.forEach((event: DiscordEvent) => {
   }
 });
 
-const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js'));
+const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
+const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates'];
 
-scheduleFiles.forEach((file) => {
-  const schedule = require(`./schedules/${file}`);
+scheduleFiles.forEach(async (file) => {
+  let schedule: any;
+  const importName = file.substring(0, file.lastIndexOf('.'));
+  if (typescriptSchedules.includes(importName)) {
+    schedule = (await import(`./schedules/${importName}`)).default;
+  } else {
+    schedule = require(`./schedules/${file}`)
+  }
   if (schedule.cron && schedule.execute) {
     cron.schedule(schedule.cron, () => schedule.execute(client));
   }

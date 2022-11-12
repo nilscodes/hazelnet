@@ -7,6 +7,8 @@ import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
 import io.hazelnet.community.data.discord.WhitelistRequirementNotMetException
+import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersCannotBeDrawnException
+import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersNotDrawnException
 import io.hazelnet.community.data.ping.LastPingTooRecentException
 import io.hazelnet.community.data.ping.PingTargetNotFoundException
 import mu.KotlinLogging
@@ -77,6 +79,20 @@ class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     fun processIncomingPaymentAlreadyRequestedException(ex: IncomingPaymentAlreadyRequestedException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(GiveawayWinnersNotDrawnException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun processGiveawayWinnersNotDrawnException(ex: GiveawayWinnersNotDrawnException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(GiveawayWinnersCannotBeDrawnException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun processGiveawayWinnersCannotBeDrawnException(ex: GiveawayWinnersCannotBeDrawnException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
     }
 

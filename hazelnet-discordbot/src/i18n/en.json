@@ -44,6 +44,15 @@
 			"configure-poll-update": "Change advanced options on your existing poll.",
 			"configure-poll-update-addrole": "Adds a new eligible role that can vote to an existing poll.",
 			"configure-poll-update-removerole": "Removes a currently eligible role from an existing poll.",
+			"configure-giveaway": "Manage giveaways for people to participate in",
+			"configure-giveaway-list": "List all giveaways that are set up on this Discord server.",
+			"configure-giveaway-add": "Adds a new giveaway to the server. You will be able to determine conditions.",
+			"configure-giveaway-announce": "Announce the winner(s) of a giveaway.",
+			"configure-giveaway-end": "Draw the winner for an existing giveaway.",
+			"configure-giveaway-remove": "Select and remove an existing giveaway. ⚠ This will also remove all participants and winners.",
+			"configure-giveaway-update": "Change advanced options on your existing giveaway.",
+			"configure-giveaway-update-addrole": "Adds a new eligible role that can participate in an existing giveaway.",
+			"configure-giveaway-update-removerole": "Removes a currently eligible role from an existing giveaway.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
 			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
@@ -110,7 +119,8 @@
 			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
 			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
 			"configure-social": "Commands to manage various Discord and social media features and integrations.",
-			"configure-social-announce": "Create custom branded announcements."
+			"configure-social-announce": "Create custom branded announcements.",
+			"join": "Join an existing giveaway or raffle."
 		},
 		"options": {
 			"verify": {
@@ -169,6 +179,16 @@
 				"channel": "The channel to send the poll announcement and voting widget to.",
 				"publishresults": "If you want to publish the results of a non-public poll, pass True for this parameter",
 				"ballot-id": "The Voteaire ballot ID you created, with the pattern of \"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\"."
+			},
+			"configure-giveaway": {
+				"giveaway-name": "The internal name for this giveaway (can only be up to 30 alphanumeric characters)",
+				"giveaway-displayname": "The display name for this giveaway that your users will see",
+				"required-role": "Role that is required for a user to have, to be able to participate in this giveaway",
+				"giveaway-opentime": "The UTC time after which signup is possible (Format: 2022-01-01T15:00:00Z)",
+				"giveaway-closetime": "The UTC time until which signup is possible (Format: 2022-01-31T15:00:00Z)",
+				"channel": "The channel to send the giveaway announcement and participation widget to.",
+				"winner-count": "The number of winners drawn at the end of the giveaway.",
+				"snapshot-time": "The time to take the token snapshot, if this is a token-based giveaway"
 			},
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
@@ -361,7 +381,7 @@
 		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of **{{totalVotingPower}}{{unit}}** in your verified wallets.",
 		"votingPowerSingleNoToken": "This poll is not token-based and as such you have a voting power of one.",
 		"votingPowerSingleToken": "Based on the token ownership snapshot you have one vote in this poll.",
-		"votingPowerNone": "You do not have any verified wallets that had contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",
+		"votingPowerNone": "You do not have any verified wallets that contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",
 		"votingPowerTokenInfo": "💡 If you feel your voting power is not accurate, ensure all your wallets are linked. The snapshot for this poll may also be different from the current token count in your wallet.",
 		"chooseVoteOption": "Choose what to vote for",
 		"voteSuccess": "✅ You have successfully cast your vote. You can revote at any time using the */vote* command.",
@@ -374,6 +394,25 @@
 		"noPremium": "🙀 Users currently can not vote in polls as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
 		"voteButton": "Cast your vote",
 		"errorNotEligible": "⚠ We are sorry, but this poll is archived or you are not eligible to vote at this time."
+	},
+	"join": {
+		"joinButton": "Join giveaway",
+		"giveawayInfoTitle": "Information about this giveaway",
+		"errorNotEligible": "⚠ We are sorry, but this giveaway is archived or you are not eligible to participate at this time.",
+		"success": "✅ You have successfully entered this giveaway!",
+		"successRemoval": "🗑️ You have removed your giveaway entry.",
+		"yourEntry": "Your Entry",
+		"yourEntryDetails": "You have **{{entries}}** entries in this giveaway.",
+		"yourEntryMissing": "❌ You are currently not participating in this giveaway.",
+		"currentParticipants": "Current Participants",
+		"yourEntryWeight": "Your raffle entry count",
+		"totalEntriesMultiple": "Based on token ownership for this giveaway you have a total of **{{totalEntries}}{{unit}}** raffle entries in your verified wallets.",
+		"totalEntriesSingleNoToken": "This giveaway is not token-based and as such you have one entry.",
+		"totalEntriesSingleToken": "Based on the token ownership snapshot you have one entry in this giveaway.",
+		"totalEntriesNone": "You do not have any verified wallets that contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",
+		"totalEntriesTokenInfo": "💡 If you feel your giveaway entry count is not accurate, ensure all your wallets are linked. The snapshot for this giveaway may also be different from the current token count in your wallet.",
+		"removeEntry": "Remove your entry",
+		"addEntry": "Join the giveaway"
 	},
 	"claim": {
 		"messageTitle": "Claim your physical items",
@@ -541,6 +580,7 @@
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
+			"errorNoAddress": "⚠ You have to provide an ADA Handle or wallet address for this whitelist type. If you did provide one, ensure to complete the whitelist registration process in under 10 minutes.",
 			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
 			"widgetNotVerified": "⚠ You currently have no verified wallets. You can use the command **/whitelist register** in a channel that allows bot commands to register any address (*addr1…*) or *$handle* for this whitelist.\n\n💡 **Better**: We recommend verifying a wallet via **/verify add** and then registering it with the whitelist by clicking the same button again.",
 			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at <t:{{signupTime}}> with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
@@ -896,7 +936,7 @@
 				"previewPhase1Channel": "The bot will post a voting announcement in <#{{publishChannel}}> once the poll opens.",
 				"previewPhase1NoRequiredRole": "No role requirements are in effect - everybody will be able to see the poll.",
 				"previewPhase1RequiredRole": "To view and participate in the vote, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-poll update* command later.",
-				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for you poll that you would like to use:",
+				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for your poll that you would like to use:",
 				"startPhase3": "Use this description",
 				"redoPhase2": "Change description",
 				"previewPhase2Description": "**Poll Description/Question**:\n{{{description}}}",
@@ -942,11 +982,11 @@
 				"purpose": "👇 Pick a poll from the list of available polls to announce. If the poll is still open, a vote button will also be added to the widget.\n\n{{{resultsPublishingInfo}}}\n\n💡 You can only have one announcement for each poll at a time. The announcement will automatically be updated with the current results every 5 minutes if your poll has public results.",
 				"resultsPublishYes": "📢 The (current) results will be published along with the poll announcement.",
 				"resultsPublishMaybe": "🔐 The results will remain hidden for non-public polls until you explicit publish them via **/configure-poll announce** with the *publishresults* parameter set to *True*.",
-				"success": "✅ Results successfully published in <#{{currentChannel}}>.",
+				"success": "✅ Results successfully published in <#{{channel}}>.",
 				"publicSuccess": "🗳 The team shared the following poll with you.",
 				"choosePoll": "Pick the poll you'd like to announce the results for",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
-				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
+				"errorWrongChannelType": "This channel cannot be used for poll announcements."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following poll from this server:",
@@ -956,7 +996,7 @@
 			},
 			"update": {
 				"addrole": {
-					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to vote the poll **{{poll.displayName}}**.",
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to vote in the poll **{{poll.displayName}}**.",
 					"purpose": "Select the poll you would like the role <@&{{roleId}}> to be able to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
 					"choosePoll": "Choose the poll you want to allow this role to vote in",
 					"tooManyRoles": "⚠ Cannot add more than 20 roles to a poll.",
@@ -964,7 +1004,7 @@
 				},
 				"removerole": {
 					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to vote on the poll **{{poll.displayName}}**.",
-					"purpose": "Select the poll you would like to remove a role froming being allowed to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"purpose": "Select the poll you would like to remove a role from being allowed to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
 					"choosePoll": "Choose the poll you want to remove this role from",
 					"chooseRolePurpose": "Choose which role you would like to remove from the poll {{displayName}}:",
 					"chooseRole": "Choose role to remove",
@@ -1095,7 +1135,7 @@
 					"chooseMarketplaceChannel": "Choose a sales tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
 					"entry": "{{marketplaceNames}}, #{{channelName}}",
-					"entryAddon": ", > ₳{{minimumPriceAda}}",
+					"entryAddon": ", >= ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any sales with a minimum price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any sales with a maximum price of **₳{{maximumPriceAda}}**",
 					"deletedChannel": "deleted",
@@ -1142,7 +1182,7 @@
 					"chooseMarketplaceChannel": "Choose a listing tracker",
 					"entryTitle": "Project \"{{{projectName}}}\" (Tracker-ID: {{marketplaceChannel.id}})",
 					"entry": "{{marketplaceNames}}, #{{channelName}}",
-					"entryAddon": ", > ₳{{minimumPriceAda}}",
+					"entryAddon": ", >= ₳{{minimumPriceAda}}",
 					"minimumPriceAddon": "This affects any listings with a minimum asking price of **₳{{minimumPriceAda}}**",
 					"maximumPriceAddon": "This affects any listings with a maximum asking price of **₳{{maximumPriceAda}}**",
 					"deletedChannel": "deleted",
@@ -1326,6 +1366,137 @@
 				"reminderTitle": "Black Edition Info",
 				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
 			}
+		},
+		"giveaway": {
+			"list": {
+				"purpose": "This is the list of all existing giveaways for this Discord server.",
+				"noGiveawaysTitle": "No giveaways",
+				"noGiveaways": "Currently, no available giveaways were found for this server.",
+				"giveawayInfo": "Winner count: {{winnerCount}}",
+				"giveawayInfoOpen": "\nOpens on: <t:{{timestamp}}>",
+				"giveawayInfoClose": "\nCloses on: <t:{{timestamp}}>",
+				"giveawayInfoSnapshot": "\nSnapshot on: <t:{{timestamp}}>",
+				"chooseGiveawayDetails": "Choose the giveaway you want more details on",
+				"details": "Giveaway Details",
+				"detailsName": "Display name (Internal name)",
+				"detailsDescription": "Description",
+				"detailsDescriptionEmpty": "N/A",
+				"detailsCreation": "Created at",
+				"creationDate": "<t:{{createTime}}>",
+				"detailsDates": "Starts/Ends",
+				"detailsConfiguration": "Giveaway configuration",
+				"optionList": "Winners must be unique: {{uniqueWinners}}\nToken-based giveaway: {{tokenBased}}\nWeighted giveaway: {{weighted}}",
+				"detailsRoles": "User has to have one of the following roles",
+				"requiredRoleEntry": "• <@&{{role.roleId}}>",
+				"detailsChannel": "Announcement info",
+				"announcementNone": "No giveaway announcement will be made by the bot and the winners will not be automatically published when the giveaway ends.",
+				"announcementChannel": "A giveaway announcement with info on how to participate will be posted in <#{{giveaway.channelId}}> when the giveaway starts.",
+				"adminName": "{{{giveaway.displayName}}} ({{giveaway.name}})",
+				"noPremium": "🙀 Users currently can not participate in or view any giveaways as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"winnerCountDescription": "Winner count",
+				"winnerCount": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
+				"drawTypeDescription": "Draw type",
+				"drawTypeDISCORD_ID": "When the winners are drawn, you will be provided with the Discord ID and tags of the winners.",
+				"drawTypeCARDANO_ADDRESS": "When the winners are drawn, you will be provided with the Cardano wallet address of the winners.",
+				"winnerCountDISCORD_ID": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
+				"winnerCountCARDANO_ADDRESS": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
+				"participationWeighted": "Users: **{{entrants}}**\nTotal giveaway entries: **{{entries}}**",
+				"participation": "Total giveaway entries: **{{entries}}**"
+			},
+			"add": {
+				"previewPhase1": "Welcome to the new giveaway wizard 🧙‍♂️! We will walk you through creating a new giveaway for your server.\n⚠ We highly suggest only running this command in a private channel as you will be asked to type messages to populate the description and options later on.\n\nYou've configured the following initial settings for your giveaway:",
+				"previewPhase1Details": "**Internal name**: {{name}}\n**Display name**: {{{displayName}}}\n**Number of winners**: {{winnerCount}}",
+				"previewPhase1DetailsOpenTime": "\n**Giveaway start time**: Users will be able to start participating at <t:{{timestamp}}>",
+				"previewPhase1DetailsCloseTime": "\n**Giveaway end time**: Users can participate until <t:{{timestamp}}>",
+				"previewPhase1DetailsSnapshotTime": "\n**Snapshot time**: The token snapshot for this poll will be done at <t:{{timestamp}}>",
+				"previewPhase1NoChannel": "You have not selected a channel for the bot to post a giveaway announcement in at giveaway start time.",
+				"previewPhase1Channel": "The bot will post a giveaway announcement in <#{{publishChannel}}> once the giveaway starts.",
+				"previewPhase1NoRequiredRole": "No role requirements are in effect - everybody will be able to see the giveaway.",
+				"previewPhase1RequiredRole": "To participate in the giveaway, users will need to be assigned the <@&{{requiredRole}}> role. You can additional roles via the */configure-giveaway update* command later.",
+				"previewPhase1NextSteps": "❗ Please send a message to this current channel (<#{{currentChannel}}>) in the next 5 minutes, containing the description for your giveaway that you would like to use:",
+				"startPhase3": "Use this description",
+				"redoPhase2": "Change description",
+				"previewPhase2Description": "**Giveaway Details**:\n{{{description}}}",
+				"previewPhase3NextSteps": "❗ Please select some final settings for your giveaway. If you choose token ownership to be required, a final step will ask you for information about the giveaway snapshot",
+				"isUniqueWinners": "Every drawn winner must be unique?",
+				"uniqueWinnersYes": "Can only win once",
+				"uniqueWinnersYesDescription": "Every user can win at most once",
+				"uniqueWinnersNo": "Can win multiple times",
+				"uniqueWinnersNoDescription": "Users can win multiple times if they have more than one entry",
+				"selectDrawType": "What info will identify winners?",
+				"drawTypeDiscordId": "Discord Info",
+				"drawTypeDiscordIdDescription": "The winners Discord ID and tag will be shown",
+				"drawTypeWalletAddress": "Wallet address",
+				"drawTypeWalletAddressDescription": "The winners wallet address will be shown",
+				"isTokenOwnershipRequired": "Can only token holders participate in this giveaway?",
+				"tokenTypeNone": "Everyone",
+				"tokenTypeHolderOnly": "Holders",
+				"tokenTypeHolderWeighted": "Weighted",
+				"tokenTypeNoneDescription": "No, anyone can",
+				"tokenTypeHolderOnlyDescription": "Yes, each holder gets one entry",
+				"tokenTypeHolderWeightedDescription": "Yes, holders get entries based on owned number of tokens",
+				"startPhase4": "Provide token details",
+				"previewPhase4NextStepsPolicyIdOnly": "Only people that are verified owners of tokens from the policy *{{policyId}}* can participate.",
+				"previewPhase4NextStepsPolicyIdAndFingerprint": "Only people that are verified owners of tokens from the policy *{{policyId}}* with the asset fingerprint *{{assetFingerprint}}* can participate.",
+				"previewPhase4NextStepsWeighted": "The entry count will be based on the amount of tokens.",
+				"previewPhase4NextSteps": "❗ Please enter the policy ID of the token that entrants will be participating with. If using fungible tokens, we also recommend to provide the asset fingerprint, separated with a plus from the policy ID, as follows: *489aa3378d13c87ad4e595ab2a9092e9c92bd645b725b853a3cdebf3+asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
+				"redoPhase4": "Change token data",
+				"finish": "Create giveaway",
+				"success": "✅ New giveaway with the following settings added to this server:",
+				"errorTimeout": "The giveaway wizard 🧙‍♂️ timed out waiting for your input, sorry. Please restart the wizard via the */configure-giveaway add* command.",
+				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
+				"invalidName": "⚠ Could not add giveaway because the name \"{{giveawayName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
+				"noPremium": "🙀 You currently can not add any giveaways as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"previewPhase5NextSteps": "configure.giveaway.add.previewPhase5NextSteps",
+				"startPhase5": "configure.giveaway.add.startPhase5"
+			},
+			"announce": {
+				"purpose": "👇 Pick a giveaway from the list of available giveaways to announce. If the giveaway is still open, a vote button will also be added to the widget.\n\n{{{participationPublishingInfo}}}\n\n💡 You can only have one announcement for each giveaway at a time. The announcement will automatically be updated with the current participation counts every 5 minutes.",
+				"participationPublishYes": "📢 The (current) entry counts will be published along with the giveaway announcement.",
+				"success": "✅ Results successfully published in <#{{channel}}>.",
+				"publicSuccess": "🗳 The team shared the following giveaway with you.",
+				"chooseGiveaway": "Pick the giveaway you'd like to announce",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for giveaway announcements."
+			},
+			"end": {
+				"purpose": "👇 Pick a giveaway from the list of available giveaways to end and draw winners for. If the giveaway is already closed, you will be asked if you want to redraw in a separate step.",
+				"success": "✅ Successfully picked the winners for **{{{displayName}}}**:",
+				"successRedraw": "✅ Successfully reset and picked the winners for **{{{displayName}}}**:",
+				"successPublish": "✅ Successfully published giveaway winners for **{{{displayName}}}**.",
+				"redrawWarning": "⚠ The winners for the giveaway **{{{displayName}}}** have already been drawn. Would you like to redraw them?",
+				"redrawButton": "Redraw winners",
+				"winnerList": "{{winnerCount}} winners drawn",
+				"chooseGiveawayDetails": "Choose the giveaway you want to draw winners for",
+				"publishButton": "Publish winners",
+				"winnerDrawDiscordId": "{{place}}. <@{{userId}}>",
+				"winnerDrawError": "{{place}}. ⚠ UNKNOWN DISCORD USER",
+				"winnerDrawCardanoAddress": "{{place}}. **{{winnerAddress}}**",
+				"errorDraw": "⚠ Error drawing your winners for giveaway **{{{displayName}}}**. Likely there are not enough entrants to match your winner count and uniqueness conditions for this giveaway."
+			},
+			"remove": {
+				"success": "🗑️ Removed the following giveaway from this server:",
+				"purpose": "Select the giveaway to remove from your Discord server.\n\n⚠ **ALL REGISTERED PARTICIPANTS WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE GIVEAWAY**.\n\nOnly do this after you have processed this giveaway.",
+				"errorNotFound": "⚠ No giveaway with the ID **{{giveawayId}}** was found for this server. Nothing was removed.",
+				"chooseGiveawayDetails": "Choose the giveaway you want to irrevocably delete"
+			},
+			"update": {
+				"addrole": {
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to participate in the giveaway **{{{giveaway.displayName}}}**.",
+					"purpose": "Select the giveaway you would like the role <@&{{roleId}}> to be able to participate in.\n\n💡 All other requirements, like giveaway times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"chooseGiveaway": "Choose the giveaway you want to allow this role to participate in",
+					"tooManyRoles": "⚠ Cannot add more than 20 roles to a giveaway.",
+					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to participate in this giveaway and was not added again."
+				},
+				"removerole": {
+					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to participate in the giveaway **{{{giveaway.displayName}}}**.",
+					"purpose": "Select the giveaway you would like to remove a role from being allowed to participate in.\n\n💡 All other requirements, like giveaway times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"chooseGiveaway": "Choose the giveaway you want to remove this role from",
+					"chooseRolePurpose": "Choose which role you would like to remove from the giveaway {{{displayName}}}:",
+					"chooseRole": "Choose role to remove",
+					"noRoles": "⚠ No roles to remove exist on this giveaway."
+				}
+			}
 		}
 	},
 	"start": {
@@ -1364,13 +1535,14 @@
 		"poll": "Polls and voting system for open and holder-limited polls",
 		"pollVoteaireTitle": "Voteaire Polls",
 		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
+		"giveawayTitle": "Giveaways (Black Edition only)",
+		"giveaway": "Custom and weighted giveaways for your community",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
 		"cardolphins": "Cardolphins Special",
-		"handle": "ADA Handle Integration",
-		"giveaway": "features.giveaway"
+		"handle": "ADA Handle Integration"
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
@@ -1408,6 +1580,5 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	},
-	"": ""
+	}
 }
