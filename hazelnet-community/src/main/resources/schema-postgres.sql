@@ -370,7 +370,7 @@ CREATE TABLE "stake_snapshot_cardano"
     "snapshot_time"              timestamp   NOT NULL,
     "snapshot_policy_id"         varchar(56) NOT NULL,
     "snapshot_asset_fingerprint" varchar,
-    "token_weight"               decimal     NOT NULL DEFAULT 1,
+    "token_weight"               numeric     NOT NULL DEFAULT 1,
     "snapshot_taken"             boolean     NOT NULL DEFAULT false
 );
 

@@ -22,7 +22,7 @@ export default <GiveawayRemoveCommand> {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.purpose', locale }), 'configure-giveaway-remove');
         await interaction.editReply({ embeds: [embed], components });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.list.noGiveawaysDetail', locale }), 'configure-giveaway-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.list.noGiveaways', locale }), 'configure-giveaway-remove');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
