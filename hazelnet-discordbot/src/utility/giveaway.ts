@@ -22,6 +22,7 @@ export type Giveaway = {
   winnerCount: number
   drawType: GiveawayDrawType
   archived: boolean
+  logoUrl?: string
 }
 
 export type ParticipationData = {

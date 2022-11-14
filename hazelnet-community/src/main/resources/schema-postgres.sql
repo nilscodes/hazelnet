@@ -339,6 +339,7 @@ CREATE TABLE "discord_giveaways"
     "giveaway_unique_winners" boolean       NOT NULL DEFAULT true,
     "giveaway_winner_count"   smallint      NOT NULL DEFAULT 1,
     "giveaway_archived"       boolean       NOT NULL DEFAULT false,
+    "giveaway_logo_url"       varchar(1000),
     UNIQUE ("discord_server_id", "giveaway_name")
 );
 

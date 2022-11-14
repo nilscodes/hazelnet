@@ -26,7 +26,7 @@ export default {
                 const participation = await client.services.discordserver.getParticipationForGiveaway(guild.id, giveaway.id);
                 const tokenMetadata = await giveawayutil.getTokenMetadataFromRegistry(guild.id, giveaway, client);
                 const { detailFields, components } = giveawayutil.getGiveawayAnnouncementParts(discordServer, giveaway, participation, tokenMetadata);
-                const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields);
+                const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields, giveaway.logoUrl);
                 try {
                   await announceChannel.messages.fetch(giveawayUpdateInfo.messageId);
                   await announceChannel.messages.edit(giveawayUpdateInfo.messageId, { embeds: [embedPublic], components });
