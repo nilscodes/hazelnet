@@ -98,7 +98,11 @@ class DiscordGiveaway @JsonCreator constructor(
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "discord_giveaway_entries", joinColumns = [JoinColumn(name = "discord_giveaway_id")])
     @field:JsonIgnore
-    var entries: MutableSet<DiscordGiveawayEntry> = mutableSetOf()
+    var entries: MutableSet<DiscordGiveawayEntry> = mutableSetOf(),
+
+    @Column(name = "giveaway_logo_url")
+    @field:Size(min = 1, max = 1000)
+    var logoUrl: String? = null,
     ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -123,6 +127,7 @@ class DiscordGiveaway @JsonCreator constructor(
         if (archived != other.archived) return false
         if (snapshotIds != other.snapshotIds) return false
         if (requiredRoles != other.requiredRoles) return false
+        if (logoUrl != other.logoUrl) return false
 
         return true
     }
@@ -145,11 +150,12 @@ class DiscordGiveaway @JsonCreator constructor(
         result = 31 * result + archived.hashCode()
         result = 31 * result + snapshotIds.hashCode()
         result = 31 * result + requiredRoles.hashCode()
+        result = 31 * result + logoUrl.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles)"
+        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles, logoUrl=$logoUrl)"
     }
 
 }

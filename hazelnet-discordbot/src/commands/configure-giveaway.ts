@@ -17,6 +17,7 @@ export default <BotCommand> {
       .addStringOption((option) => option.setName('giveaway-opentime').setDescription(ci18n.option('giveaway-opentime')).setRequired(false))
       .addStringOption((option) => option.setName('giveaway-closetime').setDescription(ci18n.option('giveaway-closetime')).setRequired(false))
       .addStringOption((option) => option.setName('snapshot-time').setDescription(ci18n.option('snapshot-time')).setRequired(false))
+      .addStringOption((option) => option.setName('image-url').setDescription(ci18n.option('image-url')).setRequired(false))
       .addIntegerOption((option) => option.setName('winner-count').setDescription(ci18n.option('winner-count')).setRequired(false))
       .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(false))
       .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(false)))

@@ -60,7 +60,7 @@ export default <GiveawayAnnounceCommand> {
           const announceChannel = await guild.channels.fetch(announceChannelId);
           if (announceChannel) {
             const guildAnnounceChannel = announceChannel as TextBasedChannel;
-            const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields);
+            const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields, giveaway.logoUrl);
             const announcementMessage = await guildAnnounceChannel.send({ embeds: [embedPublic], components });
             await interaction.client.services.discordserver.updateGiveaway(guild.id, giveaway.id, {
               channelId: announceChannel.id,

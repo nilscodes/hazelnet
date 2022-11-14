@@ -28,6 +28,7 @@ export default <GiveawayAddCommand> {
     const giveawayOpenTime = interaction.options.getString('giveaway-opentime', false);
     const giveawayCloseTime = interaction.options.getString('giveaway-closetime', false);
     const snapshotTime = interaction.options.getString('snapshot-time', false);
+    const logoUrl = interaction.options.getString('image-url', false);
     const winnerCount = interaction.options.getInteger('winner-count', false) ?? 1;
     const requiredRole = interaction.options.getRole('required-role');
     const publishChannel = interaction.options.getChannel('channel');
@@ -62,6 +63,7 @@ export default <GiveawayAddCommand> {
             channelId: publishChannel?.id,
             winnerCount,
             drawType: 'DISCORD_ID',
+            logoUrl,
           } as GiveawayPartial;
           if (requiredRole) {
             giveawayObject.requiredRoles = [{ roleId: requiredRole.id }];
@@ -95,6 +97,9 @@ export default <GiveawayAddCommand> {
       const closeTime = giveaway.getTimePhrase(giveawayObject.openUntil, 'configure.giveaway.add.previewPhase1DetailsCloseTime', locale);
       const snapshotTime = giveaway.getTimePhrase(giveawayObject.snapshotTime, 'configure.giveaway.add.previewPhase1DetailsSnapshotTime', locale);
       content.push(i18n.__({ phrase: 'configure.giveaway.add.previewPhase1Details', locale }, giveawayObject as any) + openTime + closeTime + snapshotTime);
+      if (giveawayObject.logoUrl) {
+        content.push(i18n.__({ phrase: 'configure.giveaway.add.previewPhase1DetailsImage', locale }, giveawayObject as any));
+      }
     }
 
     if (giveawayObject.channelId) {
