@@ -372,7 +372,7 @@
 	"vote": {
 		"messageTitle": "Current polls and decisions on this Discord",
 		"purpose": "Find ongoing and completed polls on this server and view the results or vote, if you fulfill the required voting conditions.",
-		"pollInfo": "{{{poll.description}}}",
+		"pollInfo": "{{{description}}}",
 		"yourVote": "Your current vote",
 		"pollInfoTitle": "Information about this poll",
 		"optionList": "Multiple options allowed: {{multipleVotes}}\nToken-based vote: {{tokenBased}}\nWeighted vote: {{weighted}}",
