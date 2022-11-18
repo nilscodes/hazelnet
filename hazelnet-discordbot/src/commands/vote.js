@@ -34,7 +34,13 @@ module.exports = {
         const member = await interaction.guild.members.fetch(interaction.user.id);
         const visiblePolls = nonArchivedPolls.filter((poll) => pollUtil.userCanSeePoll(member, poll));
 
-        const pollFields = visiblePolls.map((poll) => ({ name: poll.displayName, value: i18n.__({ phrase: 'vote.pollInfo', locale }, { poll }) }));
+        const pollFields = visiblePolls.map((poll) => {
+          const description = poll.description.substring(0, 150) + (poll.description.length > 150 ? '...' : '');
+          return {
+            name: poll.displayName,
+            value: i18n.__({ phrase: 'vote.pollInfo', locale }, { description }),
+          };
+        });
         if (!pollFields.length) {
           pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
         }

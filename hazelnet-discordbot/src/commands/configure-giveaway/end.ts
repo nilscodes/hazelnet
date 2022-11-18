@@ -38,6 +38,9 @@ export default <GiveawayEndCommand> {
         const components = [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(this.createRedrawButton(giveaway, locale))
         ];
+        if (giveaway.channelId && giveaway.messageId && giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
+          components[0].addComponents(this.createPublishButton(giveaway, locale));
+        }
         if (existingWinners === null) {
           try {
             const winners = await interaction.client.services.discordserver.drawWinners(interaction.guild!.id, giveaway.id);
@@ -51,9 +54,6 @@ export default <GiveawayEndCommand> {
         } else {
           detailFields.push(await giveawayutil.getWinnerInfo(giveaway, locale, existingWinners, interaction.guild!));
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.redrawWarning', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
-          if (giveaway.channelId && giveaway.messageId && giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
-            components[0].addComponents(this.createPublishButton(giveaway, locale));
-          }
           await interaction.editReply({ embeds: [embed], components });
         }
       }

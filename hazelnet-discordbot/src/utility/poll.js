@@ -106,10 +106,13 @@ module.exports = {
   },
   getPollAnnouncementParts(discordServer, poll, results, forcePublishResults, tokenMetadata) {
     const locale = discordServer.getBotLanguage();
+    const trimmedDescription = poll.description.trim().length
+      ? poll.description.trim().substring(0, 1000)
+      : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale });
     const detailFields = [
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
-        value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
+        value: trimmedDescription,
       },
     ];
 
@@ -202,6 +205,9 @@ module.exports = {
         },
       ];
     }
+    const trimmedDescription = poll.description.trim().length
+      ? poll.description.trim().substring(0, 1000)
+      : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale });
     const detailFields = [
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsName', locale }),
@@ -209,7 +215,7 @@ module.exports = {
       },
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsDescription', locale }),
-        value: poll.description.trim().length ? poll.description.trim() : i18n.__({ phrase: 'configure.poll.list.detailsDescriptionEmpty', locale }),
+        value: trimmedDescription,
       },
       {
         name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
