@@ -121,7 +121,7 @@ if (queueFiles.length) {
             } else {
               client.logger.error({ msg: `Consumer for queue ${queue.name} cancelled by server` });
             }
-          }); ;
+          });
         }
       });
       conn.on('close', () => {

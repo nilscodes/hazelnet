@@ -1,6 +1,7 @@
 import { BotSubcommand } from "src/utility/commandtypes";
 import i18n from 'i18n';
 import { BaseGuildVoiceChannel, ChannelType } from "discord.js";
+const cardanoaddress = require('../../utility/cardanoaddress');
 const embedBuilder = require('../../utility/embedbuilder');
 
 export default <BotSubcommand> {
@@ -14,7 +15,11 @@ export default <BotSubcommand> {
       if (clockChannel.type === ChannelType.GuildVoice || newStatus === false) {
         try {
           if (newStatus !== false) {
-            await (clockChannel as BaseGuildVoiceChannel).setName('EPOCH');
+            const epochDetails = await interaction.client.services.cardanoinfo.epochDetails();
+            if (epochDetails.estimatedSecondsLeft > 0) {
+              const epochClock = cardanoaddress.buildEpochClockText(epochDetails);
+              await (clockChannel as BaseGuildVoiceChannel).setName(epochClock);
+            }
           }
           await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild!.id, 'WIDGET_EPOCHCLOCK', newStatus === false ? '' : clockChannel.id);
           const changeMessage = i18n.__({ phrase: (newStatus ? 'configure.info.epochclock.epochclockOn' : 'configure.info.epochclock.epochclockOff'), locale }, { epochclock: clockChannel.id });

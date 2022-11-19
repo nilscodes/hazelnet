@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
-import HazelnetClient from "src/utility/hazelnetclient";
+import HazelnetClient from "../utility/hazelnetclient";
 import { BaseGuildVoiceChannel, PermissionsBitField } from 'discord.js';
+const cardanoaddress = require('../utility/cardanoaddress');
 
 export default {
   cron: '*/5 * * * *',
@@ -12,10 +13,7 @@ export default {
       if (epochDetails.estimatedSecondsLeft < 0) {
         return;
       }
-      const daysLeft = Math.floor(epochDetails.estimatedSecondsLeft / 86400);
-      const hoursLeft = Math.floor((epochDetails.estimatedSecondsLeft - daysLeft * 86400) / 3600);
-      const minutesLeft = Math.floor((epochDetails.estimatedSecondsLeft - (daysLeft * 86400 + hoursLeft * 3600)) / 60);
-      const epochClock = `⏳ E${epochDetails.epochNo}: ${daysLeft}d ${hoursLeft}h ${minutesLeft}m left`;
+      const epochClock = cardanoaddress.buildEpochClockText(epochDetails);
       for (let i = 0; i < allEpochClocksToUpdate.length; i += 1) {
         const epochClockUpdateInfo = allEpochClocksToUpdate[i];
         try {
