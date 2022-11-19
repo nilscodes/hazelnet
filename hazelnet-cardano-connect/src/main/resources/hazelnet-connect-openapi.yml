@@ -378,17 +378,24 @@ paths:
         - info
       responses:
         '200':
-          description: 'Sample response: Details about a user by ID'
+          description: 'Synchronization Information'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SyncStatus'
-        default:
-          description: Unexpected error
+  /info/epochdetails:
+    get:
+      summary: 'Get Epoch Details'
+      operationId: epochDetails
+      tags:
+        - info
+      responses:
+        '200':
+          description: 'Information about the current epoch'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/EpochDetails'
 components:
   parameters:
     WalletAddressPathParameter:
@@ -572,6 +579,43 @@ components:
         syncPercentage:
           type: number
           format: double
+    EpochDetails:
+      type: object
+      required:
+        - epochNo
+        - secondsAchieved
+        - estimatedSecondsLeft
+        - blockCount
+        - transactionCount
+        - fees
+        - outSum
+        - startTime
+      properties:
+        epochNo:
+          type: integer
+          format: int32
+        secondsAchieved:
+          type: integer
+          format: int64
+        estimatedSecondsLeft:
+          type: integer
+          format: int64
+        blockCount:
+          type: integer
+          format: int32
+        transactionCount:
+          type: integer
+          format: int32
+        fees:
+          type: integer
+          format: int64
+        outSum:
+          type: integer
+          format: int64
+        startTime:
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
     HandleName:
       type: string
       example: hazelnet

@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.persistence.other
 
+import io.hazelnet.cardano.connect.data.other.EpochDetails
 import io.hazelnet.cardano.connect.data.other.SyncInfo
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
@@ -15,12 +16,14 @@ const val GET_SYNC_PERCENTAGE: String = "select\n" +
         "      / (extract (epoch from (now () at time zone 'UTC')) - extract (epoch from (min (time) at time zone 'UTC')))\n" +
         "  from block"
 
+const val GET_CURRENT_EPOCH_INFO: String = "SELECT * FROM epoch ORDER BY no DESC LIMIT 1"
+
 @Repository
 @CacheConfig(cacheNames = ["infoCardanoDbSync"])
 class InfoDaoCardanoDbSync(
         private val jdbcTemplate: JdbcTemplate
 ) : InfoDao {
-    @Cacheable
+    @Cacheable(key = "\"syncInfo\"")
     override fun getSynchronizationStatus(): SyncInfo {
         val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         val (lastBlockDate, currentEpoch) = jdbcTemplate.queryForObject(GET_LAST_BLOCK_INFO) { rs, _ ->
@@ -30,9 +33,24 @@ class InfoDaoCardanoDbSync(
         return SyncInfo(currentEpoch, lastBlockDate, syncPercentage)
     }
 
+    @Cacheable(key = "\"epochDetails\"")
+    override fun getEpochDetails(): EpochDetails {
+        val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        return jdbcTemplate.queryForObject(GET_CURRENT_EPOCH_INFO) { rs, _ ->
+            EpochDetails(
+                epochNo = rs.getInt("no"),
+                blockCount = rs.getInt("blk_count"),
+                transactionCount = rs.getInt("tx_count"),
+                fees = rs.getLong("fees"),
+                outSum = rs.getLong("out_sum"),
+                startTime = rs.getTimestamp("start_time", utcCalendar)
+            )
+        }!!
+    }
+
     @Scheduled(fixedDelay = 30000)
     @CacheEvict(allEntries = true)
-    fun clearSynchronizationStatusCache() {
+    fun clearInfoCache() {
         // Annotation-based cache clearing
     }
 

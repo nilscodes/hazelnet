@@ -390,6 +390,10 @@ module.exports = {
     const giveawaysResultUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/giveaways/resultupdates`);
     return giveawaysResultUpdatesPromise.data;
   },
+  async listChannelsForEpochClockUpdate() {
+    const widgetUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/widgets/epochclock`);
+    return widgetUpdatesPromise.data;
+  },
   async regenerateAccessToken(guildId) {
     const roleAssignments = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);
     return roleAssignments.data;
