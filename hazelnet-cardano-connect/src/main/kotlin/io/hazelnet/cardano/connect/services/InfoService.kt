@@ -9,5 +9,7 @@ import org.springframework.stereotype.Service
 class InfoService(
         private val infoDao: InfoDao,
 ) {
-    fun getSynchronizationStatus(): SyncInfo = infoDao.getSynchronizationStatus()
+    fun getSynchronizationStatus() = infoDao.getSynchronizationStatus()
+
+    fun getEpochDetails() = infoDao.getEpochDetails()
 }

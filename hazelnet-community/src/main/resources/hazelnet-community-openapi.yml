@@ -2075,6 +2075,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordGiveawayUpdate"
+  /discord/widgets/epochclock:
+    get:
+      summary: Get all guilds and channels for which to send epoch clock updates
+      operationId: listChannelsForEpochClockUpdate
+      tags:
+        - discord
+        - widgets
+      responses:
+        "200":
+          description: "List of channels and guilds to update the epoch clock in"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordWidgetUpdate"
   /oura:
     post:
       summary: Publish an event from Oura to the community service (to react to mint events)
@@ -3192,6 +3208,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DiscordRequiredRole"
+        logoUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
     DiscordGiveawayPartial:
       type: object
       properties:
@@ -3340,6 +3360,33 @@ components:
           $ref: "#/components/schemas/DiscordChannel"
         messageId:
           $ref: "#/components/schemas/DiscordMessage"
+    DiscordGiveawayUpdate:
+      type: object
+      required:
+        - guildId
+        - giveawayId
+        - channelId
+      properties:
+        guildId:
+          $ref: "#/components/schemas/DiscordGuild"
+        giveawayId:
+          readOnly: true
+          type: integer
+          format: int64
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        messageId:
+          $ref: "#/components/schemas/DiscordMessage"
+    DiscordWidgetUpdate:
+      type: object
+      required:
+        - guildId
+        - channelId
+      properties:
+        guildId:
+          $ref: "#/components/schemas/DiscordGuild"
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
     TokenMetadata:
       type: object
       required:

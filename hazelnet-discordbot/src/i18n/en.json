@@ -25,6 +25,8 @@
 			"ping": "Get in touch with an unknown user via $handle or NFT asset fingerprint.",
 			"ping-send": "Send a ping to an unknown party.",
 			"ping-list": "List recent sent and received pings.",
+			"configure-info": "Helpful widgets and features to keep your community informed.",
+			"configure-info-epochclock": "A Cardano Epoch Clock right in your Discord.",
 			"configure-protection": "Configuration options around scammer protection",
 			"configure-protection-status": "Show the status of all protection-related mechanisms.",
 			"configure-protection-addressremove": "Turn on/off autoremoval of messages that contain an address/handle to protect from scammers.",
@@ -147,8 +149,12 @@
 				"channel": "Channel to post the verification widget to.",
 				"welcome-text": "A text included in your verification widget to welcome the community."
 			},
+			"configure-info": {
+				"channel": "The channel you want to update with the respective info.",
+				"status": "Set to False to turn this feature off."
+			},
 			"configure-protection": {
-				"status": "Set to False to turn this feature off",
+				"status": "Set to False to turn this feature off.",
 				"auditchannel": "The channel to send audit/warning messages to."
 			},
 			"configure-adminaccess": {
@@ -696,6 +702,14 @@
 				"publish": "Create announcement",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for verification announcements."
+			}
+		},
+		"info": {
+			"epochclock": {
+				"epochclockOn": "✅ The voice channel <#{{epochclock}}> has been turned into an Epoch clock. Watch the Epoch count down ☺",
+				"epochclockOff": "❌ The Epoch clock has been turned off on your server.",
+				"errorWrongChannelType": "⚠ Only guild voice channels can be used for this type of widget.",
+				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name."
 			}
 		},
 		"policy": {

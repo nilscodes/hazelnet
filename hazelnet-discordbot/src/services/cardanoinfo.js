@@ -32,4 +32,8 @@ module.exports = {
       return null;
     }
   },
+  async epochDetails() {
+    const epochDetailsPromise = await axios.get(`${hazelCardanoConnectUrl}/info/epochdetails`);
+    return epochDetailsPromise.data;
+  },
 };

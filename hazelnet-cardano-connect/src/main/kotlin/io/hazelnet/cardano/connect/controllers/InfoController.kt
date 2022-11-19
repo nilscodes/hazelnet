@@ -15,5 +15,9 @@ class InfoController(
 ) {
     @GetMapping("/syncstatus")
     @ResponseStatus(HttpStatus.OK)
-    fun syncStatus(): SyncInfo = infoService.getSynchronizationStatus()
+    fun syncStatus() = infoService.getSynchronizationStatus()
+
+    @GetMapping("/epochdetails")
+    @ResponseStatus(HttpStatus.OK)
+    fun epochDetails() = infoService.getEpochDetails()
 }

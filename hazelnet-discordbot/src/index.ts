@@ -83,7 +83,7 @@ eventFiles.forEach((event: DiscordEvent) => {
 });
 
 const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates'];
+const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates'];
 
 scheduleFiles.forEach(async (file) => {
   let schedule: any;
