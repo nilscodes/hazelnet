@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
-import { BotSubcommand } from "src/utility/commandtypes";
+import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "src/utility/hazelnetclient";
+import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "../../utility/hazelnetclient";
 const adahandle = require('../../utility/adahandle');
 const embedBuilder = require('../../utility/embedbuilder');
 

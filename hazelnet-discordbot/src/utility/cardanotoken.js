@@ -50,4 +50,8 @@ module.exports = {
     }
     return i18n.__({ phrase: joinPhrase, locale });
   },
+  getMintCountText(policyInfo, maxCount, locale) {
+    const phrase = maxCount > 0 ? 'configure.policy.mintcounter.mintCountWithMax' : 'configure.policy.mintcounter.mintCount';
+    return i18n.__({ phrase, locale }, { count: policyInfo.tokenCount, maxCount });
+  },
 };

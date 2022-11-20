@@ -36,4 +36,8 @@ module.exports = {
     const epochDetailsPromise = await axios.get(`${hazelCardanoConnectUrl}/info/epochdetails`);
     return epochDetailsPromise.data;
   },
+  async policyInfo(policyId) {
+    const policyInfoPromise = await axios.get(`${hazelCardanoConnectUrl}/token/policies/${policyId}`);
+    return policyInfoPromise.data;
+  },
 };

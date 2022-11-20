@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { BotCommand } from "src/utility/commandtypes";
+import { BotCommand } from "../utility/commandtypes";
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 

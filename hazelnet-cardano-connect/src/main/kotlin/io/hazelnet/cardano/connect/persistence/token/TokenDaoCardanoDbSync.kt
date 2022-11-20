@@ -40,6 +40,9 @@ const val GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME =
 const val GET_ASSET_MINT_METADATA_BY_ASSET_FINGERPRINT =
     "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx ON mtm.tx_id = tx.id WHERE ma.fingerprint=? AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
 
+const val GET_POLICY_INFO_BY_POLICY_ID =
+    "select sum(quantity) as count FROM multi_asset ma JOIN ma_tx_mint mtm on ma.id = mtm.ident WHERE ma.policy=decode(?, 'hex')"
+
 const val NFT_METADATA_KEY = 721
 
 @Repository
@@ -256,6 +259,13 @@ class TokenDaoCardanoDbSync(
                 String::class.java,
                 assetFingerprint.assetFingerprint
             )
+        )
+    }
+
+    override fun getPolicyInfo(policyId: String): PolicyInfo {
+        return PolicyInfo(
+            PolicyId(policyId),
+            jdbcTemplate.queryForObject(GET_POLICY_INFO_BY_POLICY_ID, Long::class.java, policyId),
         )
     }
 }

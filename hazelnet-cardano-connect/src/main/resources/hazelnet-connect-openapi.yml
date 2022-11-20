@@ -317,12 +317,21 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TokenOwnershipInfoWithAssetList'
-        default:
-          description: Unexpected error
+  /token/policies/{policyId}:
+    get:
+      summary: Get information about this policy
+      operationId: getPolicyInfo
+      tags:
+        - token
+      parameters:
+        - $ref: '#/components/parameters/PolicyIdPathParameter'
+      responses:
+        '200':
+          description: 'The token count and other policy related info'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/PolicyInfo'
   /token/assets/{policyId}/{assetNameHex}:
     get:
       summary: Get the information and metadata for a multi asset
@@ -616,6 +625,17 @@ components:
           type: string
           format: date-time
           example: 2021-11-10T13:20:57Z
+    PolicyInfo:
+      type: object
+      required:
+        - policyId
+        - tokenCount
+      properties:
+        policyId:
+          $ref: '#/components/schemas/TokenPolicyId'
+        tokenCount:
+          type: integer
+          format: int64
     HandleName:
       type: string
       example: hazelnet

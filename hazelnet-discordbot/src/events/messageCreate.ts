@@ -1,8 +1,8 @@
-import { DiscordEvent } from "src/utility/commandtypes";
+import { DiscordEvent } from "../utility/commandtypes";
 
 import i18n from 'i18n';
 import { ChannelType, Message, TextBasedChannel } from "discord.js";
-import { AugmentedMessage } from "src/utility/hazelnetclient";
+import { AugmentedMessage } from "../utility/hazelnetclient";
 const adahandle = require('../utility/adahandle');
 const cardanoaddress = require('../utility/cardanoaddress');
 const embedBuilder = require('../utility/embedbuilder');

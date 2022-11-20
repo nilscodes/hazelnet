@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.data.discord.widgets.DiscordMintCounterUpdate
 import io.hazelnet.community.data.discord.widgets.DiscordWidgetUpdate
 import io.hazelnet.community.persistence.DiscordServerRepository
 import org.springframework.stereotype.Service
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service
 @Service
 class DiscordInfoService(
     private val discordServerRepository: DiscordServerRepository,
+    private val connectService: ConnectService,
 ) {
     fun listChannelsForEpochClockUpdate() = discordServerRepository.findChannelsForEpochClockUpdate()
         .map {
@@ -15,4 +17,24 @@ class DiscordInfoService(
                 channelId = it.getChannelId(),
             )
         }
+
+    fun listChannelsForMintCounterUpdate(): List<DiscordMintCounterUpdate> {
+        val emptyUpdates = discordServerRepository.findChannelsForMintCounterUpdate().map {
+            val (channelId, policyId, maxCount) = it.getUpdateInfo().split(",")
+            DiscordMintCounterUpdate(
+                guildId = it.getGuildId(),
+                channelId = channelId.toLong(),
+                policyId = policyId,
+                tokenCount = 0,
+                maxCount = maxCount.toLong(),
+            )
+        }
+        val policyInfo = connectService
+            .getPolicyInfo(emptyUpdates.map { it.policyId })
+            .associate { Pair(it.policyId.policyId, it.tokenCount) }
+        return emptyUpdates.map {
+            it.withCount(policyInfo[it.policyId] ?: 0L)
+        }
+    }
+
 }

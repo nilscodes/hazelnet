@@ -6,9 +6,7 @@ import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
-import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetCount
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
+import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.data.verifications.VerificationConfirmation
 import io.hazelnet.cardano.connect.util.toHex
 import io.hazelnet.community.data.Verification
@@ -198,6 +196,17 @@ class ConnectService(
                     .uri("/token/assets/{policyId}/{assetNameHex}", it.first, it.second.toByteArray().toHex())
                     .retrieve()
                     .bodyToFlux(MultiAssetInfo::class.java)
+            }.collectList().block()!!
+    }
+
+    fun getPolicyInfo(policyIds: List<String>): List<PolicyInfo> {
+        return Flux.fromIterable(policyIds)
+            .flatMap {
+                connectClient.get()
+                    .uri("/token/policies/{policyId}", it)
+                    .retrieve()
+                    .bodyToFlux(PolicyInfo::class.java)
+                    .onErrorReturn(PolicyInfo(PolicyId(it), 0))
             }.collectList().block()!!
     }
 
