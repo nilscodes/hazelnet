@@ -1,4 +1,4 @@
-import { GuildDiscordEvent } from "src/utility/commandtypes";
+import { GuildDiscordEvent } from "../utility/commandtypes";
 
 export default <GuildDiscordEvent> {
   name: 'guildDelete',

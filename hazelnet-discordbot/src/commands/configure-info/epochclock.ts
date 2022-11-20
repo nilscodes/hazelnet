@@ -1,4 +1,4 @@
-import { BotSubcommand } from "src/utility/commandtypes";
+import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import { BaseGuildVoiceChannel, ChannelType } from "discord.js";
 const cardanoaddress = require('../../utility/cardanoaddress');

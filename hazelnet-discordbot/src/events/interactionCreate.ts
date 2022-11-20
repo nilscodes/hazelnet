@@ -1,5 +1,5 @@
-import { DiscordEvent } from "src/utility/commandtypes";
-import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "src/utility/hazelnetclient";
+import { DiscordEvent } from "../utility/commandtypes";
+import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "../utility/hazelnetclient";
 
 interface InteractionCreateDiscordEvent extends DiscordEvent {
   execute(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction | AugmentedUserContextMenuInteraction): void

@@ -37,7 +37,7 @@ export default {
               await client.services.discordserver.updateDiscordServerSetting(guild.id, 'WIDGET_EPOCHCLOCK', '');
             }
           } else {
-            client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: 'Guild not found while publishing epoch clock result updates' });
+            client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: 'Guild not found while publishing epoch clock updates' });
             await client.services.discordserver.updateDiscordServerSetting(epochClockUpdateInfo.guildId, 'WIDGET_EPOCHCLOCK', '');
           }
         } catch (announceError) {

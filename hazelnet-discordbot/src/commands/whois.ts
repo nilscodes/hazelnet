@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import { ApplicationCommandType, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
-import { BotCommand } from "src/utility/commandtypes";
+import { BotCommand } from "../utility/commandtypes";
 import CID from 'cids';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
 const cardanotoken = require('../utility/cardanotoken');

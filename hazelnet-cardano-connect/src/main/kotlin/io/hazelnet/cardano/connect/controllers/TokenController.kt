@@ -30,6 +30,10 @@ class TokenController(
     @ResponseStatus(HttpStatus.OK)
     fun getMultiAssetCountStakeSnapshot(@RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetCountStakeSnapshot(policyIdsWithOptionalAssetFingerprint)
 
+    @GetMapping("/policies/{policyId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getPolicyInfo(@PathVariable policyId: String) = tokenService.getPolicyInfo(policyId)
+
     @GetMapping("/assets/{policyId}/{assetNameHex}")
     @ResponseStatus(HttpStatus.OK)
     fun getMultiAssetInfo(@PathVariable policyId: String, @PathVariable assetNameHex: String) = tokenService.getMultiAssetInfo(policyId, assetNameHex)

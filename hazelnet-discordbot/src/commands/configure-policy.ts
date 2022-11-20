@@ -1,8 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { BotCommand } from "../utility/commandtypes";
+import { SlashCommandBuilder } from 'discord.js';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('configure-policy', locale);
     return new SlashCommandBuilder()
@@ -24,7 +25,14 @@ module.exports = {
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))
         .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
-        .addStringOption((option) => option.setName('info-text').setDescription(ci18n.option('info-text')).setRequired(false)));
+        .addStringOption((option) => option.setName('info-text').setDescription(ci18n.option('info-text')).setRequired(false)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('mintcounter')
+        .setDescription(ci18n.subDescription('mintcounter'))
+        .addChannelOption((option) => option.setName('voice-channel').setDescription(ci18n.option('voice-channel')).setRequired(true))
+        .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true))
+        .addIntegerOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false))
+        .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false)));;
   },
   commandTags: ['token', 'marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

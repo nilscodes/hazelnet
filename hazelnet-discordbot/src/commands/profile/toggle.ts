@@ -1,5 +1,5 @@
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
-import { BotSubcommand } from "src/utility/commandtypes";
+import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 const embedBuilder = require('../../utility/embedbuilder');
 

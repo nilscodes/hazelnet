@@ -394,6 +394,10 @@ module.exports = {
     const widgetUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/widgets/epochclock`);
     return widgetUpdatesPromise.data;
   },
+  async listChannelsForMintCountUpdate() {
+    const widgetUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/widgets/mintcounter`);
+    return widgetUpdatesPromise.data;
+  },
   async regenerateAccessToken(guildId) {
     const roleAssignments = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/accesstoken`);
     return roleAssignments.data;

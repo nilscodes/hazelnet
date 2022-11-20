@@ -96,6 +96,7 @@
 			"configure-policy-list": "List all Cardano policy IDs configured as official policies for projects on this server.",
 			"configure-policy-remove": "Remove the Cardano policy ID from this server's official policy list.",
 			"configure-policy-announce": "Announce all your official policies and associated project names.",
+			"configure-policy-mintcounter": "Track your current mint count in your Discord channel.",
 			"configure-healthcheck": "Run a basic health check on your bot to find and correct common problems.",
 			"configure-marketplace": "Configure marketplace integrations.",
 			"configure-marketplace-sales": "Configure your sales trackers.",
@@ -167,7 +168,10 @@
 				"policy-id": "Policy ID to add/remove as an official token policy on this server",
 				"project-name": "The project name to list this policy ID under",
 				"channel": "Channel to post the announcement to.",
-				"info-text": "A text included in your announcement that contains additional information."
+				"info-text": "A text included in your announcement that contains additional information.",
+				"status": "Set to False to turn this feature off.",
+				"voice-channel": "Voice channel to update with mint counts",
+				"max-count": "The maximum number of tokens that will be minted"
 			},
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
@@ -737,6 +741,14 @@
 				"errorNoPolicies": "⚠ You currently have not set any project names and policy IDs for this server. Please add a project first by using the command **/configure-policy add**.",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for policy ID announcements."
+			},
+			"mintcounter": {
+				"mintcounterOn": "✅ The voice channel <#{{mintcounter}}> has been turned into an mint counter. Watch your project grow.",
+				"mintcounterOff": "❌ The mint counter has been turned off on your server.",
+				"mintCount": "🔢 {{count}} minted",
+				"mintCountWithMax": "🔢 {{count}}/{{maxCount}} minted",
+				"errorWrongChannelType": "⚠ Only guild voice channels can be used for this type of widget.",
+				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name."				
 			}
 		},
 		"social": {

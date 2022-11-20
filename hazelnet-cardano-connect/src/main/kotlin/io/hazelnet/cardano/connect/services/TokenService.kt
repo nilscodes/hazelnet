@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-@CacheConfig(cacheNames = ["tokenmetadata", "besthandleforstake"])
+@CacheConfig(cacheNames = ["tokenmetadata", "besthandleforstake", "policyinfo"])
 class TokenService(
     @Value("\${io.hazelnet.connect.cardano.handlepolicy}")
     private val handlePolicy: String,
@@ -152,6 +152,9 @@ class TokenService(
         return tokenDao.getMultiAssetInfoForAssetFingerprint(AssetFingerprint(assetFingerprint));
     }
 
+    @Cacheable(cacheNames = ["policyinfo"], unless = "#result == null")
+    fun getPolicyInfo(policyId: String) = tokenDao.getPolicyInfo(policyId)
+
     @Scheduled(fixedDelay = 6 * 60 * 60 * 1000)
     @CacheEvict(allEntries = true, cacheNames = ["tokenmetadata"], )
     fun clearMultiAssetInfoCache() {
@@ -162,6 +165,12 @@ class TokenService(
     @CacheEvict(allEntries = true, cacheNames = ["besthandleforstake"], )
     fun clearHandleToStakeAddressCache() {
         // Annotation-based cache clearing of handle info every hour in case handle moves
+    }
+
+    @Scheduled(fixedDelay = 60 * 1000)
+    @CacheEvict(allEntries = true, cacheNames = ["policyinfo"], )
+    fun clearPolicyInfoCache() {
+        // Annotation-based cache clearing of policy info every minute
     }
 
 }

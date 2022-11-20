@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
 import giveawayutil from '../utility/giveaway';
-import HazelnetClient from "src/utility/hazelnetclient";
+import HazelnetClient from "../utility/hazelnetclient";
 import { GuildTextBasedChannel, PermissionsBitField } from 'discord.js';
 const embedBuilder = require('../utility/embedbuilder');
 

@@ -2091,6 +2091,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordWidgetUpdate"
+  /discord/widgets/mintcounter:
+    get:
+      summary: Get all guilds and channels for which to send mint counter updates
+      operationId: listChannelsForMintCountUpdate
+      tags:
+        - discord
+        - widgets
+      responses:
+        "200":
+          description: "List of channels and guilds with policy data to update the mint counters in"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordMintCounterUpdate"
   /oura:
     post:
       summary: Publish an event from Oura to the community service (to react to mint events)
@@ -3387,6 +3403,26 @@ components:
           $ref: "#/components/schemas/DiscordGuild"
         channelId:
           $ref: "#/components/schemas/DiscordChannel"
+    DiscordMintCounterUpdate:
+      type: object
+      required:
+        - guildId
+        - channelId
+        - policyId
+        - tokenCount
+      properties:
+        guildId:
+          $ref: "#/components/schemas/DiscordGuild"
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        policyId:
+          $ref: "#/components/schemas/TokenPolicyId"
+        tokenCount:
+          type: integer
+          format: int64
+        maxCount:
+          type: integer
+          format: int64
     TokenMetadata:
       type: object
       required:

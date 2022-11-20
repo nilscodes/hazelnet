@@ -1,5 +1,5 @@
-import { DiscordEvent } from "src/utility/commandtypes";
-import HazelnetClient from "src/utility/hazelnetclient";
+import { DiscordEvent } from "../utility/commandtypes";
+import HazelnetClient from "../utility/hazelnetclient";
 
 interface ReadyDiscordEvent extends DiscordEvent {
   execute(client: HazelnetClient): void

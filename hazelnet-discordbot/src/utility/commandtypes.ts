@@ -1,7 +1,6 @@
 // To be merged with commandbase.js
-import { AugmentedCommandInteraction, AugmentedButtonInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction, AugmentedGuild } from "src/utility/hazelnetclient";
+import { AugmentedCommandInteraction, AugmentedButtonInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction, AugmentedGuild } from "./hazelnetclient";
 import { ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
-import NodeCache from 'node-cache';
 
 export interface BotCommand {
   getCommandData(locale: string, commandsToEnable?: string[]): SlashCommandBuilder
