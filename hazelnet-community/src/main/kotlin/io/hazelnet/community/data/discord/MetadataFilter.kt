@@ -24,15 +24,25 @@ open class MetadataFilter {
         return false
     }
 
-    private fun findAttribute(
-        metadata: String,
-        attributeName: String,
-    ): Any? {
-        return try {
-            val attributePath = if (attributeName.startsWith("$.")) attributeName.substring(2) else attributeName
-            JsonPath.read<Any>(metadata, "$.${attributePath}")
-        } catch (pnfe: PathNotFoundException) {
-            null
+    companion object {
+        fun findAttribute(
+            metadata: String,
+            attributePath: String,
+        ): Any? {
+            return try {
+                val useAttributePath = fixupAttributePath(attributePath)
+                JsonPath.read<Any>(metadata, "$.${useAttributePath}")
+            } catch (pnfe: PathNotFoundException) {
+                null
+            }
+        }
+
+        private fun fixupAttributePath(attributeName: String): String {
+            val useAttributePath = if (attributeName.startsWith("$.")) attributeName.substring(2) else attributeName
+            if (useAttributePath.matches(Regex("^[ A-Za-z0-9]+$")) && useAttributePath.contains(" ")) {
+                return "[\"${useAttributePath}\"]"
+            }
+            return useAttributePath
         }
     }
 }

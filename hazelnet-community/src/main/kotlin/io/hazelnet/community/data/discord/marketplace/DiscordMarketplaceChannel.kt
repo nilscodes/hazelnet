@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
+import io.hazelnet.community.data.discord.MetadataFilter
 import io.hazelnet.community.data.discord.TokenOwnershipAggregationType
 import io.hazelnet.marketplace.data.Marketplace
 import org.springframework.lang.NonNull
@@ -94,21 +95,8 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
 
     fun extractHighlightAttribute(metadata: String): String? {
         return if (highlightAttributeName != null) {
-            return findAttribute(metadata, highlightAttributeName!!)?.toString() ?: null
+            return MetadataFilter.findAttribute(metadata, highlightAttributeName!!)?.toString()
         } else {
-            null
-        }
-    }
-
-    // TODO same method as in MetadataFilter.kt
-    private fun findAttribute(
-        metadata: String,
-        attributeName: String,
-    ): Any? {
-        return try {
-            val attributePath = if (attributeName.startsWith("$.")) attributeName.substring(2) else attributeName
-            JsonPath.read<Any>(metadata, "$.${attributePath}")
-        } catch (pnfe: PathNotFoundException) {
             null
         }
     }
