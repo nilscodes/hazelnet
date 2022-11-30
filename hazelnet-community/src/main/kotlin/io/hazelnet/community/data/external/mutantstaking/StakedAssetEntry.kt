@@ -15,9 +15,6 @@ data class StakedAssetEntry @JsonCreator constructor(
     @JsonProperty("policyId")
     val policyId: String?,
 
-    @JsonProperty("asset")
-    val policyIdWithAssetNameHex: String,
-
     @JsonProperty("name")
     val assetName: String,
 )

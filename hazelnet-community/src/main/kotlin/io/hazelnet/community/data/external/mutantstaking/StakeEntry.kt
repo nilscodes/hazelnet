@@ -15,9 +15,6 @@ data class StakeEntry @JsonCreator constructor(
     @JsonProperty("stakerStakeAddress")
     val stakerStakeAddress: String,
 
-    @JsonProperty("txHash")
-    val transactionHash: String,
-
     @JsonProperty("assets")
     val assets: List<StakedAssetEntry>,
 )
