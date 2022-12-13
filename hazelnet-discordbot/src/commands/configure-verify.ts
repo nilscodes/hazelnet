@@ -1,8 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { BotCommand } from "../utility/commandtypes";
+import { SlashCommandBuilder } from 'discord.js';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('configure-verify', locale);
     return new SlashCommandBuilder()
@@ -15,7 +16,8 @@ module.exports = {
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))
         .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
-        .addStringOption((option) => option.setName('welcome-text').setDescription(ci18n.option('welcome-text')).setRequired(true)));
+        .addStringOption((option) => option.setName('welcome-text').setDescription(ci18n.option('welcome-text')).setRequired(true))
+        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)));
   },
   commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

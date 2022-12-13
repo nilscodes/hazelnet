@@ -148,7 +148,8 @@
 			},
 			"configure-verify": {
 				"channel": "Channel to post the verification widget to.",
-				"welcome-text": "A text included in your verification widget to welcome the community."
+				"welcome-text": "A text included in your verification widget to welcome the community.",
+				"logo-url": "A URL to a logo to be included in your verification widget."
 			},
 			"configure-info": {
 				"channel": "The channel you want to update with the respective info.",
