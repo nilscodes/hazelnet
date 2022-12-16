@@ -21,10 +21,18 @@ class AggregationService(
 ) {
 
     private val lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val jpgStoreSalesRequestCounter = Counter
+        .builder("jpgstore_requestcount_sales")
+        .description("Count of requests for aggregating sales from jpg.store")
+        .register(meterRegistry)
     private val jpgStoreSalesStatusCounter: Counter.Builder = Counter
         .builder("jpgstore_statuscodes_sales")
         .description("HTTP status codes for encountered errors when aggregating sales from jpg.store")
     private val lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val jpgStoreListingsRequestCounter = Counter
+        .builder("jpgstore_requestcount_sales")
+        .description("Count of requests for aggregating sales from jpg.store")
+        .register(meterRegistry)
     private val jpgStoreListingsStatusCounter: Counter.Builder = Counter
         .builder("jpgstore_statuscodes_listings")
         .description("HTTP status codes for encountered errors when aggregating listings from jpg.store")
@@ -33,6 +41,7 @@ class AggregationService(
     fun processSalesForPolicies(policyId: String) {
         val lastSyncTimeBeforeCall = lastSalesSyncTimeForPolicy[policyId] ?: Date()
         lastSalesSyncTimeForPolicy[policyId] = Date()
+        jpgStoreSalesRequestCounter.increment()
         jpgStoreService.getSales(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
                 logger.info(e) { "Failed getting jpg.store sales for policy $policyId" }
@@ -62,6 +71,7 @@ class AggregationService(
     fun processListingsForPolicies(policyId: String) {
         val lastSyncTimeBeforeCall = lastListingsSyncTimeForPolicy[policyId] ?: Date()
         lastListingsSyncTimeForPolicy[policyId] = Date()
+        jpgStoreListingsRequestCounter.increment()
         jpgStoreService.getListings(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
                 logger.info(e) { "Failed getting jpg.store listings for policy $policyId" }
