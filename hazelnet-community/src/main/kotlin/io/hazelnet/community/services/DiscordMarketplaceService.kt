@@ -68,19 +68,23 @@ class DiscordMarketplaceService(
         throw NoSuchElementException("No marketplace channel with ID $marketplaceChannelId found on Discord server with guild ID ${discordServer.guildId}")
     }
 
-    @Scheduled(fixedDelay = 180000)
+    @Scheduled(fixedDelay = 60000)
     fun publishPoliciesForSalesAggregation() {
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 3
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
+            .filter { it.channelId % shard == 0L }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
     }
 
-    @Scheduled(fixedDelay = 180000)
+    @Scheduled(fixedDelay = 60000)
     fun publishPoliciesForListingsAggregation() {
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 3
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
+            .filter { it.channelId % shard == 0L }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }
