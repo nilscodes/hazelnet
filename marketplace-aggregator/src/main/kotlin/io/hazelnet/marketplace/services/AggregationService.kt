@@ -30,8 +30,8 @@ class AggregationService(
         .description("HTTP status codes for encountered errors when aggregating sales from jpg.store")
     private val lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
     private val jpgStoreListingsRequestCounter = Counter
-        .builder("jpgstore_requestcount_sales")
-        .description("Count of requests for aggregating sales from jpg.store")
+        .builder("jpgstore_requestcount_listings")
+        .description("Count of requests for aggregating listings from jpg.store")
         .register(meterRegistry)
     private val jpgStoreListingsStatusCounter: Counter.Builder = Counter
         .builder("jpgstore_statuscodes_listings")

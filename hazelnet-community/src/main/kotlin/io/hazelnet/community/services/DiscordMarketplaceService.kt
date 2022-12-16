@@ -70,10 +70,10 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedDelay = 60000)
     fun publishPoliciesForSalesAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 3L
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 4L
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { it.channelId % 3 == shard }
+            .filter { it.policyId.hashCode() % 4L == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
@@ -81,10 +81,10 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedDelay = 60000)
     fun publishPoliciesForListingsAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 3L
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 4L
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { it.channelId % 3 == shard }
+            .filter { it.policyId.hashCode() % 4L == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }
