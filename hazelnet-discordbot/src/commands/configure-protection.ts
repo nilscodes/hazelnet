@@ -1,8 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { BotCommand } from "../utility/commandtypes";
+import { SlashCommandBuilder } from 'discord.js';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('configure-protection', locale);
     return new SlashCommandBuilder()

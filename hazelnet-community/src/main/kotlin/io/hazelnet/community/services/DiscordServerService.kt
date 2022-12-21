@@ -11,11 +11,11 @@ import io.hazelnet.community.data.claim.PhysicalProduct
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.*
 import io.hazelnet.community.persistence.data.TokenOwnershipRoleRepository
-import io.hazelnet.community.services.external.CardanoTokenRegistryService
-import io.hazelnet.community.services.external.MutantStakingService
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization
@@ -27,7 +27,6 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
-import kotlin.NoSuchElementException
 
 const val LOOKUP_NAME_ALL_POOLS = "all"
 const val MIN_PAUSE_BETWEEN_MANUAL_LINKING = 24 * 60 * 60 * 1000L
@@ -47,7 +46,9 @@ class DiscordServerService(
     private val claimListService: ClaimListService,
     private val globalCommunityService: GlobalCommunityService,
     private val roleAssignmentService: RoleAssignmentService,
-    private val tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
+    private val discordMemberActivityRepository: DiscordMemberActivityRepository,
+    private val rabbitTemplate: RabbitTemplate,
+    val tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
     meterRegistry: MeterRegistry,
 ) {
     private val lastManualUserLinking: MutableMap<Long, Date> = mutableMapOf()
@@ -477,5 +478,45 @@ class DiscordServerService(
             0
         }
     }
+
+    fun updateMemberActivity(activityMap: Map<String, Long>) {
+        val guildIdToServerIdMap = mutableMapOf<Long, Int>()
+        activityMap.forEach { activityEntry ->
+            val (guildId, userId) = activityEntry.key.split("-")
+            val serverId = guildIdToServerIdMap.computeIfAbsent(guildId.toLong()) {
+                getDiscordServer(it).id!!
+            }
+            val activity = DiscordMemberActivity(serverId, userId.toLong(), Date(activityEntry.value), null)
+            discordMemberActivityRepository.save(activity)
+        }
+    }
+
+    @Scheduled(fixedDelay = 3600000, initialDelay = 5000)
+    fun sendRemindersForInactiveUsers() {
+        val discordsWithReminderFeature = discordServerRepository.findDiscordServersForActivityReminders()
+        discordsWithReminderFeature.forEach { discordServer ->
+            if (discordServer.getPremium()
+                || (discordServer.settings.find { it.name == "FREE_FEATURES" }?.value?.contains("configure-engagement-activityreminder", ignoreCase = true) == true)) {
+                val (channelIdString, activityThresholdString) = discordServer.settings.find { it.name == "ACTIVITY_REMINDER" }?.value?.split(",") ?: listOf("", "")
+                if (activityThresholdString.isNotBlank()) {
+                    val activityThreshold = Date(System.currentTimeMillis() - activityThresholdString.toLong() * 1000)
+                    val channelId = channelIdString.toLong()
+                    val userIdsOfInactiveUsers = discordMemberActivityRepository.findUsersThatNeedActivityReminder(activityThreshold)
+                    userIdsOfInactiveUsers.forEach {
+                        rabbitTemplate.convertAndSend(
+                            "activityreminders", DiscordActivityReminder(
+                                guildId = discordServer.guildId,
+                                userId = it.discordUserId!!,
+                                channelId = channelId,
+                            )
+                        )
+                        discordMemberActivityRepository.updateLastReminderTime(it.discordServerId!!, it.discordUserId!!, Date())
+                    }
+                }
+            }
+
+        }
+    }
+
 
 }

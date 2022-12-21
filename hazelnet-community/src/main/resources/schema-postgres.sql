@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS "discord_activity";
+DROP TABLE IF EXISTS "discord_marketplace_markets";
+DROP TABLE IF EXISTS "discord_marketplace_filters";
 DROP TABLE IF EXISTS "discord_marketplace_channels";
 DROP TABLE IF EXISTS "physical_orders_items";
 DROP TABLE IF EXISTS "physical_orders";
@@ -25,6 +28,7 @@ DROP TABLE IF EXISTS "discord_token_role_filters";
 DROP TABLE IF EXISTS "discord_token_roles";
 DROP TABLE IF EXISTS "discord_spo_roles";
 DROP TABLE IF EXISTS "discord_spo";
+DROP TABLE IF EXISTS "discord_incoming_payments";
 DROP TABLE IF EXISTS "discord_payments";
 DROP TABLE IF EXISTS "discord_billing";
 DROP TABLE IF EXISTS "external_account_pings";
@@ -181,6 +185,14 @@ CREATE TABLE "discord_server_members"
     "external_account_id"     bigint,
     "join_time"               timestamp,
     "premium_support"         boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE "discord_activity"
+(
+    "discord_server_id"  int,
+    "discord_user_id"    bigint    NOT NULL,
+    "last_activity_time" timestamp NOT NULL,
+    "last_reminder_time" timestamp NULL
 );
 
 CREATE TABLE "discord_spo"
@@ -541,6 +553,12 @@ ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("discord_server_id") REFER
 ALTER TABLE "discord_server_members" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
 CREATE INDEX "discord_server_members_external_account" ON "discord_server_members" ("external_account_id");
+
+ALTER TABLE "discord_activity" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+CREATE UNIQUE INDEX ON "discord_activity" ("discord_server_id", "discord_user_id");
+
+CREATE INDEX ON "discord_activity" ("discord_server_id", "last_activity_time");
 
 ALTER TABLE "discord_whitelists" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

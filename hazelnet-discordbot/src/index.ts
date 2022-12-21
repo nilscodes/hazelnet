@@ -83,7 +83,7 @@ eventFiles.forEach((event: DiscordEvent) => {
 });
 
 const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates', 'mintcountupdates'];
+const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates', 'mintcountupdates', 'activityupdater'];
 
 scheduleFiles.forEach(async (file) => {
   let schedule: any;
@@ -102,7 +102,8 @@ scheduleFiles.forEach(async (file) => {
 client.login(process.env.TOKEN);
 
 // Connect to AMQP queues
-const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.endsWith('.js'));
+const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
+const typescriptQueues = ['activityreminders'];
 
 if (queueFiles.length) {
   const connectToAmqp = async () => {
@@ -110,7 +111,13 @@ if (queueFiles.length) {
     try {
       const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}`);
       queueFiles.forEach(async (file) => {
-        const queue = require(`./queues/${file}`);
+        let queue: any;
+        const importName = file.substring(0, file.lastIndexOf('.'));
+        if (typescriptQueues.includes(importName)) {
+          queue = (await import(`./queues/${importName}`)).default;
+        } else {
+          queue = require(`./queues/${file}`)
+        }
         if (queue.name && queue.consume) {
           const queueChannel = await conn.createChannel();
           await queueChannel.assertQueue(queue.name);

@@ -83,6 +83,9 @@ class ConnectivityConfiguration {
     fun adminAnnouncementsQueue() = Queue("adminannouncements")
 
     @Bean
+    fun activityRemindersQueue() = Queue("activityreminders")
+
+    @Bean
     fun exchange() = DirectExchange("hazelnet")
 
     @Bean
@@ -124,6 +127,10 @@ class ConnectivityConfiguration {
     @Bean
     fun announcementsBinding(@Qualifier("adminAnnouncementsQueue") adminAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(adminAnnouncementsQueue).to(exchange)
+
+    @Bean
+    fun activityRemindersQueueBinding(@Qualifier("activityRemindersQueue") activityRemindersQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(activityRemindersQueue).to(exchange)
 
     @Bean
     fun messageConverter() = Jackson2JsonMessageConverter()
