@@ -123,7 +123,9 @@
 			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
 			"configure-social": "Commands to manage various Discord and social media features and integrations.",
 			"configure-social-announce": "Create custom branded announcements.",
-			"join": "Join an existing giveaway or raffle."
+			"join": "Join an existing giveaway or raffle.",
+			"configure-engagement": "Features to track and increase community engagement",
+			"configure-engagement-activityreminder": "Set up a channel for activity reminders"
 		},
 		"options": {
 			"verify": {
@@ -250,6 +252,11 @@
 			"configure-social": {
 				"channel": "Channel to post the announcement to.",
 				"title": "The title/headline of your announcement."
+			},
+			"configure-engagement": {
+				"status": "Set to False to turn this feature off.",
+				"reminderchannel": "The channel to send public activity reminder messages to.",
+				"inactivity-days": "The number of days after which to send an activity reminder."
 			}
 		},
 		"choices": {
@@ -788,6 +795,15 @@
 				"auditChannelOff": "⚠ No audit channel has been configured. No potential scam-messages or events will be logged.",
 				"auditEventTitle": "⚠ Potential Scam Attempt",
 				"auditEventDetail": "User <@{{author}}> sent a suspicious message to channel <#{{{channel}}}> with content \"{{message}}\""
+			}
+		},
+		"engagement": {
+			"activityreminder": {
+				"activityreminderOn": "✅ Activity reminder messages will be sent to the channel <#{{reminderChannel}}> after users are inactive for {{inactivityDays}} days, if the bot has permissions to send messages to this channel.",
+				"activityreminderOff": "⚠ No activity reminder channel has been configured. No reminders will be sent when users are inactive.",
+				"noPremium": "🙀 You currently can not configure engagement features as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"announceTitle": "Hey sucker!",
+				"announceText": "Yeah you <@{{userId}}>!"
 			}
 		},
 		"tokenroles": {
@@ -1569,6 +1585,8 @@
 		"claimphysical": "Claiming physical items via verified lists",
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
+		"engagementTitle": "Engagement Tools (Black Edition only)",
+		"engagement": "Various tools to track and improve community engagement",
 		"cardolphins": "Cardolphins Special",
 		"handle": "ADA Handle Integration"
 	},

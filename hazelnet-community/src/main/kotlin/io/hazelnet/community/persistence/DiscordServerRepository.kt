@@ -2,7 +2,6 @@ package io.hazelnet.community.persistence
 
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.DiscordServerMemberStake
-import io.hazelnet.community.data.discord.polls.DiscordPollUpdateProjection
 import io.hazelnet.community.data.discord.widgets.DiscordMintCounterUpdateProjection
 import io.hazelnet.community.data.discord.widgets.DiscordWidgetUpdateProjection
 import org.springframework.data.jpa.repository.Query
@@ -31,7 +30,10 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
     fun getDiscordServersForMember(@Param("externalAccountId") externalAccountId: Long): List<DiscordServer>
 
     @Query(value = "SELECT ds FROM DiscordServer ds WHERE ds.active=true AND ds.premiumUntil>:now AND (ds.premiumReminder<:now OR ds.premiumReminder IS NULL)")
-    fun getDiscordServersThatNeedReminder(@Param("now") now: Date): List<DiscordServer>
+    fun getDiscordServersThatNeedPremiumReminder(@Param("now") now: Date): List<DiscordServer>
+
+    @Query(value = "SELECT ds.* FROM discord_servers ds JOIN discord_settings dss on ds.discord_server_id = dss.discord_server_id WHERE dss.setting_name='ACTIVITY_REMINDER' AND dss.setting_value<>''", nativeQuery = true)
+    fun findDiscordServersForActivityReminders(): List<DiscordServer>
 
     @Query(value = "SELECT ds.guild_id AS guildId, dss.setting_value as channelId FROM discord_servers ds JOIN discord_settings dss on ds.discord_server_id = dss.discord_server_id WHERE dss.setting_name='WIDGET_EPOCHCLOCK' AND dss.setting_value<>''", nativeQuery = true)
     fun findChannelsForEpochClockUpdate(): List<DiscordWidgetUpdateProjection>

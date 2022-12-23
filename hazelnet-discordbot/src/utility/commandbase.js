@@ -4,7 +4,7 @@ const commandPermissions = require('./commandpermissions');
 const embedBuilder = require('./embedbuilder');
 
 module.exports = {
-  typescriptCommands: ['whois', 'profile', 'premium', 'somersault', 'configure-api', 'configure-info', 'configure-social', 'configure-policy', 'configure-giveaway', 'configure-poll', 'join', 'configure-verify'],
+  typescriptCommands: ['whois', 'profile', 'premium', 'somersault', 'configure-api', 'configure-info', 'configure-social', 'configure-policy', 'configure-giveaway', 'configure-poll', 'join', 'configure-verify', 'configure-protection', 'configure-engagement'],
   async executeSubcommandIfAdmin(interaction) {
     const subcommandGroup = interaction.options.getSubcommandGroup(false);
     const subcommand = interaction.options.getSubcommand(true);

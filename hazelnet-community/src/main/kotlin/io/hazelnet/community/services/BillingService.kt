@@ -172,7 +172,7 @@ class BillingService(
             .with(TemporalAdjusters.lastDayOfMonth())
             .withHour(23).withMinute(59).withSecond(59)
         if (ChronoUnit.DAYS.between(currentTime, endOfMonth) <= 3) {
-            discordServerRepository.getDiscordServersThatNeedReminder(Date())
+            discordServerRepository.getDiscordServersThatNeedPremiumReminder(Date())
                 .forEach { discordServer ->
                     val premiumInfo = getPremiumInfoForServer(discordServer, false)
                     val serverIsSponsored = discordServer.settings.any { it.name == "SPONSORED_BY" }

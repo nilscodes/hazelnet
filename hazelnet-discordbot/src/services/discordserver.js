@@ -374,6 +374,9 @@ module.exports = {
     this.cache.set('allservers', discordServer.data);
     return discordServer.data;
   },
+  async updateMemberActivity(activity) {
+    await axios.post(`${hazelCommunityUrl}/discord/activity`, activity);
+  },
   async listPollsToBeAnnounced() {
     const pollsToBeAnnouncedPromise = await axios.get(`${hazelCommunityUrl}/discord/polls/announcements`);
     return pollsToBeAnnouncedPromise.data;
