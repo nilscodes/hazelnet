@@ -30,8 +30,9 @@ module.exports = {
             if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
               const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
               if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+                const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
                 if (policyIdToTrack) {
-                  const officialProjectForPolicy = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
+                  const officialProjectForPolicy = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
                   if (officialProjectForPolicy) {
                     const content = await this.createMarketplaceListingsChannel(interaction, {
                       channelId: announceChannel.id,
@@ -48,7 +49,7 @@ module.exports = {
                     await interaction.editReply({ embeds: [embed], ephemeral: true });
                   }
                 } else {
-                  const officialProjects = discordServer.tokenPolicies
+                  const officialProjects = tokenPolicies
                     .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
                     .map((tokenPolicy) => ({
                       label: tokenPolicy.projectName,
@@ -142,7 +143,9 @@ module.exports = {
       marketplaceChannelData.highlightAttributeDisplayName,
     );
 
-    return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, {
+    const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
+
+    return marketplaceUtil.getMarketplaceChannelDetailsField(discordServer, tokenPolicies, {
       channelId: marketplaceChannelData.channelId,
       marketplaces: [marketplaceChannelData.marketplace],
       minimumValue,

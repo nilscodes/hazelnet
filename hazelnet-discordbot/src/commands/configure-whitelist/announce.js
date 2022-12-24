@@ -14,11 +14,12 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application.id);
         if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
-          const whitelistOptions = discordServer.whitelists
+          const whitelistOptions = whitelists
             .filter((whitelist) => !whitelist.closed)
             .map((whitelist) => ({ label: whitelist.displayName, value: `${announceChannel.id}-${whitelist.id}` }));
           if (whitelistOptions.length) {
@@ -53,9 +54,10 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/announce/publish') {
       await interaction.deferUpdate({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const [announceChannelId, whitelistId] = interaction.values[0].split('-');
-      const whitelistToAnnounce = discordServer.whitelists.find((whitelist) => whitelist.id === +whitelistId);
+      const whitelistToAnnounce = whitelists.find((whitelist) => whitelist.id === +whitelistId);
       if (whitelistToAnnounce) {
         const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelistToAnnounce, true);
         const detailFields = [

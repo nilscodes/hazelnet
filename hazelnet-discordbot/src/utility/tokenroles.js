@@ -3,7 +3,7 @@ const cardanotoken = require('./cardanotoken');
 const discordstring = require('./discordstring');
 
 module.exports = {
-  getTokenRoleDetailsFields(tokenRole, discordServer, locale, includeAllDetails, customTokenRoleMessage) {
+  getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, includeAllDetails, customTokenRoleMessage) {
     let useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetails';
     if (tokenRole.filters?.length) {
       if (tokenRole.aggregationType === 'ANY_POLICY_FILTERED_ONE_EACH') {
@@ -31,7 +31,7 @@ module.exports = {
     const policyIdCount = [...new Set(tokenRole.acceptedAssets.map((acceptedAsset) => acceptedAsset.policyId))].length;
     if (policyIdCount === 1) {
       const policyIdOfFirstAsset = tokenRole.acceptedAssets[0].policyId;
-      const officialProject = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
+      const officialProject = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
       const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
       const titlePhrase = (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial');
       title = i18n.__({ phrase: titlePhrase, locale }, { tokenRole, officialProject, policyIdShort });
@@ -48,7 +48,7 @@ module.exports = {
     if (includeAllDetails) {
       const policyInfo = tokenRole.acceptedAssets.map((acceptedAsset) => {
         const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfo', locale }, acceptedAsset) : '';
-        const policyId = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || discordstring.ensureLength(acceptedAsset.policyId, 10);
+        const policyId = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || discordstring.ensureLength(acceptedAsset.policyId, 10);
         return i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContentEntry', locale }, { policyId, fingerprintInfo });
       });
       if (policyInfo.length > 5) {

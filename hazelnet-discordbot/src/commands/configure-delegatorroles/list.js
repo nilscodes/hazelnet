@@ -6,11 +6,13 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild.id);
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const delegatorRoleFields = discordServer.delegatorRoles.map((delegatorRole) => {
+      const delegatorRoleFields = delegatorRoles.map((delegatorRole) => {
         // TODO: Share Code across delegator role modules
         let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
-        const officialStakepool = discordServer.stakepools.find((stakepool) => stakepool.poolHash === delegatorRole.poolHash);
+        const officialStakepool = stakepools.find((stakepool) => stakepool.poolHash === delegatorRole.poolHash);
         if (!delegatorRole.poolHash) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameAny';
         } else if (officialStakepool) {
@@ -24,9 +26,9 @@ module.exports = {
       if (!delegatorRoleFields.length) {
         delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale: useLocale }) });
       }
-      if (!discordServer.premium && discordServer.delegatorRoles.length > 1) {
-        const lowestDelegatorRoleId = Math.min(...discordServer.delegatorRoles.map((delegatorRole) => +delegatorRole.id));
-        const lowestIdDelegatorRole = discordServer.delegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
+      if (!discordServer.premium && delegatorRoles.length > 1) {
+        const lowestDelegatorRoleId = Math.min(...delegatorRoles.map((delegatorRole) => +delegatorRole.id));
+        const lowestIdDelegatorRole = delegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
         delegatorRoleFields.unshift({
           name: i18n.__({ phrase: 'generic.blackEditionWarning', locale: useLocale }),
           value: i18n.__({ phrase: 'configure.delegatorroles.list.noPremium', locale: useLocale }, { delegatorRole: lowestIdDelegatorRole }),

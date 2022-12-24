@@ -6,16 +6,17 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const useLocale = discordServer.getBotLanguage();
-      const infoMessageType = discordServer.stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
-      const stakepoolFields = discordServer.stakepools.map((stakepool) => ({
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
+      const locale = discordServer.getBotLanguage();
+      const infoMessageType = stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
+      const stakepoolFields = stakepools.map((stakepool) => ({
         name: `${stakepool.info?.name} (${stakepool.info?.ticker})`,
-        value: i18n.__({ phrase: infoMessageType, locale: useLocale }, stakepool.info),
+        value: i18n.__({ phrase: infoMessageType, locale }, stakepool.info),
       }));
       if (!stakepoolFields.length) {
-        stakepoolFields.push({ name: i18n.__({ phrase: 'configure.stakepool.list.noPoolName', locale: useLocale }), value: i18n.__({ phrase: 'configure.stakepool.list.noPools', locale: useLocale }) });
+        stakepoolFields.push({ name: i18n.__({ phrase: 'configure.stakepool.list.noPoolName', locale }), value: i18n.__({ phrase: 'configure.stakepool.list.noPools', locale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool list', i18n.__({ phrase: 'configure.stakepool.list.purpose', locale: useLocale }), 'configure-stakepool-list', stakepoolFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool list', i18n.__({ phrase: 'configure.stakepool.list.purpose', locale }), 'configure-stakepool-list', stakepoolFields);
       await interaction.editReply({ embeds: [embed], ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);

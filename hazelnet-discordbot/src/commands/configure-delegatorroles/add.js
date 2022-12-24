@@ -14,8 +14,9 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      if (discordServer.premium || !discordServer.delegatorRoles || discordServer.delegatorRoles.length === 0) {
+      if (discordServer.premium || delegatorRoles.length === 0) {
         if (minimumStakeAda > 0) {
           const guild = await interaction.client.guilds.fetch(interaction.guild.id);
           const allUsers = await guild.members.fetch();
@@ -62,10 +63,11 @@ module.exports = {
   async createDelegatorRole(interaction, discordServer, poolHash, minimumStakeAda, roleId) {
     const locale = discordServer.getBotLanguage();
     const newDelegatorRolePromise = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild.id, poolHash, minimumStakeAda, roleId);
+    const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
     const newDelegatorRole = newDelegatorRolePromise.data;
 
     let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
-    const officialStakepool = discordServer.stakepools.find((stakepool) => stakepool.poolHash === newDelegatorRole.poolHash);
+    const officialStakepool = stakepools.find((stakepool) => stakepool.poolHash === newDelegatorRole.poolHash);
     if (!newDelegatorRole.poolHash) {
       fieldHeader = 'configure.delegatorroles.list.stakepoolNameAny';
     } else if (officialStakepool) {

@@ -11,8 +11,10 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const tokenRoleToAddFilterTo = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoleToAddFilterTo = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToAddFilterTo) {
         const maxFiltersPerTokenRole = discordServer.settings?.MAX_FILTERS_PER_TOKEN_ROLE ?? 3;
         if (!tokenRoleToAddFilterTo.filters || tokenRoleToAddFilterTo.filters.length < maxFiltersPerTokenRole) {
@@ -26,7 +28,7 @@ module.exports = {
                 '/configure-tokenroles metadatafilter add',
                 i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
                 'configure-tokenroles-metadatafilter-add',
-                tokenroles.getTokenRoleDetailsFields(tokenRoleToAddFilterTo, discordServer, locale, true),
+                tokenroles.getTokenRoleDetailsFields(tokenRoleToAddFilterTo, tokenPolicies, locale, true),
               );
               await interaction.editReply({ embeds: [embed], ephemeral: true });
             } else {

@@ -8,9 +8,10 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const guildNameMap = await whitelistUtil.getGuildNames(discordServer, interaction);
-      const whitelistOptions = discordServer.whitelists
+      const whitelistOptions = whitelists
         .filter((whitelist) => whitelist.sharedWithServer > 0)
         .map((whitelist) => {
           const guildName = guildNameMap[whitelist.sharedWithServer];
@@ -43,10 +44,11 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/unshare/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistNameToUnshare = interaction.values[0];
-        const whitelistToUnshare = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToUnshare);
+        const whitelistToUnshare = whitelists.find((whitelist) => whitelist.name === whitelistNameToUnshare);
         if (whitelistToUnshare) {
           const discordServerToUnshareWith = await interaction.client.services.discordserver.getDiscordServerByInternalId(whitelistToUnshare.sharedWithServer);
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild.id, whitelistToUnshare.id, { sharedWithServer: 0 });

@@ -8,11 +8,13 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const tokenRoleToRemove = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleIdToRemove);
+      const tokenRoleToRemove = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleIdToRemove);
       if (tokenRoleToRemove) {
         await interaction.client.services.discordserver.deleteTokenRole(interaction.guild.id, tokenRoleToRemove.id);
-        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemove, discordServer, locale, true);
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemove, tokenPolicies, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles remove', i18n.__({ phrase: 'configure.tokenroles.remove.success', locale }), 'configure-tokenroles-remove', tokenRoleFields);
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {

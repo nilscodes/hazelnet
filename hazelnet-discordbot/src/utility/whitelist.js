@@ -120,9 +120,9 @@ module.exports = {
     }
     return `\n${i18n.__({ phrase: 'whitelist.list.youDontQualify', locale: discordServer.getBotLanguage() })}`;
   },
-  async getExistingSignups(externalAccount, discordServer, interaction) {
+  async getExistingSignups(externalAccount, whitelists, interaction) {
     if (externalAccount) {
-      const signupsPromise = discordServer.whitelists.map((whitelist) => interaction.client.services.discordserver.getWhitelistSignupsForExternalAccount(interaction.guild.id, whitelist.id, externalAccount.id));
+      const signupsPromise = whitelists.map((whitelist) => interaction.client.services.discordserver.getWhitelistSignupsForExternalAccount(interaction.guild.id, whitelist.id, externalAccount.id));
       return Promise.all(signupsPromise.map((p) => p.catch(() => undefined)));
     }
     return [];

@@ -9,17 +9,18 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const useLocale = discordServer.getBotLanguage();
-      const existingTokenPolicy = discordServer.tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyId);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
+      const locale = discordServer.getBotLanguage();
+      const existingTokenPolicy = tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyId);
       if (!existingTokenPolicy) {
         const newPolicyPromise = await interaction.client.services.discordserver.addTokenPolicy(interaction.guild!.id, policyId, projectName);
         const newPolicyData = newPolicyPromise.data;
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.success', locale: useLocale }), 'configure-policy-add', [
-          { name: newPolicyData.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale: useLocale }, { policyId: newPolicyData.policyId }) },
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.success', locale }), 'configure-policy-add', [
+          { name: newPolicyData.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: newPolicyData.policyId }) },
         ]);
         await interaction.editReply({ embeds: [embed] });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.errorAlreadyUsed', locale: useLocale }, existingTokenPolicy), 'configure-policy-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy add', i18n.__({ phrase: 'configure.policy.add.errorAlreadyUsed', locale }, existingTokenPolicy), 'configure-policy-add');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {

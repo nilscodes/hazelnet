@@ -73,7 +73,8 @@ module.exports = {
   async updateTokenRole(interaction, discordServer, tokenRoleId, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType, stakingType) {
     const locale = discordServer.getBotLanguage();
     const tokenRole = await interaction.client.services.discordserver.updateTokenRole(interaction.guild.id, tokenRoleId, null, minimumTokenQuantity, maximumTokenQuantity, roleId, aggregationType, stakingType);
-    const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale);
+    const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
+    const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale);
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles update', i18n.__({ phrase: 'configure.tokenroles.update.success', locale }), 'configure-tokenroles-update', tokenRoleFields);
     return embed;
   },

@@ -11,8 +11,10 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const tokenRoleToAddPolicyTo = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoleToAddPolicyTo = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToAddPolicyTo) {
         const maxPoliciesPerTokenRole = discordServer.settings?.MAX_POLICIES_PER_TOKEN_ROLE ?? 50;
         if (!tokenRoleToAddPolicyTo.acceptedAssets || tokenRoleToAddPolicyTo.acceptedAssets.length < maxPoliciesPerTokenRole) {
@@ -30,7 +32,7 @@ module.exports = {
                   '/configure-tokenroles policies add',
                   i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
                   'configure-tokenroles-policies-add',
-                  tokenroles.getTokenRoleDetailsFields(tokenRoleToAddPolicyTo, discordServer, locale, true),
+                  tokenroles.getTokenRoleDetailsFields(tokenRoleToAddPolicyTo, tokenPolicies, locale, true),
                 );
                 await interaction.editReply({ embeds: [embed], ephemeral: true });
               } else {

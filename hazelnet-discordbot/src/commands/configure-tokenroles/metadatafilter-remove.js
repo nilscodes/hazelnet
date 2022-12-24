@@ -11,10 +11,12 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const tokenRoleToRemoveFilterFrom = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoleToRemoveFilterFrom = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToRemoveFilterFrom) {
-        const tokenRoleInfo = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, discordServer, locale, true);
+        const tokenRoleInfo = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, tokenPolicies, locale, true);
         const components = this.createRemoveDropdown(discordServer, tokenRoleToRemoveFilterFrom);
         if (!components.length) {
           tokenRoleInfo.push({
@@ -58,15 +60,17 @@ module.exports = {
     try {
       await interaction.deferUpdate({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const ids = interaction.values[0].replace('metadata-filter-id-', '').split('-');
       const tokenRoleId = +ids[0];
-      const tokenRoleToRemoveFilterFrom = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoleToRemoveFilterFrom = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToRemoveFilterFrom) {
         const filterId = +ids[1];
         await interaction.client.services.discordserver.deleteTokenRoleMetadataFilter(interaction.guild.id, tokenRoleToRemoveFilterFrom.id, filterId);
         tokenRoleToRemoveFilterFrom.filters = tokenRoleToRemoveFilterFrom.filters.filter((metadataFilter) => metadataFilter.id !== filterId);
-        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, discordServer, locale, true);
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToRemoveFilterFrom, tokenPolicies, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles metadatafilter remove', i18n.__({ phrase: 'configure.tokenroles.metadatafilter.remove.success', locale }), 'configure-tokenroles-metadatafilter-remove', tokenRoleFields);
         interaction.editReply({ components: [], ephemeral: true });
         await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });

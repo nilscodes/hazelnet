@@ -9,14 +9,16 @@ module.exports = {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
+      const tokenRoleToShow = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
         const embed = embedBuilder.buildForAdmin(
           discordServer,
           '/configure-tokenroles details',
           i18n.__({ phrase: 'configure.tokenroles.details.purpose', locale }),
           'configure-tokenroles-details',
-          tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, discordServer, locale, true),
+          tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, tokenPolicies, locale, true),
         );
         await interaction.editReply({ embeds: [embed], ephemeral: true });
       } else {

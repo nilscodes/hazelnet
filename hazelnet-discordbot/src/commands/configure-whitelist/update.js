@@ -15,9 +15,10 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
-        const whitelistToClose = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToUpdate);
+        const whitelistToClose = whitelists.find((whitelist) => whitelist.name === whitelistNameToUpdate);
         if (whitelistToClose) {
           const errorEmbed = whitelistUtil.getWhitelistErrorEmbed(discordServer, '/configure-whitelist update', 'configure-whitelist-update', signupAfter, signupUntil, launchDate, logoUrl);
           if (errorEmbed) {

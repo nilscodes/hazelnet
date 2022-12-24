@@ -8,8 +8,9 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const whitelistOptions = discordServer.whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
+      const whitelistOptions = whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
       if (whitelistOptions.length) {
         const components = [new ActionRowBuilder()
           .addComponents(
@@ -34,10 +35,11 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/remove/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistNameToRemove = interaction.values[0];
-        const whitelistToRemove = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToRemove);
+        const whitelistToRemove = whitelists.find((whitelist) => whitelist.name === whitelistNameToRemove);
         if (whitelistToRemove) {
           await interaction.client.services.discordserver.deleteWhitelist(interaction.guild.id, whitelistToRemove.id);
 

@@ -7,12 +7,14 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild.id);
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const delegatorRoleToRemove = discordServer.delegatorRoles.find((delegatorRole) => delegatorRole.id === delegatorRoleIdToRemove);
+      const delegatorRoleToRemove = delegatorRoles.find((delegatorRole) => delegatorRole.id === delegatorRoleIdToRemove);
       if (delegatorRoleToRemove) {
         await interaction.client.services.discordserver.deleteDelegatorRole(interaction.guild.id, delegatorRoleToRemove.id);
         let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
-        const officialStakepool = discordServer.stakepools.find((stakepool) => stakepool.poolHash === delegatorRoleToRemove.poolHash);
+        const officialStakepool = stakepools.find((stakepool) => stakepool.poolHash === delegatorRoleToRemove.poolHash);
         if (!delegatorRoleToRemove.poolHash) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameAny';
         } else if (officialStakepool) {

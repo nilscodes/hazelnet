@@ -7,14 +7,15 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const tokenPolicies = discordServer.tokenPolicies
+      const tokenPoliciesFields = tokenPolicies
         .sort((policyA: any, policyB: any) => policyA.projectName.localeCompare(policyB.projectName))
         .map((tokenPolicy: any) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: tokenPolicy.policyId }) }));
-      if (!tokenPolicies.length) {
-        tokenPolicies.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale }) });
+      if (!tokenPoliciesFields.length) {
+        tokenPoliciesFields.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale }) });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy list', i18n.__({ phrase: 'configure.policy.list.purpose', locale }), 'configure-policy-list', tokenPolicies);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy list', i18n.__({ phrase: 'configure.policy.list.purpose', locale }), 'configure-policy-list', tokenPoliciesFields);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);

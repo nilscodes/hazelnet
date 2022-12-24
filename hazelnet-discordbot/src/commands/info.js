@@ -19,30 +19,31 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
       const guild = await interaction.client.guilds.fetch(discordServer.guildId);
-      const useLocale = discordServer.getBotLanguage();
-      let infoText = i18n.__({ phrase: 'info.infoBaseText', locale: useLocale });
+      const locale = discordServer.getBotLanguage();
+      let infoText = i18n.__({ phrase: 'info.infoBaseText', locale });
       if (discordServer.premium && discordServer.settings?.INFO_CONTENT_TEXT) {
         infoText = discordServer.settings?.INFO_CONTENT_TEXT;
       }
       let stakepoolFields = [];
-      if (discordServer.stakepools?.length) {
-        infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale: useLocale }, discordServer.stakepools.length)}`;
-        const infoMessageType = discordServer.stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
-        stakepoolFields = discordServer.stakepools.map((stakepool) => ({
+      if (stakepools.length) {
+        infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale }, stakepools.length)}`;
+        const infoMessageType = stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
+        stakepoolFields = stakepools.map((stakepool) => ({
           name: `${stakepool.info?.name} (${stakepool.info?.ticker})`,
-          value: i18n.__({ phrase: infoMessageType, locale: useLocale }, stakepool.info),
+          value: i18n.__({ phrase: infoMessageType, locale }, stakepool.info),
         }));
       }
 
       let infoImage;
-      let infoTitle = i18n.__({ phrase: 'info.welcomeTitle', locale: useLocale }, { guildName: guild.name });
+      let infoTitle = i18n.__({ phrase: 'info.welcomeTitle', locale }, { guildName: guild.name });
       let components;
 
       if (!discordServer.premium) {
         stakepoolFields.push({
-          name: i18n.__({ phrase: 'about.title', locale: useLocale }),
-          value: i18n.__({ phrase: 'about.info', locale: useLocale }),
+          name: i18n.__({ phrase: 'about.title', locale }),
+          value: i18n.__({ phrase: 'about.info', locale }),
         });
       } else {
         infoImage = discordServer.settings?.INFO_CONTENT_IMAGE;

@@ -277,6 +277,12 @@ class DiscordServerService(
         return getDiscordServer(guildId).members
     }
 
+    fun getTokenPolicies(guildId: Long) = getDiscordServer(guildId).tokenPolicies.toSet()
+    fun getTokenRoles(guildId: Long) = getDiscordServer(guildId).tokenRoles.toSet()
+    fun getDelegatorRoles(guildId: Long) = getDiscordServer(guildId).delegatorRoles.toSet()
+    fun getStakepools(guildId: Long) = getDiscordServer(guildId).stakepools.toSet()
+    fun getWhitelists(guildId: Long) = getDiscordServer(guildId).whitelists.toSet()
+
     fun updateSettings(guildId: Long, embeddableSetting: EmbeddableSetting): EmbeddableSetting {
         val discordServer = getDiscordServer(guildId)
         discordServer.settings.removeIf { it.name == embeddableSetting.name }
