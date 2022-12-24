@@ -1052,6 +1052,23 @@ paths:
                 items:
                   $ref: "#/components/schemas/PhysicalProduct"
   /discord/servers/{guildId}/tokenpolicies:
+    get:
+      summary: List all official token policies of this discord server
+      operationId: listTokenPolicies
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "List of token policies"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TokenPolicy"
     post:
       summary: Add an official token policy to this discord server
       operationId: addTokenPolicy
@@ -1089,6 +1106,23 @@ paths:
         "204":
           description: Successful deletion
   /discord/servers/{guildId}/stakepools:
+    get:
+      summary: List all official stakepools on this discord server
+      operationId: listStakepools
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Details of all added stakepools"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Stakepool"
     post:
       summary: Add an official stakepool to this discord server
       operationId: addStakepool
@@ -1126,6 +1160,26 @@ paths:
         "204":
           description: Successful deletion
   /discord/servers/{guildId}/delegatorroles:
+    get:
+      summary: Get all auto-assigned roles based on stakepool delegation for this discord server
+      operationId: listDelegatorRoles
+      tags:
+        - discord
+        - stakepool
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordDelegatorRole"
+      responses:
+        "201":
+          description: "Newly created Delegator Role"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordDelegatorRole"
     post:
       summary: Add an auto-assigned role based on stakepool delegation to this discord server
       operationId: addDelegatorRole
@@ -1163,6 +1217,23 @@ paths:
         "204":
           description: Successful deletion
   /discord/servers/{guildId}/tokenroles:
+    get:
+      summary: Get all auto-assigned roles based on token ownership for this discord server
+      operationId: listTokenOwnershipRoles
+      tags:
+        - discord
+        - token
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "All current token roles"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordTokenRole"
     post:
       summary: Add an auto-assigned role based on token ownership to this discord server
       operationId: addTokenOwnershipRole
@@ -1769,6 +1840,23 @@ paths:
           "204":
             description: Successful deletion
   /discord/servers/{guildId}/whitelists:
+    get:
+      summary: Get all whitelists created on this server, not including whitelists shared with this server
+      operationId: listWhitelists
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "All whitelists created on this server"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Whitelist"
     post:
       summary: Add a whitelist for owners of a specific role to this server
       operationId: addWhitelist
@@ -2783,22 +2871,6 @@ components:
         active:
           type: boolean
           description: If the bot is on or off. When the bot is removed from the guild or manually turned off by an admin this is false
-        tokenPolicies:
-          type: array
-          items:
-            $ref: "#/components/schemas/TokenPolicy"
-        stakepools:
-          type: array
-          items:
-            $ref: "#/components/schemas/Stakepool"
-        delegatorRoles:
-          type: array
-          items:
-            $ref: "#/components/schemas/DiscordDelegatorRole"
-        tokenRoles:
-          type: array
-          items:
-            $ref: "#/components/schemas/DiscordTokenRole"
         settings:
           type: object
           additionalProperties:

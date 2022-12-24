@@ -11,13 +11,14 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
 
       const marketplaceChannelToRemoveFilterFrom = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id))
         .find((channel) => channel.id === trackerId);
       if (marketplaceChannelToRemoveFilterFrom) {
         const marketplaceChannelInfo = [
-          marketplace.getMarketplaceChannelDetailsField(discordServer, marketplaceChannelToRemoveFilterFrom, 'list.entry', 'add'),
+          marketplace.getMarketplaceChannelDetailsField(discordServer, tokenPolicies, marketplaceChannelToRemoveFilterFrom, 'list.entry', 'add'),
         ];
         const components = this.createRemoveDropdown(discordServer, marketplaceChannelToRemoveFilterFrom);
         if (!components.length) {
@@ -62,6 +63,7 @@ module.exports = {
     try {
       await interaction.deferUpdate({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const ids = interaction.values[0].replace('metadata-filter-id-', '').split('-');
       const trackerId = +ids[0];
@@ -71,7 +73,7 @@ module.exports = {
         const filterId = +ids[1];
         await interaction.client.services.discordserver.deleteMarketplaceChannelMetadataFilter(interaction.guild.id, marketplaceChannelToRemoveFilterFrom.id, filterId);
         marketplaceChannelToRemoveFilterFrom.filters = marketplaceChannelToRemoveFilterFrom.filters.filter((metadataFilter) => metadataFilter.id !== filterId);
-        const marketplaceChannelFields = [marketplace.getMarketplaceChannelDetailsField(discordServer, marketplaceChannelToRemoveFilterFrom, 'add.success', 'add')];
+        const marketplaceChannelFields = [marketplace.getMarketplaceChannelDetailsField(discordServer, tokenPolicies, marketplaceChannelToRemoveFilterFrom, 'add.success', 'add')];
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace metadatafilter remove', i18n.__({ phrase: 'configure.marketplace.metadatafilter.remove.success', locale }), 'configure-marketplace-metadatafilter-remove', marketplaceChannelFields);
         interaction.editReply({ components: [], ephemeral: true });
         await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });

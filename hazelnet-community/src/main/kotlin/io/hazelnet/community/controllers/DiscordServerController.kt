@@ -53,6 +53,10 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.OK)
     fun updateDiscordServer(@PathVariable guildId: Long, @RequestBody @Valid discordServerPartial: DiscordServerPartial) = discordServerService.updateDiscordServer(guildId, discordServerPartial)
 
+    @GetMapping("/{guildId}/tokenpolicies")
+    @ResponseStatus(HttpStatus.OK)
+    fun listTokenPolicies(@PathVariable guildId: Long) = discordServerService.getTokenPolicies(guildId)
+
     @PostMapping("/{guildId}/tokenpolicies")
     @ResponseStatus(HttpStatus.CREATED)
     fun addTokenPolicy(@PathVariable guildId: Long, @RequestBody @Valid tokenPolicy: TokenPolicy): ResponseEntity<TokenPolicy> {
@@ -68,6 +72,10 @@ class DiscordServerController(
     @DeleteMapping("/{guildId}/tokenpolicies/{policyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTokenPolicy(@PathVariable guildId: Long, @PathVariable policyId: String) = discordServerService.deleteTokenPolicy(guildId, policyId)
+
+    @GetMapping("/{guildId}/stakepools")
+    @ResponseStatus(HttpStatus.OK)
+    fun listStakepools(@PathVariable guildId: Long) = discordServerService.getStakepools(guildId)
 
     @PostMapping("/{guildId}/stakepools")
     @ResponseStatus(HttpStatus.CREATED)
@@ -85,6 +93,10 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteStakepool(@PathVariable guildId: Long, @PathVariable poolHash: String) = discordServerService.deleteStakepool(guildId, poolHash)
 
+    @GetMapping("/{guildId}/delegatorroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun listDelegatorRoles(@PathVariable guildId: Long) = discordServerService.getDelegatorRoles(guildId)
+
     @PostMapping("/{guildId}/delegatorroles")
     @ResponseStatus(HttpStatus.CREATED)
     fun addDelegatorRole(@PathVariable guildId: Long, @RequestBody @Valid delegatorRole: DelegatorRole): ResponseEntity<DelegatorRole> {
@@ -100,6 +112,10 @@ class DiscordServerController(
     @DeleteMapping("/{guildId}/delegatorroles/{delegatorRoleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteDelegatorRole(@PathVariable guildId: Long, @PathVariable delegatorRoleId: Long) = discordServerService.deleteDelegatorRole(guildId, delegatorRoleId)
+
+    @GetMapping("/{guildId}/tokenroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun listTokenOwnershipRoles(@PathVariable guildId: Long) = discordServerService.getTokenRoles(guildId)
 
     @PostMapping("/{guildId}/tokenroles")
     @ResponseStatus(HttpStatus.CREATED)
@@ -136,6 +152,10 @@ class DiscordServerController(
     @DeleteMapping("/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteMetadataFilterFromTokenRole(@PathVariable guildId: Long, @PathVariable tokenRoleId: Long, @PathVariable filterId: Long) = discordServerService.deleteMetadataFilterFromTokenRole(guildId, tokenRoleId, filterId)
+
+    @GetMapping("/{guildId}/whitelists")
+    @ResponseStatus(HttpStatus.OK)
+    fun listWhitelists(@PathVariable guildId: Long) = discordServerService.getWhitelists(guildId)
 
     @PostMapping("/{guildId}/whitelists")
     @ResponseStatus(HttpStatus.CREATED)

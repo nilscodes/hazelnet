@@ -10,18 +10,20 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const maxDetailedRolesOnOnePage = 5;
       const maxForDropdown = 25;
       let customTokenRoleMessage = false;
 
-      if (discordServer.tokenRoles.length > maxForDropdown) {
+      if (tokenRoles.length > maxForDropdown) {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortCommand';
-      } else if (discordServer.tokenRoles.length > maxDetailedRolesOnOnePage) {
+      } else if (tokenRoles.length > maxDetailedRolesOnOnePage) {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortSelect';
       }
 
-      const tokenRoleFieldsNested = discordServer.tokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale, false, customTokenRoleMessage));
+      const tokenRoleFieldsNested = tokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, false, customTokenRoleMessage));
       const tokenRoleFields = tokenRoleFieldsNested.flat();
       if (!tokenRoleFields.length) {
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
@@ -30,31 +32,30 @@ module.exports = {
         tokenRoleFields.splice(24);
         tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.moreRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.moreRoles', locale }, { moreCount }) });
       }
-      if (!discordServer.premium && discordServer.tokenRoles.length > 1) {
-        const lowestTokenRoleId = Math.min(...discordServer.tokenRoles.map((tokenRole) => +tokenRole.id));
-        const lowestIdTokenRole = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
+      if (!discordServer.premium && tokenRoles.length > 1) {
+        const lowestTokenRoleId = Math.min(...tokenRoles.map((tokenRole) => +tokenRole.id));
+        const lowestIdTokenRole = tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
         tokenRoleFields.unshift({
           name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
           value: i18n.__({ phrase: 'configure.tokenroles.list.noPremium', locale }, { tokenRole: lowestIdTokenRole }),
         });
       }
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
-      const components = this.createDetailsDropdown(discordServer, maxForDropdown);
+      const components = this.createDetailsDropdown(tokenRoles, discordServer.getBotLanguage(), maxForDropdown);
       await interaction.editReply({ embeds: [embed], components, ephemeral: true });
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting auto-role-assignment for token owners. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
-  createDetailsDropdown(discordServer, maxForDropdown) {
-    if (discordServer.tokenRoles.length > 0 && discordServer.tokenRoles.length <= maxForDropdown) {
-      const locale = discordServer.getBotLanguage();
+  createDetailsDropdown(tokenRoles, locale, maxForDropdown) {
+    if (tokenRoles.length > 0 && tokenRoles.length <= maxForDropdown) {
       return [new ActionRowBuilder()
         .addComponents(
           new SelectMenuBuilder()
             .setCustomId('configure-tokenroles/list/details')
             .setPlaceholder(i18n.__({ phrase: 'configure.tokenroles.list.chooseDetails', locale }))
-            .addOptions(discordServer.tokenRoles.map((tokenRole) => ({
+            .addOptions(tokenRoles.map((tokenRole) => ({
               label: i18n.__({ phrase: 'configure.tokenroles.list.chooseText', locale }, { tokenRole }),
               value: `token-role-id-${tokenRole.id}`,
             }))),
@@ -67,11 +68,13 @@ module.exports = {
     try {
       await interaction.deferUpdate({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const tokenRoleId = +interaction.values[0].replace('token-role-id-', '');
-      const tokenRoleToShow = discordServer.tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
+      const tokenRoleToShow = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToShow) {
-        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, discordServer, locale, true);
+        const tokenRoleFields = tokenroles.getTokenRoleDetailsFields(tokenRoleToShow, tokenPolicies, locale, true);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.detailsPurpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
         await interaction.followUp({ embeds: [embed], ephemeral: true });
       } else {

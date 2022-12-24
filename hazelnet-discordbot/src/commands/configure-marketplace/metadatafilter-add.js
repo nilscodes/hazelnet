@@ -22,8 +22,9 @@ module.exports = {
               const newMetadataFilter = await interaction.client.services.discordserver.addMarketplaceChannelMetadataFilter(interaction.guild.id, marketplaceChannelToAddFilterTo.id, attributeName, operator, attributeValue);
               const effectiveFilters = [...(marketplaceChannelToAddFilterTo.filters ?? []), newMetadataFilter];
               marketplaceChannelToAddFilterTo.filters = effectiveFilters;
+              const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
               const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace metadatafilter add', i18n.__({ phrase: 'configure.marketplace.metadatafilter.add.success', locale }), 'configure-marketplace-metadatafilter-add', [
-                marketplace.getMarketplaceChannelDetailsField(discordServer, marketplaceChannelToAddFilterTo, 'list.entry', 'add'),
+                marketplace.getMarketplaceChannelDetailsField(discordServer, tokenPolicies, marketplaceChannelToAddFilterTo, 'list.entry', 'add'),
               ]);
               await interaction.editReply({ embeds: [embed], ephemeral: true });
             } else {

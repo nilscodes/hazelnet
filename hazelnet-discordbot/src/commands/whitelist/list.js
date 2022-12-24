@@ -12,8 +12,9 @@ module.exports = {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const signups = (await whitelistUtil.getExistingSignups(externalAccount, discordServer, interaction)).filter((signup) => signup !== undefined);
-      const whitelistFields = await this.getWhitelists(discordServer, interaction, signups, false);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const signups = (await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction)).filter((signup) => signup !== undefined);
+      const whitelistFields = await this.getWhitelists(discordServer, whitelists, interaction, signups, false);
       const components = [];
       if (signups.length) {
         components.push(
@@ -52,8 +53,8 @@ module.exports = {
       await interaction.editReply({ content: 'Error while getting official whitelists. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
     }
   },
-  async getWhitelists(discordServer, interaction, signups, includeAddresses) {
-    const whitelistFieldsPromise = discordServer.whitelists.map(async (whitelist) => {
+  async getWhitelists(discordServer, whitelists, interaction, signups, includeAddresses) {
+    const whitelistFieldsPromise = whitelists.map(async (whitelist) => {
       const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
       const existingSignup = signups.find((signup) => signup?.whitelistId === whitelist.id);
       const qualifyText = await whitelistUtil.getQualifyText(interaction, discordServer, whitelist, existingSignup?.signup, includeAddresses);
@@ -68,10 +69,11 @@ module.exports = {
   async executeButton(interaction) {
     if (interaction.customId === 'whitelist/list/withaddress') {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const signups = await whitelistUtil.getExistingSignups(externalAccount, discordServer, interaction);
-      const whitelistFields = await this.getWhitelists(discordServer, interaction, signups, true);
+      const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
+      const whitelistFields = await this.getWhitelists(discordServer, whitelists, interaction, signups, true);
       const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'whitelist.list.messageTitle', locale }), i18n.__({ phrase: 'whitelist.list.purpose', locale }), 'whitelist-list', whitelistFields);
       await interaction.update({ components: [], embeds: [embed], ephemeral: true });
     }

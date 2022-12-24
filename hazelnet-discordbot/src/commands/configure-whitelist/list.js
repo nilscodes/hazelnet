@@ -7,8 +7,9 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const whitelistFields = discordServer.whitelists.map((whitelist) => {
+      const whitelistFields = whitelists.map((whitelist) => {
         const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
         return {
           name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist }),
@@ -21,7 +22,7 @@ module.exports = {
           value: i18n.__({ phrase: 'whitelist.list.noWhitelistsDetail', locale }),
         });
       }
-      if (!discordServer.premium && discordServer.whitelists.length) {
+      if (!discordServer.premium && whitelists.length) {
         whitelistFields.unshift({
           name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
           value: i18n.__({ phrase: 'configure.whitelist.list.noPremium', locale }),

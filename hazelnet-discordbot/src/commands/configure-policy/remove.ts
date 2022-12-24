@@ -9,8 +9,9 @@ export default <BotSubcommand> {
       // TODO verify policy exists in the first place, send different message if not
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const policyToRemove = discordServer.tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyIdToRemove);
+      const policyToRemove = tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyIdToRemove);
       if (policyToRemove) {
         await interaction.client.services.discordserver.deleteTokenPolicy(interaction.guild!.id, policyToRemove.policyId);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.success', locale: locale }), 'configure-policy-remove', [

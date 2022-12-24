@@ -13,7 +13,8 @@ module.exports = {
       try {
         const discordServerToShareWith = await interaction.client.services.discordserver.getDiscordServer(guildToShareWith);
         if (discordServerToShareWith.id !== discordServer.id) {
-          const whitelistOptions = discordServer.whitelists
+          const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+          const whitelistOptions = whitelists
             .map((whitelist) => ({ label: whitelist.displayName, value: `${whitelist.name}-${discordServerToShareWith.guildId}` }));
           if (whitelistOptions.length) {
             const components = [new ActionRowBuilder()
@@ -47,10 +48,11 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/share/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const [whitelistNameToShare, sharedWithGuild] = interaction.values[0].split('-');
-        const whitelistToShare = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToShare);
+        const whitelistToShare = whitelists.find((whitelist) => whitelist.name === whitelistNameToShare);
         if (whitelistToShare) {
           const discordServerToShareWith = await interaction.client.services.discordserver.getDiscordServer(sharedWithGuild);
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild.id, whitelistToShare.id, { sharedWithServer: discordServerToShareWith.id });

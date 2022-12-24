@@ -8,8 +8,9 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
-      const whitelistOptions = discordServer.whitelists
+      const whitelistOptions = whitelists
         .filter((whitelist) => whitelist.closed)
         .map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
       if (whitelistOptions.length) {
@@ -36,10 +37,11 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/open/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistNameToOpen = interaction.values[0];
-        const whitelistToOpen = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToOpen);
+        const whitelistToOpen = whitelists.find((whitelist) => whitelist.name === whitelistNameToOpen);
         if (whitelistToOpen) {
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild.id, whitelistToOpen.id, { closed: false });
 

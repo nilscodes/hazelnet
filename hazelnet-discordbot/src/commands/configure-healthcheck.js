@@ -103,6 +103,9 @@ module.exports = {
       const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
       const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id);
       // TODO Check each marketplace channel!
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const blackEditionIssues = [];
       if (polls.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssuePolls', locale }));
@@ -110,13 +113,13 @@ module.exports = {
       if (marketplaceChannels.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueMarketplaceChannels', locale }));
       }
-      if (discordServer.whitelists.length) {
+      if (whitelists.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueWhitelists', locale }));
       }
-      if (discordServer.tokenRoles.length > 1) {
+      if (tokenRoles.length > 1) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueTokenRoles', locale }));
       }
-      if (discordServer.delegatorRoles.length > 1) {
+      if (delegatorRoles.length > 1) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssueDelegatorRoles', locale }));
       }
       if (blackEditionIssues.length) {

@@ -24,9 +24,10 @@ export default <SocialAnnounceCommand> {
     const title = interaction.options.getString('title');
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      if (discordServer.tokenPolicies.length) {
+      if (tokenPolicies.length) {
         if (announceChannel
           && (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement)) {
           const guildChannel = announceChannel as GuildChannel;

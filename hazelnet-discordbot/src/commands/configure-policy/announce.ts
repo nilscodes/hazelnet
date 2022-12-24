@@ -17,8 +17,9 @@ export default <PolicyAnnounceCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      if (discordServer.tokenPolicies.length) {
+      if (tokenPolicies.length) {
         if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
           const announceGuildChannel = announceChannel as GuildChannel;
           const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
@@ -76,7 +77,8 @@ export default <PolicyAnnounceCommand> {
         value: infoText,
       }] : [];
 
-      const policyFields = this.getPolicyFields(discordServer.tokenPolicies, locale);
+      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
+      const policyFields = this.getPolicyFields(tokenPolicies, locale);
 
       const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-policy announce', i18n.__({ phrase: 'configure.policy.announce.success', locale }, { channel: announceChannelId }), 'configure-policy-announce');
       await interaction.editReply({ embeds: [embedAdmin], components: [] });

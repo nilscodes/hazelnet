@@ -64,29 +64,34 @@ class DiscordServer @JsonCreator constructor(
     @Column(name = "premium_reminder")
     var premiumReminder: Date? = null,
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "discord_policy_ids", joinColumns = [JoinColumn(name = "discord_server_id")])
     @field:Valid
+    @field:JsonIgnore
     var tokenPolicies: MutableSet<TokenPolicy> = mutableSetOf(),
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "discord_spo", joinColumns = [JoinColumn(name = "discord_server_id")])
     @field:Valid
+    @field:JsonIgnore
     var stakepools: MutableSet<Stakepool> = mutableSetOf(),
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "discord_server_id")
     @field:Valid
+    @field:JsonIgnore
     var delegatorRoles: MutableSet<DelegatorRole> = mutableSetOf(),
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "discord_server_id")
     @field:Valid
+    @field:JsonIgnore
     var tokenRoles: MutableSet<TokenOwnershipRole> = mutableSetOf(),
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "discord_server_id")
     @field:Valid
+    @field:JsonIgnore
     var whitelists: MutableSet<Whitelist> = mutableSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)

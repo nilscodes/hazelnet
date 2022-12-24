@@ -18,14 +18,15 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
       const maxTokenRoles = discordServer.settings?.MAXIMUM_TOKEN_ROLES ?? 30;
       const locale = discordServer.getBotLanguage();
-      if (discordServer.premium || !discordServer.tokenRoles || discordServer.tokenRoles.length === 0) {
+      if (discordServer.premium || tokenRoles.length === 0) {
         if (parseInt(minimumTokenQuantity, 10) > 0) {
           if (maximumTokenQuantity === null || (parseInt(maximumTokenQuantity, 10) > 0 && parseInt(maximumTokenQuantity, 10) >= minimumTokenQuantity)) {
             if (cardanotoken.isValidPolicyId(policyId)) {
               if (assetFingerprint === null || cardanotoken.isValidAssetFingerprint(assetFingerprint)) {
-                if (discordServer.tokenRoles.length <= maxTokenRoles) {
+                if (tokenRoles.length <= maxTokenRoles) {
                   const guild = await interaction.client.guilds.fetch(interaction.guild.id);
                   const allUsers = await guild.members.fetch();
                   const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
@@ -89,6 +90,7 @@ module.exports = {
   async createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint) {
     const locale = discordServer.getBotLanguage();
     const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild.id, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint);
+    const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild.id);
     const tokenRole = newTokenRolePromise.data;
 
     const embed = embedBuilder.buildForAdmin(
@@ -96,7 +98,7 @@ module.exports = {
       '/configure-tokenroles add',
       i18n.__({ phrase: 'configure.tokenroles.add.success', locale }),
       'configure-tokenroles-add',
-      tokenroles.getTokenRoleDetailsFields(tokenRole, discordServer, locale),
+      tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale),
     );
     return embed;
   },

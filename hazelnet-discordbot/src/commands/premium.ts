@@ -17,7 +17,7 @@ type EmbedParts = {
 
 interface PremiumCommand extends BotCommand {
   getGiveawayInfo(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction): Promise<InterfaceInfo>
-  showPremiumEmbed(externalAccount: any, discordMemberInfo: any, premiumInfo: any, locale: string, discordServer: any, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
+  showPremiumEmbed(discordMemberInfo: any, premiumInfo: any, locale: string, discordServer: any, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
 }
 
 export default <PremiumCommand> {
@@ -33,7 +33,7 @@ export default <PremiumCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild?.id, externalAccount.id);
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
@@ -45,7 +45,7 @@ export default <PremiumCommand> {
         await interaction.client.services.externalaccounts.clearExternalDiscordAccountCache(interaction.user.id);
       }
 
-      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
+      const { embed, components } = this.showPremiumEmbed(discordMemberInfo, premiumInfo, locale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
@@ -60,7 +60,7 @@ export default <PremiumCommand> {
       text: giveawayText,
     };
   },
-  showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, locale, discordServer, stakeLink, giveawayInfo) {
+  showPremiumEmbed(discordMemberInfo, premiumInfo, locale, discordServer, stakeLink, giveawayInfo) {
     const stakedAda = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / 1000000));
     const premiumFields = [{
       name: i18n.__({ phrase: 'premium.premiumStatus', locale }),
@@ -121,7 +121,7 @@ export default <PremiumCommand> {
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
 
-      const { embed, components } = this.showPremiumEmbed(externalAccount, discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
+      const { embed, components } = this.showPremiumEmbed(discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components });
     }
   },

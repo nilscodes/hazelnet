@@ -17,9 +17,10 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
-        const whitelistWithNameExists = discordServer.whitelists.some((whitelist) => whitelist.name === whitelistName);
+        const whitelistWithNameExists = whitelists.some((whitelist) => whitelist.name === whitelistName);
         if (!whitelistWithNameExists) {
           if (whitelistUtil.isValidName(whitelistName)) {
             const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);

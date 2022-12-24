@@ -9,8 +9,9 @@ module.exports = {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
-      const localWhitelistOptions = discordServer.whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
+      const localWhitelistOptions = whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
       const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild.id)).map((sharedWhitelist) => ({
         label: i18n.__({ phrase: 'configure.whitelist.download.externalWhitelist', locale }, {
           whitelistDisplayName: sharedWhitelist.whitelistDisplayName.substr(0, 40),
@@ -43,10 +44,11 @@ module.exports = {
     if (interaction.customId === 'configure-whitelist/download/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
       const locale = discordServer.getBotLanguage();
       try {
         const whitelistNameToDownload = interaction.values[0];
-        const whitelistToDownload = discordServer.whitelists.find((whitelist) => whitelist.name === whitelistNameToDownload);
+        const whitelistToDownload = whitelists.find((whitelist) => whitelist.name === whitelistNameToDownload);
         if (whitelistToDownload) {
           const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild.id, whitelistToDownload.id);
           if (signups.length) {
