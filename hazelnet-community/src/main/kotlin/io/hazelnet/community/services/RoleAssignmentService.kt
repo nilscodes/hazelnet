@@ -434,6 +434,7 @@ class RoleAssignmentService(
     }
 
     @Async
+    @Transactional
     fun publishRoleAssignmentsForGuildMemberOnAllServers(externalAccountId: Long) {
         val discordServers = discordServerRepository.getDiscordServersForMember(externalAccountId = externalAccountId)
         if (discordServers.isNotEmpty()) {
