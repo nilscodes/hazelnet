@@ -1,8 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from '../utility/commandtypes';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('ping', locale);
     return new SlashCommandBuilder()

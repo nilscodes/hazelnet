@@ -1,12 +1,23 @@
 /* eslint-disable no-await-in-loop */
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
-const i18n = require('i18n');
+import { APIEmbedField } from 'discord-api-types';
+import { GuildMember, GuildTextBasedChannel } from 'discord.js';
+import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
+import { DelegatorRole, DiscordServer, TokenOwnershipRole } from '../utility/sharedtypes';
+import { BotCommand } from '../utility/commandtypes';
+import { SlashCommandBuilder, PermissionsBitField } from 'discord.js';
+import i18n from 'i18n';
 const commandbase = require('../utility/commandbase');
 const embedBuilder = require('../utility/embedbuilder');
 const commandpermissions = require('../utility/commandpermissions');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+interface ConfigureHealthCheckCommand extends BotCommand {
+  healthCheckRoles(interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string, roleProperty: string, roles: DelegatorRole[] | TokenOwnershipRole[], botObject: GuildMember): Promise<Boolean>
+  healthCheckAuditChannel(discordServer: DiscordServer, interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string): Promise<Boolean>
+  healthCheckBlackEdition(discordServer: DiscordServer, tokenRoles: TokenOwnershipRole[], delegatorRoles: DelegatorRole[], interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string): Promise<Boolean>
+}
+
+export default<ConfigureHealthCheckCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('configure-healthcheck', locale);
     return new SlashCommandBuilder()
@@ -16,17 +27,19 @@ module.exports = {
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
     const locale = discordServer.getBotLanguage();
     const isAdminUser = await commandpermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
     if (isAdminUser) {
       try {
-        const healthCheckFields = [];
-        const botObject = await interaction.guild.members.fetch(interaction.client.application.id);
-        const tokenRoleProblem = await this.healthCheckRoles(discordServer, interaction, healthCheckFields, locale, 'tokenRoles', botObject);
-        const delegatorRoleProblem = await this.healthCheckRoles(discordServer, interaction, healthCheckFields, locale, 'delegatorRoles', botObject);
+        const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild!.id);
+        const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id);
+        const healthCheckFields = [] as APIEmbedField[];
+        const botObject = await interaction.guild!.members.fetch(interaction.client.application!.id);
+        const tokenRoleProblem = await this.healthCheckRoles(interaction, healthCheckFields, locale, 'tokenRoles', tokenRoles, botObject);
+        const delegatorRoleProblem = await this.healthCheckRoles(interaction, healthCheckFields, locale, 'delegatorRoles', delegatorRoles, botObject);
         const auditChannelProblem = await this.healthCheckAuditChannel(discordServer, interaction, healthCheckFields, locale);
-        const blackEditionProblem = await this.healthCheckBlackEdition(discordServer, interaction, healthCheckFields, locale);
+        const blackEditionProblem = await this.healthCheckBlackEdition(discordServer, tokenRoles, delegatorRoles, interaction, healthCheckFields, locale);
         if (!tokenRoleProblem && !delegatorRoleProblem && !auditChannelProblem && !blackEditionProblem) {
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.success', locale }),
@@ -34,22 +47,22 @@ module.exports = {
           });
         }
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-healthcheck', i18n.__({ phrase: 'configure.healthcheck.purpose', locale }), 'configure-healthcheck', healthCheckFields);
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       } catch (error) {
         interaction.client.logger.error(error);
       }
     } else {
       const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'errors.permissionDeniedTitle', locale: discordServer.getBotLanguage() }), i18n.__({ phrase: 'errors.permissionDeniedInformation', locale: discordServer.getBotLanguage() }));
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({ embeds: [embed] });
     }
   },
-  async healthCheckRoles(discordServer, interaction, healthCheckFields, locale, roleProperty, botObject) {
+  async healthCheckRoles(interaction, healthCheckFields, locale, roleProperty, roles, botObject) {
     let problems = false;
-    const roleIds = [...new Set(discordServer[roleProperty].map((role) => role.roleId))];
+    const roleIds = [...new Set(roles.map((role) => role.roleId))];
     const highestRole = botObject.roles.highest;
     const unassignableRoles = [];
     for (let i = 0, len = roleIds.length; i < len; i += 1) {
-      const guildRole = await interaction.guild.roles.fetch(roleIds[i]);
+      const guildRole = await interaction.guild!.roles.fetch(roleIds[i]);
       if (guildRole) {
         if (guildRole.position > highestRole.position) {
           unassignableRoles.push(guildRole.id);
@@ -78,9 +91,10 @@ module.exports = {
     const auditChannel = discordServer.settings?.PROTECTION_AUDIT_CHANNEL;
     if (auditChannel?.length) {
       try {
-        const auditChannelObject = await interaction.guild.channels.fetch(auditChannel);
-        const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application.id);
-        if (!auditChannelPermissions.has(PermissionsBitField.Flags.SendMessages) || !auditChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) || !auditChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+        const auditChannelObject = await interaction.guild!.channels.fetch(auditChannel) as GuildTextBasedChannel;
+        const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application!.id);
+        if (auditChannelPermissions
+          && (!auditChannelPermissions.has(PermissionsBitField.Flags.SendMessages) || !auditChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) || !auditChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks))) {
           problems = true;
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),
@@ -97,15 +111,13 @@ module.exports = {
     }
     return problems;
   },
-  async healthCheckBlackEdition(discordServer, interaction, healthCheckFields, locale) {
+  async healthCheckBlackEdition(discordServer, tokenRoles, delegatorRoles, interaction, healthCheckFields, locale) {
     let problems = false;
     if (!discordServer.premium) {
-      const polls = await interaction.client.services.discordserver.getPolls(interaction.guild.id);
-      const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild.id);
+      const polls = await interaction.client.services.discordserver.getPolls(interaction.guild!.id);
+      const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id);
       // TODO Check each marketplace channel!
-      const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild.id);
-      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const blackEditionIssues = [];
       if (polls.length) {
         blackEditionIssues.push(i18n.__({ phrase: 'configure.healthcheck.blackEditionIssuePolls', locale }));

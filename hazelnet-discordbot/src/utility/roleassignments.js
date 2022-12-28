@@ -4,11 +4,12 @@ const i18n = require('i18n');
 module.exports = {
   async ensureRoleAssignments(client, discordServer, roleProperty, expectedRoleAssignments, removeInvalid) {
     client.logger.info(`Processing ${roleProperty} for ${discordServer.guildName} (${discordServer.guildId}). ${removeInvalid ? 'R' : 'Not r'}emoving invalid role assignments. Processing a total of ${expectedRoleAssignments.length} roles that should be assigned.`);
-    const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
+    const roles = await this.getRoles(client, discordServer.guildId, roleProperty);
+    const rolesToUsers = this.createRolesToUsersMap(discordServer, roles, expectedRoleAssignments);
     const guildForAssignments = await client.guilds.fetch(discordServer.guildId);
     if (guildForAssignments) {
-      if (removeInvalid && (discordServer.premium || discordServer[roleProperty].length <= 1)) {
-        await this.removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
+      if (removeInvalid && (discordServer.premium || roles.length <= 1)) {
+        await this.removeInvalidMembersFromRole(discordServer, roleProperty, roles, guildForAssignments, rolesToUsers, client);
       }
       await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
     } else {
@@ -17,15 +18,22 @@ module.exports = {
   },
   async ensureRoleAssignmentsForUser(client, discordServer, roleProperty, guildForAssignments, expectedRoleAssignments, userId, removeInvalid) {
     client.logger.info(`Processing ${roleProperty} for single user with ID ${userId} on ${discordServer.guildName} (${discordServer.guildId}). ${removeInvalid ? 'R' : 'Not r'}emoving invalid role assignments. Processing a total of ${expectedRoleAssignments.length} roles that should be assigned.`);
-    const rolesToUsers = this.createRolesToUsersMap(discordServer, roleProperty, expectedRoleAssignments);
-    if (removeInvalid && (discordServer.premium || discordServer[roleProperty].length <= 1)) {
-      await this.removeInvalidRolesFromMember(discordServer, roleProperty, guildForAssignments, rolesToUsers, client, userId);
+    const roles = await this.getRoles(client, discordServer.guildId, roleProperty);
+    const rolesToUsers = this.createRolesToUsersMap(discordServer, roles, expectedRoleAssignments);
+    if (removeInvalid && (discordServer.premium || roles.length <= 1)) {
+      await this.removeInvalidRolesFromMember(discordServer, roleProperty, roles, guildForAssignments, rolesToUsers, client, userId);
     }
     await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
   },
-  createRolesToUsersMap(discordServer, roleProperty, roleAssignments) {
+  async getRoles(client, guildId, roleProperty) {
+    if (roleProperty === 'tokenRoles') {
+      return client.services.discordserver.listTokenOwnershipRoles(guildId);
+    }
+    return client.services.discordserver.listDelegatorRoles(guildId);
+  },
+  createRolesToUsersMap(discordServer, roles, roleAssignments) {
     const rolesToUsers = {};
-    discordServer[roleProperty].forEach((roleMapping) => { rolesToUsers[roleMapping.roleId] = []; });
+    roles.forEach((roleMapping) => { rolesToUsers[roleMapping.roleId] = []; });
     roleAssignments.forEach((roleAssignment) => {
       if (roleAssignment.guildId === discordServer.guildId) {
         const listForRole = rolesToUsers[roleAssignment.roleId] ?? [];
@@ -38,11 +46,11 @@ module.exports = {
   /*
    * Remove roles from individual user they do not qualify any more for
    */
-  async removeInvalidRolesFromMember(discordServer, roleProperty, guildForAssignments, rolesToUsers, client, userId) {
+  async removeInvalidRolesFromMember(discordServer, roleProperty, roles, guildForAssignments, rolesToUsers, client, userId) {
     try {
       const member = await guildForAssignments.members.fetch(userId);
-      for (let r = 0, len = discordServer[roleProperty].length; r < len; r += 1) {
-        const roleMapping = discordServer[roleProperty][r];
+      for (let r = 0, len = roles.length; r < len; r += 1) {
+        const roleMapping = roles[r];
         const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
         if (guildRole) {
           if (!rolesToUsers[roleMapping.roleId].includes(member.user.id) && member.roles.cache.some((role) => role.id === roleMapping.roleId)) {
@@ -61,12 +69,12 @@ module.exports = {
       client.logger.error({ msg: `Failed fetching member ${userId} for ${discordServer.guildName} (${discordServer.guildId})`, error });
     }
   },
-  async removeInvalidMembersFromRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client) {
+  async removeInvalidMembersFromRole(discordServer, roleProperty, roles, guildForAssignments, rolesToUsers, client) {
     try {
       // TODO - add paging - but how to get the member count to page by?
       const allUsers = await guildForAssignments.members.fetch();
-      for (let r = 0, len = discordServer[roleProperty].length; r < len; r += 1) {
-        const roleMapping = discordServer[roleProperty][r];
+      for (let r = 0, len = roles.length; r < len; r += 1) {
+        const roleMapping = roles[r];
         const guildRole = await guildForAssignments.roles.fetch(roleMapping.roleId);
         if (guildRole) {
           for (let i = 0; i < allUsers.size; i += 1) {

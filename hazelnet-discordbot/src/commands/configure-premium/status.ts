@@ -1,27 +1,37 @@
-const i18n = require('i18n');
+import { APIEmbedField } from 'discord.js';
+import i18n from 'i18n';
+import { DiscordServer } from '../../utility/sharedtypes';
+import { BotSubcommand } from '../../utility/commandtypes';
 const embedBuilder = require('../../utility/embedbuilder');
 
-module.exports = {
+interface PremiumStatusCommand extends BotSubcommand {
+  addBillingInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addCostInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addBalanceInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addBenefitsInfo(premiumInfo: any, locale: string): void
+}
+
+export default <PremiumStatusCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const premiumInfo = await interaction.client.services.discordserver.getPremiumInfo(interaction.guild.id);
+      const premiumInfo = await interaction.client.services.discordserver.getPremiumInfo(interaction.guild!.id);
       const premiumUntilTimestamp = Math.floor(new Date(premiumInfo.premiumUntil).getTime() / 1000);
       const premiumFields = [{
         name: i18n.__({ phrase: 'configure.premium.status.premiumStatus', locale }),
-        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilTimestamp }),
+        value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilTimestamp } as any),
       }];
       this.addBillingInfo(premiumInfo, premiumFields, discordServer, locale);
       this.addCostInfo(premiumInfo, premiumFields, discordServer, locale);
       this.addBalanceInfo(premiumInfo, premiumFields, discordServer, locale);
       this.addBenefitsInfo(premiumFields, locale);
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-premium status', i18n.__({ phrase: 'configure.premium.status.purpose', locale }), 'configure-premium-status', premiumFields);
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while viewing premium status. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while viewing premium status. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
   addBillingInfo(premiumInfo, premiumFields, discordServer, locale) {
@@ -55,7 +65,7 @@ module.exports = {
         totalDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.totalDelegation / 1000000)),
         maxDelegationFormatted: discordServer.formatNumber(Math.round(premiumInfo.maxDelegation / 1000000)),
         discount: Math.min(100, Math.round(Math.round((premiumInfo.totalDelegation / premiumInfo.maxDelegation) * 100))),
-      }),
+      } as any),
     });
   },
   addBalanceInfo(premiumInfo, premiumFields, discordServer, locale) {
