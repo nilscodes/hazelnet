@@ -105,19 +105,20 @@ class DiscordServerService(
     }
 
     fun getDiscordServer(guildId: Long): DiscordServer {
-        val discordServer = discordServerRepository.findByGuildId(guildId)
+        return discordServerRepository.findByGuildId(guildId)
                 .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+    }
+
+    fun getDiscordServerWithStakepoolInfo(guildId: Long): DiscordServer {
+        val discordServer = getDiscordServer(guildId)
         val stakepoolMap = stakepoolService.getStakepools()
         discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
         return discordServer
     }
 
     fun getDiscordServerByInternalId(serverId: Int): DiscordServer {
-        val discordServer = discordServerRepository.findById(serverId)
+        return discordServerRepository.findById(serverId)
             .orElseThrow { NoSuchElementException("No Discord Server with server ID $serverId found") }
-        val stakepoolMap = stakepoolService.getStakepools()
-        discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
-        return discordServer
     }
 
     fun updateDiscordServer(guildId: Long, discordServerPartial: DiscordServerPartial): DiscordServer {
@@ -280,7 +281,7 @@ class DiscordServerService(
     fun getTokenPolicies(guildId: Long) = getDiscordServer(guildId).tokenPolicies.toSet()
     fun getTokenRoles(guildId: Long) = getDiscordServer(guildId).tokenRoles.toSet()
     fun getDelegatorRoles(guildId: Long) = getDiscordServer(guildId).delegatorRoles.toSet()
-    fun getStakepools(guildId: Long) = getDiscordServer(guildId).stakepools.toSet()
+    fun getStakepools(guildId: Long) = getDiscordServerWithStakepoolInfo(guildId).stakepools.toSet()
     fun getWhitelists(guildId: Long) = getDiscordServer(guildId).whitelists.toSet()
 
     fun updateSettings(guildId: Long, embeddableSetting: EmbeddableSetting): EmbeddableSetting {
