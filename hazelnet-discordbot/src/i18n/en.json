@@ -256,7 +256,8 @@
 			"configure-engagement": {
 				"status": "Set to False to turn this feature off.",
 				"reminderchannel": "The channel to send public activity reminder messages to.",
-				"inactivity-days": "The number of days after which to send an activity reminder."
+				"inactivity-days": "The number of days after which to send an activity reminder.",
+				"remindermessage": "A custom reminder message in which you can use the %USER% placeholder."
 			}
 		},
 		"choices": {
@@ -802,8 +803,10 @@
 				"activityreminderOn": "✅ Activity reminder messages will be sent to the channel <#{{reminderChannel}}> after users are inactive for {{inactivityDays}} days, if the bot has permissions to send messages to this channel.",
 				"activityreminderOff": "⚠ No activity reminder channel has been configured. No reminders will be sent when users are inactive.",
 				"noPremium": "🙀 You currently can not configure engagement features as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
-				"announceTitle": "Hey sucker!",
-				"announceText": "Yeah you <@{{userId}}>!"
+				"minimumActivityDays": "⚠ You cannot configure activity reminders that run more frequently than once a day.",
+				"announceTitle": "Hey there!",
+				"announceTextPrefixWithMention": "Hi <@{{userId}}>. ",
+				"announceText": "Long time no see, <@{{userId}}>. We are glad you joined our community and would love for you to chat with us. Swing by any of our channels to see what is new 🙂"
 			}
 		},
 		"tokenroles": {

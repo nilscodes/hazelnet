@@ -514,7 +514,6 @@ class DiscordServerService(
                     }
                 }
             }
-
         }
     }
 
