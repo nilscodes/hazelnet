@@ -18,6 +18,7 @@ import guildCreate from './events/guildCreate';
 import guildDelete from './events/guildDelete';
 import interactionCreate from './events/interactionCreate';
 import messageCreate from './events/messageCreate';
+import guildMemberAdd from './events/guildMemberAdd';
 import ready from './events/ready';
 import { DiscordEvent } from './utility/commandtypes';
 const commandbase = require('./utility/commandbase');
@@ -70,15 +71,15 @@ commandFiles.forEach(async (file) => {
   }
 });
 
-const eventFiles = [guildCreate, guildDelete, interactionCreate, messageCreate, ready];
+const eventFiles = [guildCreate, guildDelete, interactionCreate, messageCreate,  guildMemberAdd, ready];
 
 eventFiles.forEach((event: DiscordEvent) => {
   if (event.once) {
     client.logger.info(`Registering event ${event.name} (once-type)`);
-    client.once(event.name, event.execute);
+    client.once(event.name, (...args) => event.execute(client, ...args));
   } else {
     client.logger.info(`Registering event ${event.name} (on-type)`);
-    client.on(event.name, event.execute);
+    client.on(event.name, (...args) => event.execute(client, ...args));
   }
 });
 

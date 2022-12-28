@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
 import i18n from 'i18n';
-import HazelnetClient from "src/utility/hazelnetclient";
+import HazelnetClient from '../utility/hazelnetclient';
 const embedBuilder = require('../utility/embedbuilder');
 
 export type DiscordActivityReminder = {

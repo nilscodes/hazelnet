@@ -1,5 +1,5 @@
 import HazelnetClient from '../utility/hazelnetclient';
-import engagementMessageEventHandler from '../events/configure-engagement/messageCreate';
+import engagementMessageEventHandler from '../utility/activitytracker';
 
 export default {
   cron: '*/15 * * * *',
