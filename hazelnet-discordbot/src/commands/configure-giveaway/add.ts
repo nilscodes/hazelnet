@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import giveaway, { GiveawayDrawType, GiveawayPartial } from '../../utility/giveaway';
 const datetime = require('../../utility/datetime');
@@ -164,7 +164,7 @@ export default <GiveawayAddCommand> {
         const content = this.buildContent(locale, interaction.channel!.id, phase2GiveawayObject, 2);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', content.join('\n\n'), 'configure-giveaway-add');
         this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, phase2GiveawayObject);
-        const components = [new ActionRowBuilder()
+        const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
             new ButtonBuilder()
               .setCustomId('configure-giveaway/add/startphase3')
@@ -175,7 +175,7 @@ export default <GiveawayAddCommand> {
               .setLabel(i18n.__({ phrase: 'configure.giveaway.add.redoPhase2', locale }))
               .setStyle(ButtonStyle.Secondary),
           ),
-        ] as ActionRowBuilder<MessageActionRowComponentBuilder>[];
+        ];
         await interaction.editReply({ embeds: [embed], components });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', i18n.__({ phrase: 'configure.giveaway.add.errorTimeout', locale }), 'configure-giveaway-add');

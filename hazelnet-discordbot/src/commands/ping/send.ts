@@ -1,24 +1,29 @@
-const NodeCache = require('node-cache');
-const i18n = require('i18n');
-const {
-  ActionRowBuilder, ButtonBuilder, ButtonStyle,
-} = require('discord.js');
+import NodeCache from 'node-cache';
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
+import { ExternalAccountPing } from '../../utility/sharedtypes';
 const adahandle = require('../../utility/adahandle');
 const cardanoaddress = require('../../utility/cardanoaddress');
 const cardanotoken = require('../../utility/cardanotoken');
 const embedBuilder = require('../../utility/embedbuilder');
 
-module.exports = {
+interface PingSendCommand extends BotSubcommand {
+  cache: NodeCache
+  isUnsafeMessage(message: string): boolean
+}
+
+export default <PingSendCommand> {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
-    const pingType = interaction.options.getString('ping-type');
-    const target = interaction.options.getString('target');
+    const pingType = interaction.options.getString('ping-type', true);
+    const target = interaction.options.getString('target', true);
     const message = interaction.options.getString('message');
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      let errorMessage = false;
+      let errorMessage = false as string | boolean;
       switch (pingType) {
         case 'PING_TYPE_HANDLE':
           if (!adahandle.isHandle(target)) {
@@ -39,9 +44,9 @@ module.exports = {
           errorMessage = 'unknownPingType';
           break;
       }
-      if (errorMessage === false && message?.length > 320) {
+      if (errorMessage === false && message && message.length > 320) {
         errorMessage = 'tooLongMessage';
-      } else if (errorMessage === false && this.isUnsafeMessage(message)) {
+      } else if (errorMessage === false && this.isUnsafeMessage(message as string)) {
         errorMessage = 'messageContainsUnsafePhrases';
       }
       if (errorMessage === false) {
@@ -51,16 +56,16 @@ module.exports = {
           this.cache.set(`${interaction.user.id}`, newPing);
           const pingFields = [{
             name: i18n.__({ phrase: 'ping.send.messageContentTitle', locale }),
-            value: i18n.__({ phrase: `ping.send.${message ? 'messageContent' : 'messageContentEmpty'}`, locale }, { message })
-              + i18n.__({ phrase: 'ping.send.clickBelowToSend', locale }, { message })
-              + i18n.__({ phrase: 'ping.send.recipientAcknowledgement', locale }, { message }),
+            value: i18n.__({ phrase: `ping.send.${message ? 'messageContent' : 'messageContentEmpty'}`, locale }, { message } as any)
+              + i18n.__({ phrase: 'ping.send.clickBelowToSend', locale }, { message } as any)
+              + i18n.__({ phrase: 'ping.send.recipientAcknowledgement', locale }, { message } as any),
           },
           {
             name: i18n.__({ phrase: 'ping.send.pingLimitTitle', locale }),
             value: i18n.__({ phrase: `ping.send.${externalAccount.premium ? 'pingLimitPremium' : 'pingLimitStandard'}`, locale }),
           }];
           const components = [
-            new ActionRowBuilder()
+            new ActionRowBuilder<MessageActionRowComponentBuilder>()
               .addComponents(
                 new ButtonBuilder()
                   .setCustomId('ping/send/send')
@@ -69,8 +74,8 @@ module.exports = {
               ),
           ];
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: 'ping.send.purpose', locale }, { targetShort: cardanoaddress.shorten(target) }), 'ping-send', pingFields);
-          await interaction.editReply({ embeds: [embed], components, ephemeral: true });
-        } catch (pingError) {
+          await interaction.editReply({ embeds: [embed], components });
+        } catch (pingError: any) {
           let pingAddErrorMessage = 'ping.send.pingOtherError';
           let waitTime;
           let waitUnits;
@@ -92,23 +97,23 @@ module.exports = {
             default:
               break;
           }
-          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: pingAddErrorMessage, locale }, { targetShort: cardanoaddress.shorten(target), waitTime, waitUnits }), 'ping-send');
-          await interaction.editReply({ embeds: [embed], ephemeral: true });
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: pingAddErrorMessage, locale }, { targetShort: cardanoaddress.shorten(target), waitTime, waitUnits } as any), 'ping-send');
+          await interaction.editReply({ embeds: [embed] });
         }
       } else {
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: `ping.send.${errorMessage}`, locale }, { target }), 'ping-send');
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ guildId: interaction.guild.id, content: 'Error while pinging user. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while pinging user. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
   async executeButton(interaction) {
     if (interaction.customId === 'ping/send/send') {
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const pingToSend = this.cache.take(`${interaction.user.id}`);
+      const pingToSend = this.cache.take(`${interaction.user.id}`) as ExternalAccountPing;
       if (pingToSend) {
         const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
         await interaction.client.services.pings.updateExternalAccountPing(externalAccount.id, pingToSend.id, {
@@ -129,7 +134,7 @@ module.exports = {
               value: i18n.__({ phrase: 'ping.send.pingRecipientAdditionalContent', locale }),
             });
             const components = [
-              new ActionRowBuilder()
+              new ActionRowBuilder<MessageActionRowComponentBuilder>()
                 .addComponents(
                   new ButtonBuilder()
                     .setCustomId(`ping/send/report-${pingToSend.id}-${discordServer.id}`)
@@ -145,20 +150,20 @@ module.exports = {
             }
             const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.pingRecipientTitle', locale }), i18n.__({ phrase: 'ping.send.pingRecipientText', locale }, {
               sender: interaction.user.id,
-              guildName: interaction.guild.name,
+              guildName: interaction.guild!.name,
               targetType: i18n.__({ phrase: `ping.send.${targetType}`, locale }),
               target: pingToSend.recipientAddress,
             }), 'ping-send', messageFields);
-            await recipientDmChannel.send({ components, embeds: [embed], ephemeral: true });
+            await recipientDmChannel.send({ components, embeds: [embed] });
           } catch (error) {
-            interaction.client.logger.info({ guildId: interaction.guild.id, error: `The discord user with the ID ${pingToSend.recipientLocal} is not accepting messages. Ping was sent by ${interaction.user.id} (${interaction.user.tag}).` });
+            interaction.client.logger.info({ guildId: interaction.guild!.id, error: `The discord user with the ID ${pingToSend.recipientLocal} is not accepting messages. Ping was sent by ${interaction.user.id} (${interaction.user.tag}).` });
           }
         }
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: 'ping.send.success', locale }, { targetShort: cardanoaddress.shorten(pingToSend.recipientAddress) }), 'ping-send');
-        await interaction.update({ components: [], embeds: [embed], ephemeral: true });
+        await interaction.update({ components: [], embeds: [embed] });
       } else {
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.messageTitle', locale }), i18n.__({ phrase: 'ping.send.failedTimeout', locale }), 'ping-send');
-        await interaction.update({ components: [], embeds: [embed], ephemeral: true });
+        await interaction.update({ components: [], embeds: [embed] });
       }
     } else if (interaction.customId.indexOf('ping/send/report-') === 0) {
       const [, pingToReport, discordServerId] = interaction.customId.split('-');
@@ -168,7 +173,7 @@ module.exports = {
       await interaction.client.services.pings.updateExternalAccountPing(externalAccount.id, pingToReport, { reported: true });
       const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.reportTitle', locale }), i18n.__({ phrase: 'ping.send.reportContent', locale }), 'ping-send');
       await interaction.update({ components: [] });
-      await interaction.user.send({ embeds: [embed], ephemeral: true });
+      await interaction.user.send({ embeds: [embed] });
     }
   },
   isUnsafeMessage(message) {

@@ -1,14 +1,15 @@
-const i18n = require('i18n');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
 const embedBuilder = require('../../utility/embedbuilder');
 
-module.exports = {
+export default <BotSubcommand> {
   async execute(interaction) {
-    const poolHash = interaction.options.getString('pool-id');
+    const poolHash = interaction.options.getString('pool-id', true);
     try {
       await interaction.deferReply({ ephemeral: true });
-      const newPoolPromise = await interaction.client.services.discordserver.addStakepool(interaction.guild.id, poolHash);
+      const newPoolPromise = await interaction.client.services.discordserver.addStakepool(interaction.guild!.id, poolHash);
       const newPoolData = newPoolPromise.data;
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool add', i18n.__({ phrase: 'configure.stakepool.add.success', locale: useLocale }), 'configure-stakepool-add', [
         {
@@ -16,10 +17,10 @@ module.exports = {
           value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, newPoolData.info),
         },
       ]);
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding official stakepool to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while adding official stakepool to your server. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
 };

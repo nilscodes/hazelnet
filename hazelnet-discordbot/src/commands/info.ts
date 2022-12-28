@@ -1,13 +1,12 @@
-const i18n = require('i18n');
-const { SlashCommandBuilder, ButtonStyle } = require('discord.js');
-const {
-  ActionRowBuilder, ButtonBuilder,
-} = require('discord.js');
+import { SlashCommandBuilder, APIEmbedField, ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder, ButtonStyle, } from 'discord.js';
+import i18n from 'i18n';
+import { Stakepool } from '../utility/sharedtypes';
+import { BotCommand } from '../utility/commandtypes';
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('info', locale);
     return new SlashCommandBuilder()
@@ -18,15 +17,15 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id) as Stakepool[];
       const guild = await interaction.client.guilds.fetch(discordServer.guildId);
       const locale = discordServer.getBotLanguage();
       let infoText = i18n.__({ phrase: 'info.infoBaseText', locale });
       if (discordServer.premium && discordServer.settings?.INFO_CONTENT_TEXT) {
         infoText = discordServer.settings?.INFO_CONTENT_TEXT;
       }
-      let stakepoolFields = [];
+      let stakepoolFields = [] as APIEmbedField[];
       if (stakepools.length) {
         infoText += `\n\n${i18n.__n({ singular: 'info.stakepoolsBaseText.one', plural: 'info.stakepoolsBaseText.other', locale }, stakepools.length)}`;
         const infoMessageType = stakepools.length > 6 ? 'info.stakepoolDetailsShort' : 'info.stakepoolDetails';
@@ -52,9 +51,9 @@ module.exports = {
         }
         if (discordServer.settings?.INFO_CONTENT_BUTTONS) {
           try {
-            const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS);
+            const buttonData = JSON.parse(discordServer.settings.INFO_CONTENT_BUTTONS) as any[];
             if (buttonData.length) {
-              components = [new ActionRowBuilder()
+              components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
                 .addComponents(
                   buttonData.map((button) => (
                     new ButtonBuilder()
@@ -70,10 +69,10 @@ module.exports = {
         }
       }
       const embed = embedBuilder.buildForUser(discordServer, infoTitle, infoText, 'info', stakepoolFields, infoImage);
-      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
+      await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting server info.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting server info.' });
     }
   },
 };

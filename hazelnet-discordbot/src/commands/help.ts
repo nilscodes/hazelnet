@@ -1,11 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
-const i18n = require('i18n');
+import { SlashCommandBuilder } from 'discord.js';
+import i18n from 'i18n';
+import { BotCommand } from '../utility/commandtypes';
 const embedBuilder = require('../utility/embedbuilder');
 const commandbase = require('../utility/commandbase');
 const commandPermissions = require('../utility/commandpermissions');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('help', locale);
     return new SlashCommandBuilder()
@@ -16,7 +17,7 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const isBotAdmin = await commandPermissions.isBotAdmin(discordServer, interaction.client, interaction.user.id);
       const enabledFeatures = discordServer.settings.ENABLED_COMMAND_TAGS.split(',');
@@ -50,7 +51,7 @@ module.exports = {
       helpTexts.push(`${i18n.__({ phrase: 'help.generalCommands.help', locale })}`);
 
       const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitle', locale }, { botName: 'HAZELnet.io Bot' }), helpTexts.join('\n'), 'help');
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({ embeds: [embed] });
 
       if (isBotAdmin) {
         const adminHelpTexts = [];
@@ -95,7 +96,7 @@ module.exports = {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting help information.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting help information.' });
     }
   },
 };

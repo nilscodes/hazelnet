@@ -164,10 +164,10 @@ module.exports = {
   async deleteTokenRoleMetadataFilter(guildId, tokenRoleId, filterIdToRemove) {
     return axios.delete(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
   },
-  async createDelegatorRole(guildId, poolHash, minimumStakeAda, discordRoleId) {
+  async createDelegatorRole(guildId, poolHash, minimumStake, discordRoleId) {
     return axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/delegatorroles`, {
       poolHash,
-      minimumStake: minimumStakeAda * 1000000,
+      minimumStake,
       roleId: discordRoleId,
     });
   },
@@ -206,12 +206,10 @@ module.exports = {
     };
   },
   async registerForWhitelist(guildId, whitelistId, externalAccountId, address) {
-    const newWhitelistSignupPromise = await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups`, {
+    return axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups`, {
       externalAccountId,
       address,
     });
-    this.clearCacheEntry(guildId);
-    return newWhitelistSignupPromise;
   },
   async getWhitelistSignups(guildId, whitelistId) {
     return (await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists/${whitelistId}/signups`)).data;

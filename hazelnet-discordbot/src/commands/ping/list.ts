@@ -1,20 +1,20 @@
-const i18n = require('i18n');
-const {
-  ActionRowBuilder, ButtonBuilder, ButtonStyle,
-} = require('discord.js');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
+import { ExternalAccountPing } from '../../utility/sharedtypes';
 const embedBuilder = require('../../utility/embedbuilder');
 const cardanoaddress = require('../../utility/cardanoaddress');
 
-module.exports = {
+export default <BotSubcommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
 
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
-      const allPings = await interaction.client.services.pings.getPingsForExternalAccount(externalAccount.id);
+      const allPings = await interaction.client.services.pings.getPingsForExternalAccount(externalAccount.id) as ExternalAccountPing[];
       const receivedPings = allPings.filter((ping) => ping.sentTime && ping.recipient === mainAccount.id);
       const sentPings = allPings.filter((ping) => ping.sentTime && ping.sender === externalAccount.id);
       const pingFields = [{
@@ -26,7 +26,7 @@ module.exports = {
             sentTime,
             targetShort: cardanoaddress.shorten(ping.recipientAddress),
             message: ping.senderMessage,
-          });
+          } as any);
         }).join('\n\n') : i18n.__({ phrase: 'ping.list.receivedPingsNone', locale }),
       },
       {
@@ -36,7 +36,7 @@ module.exports = {
           return i18n.__({ phrase: 'ping.list.sentPing', locale }, {
             sentTime,
             targetShort: cardanoaddress.shorten(ping.recipientAddress),
-          });
+          } as any);
         }).join('\n\n') : i18n.__({ phrase: 'ping.list.sentPingsNone', locale }),
       }];
       if (receivedPings.length) {
@@ -46,7 +46,7 @@ module.exports = {
         });
       }
       const components = [
-        new ActionRowBuilder()
+        new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
             new ButtonBuilder()
               .setCustomId('ping/list/test')
@@ -55,15 +55,15 @@ module.exports = {
           ),
       ];
       const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.list.messageTitle', locale }), i18n.__({ phrase: 'ping.list.purpose', locale }), 'ping-list', pingFields);
-      await interaction.editReply({ embeds: [embed], components, ephemeral: true });
+      await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ guildId: interaction.guild.id, content: 'Error while pinging user. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while pinging user. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
   async executeButton(interaction) {
     if (interaction.customId === 'ping/list/test') {
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       try {
         const recipientDmChannel = await interaction.client.users.createDM(interaction.user.id);
@@ -76,14 +76,14 @@ module.exports = {
         }];
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.send.pingRecipientTitle', locale }), i18n.__({ phrase: 'ping.send.pingRecipientText', locale }, {
           sender: interaction.user.id,
-          guildName: interaction.guild.name,
+          guildName: interaction.guild!.name,
           target: '$test',
         }), 'ping-list', messageFields);
-        await recipientDmChannel.send({ embeds: [embed], ephemeral: true });
+        await recipientDmChannel.send({ embeds: [embed] });
         const embedFollowUp = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.list.testMessageSentTitle', locale }), i18n.__({ phrase: 'ping.list.testMessageSentContent', locale }), 'ping-list');
         await interaction.reply({ embeds: [embedFollowUp], components: [], ephemeral: true });
       } catch (error) {
-        if (error.constructor?.name === 'DiscordAPIError') {
+        if (error?.constructor?.name === 'DiscordAPIError') {
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'ping.list.noDirectMessageTitle', locale }), i18n.__({ phrase: 'ping.list.noDirectMessage', locale }), 'ping-list');
           await interaction.reply({ embeds: [embed], components: [], ephemeral: true });
         } else {
