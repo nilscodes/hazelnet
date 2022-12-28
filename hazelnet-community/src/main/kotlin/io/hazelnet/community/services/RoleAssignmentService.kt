@@ -12,6 +12,7 @@ import io.hazelnet.community.services.external.MutantStakingService
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import javax.transaction.Transactional
 
 @Service
 class RoleAssignmentService(
@@ -418,7 +419,10 @@ class RoleAssignmentService(
     }
 
     @Async
-    fun publishRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long) {
+    @Transactional
+    fun publishRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = discordServerRepository.findByGuildId(guildId)
+            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
         if (discordServer.tokenRoles.isNotEmpty() || discordServer.delegatorRoles.isNotEmpty()) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             val allVerificationsOfMember =
@@ -486,7 +490,9 @@ class RoleAssignmentService(
     }
 
     @Async
-    fun publishRemoveRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long) {
+    fun publishRemoveRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = discordServerRepository.findByGuildId(guildId)
+            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
         fun publishRoleRemoval(roleType: String) {
             rabbitTemplate.convertAndSend(

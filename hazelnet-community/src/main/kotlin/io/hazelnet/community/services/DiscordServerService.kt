@@ -48,7 +48,7 @@ class DiscordServerService(
     private val roleAssignmentService: RoleAssignmentService,
     private val discordMemberActivityRepository: DiscordMemberActivityRepository,
     private val rabbitTemplate: RabbitTemplate,
-    val tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
+    tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
     meterRegistry: MeterRegistry,
 ) {
     private val lastManualUserLinking: MutableMap<Long, Date> = mutableMapOf()
@@ -234,6 +234,7 @@ class DiscordServerService(
         return tokenRoleMetadataFilter
     }
 
+    @Transactional
     fun addMember(guildId: Long, discordMember: DiscordMember): DiscordMember {
         val discordServer = getDiscordServer(guildId)
         discordMember.joinTime = Date.from(ZonedDateTime.now().toInstant())
@@ -244,7 +245,7 @@ class DiscordServerService(
             || lastManualUserLinkingForUser.before(Date(System.currentTimeMillis() - MIN_PAUSE_BETWEEN_MANUAL_LINKING))
         ) {
             lastManualUserLinking[discordMember.externalAccountId] = Date()
-            roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer, discordMember.externalAccountId)
+            roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
         }
         return discordMember
     }
@@ -270,7 +271,7 @@ class DiscordServerService(
         discordServer.members.removeIf { it.externalAccountId == externalAccountId }
         discordServerRepository.save(discordServer)
         if (!skipRoleUpdates) {
-            roleAssignmentService.publishRemoveRoleAssignmentsForGuildMember(discordServer, externalAccountId)
+            roleAssignmentService.publishRemoveRoleAssignmentsForGuildMember(discordServer.guildId, externalAccountId)
         }
     }
 
@@ -400,10 +401,11 @@ class DiscordServerService(
         return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForGuildMember(discordServer, externalAccountId)
     }
 
+    @Transactional
     fun queueRoleAssignments(guildId: Long, externalAccountId: Long) {
         val discordServer = getDiscordServer(guildId)
         val discordMember = getMember(discordServer, externalAccountId)
-        roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer, discordMember.externalAccountId)
+        roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
     }
 
     fun getEligibleClaimListsOfUser(guildId: Long, externalAccountId: Long): ClaimListsWithProducts {
