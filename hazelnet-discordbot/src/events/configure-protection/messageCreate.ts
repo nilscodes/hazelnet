@@ -1,5 +1,5 @@
-import { AugmentedMessage } from '../../utility/hazelnetclient';
-import { TextBasedChannel } from "discord.js";
+import HazelnetClient from '../../utility/hazelnetclient';
+import { Message, TextBasedChannel } from "discord.js";
 const adahandle = require('../../utility/adahandle');
 const cardanoaddress = require('../../utility/cardanoaddress');
 const embedBuilder = require('../../utility/embedbuilder');
@@ -7,11 +7,11 @@ const ethereumaddress = require('../../utility/ethereumaddress');
 
 
 interface ProtectionInteractionHandler {
-  applyProtection(message: AugmentedMessage, discordServer: any): void
+  applyProtection(client: HazelnetClient, message: Message, discordServer: any): void
 }
 
 export default<ProtectionInteractionHandler> {
-  async applyProtection(message, discordServer) {
+  async applyProtection(client, message, discordServer) {
     const containsCardanoAddress = cardanoaddress.containsWalletOrEnterpriseAddress(message.content);
     const containsEthereumAddress = ethereumaddress.containsWalletAddress(message.content);
     const containsAdaHandle = adahandle.containsHandle(message.content);
@@ -36,17 +36,17 @@ export default<ProtectionInteractionHandler> {
                   );
                   channel.send({ embeds: [embed] });
                 } else {
-                  message.client.logger.warn(`Server ${discordServer.guildId} does not have a valid audit channel configured with ${discordServer.settings.PROTECTION_AUDIT_CHANNEL}`);
+                  client.logger.warn(`Server ${discordServer.guildId} does not have a valid audit channel configured with ${discordServer.settings.PROTECTION_AUDIT_CHANNEL}`);
                 }
               } catch (error) {
-                message.client.logger.warn(`Error when sending audit message for guild ${discordServer.guildId} with audit channel configured with ${discordServer.settings.PROTECTION_AUDIT_CHANNEL}`);
+                client.logger.warn(`Error when sending audit message for guild ${discordServer.guildId} with audit channel configured with ${discordServer.settings.PROTECTION_AUDIT_CHANNEL}`);
               }
             }
             message.delete();
           }
         }
       } catch (error) {
-        message.client.logger.error(error);
+        client.logger.error(error);
       }
     }
   },

@@ -1,8 +1,6 @@
-import { AugmentedMessage } from '../../utility/hazelnetclient';
-
 interface EngagementInteractionHandler {
   activity: Map<String, Number>
-  applyActivityTracking(message: AugmentedMessage, discordServer: any): void
+  applyActivityTracking(userId: string, discordServer: any): void
   swapActivityData(): Map<String, Number>
 }
 
@@ -15,9 +13,9 @@ export default <EngagementInteractionHandler> {
     return oldActivity;
   },
 
-  async applyActivityTracking(message, discordServer) {
+  async applyActivityTracking(userId, discordServer) {
     if (discordServer?.settings?.ACTIVITY_REMINDER) {
-      this.activity.set(`${discordServer.guildId}-${message.author.id}`, new Date().getTime());
+      this.activity.set(`${discordServer.guildId}-${userId}`, new Date().getTime());
     }
   },
 };

@@ -22,10 +22,6 @@ export interface AugmentedMessage extends Message {
   client: HazelnetClient
 }
 
-export interface AugmentedGuild extends Guild {
-  client: HazelnetClient
-}
-
 export default class HazelnetClient extends Client {
   services: any;
   logger: Logger;

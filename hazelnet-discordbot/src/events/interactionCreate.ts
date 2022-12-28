@@ -1,8 +1,8 @@
 import { DiscordEvent } from "../utility/commandtypes";
-import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "../utility/hazelnetclient";
+import HazelnetClient, { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "../utility/hazelnetclient";
 
 interface InteractionCreateDiscordEvent extends DiscordEvent {
-  execute(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction | AugmentedUserContextMenuInteraction): void
+  execute(client: HazelnetClient, interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction | AugmentedUserContextMenuInteraction): void
 }
 
 type UserContextTranslationMap = {
@@ -16,16 +16,16 @@ const USERCONTEXT_COMMAND_NAME_MAP: UserContextTranslationMap = {
 
 export default <InteractionCreateDiscordEvent> {
   name: 'interactionCreate',
-  async execute(interaction) {
+  async execute(client, interaction) {
     try {
       if (interaction.isUserContextMenuCommand()) {
         const userContextMenuCommandInteraction = interaction as AugmentedUserContextMenuInteraction
         try {
-          const command: any = interaction.client.commands.get(USERCONTEXT_COMMAND_NAME_MAP[userContextMenuCommandInteraction.commandName]);
+          const command: any = client.commands.get(USERCONTEXT_COMMAND_NAME_MAP[userContextMenuCommandInteraction.commandName]);
           if (!command) return;
           await command.executeUserContextMenu(interaction);
         } catch (error) {
-          interaction.client.logger.error({ guildId: interaction.guild?.id, error });
+          client.logger.error({ guildId: interaction.guild?.id, error });
           await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
       } else if (interaction.isCommand()) {
@@ -40,11 +40,11 @@ export default <InteractionCreateDiscordEvent> {
         try {
           await command.execute(interaction);
         } catch (error) {
-          interaction.client.logger.error({ guildId: interaction.guild?.id, error });
+          client.logger.error({ guildId: interaction.guild?.id, error });
           await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
         }
         const durationInMs = new Date().getTime() - startRun.getTime();
-        interaction.client.metrics.commandDuration
+        client.metrics.commandDuration
           .labels({
             command: subcommandName ? `${interaction.commandName}-${subcommandName}` : interaction.commandName,
             guild: interaction.guild?.id,
@@ -52,29 +52,29 @@ export default <InteractionCreateDiscordEvent> {
           .observe(durationInMs);
       } else if (interaction.isSelectMenu()) {
         const commandForSelect = interaction.customId.split('/')[0];
-        const command: any = interaction.client.commands.get(commandForSelect);
+        const command: any = client.commands.get(commandForSelect);
         if (!command) return;
 
         try {
           await command.executeSelectMenu(interaction);
         } catch (error) {
-          interaction.client.logger.error({ guildId: interaction.guild?.id, error });
+          client.logger.error({ guildId: interaction.guild?.id, error });
           await interaction.reply({ content: `There was an error while executing the select menu action ${interaction.customId} for this command!`, ephemeral: true });
         }
       } else if (interaction.isButton()) {
         const commandForButton = interaction.customId.split('/')[0];
-        const command: any = interaction.client.commands.get(commandForButton);
+        const command: any = client.commands.get(commandForButton);
         if (!command) return;
 
         try {
           await command.executeButton(interaction);
         } catch (error) {
-          interaction.client.logger.error({ guildId: interaction.guild?.id, error });
+          client.logger.error({ guildId: interaction.guild?.id, error });
           await interaction.reply({ content: `There was an error while executing the button action ${interaction.customId} for this command!`, ephemeral: true });
         }
       }
     } catch (fatalError) {
-      interaction.client.logger.error({ guildId: interaction.guild?.id, error: fatalError });
+      client.logger.error({ guildId: interaction.guild?.id, error: fatalError });
     }
   },
 };

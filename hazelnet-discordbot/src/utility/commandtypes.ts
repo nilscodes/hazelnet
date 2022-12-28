@@ -1,6 +1,6 @@
 // To be merged with commandbase.js
-import { AugmentedCommandInteraction, AugmentedButtonInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction, AugmentedGuild } from "./hazelnetclient";
-import { ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
+import HazelnetClient, { AugmentedCommandInteraction, AugmentedButtonInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "./hazelnetclient";
+import { ContextMenuCommandBuilder, Guild, SlashCommandBuilder } from 'discord.js';
 
 export interface BotCommand {
   getCommandData(locale: string, commandsToEnable?: string[]): SlashCommandBuilder
@@ -22,9 +22,10 @@ export interface BotSubcommand {
 export interface DiscordEvent {
   once?: boolean
   name: string
-  execute(args: any): void
+  client?: HazelnetClient
+  execute(client: HazelnetClient, ...args: any[]): void
 }
 
 export interface GuildDiscordEvent extends DiscordEvent {
-  execute(guild: AugmentedGuild): void
+  execute(client: HazelnetClient, guild: Guild): void
 }

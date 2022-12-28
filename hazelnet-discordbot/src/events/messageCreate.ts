@@ -1,30 +1,30 @@
 import { DiscordEvent } from "../utility/commandtypes";
-import { ChannelType } from "discord.js";
-import { AugmentedMessage } from "../utility/hazelnetclient";
+import { ChannelType, Message } from "discord.js";
+import HazelnetClient from "../utility/hazelnetclient";
 import protectionMessageEventHandler from './configure-protection/messageCreate';
-import engagementMessageEventHandler from './configure-engagement/messageCreate';
+import activityTracker from '../utility/activitytracker';
 
 interface MessageCreateDiscordEvent extends DiscordEvent {
-  execute(message: AugmentedMessage): void
+  execute(client: HazelnetClient, message: Message): void
 }
 
 export default <MessageCreateDiscordEvent> {
   name: 'messageCreate',
-  async execute(message) {
+  async execute(client, message) {
     try {
-      const isSentByHazelnet = message.author.id === message.client.application?.id;
+      const isSentByHazelnet = message.author.id === client.application?.id;
       if (!isSentByHazelnet) {
         if (message.channel.type === ChannelType.DM) {
-          const claimCommand: any = message.client.commands.get('claim');
+          const claimCommand: any = client.commands.get('claim');
           await claimCommand.processDirectMessage(message);
         } else if (message.content && message.guildId) {
-          const discordServer = await message.client.services.discordserver.getDiscordServer(message.guildId);
-          protectionMessageEventHandler.applyProtection(message, discordServer);
-          engagementMessageEventHandler.applyActivityTracking(message, discordServer);
+          const discordServer = await client.services.discordserver.getDiscordServer(message.guildId);
+          protectionMessageEventHandler.applyProtection(client, message, discordServer);
+          activityTracker.applyActivityTracking(message.author.id, discordServer);
         }
       }
     } catch (error) {
-      message.client.logger.error(error);
+      client.logger.error(error);
     }
   },
 };
