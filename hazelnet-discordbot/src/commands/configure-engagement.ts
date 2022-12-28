@@ -14,6 +14,7 @@ export default <BotCommand> {
         .setDescription(ci18n.subDescription('activityreminder'))
         .addIntegerOption((option) => option.setName('inactivity-days').setDescription(ci18n.option('inactivity-days')).setRequired(true))
         .addChannelOption((option) => option.setName('reminderchannel').setDescription(ci18n.option('reminderchannel')).setRequired(true))
+        .addStringOption((option) => option.setName('remindermessage').setDescription(ci18n.option('remindermessage')).setRequired(false))
         .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false)));
   },
   commandTags: ['engagement'],
