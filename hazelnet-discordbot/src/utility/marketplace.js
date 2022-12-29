@@ -183,10 +183,10 @@ module.exports = {
       value: `marketplace-channel-id-${marketplaceChannel.id}`,
     };
   },
-  getMarketplaceChannelDetailsField(discordServer, marketplaceChannel, mainTextSubAttribute, priceAddonSubCommand) {
+  getMarketplaceChannelDetailsField(discordServer, tokenPolicies, marketplaceChannel, mainTextSubAttribute, priceAddonSubCommand) {
     const subcommand = marketplaceChannel.type.toLowerCase();
     const locale = discordServer.getBotLanguage();
-    const projectName = this.getProjectName(discordServer, marketplaceChannel);
+    const projectName = this.getProjectName(tokenPolicies, marketplaceChannel);
     const marketplaceNames = marketplaceChannel.marketplaces?.map((marketplace) => i18n.__({ phrase: `marketplaces.${marketplace}`, locale })).join(', ');
     let content = i18n.__({ phrase: `configure.marketplace.${subcommand}.${mainTextSubAttribute}`, locale }, { projectName, marketplaceNames, channel: marketplaceChannel.channelId });
     if (marketplaceChannel.type !== 'MINT') {
@@ -205,8 +205,8 @@ module.exports = {
       value: content,
     };
   },
-  getProjectName(discordServer, marketplaceChannel) {
-    const projectData = discordServer.tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannel.policyId);
+  getProjectName(tokenPolicies, marketplaceChannel) {
+    const projectData = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === marketplaceChannel.policyId);
     return projectData ? projectData.projectName : marketplaceChannel.policyId;
   },
   addMetadataAttributeHighlightField(announcement, fields) {
