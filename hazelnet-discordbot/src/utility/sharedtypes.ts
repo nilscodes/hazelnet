@@ -53,7 +53,7 @@ export type DiscordServer = {
 }
 
 enum ExternalAccountType {
-    DISCORD,
+    DISCORD = 'DISCORD',
 }
 
 export type ExternalAccount = {
@@ -73,8 +73,8 @@ export type DiscordServerMember = {
 }
 
 export enum WhitelistType {
-    CARDANO_ADDRESS,
-    DISCORD_ID,
+    CARDANO_ADDRESS = 'CARDANO_ADDRESS',
+    DISCORD_ID = 'DISCORD_ID',
 }
 
 export type Whitelist = {
@@ -115,8 +115,8 @@ export type SummarizedWhitelistSignup = {
 }
 
 enum BlockchainType {
-    CARDANO,
-    ETHEREUM
+    CARDANO = 'CARDANO',
+    ETHEREUM = 'ETHEREUM',
 }
 
 export type Verification = {
