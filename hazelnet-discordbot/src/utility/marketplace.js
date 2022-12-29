@@ -162,9 +162,9 @@ module.exports = {
     }
     return [];
   },
-  async getMarketplaceChannelOption(discordServer, marketplaceChannel, interaction, subcommand) {
+  async getMarketplaceChannelOption(discordServer, tokenPolicies, marketplaceChannel, interaction, subcommand) {
     const locale = discordServer.getBotLanguage();
-    const projectName = this.getProjectName(discordServer, marketplaceChannel);
+    const projectName = this.getProjectName(tokenPolicies, marketplaceChannel);
     let announceChannel = null;
     try {
       announceChannel = await interaction.guild.channels.fetch(marketplaceChannel.channelId);
