@@ -188,6 +188,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
@@ -239,6 +240,7 @@ internal class RoleAssignmentServiceTest {
         } answers { emptyList() }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -322,6 +324,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -390,6 +393,7 @@ internal class RoleAssignmentServiceTest {
         }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -463,6 +467,7 @@ internal class RoleAssignmentServiceTest {
         }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -556,6 +561,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -637,6 +643,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            mockk(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -702,6 +709,7 @@ internal class RoleAssignmentServiceTest {
         } answers { emptyList() }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
+            mockk(),
             mockk(),
             mockk(),
             mockk(),
