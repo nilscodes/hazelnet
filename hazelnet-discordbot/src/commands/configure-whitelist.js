@@ -19,7 +19,8 @@ module.exports = {
             { name: ci18n.choice('DISCORD_ID'), value: 'DISCORD_ID' },
           )
           .setRequired(true))
-        .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true))
+        .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(false))
+        .addRoleOption((option) => option.setName('awarded-role').setDescription(ci18n.option('awarded-role')).setRequired(false))
         .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
         .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
         .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
@@ -43,7 +44,8 @@ module.exports = {
         .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
         .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
         .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
-        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)))
+        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false))
+        .addRoleOption((option) => option.setName('awarded-role').setDescription(ci18n.option('awarded-role')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))

@@ -18,7 +18,7 @@ module.exports = {
       signupAfterTimestamp: whitelist.signupAfter ? Math.floor(new Date(whitelist.signupAfter).getTime() / 1000) : 0,
       signupUntilTimestamp: whitelist.signupUntil ? Math.floor(new Date(whitelist.signupUntil).getTime() / 1000) : 0,
     });
-    const roleAndDatePart = i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirement', locale }, { whitelist, datePart });
+    const rolePart = this.getRolePart(locale, whitelist);
 
     const memberPhrase = this.getMemberPhrase(whitelist, noCurrentNumbers);
     const lockIcon = running && !whitelist.closed ? '🔓' : '🔒';
@@ -29,7 +29,7 @@ module.exports = {
     }) : '';
     const manualClose = whitelist.closed ? i18n.__({ phrase: 'whitelist.list.whitelistManuallyClosed', locale }) : '';
 
-    return `${lockIcon} ${roleAndDatePart} ${memberPart} ${launchDate} ${manualClose}`;
+    return `${lockIcon} ${rolePart}${datePart} ${memberPart} ${launchDate} ${manualClose}`;
   },
   hasSignupEnded(whitelist) {
     if (whitelist.signupUntil) {
@@ -68,6 +68,18 @@ module.exports = {
     }
     return datePhrase;
   },
+  getRolePart(locale, whitelist) {
+    let rolePart = i18n.__({ phrase: 'whitelist.list.whitelistNoRoleRequirement', locale });
+    if (whitelist.requiredRoles?.length === 1) {
+      rolePart = `${i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirementSingle', locale }, whitelist.requiredRoles[0])} `;
+    } else if (whitelist.requiredRoles?.length > 1) {
+      rolePart = `${i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirementMultiple', locale })}\n${whitelist.requiredRoles.map((requiredRole) => i18n.__({ phrase: 'whitelist.list.whitelistRoleEntry', locale }, requiredRole))}\n`;
+    }
+    if (whitelist.awardedRole) {
+      rolePart += i18n.__({ phrase: 'whitelist.list.whitelistRoleAwarded', locale }, { whitelist });
+    }
+    return rolePart;
+  },
   getMemberPhrase(whitelist, noCurrentNumbers) {
     let memberPhrase = 'whitelist.list.whitelistMembersNoLimit';
     if (whitelist.maxUsers > 0) {
@@ -85,14 +97,17 @@ module.exports = {
   async userQualifies(interaction, whitelist, existingSignup) {
     if (!existingSignup) {
       if (!this.isSignupPaused(whitelist) && !this.hasSignupEnded(whitelist) && this.hasSignupStarted(whitelist) && !(whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
-        const { guild } = interaction;
-        const guildRole = await guild.roles.fetch(whitelist.requiredRoleId);
-        if (guildRole) {
-          const member = await guild.members.fetch(interaction.user.id);
-          const hasRequiredRole = await member.roles.cache.some((role) => role.id === whitelist.requiredRoleId);
-          return hasRequiredRole;
-        }
+        return this.userHasRequiredRole(interaction, whitelist);
       }
+    }
+    return false;
+  },
+  async userHasRequiredRole(interaction, whitelist) {
+    if (whitelist.requiredRoles?.length) {
+      const needsAnyOfRoleIds = whitelist.requiredRoles.map((role) => role.roleId);
+      const { guild } = interaction;
+      const member = await guild.members.fetch(interaction.user.id);
+      return needsAnyOfRoleIds.length === 0 || member.roles.cache.some((role) => needsAnyOfRoleIds.includes(role.id));
     }
     return false;
   },
@@ -108,13 +123,7 @@ module.exports = {
     if (this.hasSignupEnded(whitelist) || !this.hasSignupStarted(whitelist) || (whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
       return ''; // Signup closed
     }
-    const { guild } = interaction;
-    const guildRole = await guild.roles.fetch(whitelist.requiredRoleId);
-    if (!guildRole) {
-      return ''; // Role does not exist
-    }
-    const member = await guild.members.fetch(interaction.user.id);
-    const hasRequiredRole = await member.roles.cache.some((role) => role.id === whitelist.requiredRoleId);
+    const hasRequiredRole = await this.userHasRequiredRole(interaction, whitelist);
     if (hasRequiredRole) {
       return `\n${i18n.__({ phrase: 'whitelist.list.youQualify', locale: discordServer.getBotLanguage() }, { whitelist })}`;
     }

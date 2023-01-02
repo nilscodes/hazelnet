@@ -1,9 +1,11 @@
+import HazelnetClient from "src/utility/hazelnetclient";
+
 /* eslint-disable no-await-in-loop */
 const roleassignments = require('../utility/roleassignments');
 
-module.exports = {
+export default {
   cron: '30 * * * * *',
-  async execute(client) {
+  async execute(client: HazelnetClient) {
     client.logger.info('Running token role assignment job');
     try {
       const hours = new Date().getHours();

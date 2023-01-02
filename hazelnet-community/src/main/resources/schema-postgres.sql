@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS "discord_poll_options";
 DROP TABLE IF EXISTS "discord_poll_required_roles";
 DROP TABLE IF EXISTS "discord_polls";
 DROP TABLE IF EXISTS "stake_snapshot_cardano";
+DROP TABLE IF EXISTS "discord_whitelists_required_roles";
 DROP TABLE IF EXISTS "discord_whitelists_signup";
 DROP TABLE IF EXISTS "discord_whitelists";
 DROP TABLE IF EXISTS "discord_server_members";
@@ -272,7 +273,7 @@ CREATE TABLE "discord_whitelists"
     "whitelist_launch_date"      timestamp,
     "whitelist_max_users"        int,
     "whitelist_closed"           boolean      NOT NULL DEFAULT false,
-    "required_discord_role_id"   bigint,
+    "awarded_discord_role_id"    bigint,
     "shared_with_discord_server" int,
     "whitelist_logo_url"         varchar(1000),
     "whitelist_type"             smallint     NOT NULL DEFAULT 0,
@@ -286,6 +287,12 @@ CREATE TABLE "discord_whitelists_signup"
     "address"                   varchar(150),
     "signup_time"               timestamp NOT NULL,
     UNIQUE("discord_whitelist_id", "external_account_id")
+);
+
+CREATE TABLE "discord_whitelists_required_roles"
+(
+    "discord_whitelist_id" bigint,
+    "discord_role_id"     bigint NOT NULL
 );
 
 CREATE TABLE "discord_polls"
@@ -571,6 +578,8 @@ ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id")
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
 CREATE INDEX "discord_whitelists_signup_external_account_id_index" ON "discord_whitelists_signup" ("external_account_id");
+
+ALTER TABLE "discord_whitelists_required_roles" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_polls" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

@@ -26,10 +26,14 @@ module.exports = {
     await this.addMissingMembersToRole(discordServer, roleProperty, guildForAssignments, rolesToUsers, client);
   },
   async getRoles(client, guildId, roleProperty) {
-    if (roleProperty === 'tokenRoles') {
-      return client.services.discordserver.listTokenOwnershipRoles(guildId);
+    if (roleProperty === 'delegatorRoles') {
+      return client.services.discordserver.listDelegatorRoles(guildId);
     }
-    return client.services.discordserver.listDelegatorRoles(guildId);
+    if (roleProperty === 'whitelistRoles') {
+      const whitelists = await client.services.discordserver.listWhitelists(guildId);
+      return whitelists.filter((whitelist) => !!whitelist.awardedRole).map((whitelist) => ({ roleId: whitelist.awardedRole }));
+    }
+    return client.services.discordserver.listTokenOwnershipRoles(guildId);
   },
   createRolesToUsersMap(discordServer, roles, roleAssignments) {
     const rolesToUsers = {};
@@ -62,7 +66,7 @@ module.exports = {
             }
           }
         } else {
-          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
+          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName} while removing roles from individual member`);
         }
       }
     } catch (error) {
@@ -89,7 +93,7 @@ module.exports = {
             }
           }
         } else {
-          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName}`);
+          client.logger.info(`No role with ID ${roleMapping.roleId} found on discord server ${discordServer.guildName} while removing members from role`);
         }
       }
     } catch (error) {
@@ -123,7 +127,7 @@ module.exports = {
           }
         }
       } else {
-        client.logger.info(`No role with ID ${roleId} found on discord server ${discordServer.guildName}`);
+        client.logger.info(`No role with ID ${roleId} found on discord server ${discordServer.guildName} while adding members to role`);
       }
     }
   },

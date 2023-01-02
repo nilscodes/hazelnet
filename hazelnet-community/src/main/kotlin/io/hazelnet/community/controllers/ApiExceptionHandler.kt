@@ -6,7 +6,7 @@ import io.hazelnet.shared.data.ApiErrorMessage
 import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
-import io.hazelnet.community.data.discord.WhitelistRequirementNotMetException
+import io.hazelnet.community.data.discord.whitelists.WhitelistRequirementNotMetException
 import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersCannotBeDrawnException
 import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersNotDrawnException
 import io.hazelnet.community.data.ping.LastPingTooRecentException

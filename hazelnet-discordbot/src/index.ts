@@ -84,7 +84,7 @@ eventFiles.forEach((event: DiscordEvent) => {
 });
 
 const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates', 'mintcountupdates', 'activityupdater'];
+const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates', 'mintcountupdates', 'activityupdater', 'delegatorroles', 'tokenroles', 'whitelistroles'];
 
 scheduleFiles.forEach(async (file) => {
   let schedule: any;
@@ -104,7 +104,7 @@ client.login(process.env.TOKEN);
 
 // Connect to AMQP queues
 const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptQueues = ['activityreminders'];
+const typescriptQueues = ['activityreminders', 'whitelistroles', 'delegatorroles', 'tokenroles'];
 
 if (queueFiles.length) {
   const connectToAmqp = async () => {
