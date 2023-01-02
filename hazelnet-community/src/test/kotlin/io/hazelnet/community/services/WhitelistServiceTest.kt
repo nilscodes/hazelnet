@@ -157,6 +157,7 @@ internal class WhitelistServiceTest {
             mockk(),
             mockk(),
             mockWhitelistRepository,
+            mockk(),
         )
         assertEquals(listOf(SharedWhitelist(
             guildId = sharedServer.guildId,
@@ -178,6 +179,7 @@ internal class WhitelistServiceTest {
             mockk(),
             mockk(),
             mockWhitelistRepository,
+            mockk(),
         )
         return Pair(whitelistSaveSlot, whitelistService)
     }
