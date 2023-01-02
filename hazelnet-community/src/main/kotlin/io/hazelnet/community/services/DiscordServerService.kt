@@ -363,6 +363,11 @@ class DiscordServerService(
         return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMembers, allDelegationToAllowedPools, discordServer)
     }
 
+    fun getAllCurrentWhitelistRoleAssignmentsForGuild(guildId: Long) =
+        roleAssignmentService.getAllCurrentWhitelistRoleAssignmentsForGuild(
+            getDiscordServer(guildId)
+        )
+
     fun regenerateAccessToken(guildId: Long): String {
         val discordServer = getDiscordServer(guildId)
         val snowflakeId = discordServer.guildId.toString()

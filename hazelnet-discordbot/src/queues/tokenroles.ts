@@ -1,9 +1,10 @@
-/* eslint-disable no-await-in-loop */
+import HazelnetClient from "../utility/hazelnetclient";
+import { DiscordRoleAssignmentListForGuildMember } from "../utility/sharedtypes";
 const roleassignments = require('../utility/roleassignments');
 
-module.exports = {
+export default {
   name: 'tokenroles',
-  async consume(client, roleAssignmentsForUser) {
+  async consume(client: HazelnetClient, roleAssignmentsForUser: DiscordRoleAssignmentListForGuildMember) {
     try {
       const guild = await client.guilds.fetch(roleAssignmentsForUser.guildId);
       if (guild) {

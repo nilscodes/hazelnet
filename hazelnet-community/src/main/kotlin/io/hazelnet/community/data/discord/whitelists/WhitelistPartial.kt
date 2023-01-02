@@ -1,4 +1,4 @@
-package io.hazelnet.community.data.discord
+package io.hazelnet.community.data.discord.whitelists
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import java.util.*
@@ -12,4 +12,5 @@ data class WhitelistPartial @JsonCreator constructor(
     val sharedWithServer: Int?,
     val launchDate: Date?,
     val logoUrl: String?,
+    val awardedRole: Long?,
 )

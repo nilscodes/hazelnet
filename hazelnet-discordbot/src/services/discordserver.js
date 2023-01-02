@@ -178,7 +178,7 @@ module.exports = {
     const discordPollPromise = await axios.patch(`${hazelCommunityUrl}/discord/servers/${guildId}/polls/${pollId}`, discordPollPartial);
     return discordPollPromise.data;
   },
-  async createWhitelist(guildId, creator, name, displayName, type, signupAfter, signupUntil, maxUsers, requiredRoleId, launchDate, logoUrl) {
+  async createWhitelist(guildId, creator, name, displayName, type, signupAfter, signupUntil, maxUsers, requiredRoles, awardedRole, launchDate, logoUrl) {
     return axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/whitelists`, {
       creator,
       displayName,
@@ -187,7 +187,8 @@ module.exports = {
       signupAfter,
       signupUntil,
       maxUsers,
-      requiredRoleId,
+      requiredRoles,
+      awardedRole,
       launchDate,
       logoUrl,
     });
@@ -252,6 +253,9 @@ module.exports = {
   },
   async getCurrentTokenRoleAssignments(guildId) {
     return (await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/roleassignments/tokenroles`)).data;
+  },
+  async getCurrentWhitelistRoleAssignments(guildId) {
+    return (await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/roleassignments/whitelistroles`)).data;
   },
   async getPolls(guildId) {
     return (await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/polls`)).data;

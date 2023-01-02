@@ -82,7 +82,8 @@ export type Whitelist = {
     name: string
     displayName: string
     creator: string
-    requiredRoleId: string
+    requiredRoles: string[]
+    awardedRole?: string
     createTime: string
     type: WhitelistType
     signupAfter: string
@@ -145,4 +146,16 @@ export type Handle = {
     address?: string
     resolved: boolean
     image?: string
+}
+
+export type DiscordRoleAssignment = {
+    guildId: string
+    userId: string
+    roleId: string
+}
+
+export type DiscordRoleAssignmentListForGuildMember = {
+    guildId: string
+    userId: string
+    assignments: DiscordRoleAssignment[]
 }

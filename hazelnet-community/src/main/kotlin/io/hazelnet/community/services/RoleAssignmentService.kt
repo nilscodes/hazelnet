@@ -8,6 +8,7 @@ import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordServerRepository
+import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
@@ -21,6 +22,7 @@ class RoleAssignmentService(
     private val rabbitTemplate: RabbitTemplate,
     private val discordServerRepository: DiscordServerRepository,
     private val mutantStakingService: MutantStakingService,
+    private val whitelistRepository: DiscordWhitelistRepository,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -397,6 +399,11 @@ class RoleAssignmentService(
         return memberIdsToTokenPolicyOwnershipCounts.computeIfAbsent(externalAccountId) { mutableMapOf() }
     }
 
+    fun getAllCurrentWhitelistRoleAssignmentsForGuild(discordServer: DiscordServer) =
+        whitelistRepository.findAwardedRoleAssignments(discordServer.id!!)
+            .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
+            .toSet()
+
     fun getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
         return if (discordServer.tokenRoles.isNotEmpty()) {
             val allVerificationsOfMember =
@@ -418,6 +425,11 @@ class RoleAssignmentService(
         }
     }
 
+    fun getAllCurrentWhitelistRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long) =
+        whitelistRepository.findAwardedRoleAssignmentsForExternalAccount(discordServer.id!!, externalAccountId)
+            .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
+            .toSet()
+
     @Async
     @Transactional
     fun publishRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
@@ -430,6 +442,17 @@ class RoleAssignmentService(
             val allDelegationToAllowedPools = getDelegationIfNeeded(discordServer)
             publishTokenRoleAssignmentsForGuildMember(allVerificationsOfMember, discordServer, externalAccount)
             publishDelegatorRoleAssignmentsForGuildMember(allVerificationsOfMember, allDelegationToAllowedPools, discordServer, externalAccount)
+        }
+    }
+
+    @Async
+    @Transactional
+    fun publishWhitelistRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = discordServerRepository.findByGuildId(guildId)
+            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        if (discordServer.whitelists.any { it.awardedRole != null }) {
+            val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
+            publishWhitelistRoleAssignmentsForGuildMember(discordServer, externalAccount)
         }
     }
 
@@ -490,6 +513,19 @@ class RoleAssignmentService(
         }
     }
 
+    private fun publishWhitelistRoleAssignmentsForGuildMember(
+        discordServer: DiscordServer,
+        externalAccount: ExternalAccount
+    ) {
+        rabbitTemplate.convertAndSend(
+            "whitelistroles", DiscordRoleAssignmentListForGuildMember(
+                guildId = discordServer.guildId,
+                userId = externalAccount.referenceId.toLong(),
+                assignments = getAllCurrentWhitelistRoleAssignmentsForGuildMember(discordServer, externalAccount.id!!)
+            )
+        )
+    }
+
     @Async
     fun publishRemoveRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
         val discordServer = discordServerRepository.findByGuildId(guildId)
@@ -507,6 +543,7 @@ class RoleAssignmentService(
 
         publishRoleRemoval("tokenroles")
         publishRoleRemoval("delegatorroles")
+        // Whitelist roles are independent of verifications and not removed here
     }
 
 }

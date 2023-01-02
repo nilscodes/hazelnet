@@ -734,6 +734,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordRoleAssignment"
+  /discord/servers/{guildId}/roleassignments/whitelistroles:
+    get:
+      summary: Get the current set of whitelist role assignments for this server
+      operationId: getCurrentWhitelistRoleAssignments
+      tags:
+        - discord
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Role assignment list for whitelists"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordRoleAssignment"
   /discord/servers/{guildId}/members:
     get:
       summary: Get the list of external accounts that are members of this discord server
@@ -3602,7 +3619,6 @@ components:
         - displayName
         - name
         - creator
-        - requiredRoleId
       properties:
         id:
           readOnly: true
@@ -3644,7 +3660,12 @@ components:
         closed:
           type: boolean
           default: false
-        requiredRoleId:
+        requiredRoles:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/DiscordRequiredRole"
+        awardedRole:
           $ref: "#/components/schemas/DiscordRole"
         sharedWithServer:
           type: integer
@@ -3686,6 +3707,8 @@ components:
           type: string
           minLength: 1
           maxLength: 1000
+        awardedRole:
+          $ref: "#/components/schemas/DiscordRole"
     WhitelistSignup:
       type: object
       required:

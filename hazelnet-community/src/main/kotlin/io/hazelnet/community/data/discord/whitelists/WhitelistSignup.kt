@@ -1,4 +1,4 @@
-package io.hazelnet.community.data.discord
+package io.hazelnet.community.data.discord.whitelists
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize

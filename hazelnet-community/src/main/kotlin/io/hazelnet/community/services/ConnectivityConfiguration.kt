@@ -80,6 +80,9 @@ class ConnectivityConfiguration {
     fun delegatorRolesQueue() = Queue("delegatorroles")
 
     @Bean
+    fun whitelistRolesQueue() = Queue("whitelistroles")
+
+    @Bean
     fun adminAnnouncementsQueue() = Queue("adminannouncements")
 
     @Bean
@@ -123,6 +126,10 @@ class ConnectivityConfiguration {
     @Bean
     fun delegatorRolesBinding(@Qualifier("delegatorRolesQueue") delegatorRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(delegatorRolesQueue).to(exchange)
+
+    @Bean
+    fun whitelistRolesBinding(@Qualifier("whitelistRolesQueue") whitelisttRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(whitelisttRolesQueue).to(exchange)
 
     @Bean
     fun announcementsBinding(@Qualifier("adminAnnouncementsQueue") adminAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer

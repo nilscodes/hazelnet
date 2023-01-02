@@ -1,6 +1,10 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.data.discord.whitelists.Whitelist
+import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
+import io.hazelnet.community.data.discord.whitelists.WhitelistRequirementNotMetException
+import io.hazelnet.community.data.discord.whitelists.WhitelistType
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.shared.data.SharedWhitelist
@@ -19,6 +23,7 @@ class WhitelistService(
     private val discordServerRepository: DiscordServerRepository,
     private val externalAccountService: ExternalAccountService,
     private val discordWhitelistRepository: DiscordWhitelistRepository,
+    private val roleAssignmentService: RoleAssignmentService,
 ) {
     fun addWhitelist(guildId: Long, whitelist: Whitelist): Whitelist {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -76,6 +81,9 @@ class WhitelistService(
         if (whitelistPartial.logoUrl != null) {
             whitelistToUpdate.logoUrl = whitelistPartial.logoUrl.ifBlank { null }
         }
+        if (whitelistPartial.awardedRole != null) {
+            whitelistToUpdate.awardedRole = if (whitelistPartial.awardedRole > 0) whitelistPartial.awardedRole else null
+        }
         discordWhitelistRepository.save(whitelistToUpdate)
         return whitelistToUpdate
     }
@@ -119,7 +127,7 @@ class WhitelistService(
 
     private fun buildWhitelistSignup(
         whitelist: Whitelist,
-        signup: io.hazelnet.community.data.discord.WhitelistSignup
+        signup: io.hazelnet.community.data.discord.whitelists.WhitelistSignup
     ): WhitelistSignup {
         // TODO improve very inefficient looped SQL queries
         val externalAccount =
@@ -143,7 +151,7 @@ class WhitelistService(
             ?: throw NoSuchElementException("No whitelist with name $whitelistName found on Discord server ${discordServer.guildId}")
 
     @Transactional
-    fun addWhitelistSignup(guildId: Long, whitelistId: Long, whitelistSignup: io.hazelnet.community.data.discord.WhitelistSignup): io.hazelnet.community.data.discord.WhitelistSignup {
+    fun addWhitelistSignup(guildId: Long, whitelistId: Long, whitelistSignup: io.hazelnet.community.data.discord.whitelists.WhitelistSignup): io.hazelnet.community.data.discord.whitelists.WhitelistSignup {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val whitelist = getWhitelistById(discordServer, whitelistId)
         if (whitelist.closed) {
@@ -170,8 +178,11 @@ class WhitelistService(
         // Remove existing signup (currently only one per external account possible)
         whitelist.signups.removeIf { it.externalAccountId == whitelistSignup.externalAccountId }
         whitelistSignup.signupTime = Date.from(ZonedDateTime.now().toInstant())
-        whitelist.signups.add(whitelistSignup)
+        val added = whitelist.signups.add(whitelistSignup)
         discordWhitelistRepository.save(whitelist)
+        if (added && whitelist.awardedRole != null) {
+            roleAssignmentService.publishWhitelistRoleAssignmentsForGuildMember(discordServer.guildId, whitelistSignup.externalAccountId)
+        }
         return whitelistSignup
     }
 
@@ -179,17 +190,20 @@ class WhitelistService(
     fun deleteWhitelistSignup(guildId: Long, whitelistId: Long, externalAccountId: Long) {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val whitelist = getWhitelistById(discordServer, whitelistId)
-        whitelist.signups.removeIf { it.externalAccountId == externalAccountId }
+        val removed = whitelist.signups.removeIf { it.externalAccountId == externalAccountId }
         discordWhitelistRepository.save(whitelist)
+        if (removed && whitelist.awardedRole != null) {
+            roleAssignmentService.publishWhitelistRoleAssignmentsForGuildMember(discordServer.guildId, externalAccountId)
+        }
     }
 
-    fun getWhitelistSignup(guildId: Long, whitelistId: Long, externalAccountId: Long): io.hazelnet.community.data.discord.WhitelistSignup {
+    fun getWhitelistSignup(guildId: Long, whitelistId: Long, externalAccountId: Long): io.hazelnet.community.data.discord.whitelists.WhitelistSignup {
         val discordServer = discordServerService.getDiscordServer(guildId)
         val whitelist = getWhitelistById(discordServer, whitelistId)
         return whitelist.signups.find { it.externalAccountId == externalAccountId }
             ?: throw NoSuchElementException("No whitelist registration found for external account $externalAccountId for whitelist ID $whitelistId on Discord server ${discordServer.guildId}")
-    }  
-    
+    }
+
 
     fun getExternalAccountWhitelists(externalAccountId: Long): List<SummarizedWhitelistSignup> {
         externalAccountService.getExternalAccount(externalAccountId)

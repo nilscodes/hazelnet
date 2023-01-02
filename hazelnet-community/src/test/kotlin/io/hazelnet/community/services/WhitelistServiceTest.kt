@@ -1,8 +1,9 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.data.discord.DiscordRequiredRole
 import io.hazelnet.community.data.discord.DiscordServer
-import io.hazelnet.community.data.discord.Whitelist
-import io.hazelnet.community.data.discord.WhitelistPartial
+import io.hazelnet.community.data.discord.whitelists.Whitelist
+import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.shared.data.SharedWhitelist
 import io.mockk.CapturingSlot
@@ -30,7 +31,8 @@ internal class WhitelistServiceTest {
         stakepools = mutableSetOf(),
         delegatorRoles = mutableSetOf(),
         tokenRoles = mutableSetOf(),
-        whitelists = mutableSetOf(Whitelist(
+        whitelists = mutableSetOf(
+            Whitelist(
             id = 1L,
             discordServerId = 12,
             creator = 515L,
@@ -40,13 +42,15 @@ internal class WhitelistServiceTest {
             signupAfter = null,
             signupUntil = null,
             launchDate = null,
-            requiredRoleId = 81294L,
+            requiredRoles = mutableSetOf(DiscordRequiredRole(81294L)),
+            awardedRole = null,
             maxUsers = null,
             closed = false,
             signups = mutableSetOf(),
             sharedWithServer = null,
             logoUrl = null,
-        )),
+        )
+        ),
         settings = mutableSetOf()
     )
 
@@ -63,7 +67,9 @@ internal class WhitelistServiceTest {
             logoUrl = null,
             sharedWithServer = null,
             maxUsers = null,
-        ))
+            awardedRole = null,
+        )
+        )
         assertEquals(now, whitelistSaveSlot.captured.launchDate)
     }
 
@@ -80,7 +86,9 @@ internal class WhitelistServiceTest {
             logoUrl = null,
             sharedWithServer = null,
             maxUsers = null,
-        ))
+            awardedRole = null,
+        )
+        )
         assertEquals(now, whitelistSaveSlot.captured.signupAfter)
     }
 
@@ -97,7 +105,9 @@ internal class WhitelistServiceTest {
             logoUrl = null,
             sharedWithServer = null,
             maxUsers = null,
-        ))
+            awardedRole = null,
+        )
+        )
         assertEquals(now, whitelistSaveSlot.captured.signupUntil)
     }
 
@@ -124,16 +134,19 @@ internal class WhitelistServiceTest {
         val mockWhitelistRepository = mockk<DiscordWhitelistRepository>()
         every {
             mockWhitelistRepository.findBySharedWithServer(testServer.id!!)
-        } returns listOf(Whitelist(
+        } returns listOf(
+            Whitelist(
             id = 15,
             name = "white",
             displayName = "Black",
             discordServerId = 66,
             creator = 15L,
             createTime = Date(),
-            requiredRoleId = 4141L,
-            sharedWithServer = testServer.id
-        ))
+            requiredRoles = mutableSetOf(DiscordRequiredRole(4141L)),
+            awardedRole = null,
+            sharedWithServer = testServer.id,
+        )
+        )
 
         val mockDiscordServerService = getMockDiscordServerService()
         every {

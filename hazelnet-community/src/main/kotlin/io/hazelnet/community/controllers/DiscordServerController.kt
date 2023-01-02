@@ -5,6 +5,9 @@ import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.claim.PhysicalOrder
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.data.discord.whitelists.Whitelist
+import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
+import io.hazelnet.community.data.discord.whitelists.WhitelistSignup
 import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import io.hazelnet.community.data.premium.IncomingDiscordPaymentRequest
 import io.hazelnet.community.services.BillingService
@@ -285,6 +288,10 @@ class DiscordServerController(
     @GetMapping("/{guildId}/roleassignments/tokenroles")
     @ResponseStatus(HttpStatus.OK)
     fun getCurrentTokenRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentTokenRoleAssignmentsForGuild(guildId)
+
+    @GetMapping("/{guildId}/roleassignments/whitelistroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun getCurrentWhitelistRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentWhitelistRoleAssignmentsForGuild(guildId)
 
     @PostMapping("/{guildId}/accesstoken")
     @ResponseStatus(HttpStatus.OK)

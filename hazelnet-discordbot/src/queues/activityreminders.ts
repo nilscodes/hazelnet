@@ -38,7 +38,6 @@ export default {
         client.logger.error({ guildId: activityReminder.guildId, msg: 'Guild not found while publishing activity reminder' });
       }
     } catch (reminderError) {
-      console.log(reminderError);
       client.logger.error({ guildId: activityReminder.guildId, msg: 'Failed to publish activity reminder', error: reminderError });
     }
   },

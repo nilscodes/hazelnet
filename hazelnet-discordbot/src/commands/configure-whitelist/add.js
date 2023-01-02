@@ -8,6 +8,7 @@ module.exports = {
     const whitelistDisplayName = interaction.options.getString('whitelist-displayname');
     const whitelistType = interaction.options.getString('type');
     const requiredRole = interaction.options.getRole('required-role');
+    const awardedRole = interaction.options.getRole('awarded-role');
     const maxUsers = interaction.options.getInteger('max-users');
     const signupAfter = interaction.options.getString('signup-start');
     const signupUntil = interaction.options.getString('signup-end');
@@ -30,6 +31,10 @@ module.exports = {
               await interaction.editReply({ embeds: [errorEmbed], ephemeral: true });
               return;
             }
+            const requiredRoles = [];
+            if (requiredRole) {
+              requiredRoles.push({ roleId: requiredRole.id });
+            }
 
             const newWhitelistPromise = await interaction.client.services.discordserver.createWhitelist(
               interaction.guild.id,
@@ -40,7 +45,8 @@ module.exports = {
               signupAfter,
               signupUntil,
               maxUsers,
-              requiredRole.id,
+              requiredRoles,
+              awardedRole?.id,
               launchDate,
               logoUrl,
             );

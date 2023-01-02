@@ -11,6 +11,7 @@ module.exports = {
     const signupUntil = interaction.options.getString('signup-end');
     const launchDate = interaction.options.getString('launch-date');
     const logoUrl = interaction.options.getString('logo-url');
+    const awardedRole = interaction.options.getRole('awarded-role');
 
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -33,6 +34,7 @@ module.exports = {
             maxUsers,
             launchDate,
             logoUrl,
+            awardedRole: awardedRole?.id,
           });
 
           const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);

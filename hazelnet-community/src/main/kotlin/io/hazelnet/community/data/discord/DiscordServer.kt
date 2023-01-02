@@ -8,6 +8,7 @@ import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.EmbeddableSettingSerializer
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
+import io.hazelnet.community.data.discord.whitelists.Whitelist
 import java.util.*
 import javax.persistence.*
 import javax.validation.Valid
