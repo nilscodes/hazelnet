@@ -1,3 +1,5 @@
+import { DiscordRequiredRole } from "./polltypes"
+
 type StakepoolInfo = {
     hash: string
     view: string
@@ -82,13 +84,15 @@ export type Whitelist = {
     name: string
     displayName: string
     creator: string
-    requiredRoles: string[]
+    requiredRoles: DiscordRequiredRole[]
     awardedRole?: string
     createTime: string
     type: WhitelistType
     signupAfter: string
     signupUntil: string
     launchDate?: string
+    maxUsers: number
+    currentUsers: number
     closed: boolean
     sharedWithServer: string
     logoUrl?: string
@@ -102,7 +106,16 @@ export type WhitelistSignupContainer = {
 export type WhitelistSignup = {
     externalAccountId: string
     address?: string
-    signupTime?: string
+    signupTime: number
+}
+
+export type SharedWhitelistSignup = {
+    externalAccountId: string
+    address?: string
+    referenceId?: string
+    referenceName?: string
+    referenceType: ExternalAccountType
+    signupTime: string
 }
 
 export type SummarizedWhitelistSignup = {

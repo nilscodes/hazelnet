@@ -3,8 +3,8 @@ import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import { DiscordServer, SummarizedWhitelistSignup, Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 
 interface WhitelistSendCommand extends BotSubcommand {
   getWhitelists(discordServer: DiscordServer, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, signups: WhitelistSignupContainer[], includeAddresses: boolean): Promise<APIEmbedField[]>

@@ -445,7 +445,7 @@ class RoleAssignmentService(
         }
     }
 
-    @Async
+    // Cannot be @Async for now because if it is called from external, the transaction that updates the whitelist is not yet committed while this thread starts immediately
     @Transactional
     fun publishWhitelistRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
         val discordServer = discordServerRepository.findByGuildId(guildId)

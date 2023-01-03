@@ -2,6 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponent
 import { DiscordRequiredRole } from "./polltypes"
 import i18n from 'i18n';
 import HazelnetClient from "./hazelnetclient";
+import { DiscordServer } from "./sharedtypes";
 
 export type Giveaway = {
   name: string
@@ -105,7 +106,7 @@ export default {
     }
     return false;
   },
-  getDiscordGiveawayListParts(discordServer: any, giveaways: Giveaway[], customId: string, selectionPhrase: string) {
+  getDiscordGiveawayListParts(discordServer: DiscordServer, giveaways: Giveaway[], customId: string, selectionPhrase: string) {
     const locale = discordServer.getBotLanguage();
     const sortedGiveaways = giveaways.sort((giveawayA, giveawayB) => giveawayA.displayName.localeCompare(giveawayB.displayName));
 
@@ -128,7 +129,7 @@ export default {
       });
     }
     const components = this.getGiveawayChoices(locale, sortedGiveaways, customId, selectionPhrase);
-    return { locale, giveawayFields, components };
+    return { giveawayFields, components };
   },
   getTimePhrase(timeObject: string | undefined, phrase: string, locale: string) {
     return timeObject ? i18n.__({ phrase, locale }, {

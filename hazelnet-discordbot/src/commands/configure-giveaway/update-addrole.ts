@@ -32,7 +32,7 @@ export default <GiveawayUpdateAddRoleCommand> {
       const guildId = interaction.guild!.id;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
-      const giveawayId = +interaction.values[0].substring(19);
+      const giveawayId = +interaction.values[0].substring('configure-giveaway-'.length);
       const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId) as Giveaway[];
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {

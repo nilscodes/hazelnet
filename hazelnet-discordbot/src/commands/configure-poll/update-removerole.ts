@@ -32,7 +32,7 @@ export default <PollUpdateRemoveRoleCommand> {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(guild.id);
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-poll/update-removerole/chooserole') {
-      const pollId = +interaction.values[0].substring(15);
+      const pollId = +interaction.values[0].substring('configure-poll-'.length);
       const polls = await interaction.client.services.discordserver.getPolls(guild.id) as Poll[];
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {

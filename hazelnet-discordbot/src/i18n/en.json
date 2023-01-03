@@ -60,7 +60,10 @@
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
 			"configure-whitelist-close": "Temporarily or permanently close a whitelist for registrations.",
 			"configure-whitelist-open": "Reopen a closed whitelist for registrations.",
-			"configure-whitelist-update": "Update settings for an existing whitelist",
+			"configure-whitelist-update": "Update an existing whitelist",
+			"configure-whitelist-update-details": "Update settings for an existing whitelist",
+			"configure-whitelist-update-addrole": "Adds a new eligible role that can register for a whitelist.",
+			"configure-whitelist-update-removerole": "Removes a currently eligible role from a whitelist.",
 			"configure-whitelist-announce": "Announce your whitelist in a channel and create an interactive signup widget.",
 			"configure-whitelist-share": "Share your whitelist data with another HAZELnet Discord.",
 			"configure-whitelist-unshare": "Turn off whitelist sharing for this whitelist.",
@@ -564,7 +567,7 @@
 			"noWhitelistsTitle": "No whitelists",
 			"noWhitelistsDetail": "*Currently, this server has no open or recently closed whitelists.*",
 			"whitelistNoRoleRequirement": "No role is required to sign up for this whitelist. ",
-			"whitelistRoleRequirementSingle": "Requirement for this whitelist is to have one the role <@&{{roleId}}>.",
+			"whitelistRoleRequirementSingle": "Requirement for this whitelist is to have the role <@&{{roleId}}>.",
 			"whitelistRoleRequirementMultiple": "Requirement for this whitelist is to have one of the following roles:",
 			"whitelistRoleEntry": "• <@&{{roleId}}>",
 			"whitelistRoleAwarded": "Once signed up, the user will receive the role <@&{{whitelist.awardedRole}}>. ",
@@ -602,6 +605,7 @@
 			"registerButton": "Register for this whitelist",
 			"success": "✅ Congratulations, you have successfully registered for the whitelist **{{{whitelist.displayName}}}**!",
 			"successUsedAddress": "\n\nUsed address (if you entered a $handle, it was resolved to an address immediately): *{{address}}*",
+			"successAwardedRole": "\n\nYou will receive the whitelist role <@&{{awardedRole}}> shortly and keep it as long as you remain registered for this whitelist.",
 			"invalidAddress": "This does not look like a valid address: *\"{{address}}\"*. If you used a $handle, please ensure it is correct.\n\nPlease verify you are using a valid {{blockchain}} address to register. Example addresses look as follows *{{example}}*.",
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
@@ -762,7 +766,7 @@
 				"mintCount": "🔢 {{count}} minted",
 				"mintCountWithMax": "🔢 {{count}}/{{maxCount}} minted",
 				"errorWrongChannelType": "⚠ Only guild voice channels can be used for this type of widget.",
-				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name."				
+				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name."
 			}
 		},
 		"social": {
@@ -1081,8 +1085,25 @@
 				"noPremium": "🙀 You currently can not add any whitelists as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"update": {
-				"success": "✅ Whitelist **{{{whitelist.displayName}}}** (API name: {{whitelist.name}}) was successfully updated:",
-				"notFound": "⚠ No whitelist with API name **{{whitelistName}}** found. Use **/configure-whitelist list** to see your available API names."
+				"details": {
+					"success": "✅ Whitelist **{{{whitelist.displayName}}}** (API name: {{whitelist.name}}) was successfully updated:",
+					"notFound": "⚠ No whitelist with API name **{{whitelistName}}** found. Use **/configure-whitelist list** to see your available API names."
+				},
+				"addrole": {
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to register for the whitelist **{{whitelist.displayName}}**.",
+					"purpose": "Select the whitelist you would like the role <@&{{roleId}}> to be able to register for.\n\n💡 All other requirements, like signup times and maximum counts, remain in place in addition to the existing role requirements.",
+					"chooseWhitelist": "Choose the whitelist you want to allow this role to vote in",
+					"tooManyRoles": "⚠ Cannot add more than 20 roles to a whitelist.",
+					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to register for this whitelist and was not added again."
+				},
+				"removerole": {
+					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to register for the whitelist **{{whitelist.displayName}}**.",
+					"purpose": "Select the whitelist you would like to remove a role from being able to register for.\n\n💡 All other requirements, like signup times and maximum counts, remain in place in addition to the existing role requirements.",
+					"chooseWhitelist": "Choose the whitelist you want to remove this role from",
+					"chooseRolePurpose": "Choose which role you would like to remove from the whitelist {{displayName}}:",
+					"chooseRole": "Choose role to remove",
+					"noRoles": "⚠ No roles to remove exist on this whitelist."
+				}
 			},
 			"close": {
 				"purpose": "Close registrations for this whitelist, either permanently or temporarily. You can close lists before they reach their end times or max user counts with this command. You can reopen it later via */configure-whitelist open*.",
@@ -1634,5 +1655,6 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	}
+	},
+	"": ""
 }

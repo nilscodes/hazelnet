@@ -3,8 +3,8 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import { StakeAddressAndHandle, Verification, Whitelist, WhitelistSignupContainer, WhitelistType } from '../../utility/sharedtypes';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 const adahandle = require('../../utility/adahandle');
 const cardanoaddress = require('../../utility/cardanoaddress');
 
@@ -98,7 +98,7 @@ export default <WhitelistRegisterCommand> {
             const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
             const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction) as WhitelistSignupContainer[];
             const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
-            if (whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, existingSignup)) {
+            if (await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, existingSignup)) {
               await interaction.client.services.discordserver.registerForWhitelist(interaction.guild!.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
               const successText = this.getSuccessText(locale, whitelistToRegisterFor, addressToWhitelist);
               const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), successText, 'whitelist-register', [], whitelistToRegisterFor.logoUrl);
@@ -134,7 +134,8 @@ export default <WhitelistRegisterCommand> {
   },
   getSuccessText(locale, whitelist, addressToWhitelist) {
     return i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist } as any)
-      + (addressToWhitelist ? i18n.__({ phrase: 'whitelist.register.successUsedAddress', locale }, { address: addressToWhitelist }) : '');
+      + (addressToWhitelist ? i18n.__({ phrase: 'whitelist.register.successUsedAddress', locale }, { address: addressToWhitelist }) : '')
+      + (whitelist.awardedRole ? i18n.__({ phrase: 'whitelist.register.successAwardedRole', locale }, whitelist as any) : '');
   },
   getSignupsText(signups, whitelists, locale) {
     let signupsText = '';
@@ -163,7 +164,7 @@ export default <WhitelistRegisterCommand> {
       if (whitelistToRegisterFor) {
         const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
         const titlePhrase = existingSignup ? 'whitelist.register.alreadyRegisteredTitle' : 'whitelist.register.messageTitle';
-        const userQualifiesForWhitelist = await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, false);
+        const userQualifiesForWhitelist = await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, undefined);
         if (!existingSignup && !userQualifiesForWhitelist) {
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), i18n.__({ phrase: 'whitelist.register.userDoesNotQualify', locale }, { whitelist: whitelistToRegisterFor } as any), 'whitelist-register');
           await interaction.editReply({ embeds: [embed] });

@@ -1,18 +1,30 @@
-const i18n = require('i18n');
-const { ActionRowBuilder, SelectMenuBuilder, AttachmentBuilder } = require('discord.js');
-const csvStringify = require('csv-stringify/sync');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
+import {
+  ActionRowBuilder,
+  AttachmentBuilder,
+  MessageActionRowComponentBuilder,
+  SelectMenuBuilder,
+} from 'discord.js';
+import csvStringify from 'csv-stringify/sync';
+import { Whitelist, SharedWhitelistSignup } from '../../utility/sharedtypes';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 
-module.exports = {
+interface WhitelistDownloadCommand extends BotSubcommand {
+  buildFileToDownload(whitelist: Whitelist, signups: SharedWhitelistSignup[], guildId: string, whitelistName: string): AttachmentBuilder
+  getCsvContent(whitelist: Whitelist, signups: SharedWhitelistSignup[]): any[]
+}
+
+export default <WhitelistDownloadCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
       const locale = discordServer.getBotLanguage();
       const localWhitelistOptions = whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
-      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild.id)).map((sharedWhitelist) => ({
+      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id)).map((sharedWhitelist: any) => ({
         label: i18n.__({ phrase: 'configure.whitelist.download.externalWhitelist', locale }, {
           whitelistDisplayName: sharedWhitelist.whitelistDisplayName.substr(0, 40),
           guildName: sharedWhitelist.guildName.substr(0, 50),
@@ -21,7 +33,7 @@ module.exports = {
       }));
       const whitelistOptions = [...localWhitelistOptions, ...sharedWhitelists];
       if (whitelistOptions.length) {
-        const components = [new ActionRowBuilder()
+        const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
             new SelectMenuBuilder()
               .setCustomId('configure-whitelist/download/complete')
@@ -30,34 +42,34 @@ module.exports = {
           )];
 
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.purpose', locale }), 'configure-whitelist-download');
-        await interaction.editReply({ components, embeds: [embed], ephemeral: true });
+        await interaction.editReply({ components, embeds: [embed] });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.list.noWhitelistsDetail', locale }), 'configure-whitelist-download');
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while removing whitelists from your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while removing whitelists from your server. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
   async executeSelectMenu(interaction) {
     if (interaction.customId === 'configure-whitelist/download/complete') {
       await interaction.deferUpdate();
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
       const locale = discordServer.getBotLanguage();
       try {
         const whitelistNameToDownload = interaction.values[0];
         const whitelistToDownload = whitelists.find((whitelist) => whitelist.name === whitelistNameToDownload);
         if (whitelistToDownload) {
-          const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild.id, whitelistToDownload.id);
+          const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild!.id, whitelistToDownload.id) as SharedWhitelistSignup[];
           if (signups.length) {
             const fileToDownload = this.buildFileToDownload(whitelistToDownload, signups, discordServer.guildId, whitelistToDownload.name);
 
             const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelistToDownload);
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.success', locale }, { whitelist: whitelistToDownload }), 'configure-whitelist-download', [
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.success', locale }, { whitelist: whitelistToDownload } as any), 'configure-whitelist-download', [
               {
-                name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist: whitelistToDownload }),
+                name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist: whitelistToDownload } as any),
                 value: detailsPhrase,
               },
             ]);
@@ -65,40 +77,38 @@ module.exports = {
               components: [],
               embeds: [embed],
               files: [fileToDownload],
-              ephemeral: true,
             });
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.errorSignupsEmpty', locale }, { whitelist: whitelistToDownload }), 'configure-whitelist-download');
-            await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.errorSignupsEmpty', locale }, { whitelist: whitelistToDownload } as any), 'configure-whitelist-download');
+            await interaction.editReply({ components: [], embeds: [embed] });
           }
         } else {
           const [guildIdSharing, whitelistNameShared] = whitelistNameToDownload.split('-');
-          const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild.id, true);
-          const sharedWhitelistToDownload = sharedWhitelists.find((sharedWhitelist) => sharedWhitelist.guildId === guildIdSharing && sharedWhitelist.whitelistName === whitelistNameShared);
+          const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, true);
+          const sharedWhitelistToDownload = sharedWhitelists.find((sharedWhitelist: any) => sharedWhitelist.guildId === guildIdSharing && sharedWhitelist.whitelistName === whitelistNameShared);
           if (sharedWhitelistToDownload) {
             if (sharedWhitelistToDownload.signups.length) {
-              const fileToDownload = this.buildFileToDownload(sharedWhitelistToDownload.signups, sharedWhitelistToDownload.guildId, sharedWhitelistToDownload.whitelistName);
+              const fileToDownload = this.buildFileToDownload(sharedWhitelistToDownload, sharedWhitelistToDownload.signups, sharedWhitelistToDownload.guildId, sharedWhitelistToDownload.whitelistName);
 
               const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.successExternal', locale }, sharedWhitelistToDownload), 'configure-whitelist-download');
               await interaction.editReply({
                 components: [],
                 embeds: [embed],
                 files: [fileToDownload],
-                ephemeral: true,
               });
             } else {
-              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.errorSignupsEmpty', locale }, { whitelist: { displayName: sharedWhitelistToDownload.whitelistDisplayName } }), 'configure-whitelist-download');
-              await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.errorSignupsEmpty', locale }, { whitelist: { displayName: sharedWhitelistToDownload.whitelistDisplayName } } as any), 'configure-whitelist-download');
+              await interaction.editReply({ components: [], embeds: [embed] });
             }
           } else {
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.errorNotFound', locale }, { whitelistName: whitelistNameToDownload }), 'configure-whitelist-download');
-            await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+            await interaction.editReply({ components: [], embeds: [embed] });
           }
         }
       } catch (error) {
         interaction.client.logger.error(error);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.otherError', locale }), 'configure-whitelist-download');
-        await interaction.editReply({ components: [], embeds: [embed], ephemeral: true });
+        await interaction.editReply({ components: [], embeds: [embed] });
       }
     }
   },
