@@ -6,7 +6,7 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
-import csvStringify from 'csv-stringify/sync';
+import { stringify } from 'csv-stringify/sync';
 import { Whitelist, SharedWhitelistSignup } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
@@ -114,7 +114,7 @@ export default <WhitelistDownloadCommand> {
   },
   buildFileToDownload(whitelist, signups, guildId, whitelistName) {
     const csvList = this.getCsvContent(whitelist, signups);
-    const csv = csvStringify.stringify(csvList);
+    const csv = stringify(csvList);
     const csvBuffer = Buffer.from(csv, 'utf8');
     const fileToDownload = new AttachmentBuilder(csvBuffer, { name: `hazelnet-${guildId}-whitelist-${whitelistName}.csv` });
     fileToDownload.setDescription('HAZELnet Whitelist Signups Download');
