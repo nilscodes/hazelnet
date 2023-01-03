@@ -38,7 +38,7 @@ gradle-build:
     - export GRADLE_USER_HOME=`pwd`/.gradle
 
   stage: build
-  script: gradle build
+  script: gradle --build-cache build
   artifacts:
     paths:
       - hazelnet-community/build/libs

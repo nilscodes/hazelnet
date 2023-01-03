@@ -84,6 +84,9 @@ class WhitelistService(
         if (whitelistPartial.awardedRole != null) {
             whitelistToUpdate.awardedRole = if (whitelistPartial.awardedRole > 0) whitelistPartial.awardedRole else null
         }
+        if (whitelistPartial.requiredRoles != null) {
+            whitelistToUpdate.requiredRoles = whitelistPartial.requiredRoles
+        }
         discordWhitelistRepository.save(whitelistToUpdate)
         return whitelistToUpdate
     }

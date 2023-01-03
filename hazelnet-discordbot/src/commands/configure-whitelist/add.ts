@@ -1,12 +1,14 @@
-const i18n = require('i18n');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
+import { Whitelist } from '../../utility/sharedtypes';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 
-module.exports = {
+export default <BotSubcommand> {
   async execute(interaction) {
-    const whitelistName = interaction.options.getString('whitelist-name');
-    const whitelistDisplayName = interaction.options.getString('whitelist-displayname');
-    const whitelistType = interaction.options.getString('type');
+    const whitelistName = interaction.options.getString('whitelist-name', true);
+    const whitelistDisplayName = interaction.options.getString('whitelist-displayname', true);
+    const whitelistType = interaction.options.getString('type', true);
     const requiredRole = interaction.options.getRole('required-role');
     const awardedRole = interaction.options.getRole('awarded-role');
     const maxUsers = interaction.options.getInteger('max-users');
@@ -17,8 +19,8 @@ module.exports = {
 
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
         const whitelistWithNameExists = whitelists.some((whitelist) => whitelist.name === whitelistName);
@@ -28,7 +30,7 @@ module.exports = {
 
             const errorEmbed = whitelistUtil.getWhitelistErrorEmbed(discordServer, '/configure-whitelist add', 'configure-whitelist-add', signupAfter, signupUntil, launchDate, logoUrl);
             if (errorEmbed) {
-              await interaction.editReply({ embeds: [errorEmbed], ephemeral: true });
+              await interaction.editReply({ embeds: [errorEmbed] });
               return;
             }
             const requiredRoles = [];
@@ -37,7 +39,7 @@ module.exports = {
             }
 
             const newWhitelistPromise = await interaction.client.services.discordserver.createWhitelist(
-              interaction.guild.id,
+              interaction.guild!.id,
               externalAccount.id,
               whitelistName,
               whitelistDisplayName,
@@ -59,22 +61,22 @@ module.exports = {
                 value: detailsPhrase,
               },
             ], whitelist.logoUrl);
-            await interaction.editReply({ embeds: [embed], ephemeral: true });
+            await interaction.editReply({ embeds: [embed] });
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.invalidName', locale }, { whitelistName }), 'configure-whitelist-add');
-            await interaction.editReply({ embeds: [embed], ephemeral: true });
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.invalidName', locale }, { whitelistName } as any), 'configure-whitelist-add');
+            await interaction.editReply({ embeds: [embed] });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.alreadyExists', locale }, { whitelistName }), 'configure-whitelist-add');
-          await interaction.editReply({ embeds: [embed], ephemeral: true });
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.alreadyExists', locale }, { whitelistName } as any), 'configure-whitelist-add');
+          await interaction.editReply({ embeds: [embed] });
         }
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.noPremium', locale }), 'configure-whitelist-add');
-        await interaction.editReply({ embeds: [embed], ephemeral: true });
+        await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding whitelist to your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while adding whitelist to your server. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
 };

@@ -30,6 +30,7 @@ module.exports = {
     'configure-stakepool',
     'configure-settings',
     'whitelist',
+    'configure-whitelist',
   ],
   async executeSubcommandIfAdmin(interaction) {
     const subcommandGroup = interaction.options.getSubcommandGroup(false);

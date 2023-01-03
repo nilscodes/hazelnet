@@ -2,8 +2,8 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import { Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 
 export default <BotSubcommand> {
   async execute(interaction) {

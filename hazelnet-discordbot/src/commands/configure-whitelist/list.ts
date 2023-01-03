@@ -1,18 +1,20 @@
-const i18n = require('i18n');
+import i18n from 'i18n';
+import { BotSubcommand } from '../../utility/commandtypes';
+import { Whitelist } from '../../utility/sharedtypes';
+import whitelistUtil from '../../utility/whitelist';
 const embedBuilder = require('../../utility/embedbuilder');
-const whitelistUtil = require('../../utility/whitelist');
 
-module.exports = {
+export default <BotSubcommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
       const locale = discordServer.getBotLanguage();
       const whitelistFields = whitelists.map((whitelist) => {
         const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
         return {
-          name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist }),
+          name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist } as any),
           value: detailsPhrase,
         };
       });
@@ -29,19 +31,19 @@ module.exports = {
         });
       }
 
-      const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild.id);
+      const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id);
       if (sharedWhitelists.length) {
         whitelistFields.push({
           name: i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelists', locale }),
-          value: `${i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsDetail', locale })}\n\n${sharedWhitelists.map((sharedWhitelist) => i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsEntry', locale }, sharedWhitelist)).join('\n')}`,
+          value: `${i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsDetail', locale })}\n\n${sharedWhitelists.map((sharedWhitelist: any) => i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsEntry', locale }, sharedWhitelist)).join('\n')}`,
         });
       }
 
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist list', i18n.__({ phrase: 'configure.whitelist.list.purpose', locale }), 'configure-whitelist-list', whitelistFields);
-      await interaction.editReply({ embeds: [embed], ephemeral: true });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting auto-role-assignment for delegators. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.editReply({ content: 'Error while getting auto-role-assignment for delegators. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
 };

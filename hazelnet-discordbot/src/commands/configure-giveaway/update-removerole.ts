@@ -31,7 +31,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(guild.id);
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-giveaway/update-removerole/chooserole') {
-      const giveawayId = +interaction.values[0].substring(19);
+      const giveawayId = +interaction.values[0].substring('configure-giveaway-'.length);
       const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) as Giveaway[];
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {

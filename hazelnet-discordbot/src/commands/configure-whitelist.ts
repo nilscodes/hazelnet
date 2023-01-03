@@ -1,8 +1,9 @@
-const { SlashCommandBuilder } = require('discord.js');
+import { BotCommand } from '../utility/commandtypes';
+import { SlashCommandBuilder } from 'discord.js';
 const commandbase = require('../utility/commandbase');
 const CommandTranslations = require('../utility/commandtranslations');
 
-module.exports = {
+export default <BotCommand> {
   getCommandData(locale) {
     const ci18n = new CommandTranslations('configure-whitelist', locale);
     return new SlashCommandBuilder()
@@ -35,17 +36,27 @@ module.exports = {
       .addSubcommand((subcommand) => subcommand
         .setName('open')
         .setDescription(ci18n.subDescription('open')))
-      .addSubcommand((subcommand) => subcommand
+      .addSubcommandGroup((group) => group
         .setName('update')
         .setDescription(ci18n.subDescription('update'))
-        .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
-        .addStringOption((option) => option.setName('whitelist-displayname').setDescription(ci18n.option('whitelist-displayname')).setRequired(false))
-        .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
-        .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
-        .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
-        .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
-        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false))
-        .addRoleOption((option) => option.setName('awarded-role').setDescription(ci18n.option('awarded-role')).setRequired(false)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('addrole')
+          .setDescription(ci18n.subDescription('update-addrole'))
+          .addRoleOption((option) => option.setName('required-role').setDescription(ci18n.option('required-role')).setRequired(true)))
+        .addSubcommand((subcommand) => subcommand
+          .setName('removerole')
+          .setDescription(ci18n.subDescription('update-removerole')))
+        .addSubcommand((subcommand) => subcommand
+          .setName('details')
+          .setDescription(ci18n.subDescription('update-details'))
+          .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
+          .addStringOption((option) => option.setName('whitelist-displayname').setDescription(ci18n.option('whitelist-displayname')).setRequired(false))
+          .addIntegerOption((option) => option.setName('max-users').setDescription(ci18n.option('max-users')).setRequired(false))
+          .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
+          .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
+          .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
+          .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false))
+          .addRoleOption((option) => option.setName('awarded-role').setDescription(ci18n.option('awarded-role')).setRequired(false))))
       .addSubcommand((subcommand) => subcommand
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))

@@ -68,6 +68,7 @@ internal class WhitelistServiceTest {
             sharedWithServer = null,
             maxUsers = null,
             awardedRole = null,
+            requiredRoles = null,
         )
         )
         assertEquals(now, whitelistSaveSlot.captured.launchDate)
@@ -87,6 +88,7 @@ internal class WhitelistServiceTest {
             sharedWithServer = null,
             maxUsers = null,
             awardedRole = null,
+            requiredRoles = null,
         )
         )
         assertEquals(now, whitelistSaveSlot.captured.signupAfter)
@@ -106,6 +108,7 @@ internal class WhitelistServiceTest {
             sharedWithServer = null,
             maxUsers = null,
             awardedRole = null,
+            requiredRoles = null,
         )
         )
         assertEquals(now, whitelistSaveSlot.captured.signupUntil)

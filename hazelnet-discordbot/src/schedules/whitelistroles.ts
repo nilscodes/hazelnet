@@ -1,4 +1,4 @@
-import HazelnetClient from "src/utility/hazelnetclient";
+import HazelnetClient from '../utility/hazelnetclient';
 
 /* eslint-disable no-await-in-loop */
 const roleassignments = require('../utility/roleassignments');
