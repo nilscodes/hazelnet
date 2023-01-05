@@ -10,6 +10,7 @@ import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.lang.IllegalStateException
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -59,10 +60,14 @@ class IncomingPaymentService(
         val usedAmounts = outstandingPayments.map { it.amount }
         var paymentAmount: Long
         var amountFound = false
+        var attempts = 0
         do {
             paymentAmount = refillAmount + (0..9999).random().toLong()
             if (!usedAmounts.contains(paymentAmount)) {
                 amountFound = true
+            }
+            if (attempts++ > 10000) {
+                throw IllegalStateException("Too many incoming payments to generate a unique payment amount")
             }
         } while (!amountFound)
         return paymentAmount
