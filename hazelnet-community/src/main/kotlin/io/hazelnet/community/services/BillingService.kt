@@ -132,24 +132,26 @@ class BillingService(
     }
 
     fun calculateMaximumDelegationDiscountAmountInLovelace(memberCount: Int): Long {
-        return memberCount * 10000000L
+        return memberCount * 20000000L
     }
 
     fun calculateMonthlyTotalCostInLovelace(memberCount: Int): Long {
         return 1000000L * if (memberCount < 1000) {
-            10
-        } else if(memberCount < 5000) {
-            20
-        } else if(memberCount < 10000) {
-            30
-        } else if(memberCount < 25000) {
-            40
-        } else if(memberCount < 50000) {
             50
+        } else if(memberCount < 5000) {
+            100
+        } else if(memberCount < 10000) {
+            150
+        } else if(memberCount < 25000) {
+            200
+        } else if(memberCount < 50000) {
+            250
         } else if(memberCount < 100000) {
-            60
+            300
+        } else if(memberCount < 250000) {
+            350
         } else {
-            70
+            400
         }
     }
 
