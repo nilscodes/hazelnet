@@ -7,13 +7,13 @@ import {
   SelectMenuBuilder,
 } from 'discord.js';
 import { stringify } from 'csv-stringify/sync';
-import { Whitelist, SharedWhitelistSignup } from '../../utility/sharedtypes';
+import { Whitelist, SharedWhitelistSignup, SharedWhitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface WhitelistDownloadCommand extends BotSubcommand {
-  buildFileToDownload(whitelist: Whitelist, signups: SharedWhitelistSignup[], guildId: string, whitelistName: string): AttachmentBuilder
-  getCsvContent(whitelist: Whitelist, signups: SharedWhitelistSignup[]): any[]
+  buildFileToDownload(whitelist: Whitelist | SharedWhitelist, signups: SharedWhitelistSignup[], guildId: string, whitelistName: string): AttachmentBuilder
+  getCsvContent(whitelist: Whitelist | SharedWhitelist, signups: SharedWhitelistSignup[]): any[]
 }
 
 export default <WhitelistDownloadCommand> {
@@ -21,10 +21,10 @@ export default <WhitelistDownloadCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const localWhitelistOptions = whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
-      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id)).map((sharedWhitelist: any) => ({
+      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, false)).map((sharedWhitelist: any) => ({
         label: i18n.__({ phrase: 'configure.whitelist.download.externalWhitelist', locale }, {
           whitelistDisplayName: sharedWhitelist.whitelistDisplayName.substr(0, 40),
           guildName: sharedWhitelist.guildName.substr(0, 50),
@@ -56,13 +56,13 @@ export default <WhitelistDownloadCommand> {
     if (interaction.customId === 'configure-whitelist/download/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       try {
         const whitelistNameToDownload = interaction.values[0];
         const whitelistToDownload = whitelists.find((whitelist) => whitelist.name === whitelistNameToDownload);
         if (whitelistToDownload) {
-          const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild!.id, whitelistToDownload.id) as SharedWhitelistSignup[];
+          const signups = await interaction.client.services.discordserver.getWhitelistSignups(interaction.guild!.id, whitelistToDownload.id);
           if (signups.length) {
             const fileToDownload = this.buildFileToDownload(whitelistToDownload, signups, discordServer.guildId, whitelistToDownload.name);
 
@@ -85,12 +85,12 @@ export default <WhitelistDownloadCommand> {
         } else {
           const [guildIdSharing, whitelistNameShared] = whitelistNameToDownload.split('-');
           const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, true);
-          const sharedWhitelistToDownload = sharedWhitelists.find((sharedWhitelist: any) => sharedWhitelist.guildId === guildIdSharing && sharedWhitelist.whitelistName === whitelistNameShared);
+          const sharedWhitelistToDownload = sharedWhitelists.find((sharedWhitelist) => sharedWhitelist.guildId === guildIdSharing && sharedWhitelist.whitelistName === whitelistNameShared);
           if (sharedWhitelistToDownload) {
             if (sharedWhitelistToDownload.signups.length) {
               const fileToDownload = this.buildFileToDownload(sharedWhitelistToDownload, sharedWhitelistToDownload.signups, sharedWhitelistToDownload.guildId, sharedWhitelistToDownload.whitelistName);
 
-              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.successExternal', locale }, sharedWhitelistToDownload), 'configure-whitelist-download');
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist download', i18n.__({ phrase: 'configure.whitelist.download.successExternal', locale }, sharedWhitelistToDownload as any), 'configure-whitelist-download');
               await interaction.editReply({
                 components: [],
                 embeds: [embed],

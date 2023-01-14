@@ -128,7 +128,8 @@
 			"configure-social-announce": "Create custom branded announcements.",
 			"join": "Join an existing giveaway or raffle.",
 			"configure-engagement": "Features to track and increase community engagement",
-			"configure-engagement-activityreminder": "Set up a channel for activity reminders"
+			"configure-engagement-activityreminder": "Set up a channel for activity reminders",
+			"configure-engagement-downloadusers": "Download a file with Discord users in a certain role"
 		},
 		"options": {
 			"verify": {
@@ -261,7 +262,11 @@
 				"status": "Set to False to turn this feature off.",
 				"reminderchannel": "The channel to send public activity reminder messages to.",
 				"inactivity-days": "The number of days after which to send an activity reminder.",
-				"remindermessage": "A custom reminder message in which you can use the %USER% placeholder."
+				"remindermessage": "A custom reminder message in which you can use the %USER% placeholder.",
+				"target-role": "commands.options.configure-engagement.target-role"
+			},
+			"configure-downloadusers": {
+				"target-role": "The role which users need to be in to be included in the list."
 			}
 		},
 		"choices": {
@@ -816,6 +821,10 @@
 				"announceTitle": "Hey there!",
 				"announceTextPrefixWithMention": "Hi <@{{userId}}>. ",
 				"announceText": "Long time no see, <@{{userId}}>. We are glad you joined our community and would love for you to chat with us. Swing by any of our channels to see what is new 🙂"
+			},
+			"downloadusers": {
+				"success": "Successfully compiled a list of **{{userCount}}** users with the role <@&{{role}}> for your server. Please find the CSV file attached.",
+				"noUsersInRole": "⚠ No users with the role <@&{{role}}> were found on your server."
 			}
 		},
 		"tokenroles": {
@@ -942,7 +951,9 @@
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
 				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}",
-				"noPremium": "🙀 You currently can not add any additional delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+				"noPremium": "🙀 You currently can not add any additional delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"noMatchingStakepool": "⚠ The pool hash *{{poolHash}}* you have provided is not included in your list of supported stakepools on this server. Make sure it is added via **/configure-stakepool add** or verify the right pool hash via **/configure-stakepool list**.",
+				"noStakepools": "⚠ You have to add at least one supported stake pool to your server via the **/configure-stakepool add** command, to be able to add a delegator role."
 			},
 			"remove": {
 				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",

@@ -1,7 +1,7 @@
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import { DelegatorRole, Stakepool } from '../../utility/sharedtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -9,7 +9,7 @@ export default <BotSubcommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id) as DelegatorRole[];
-      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id) as Stakepool[];
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       const useLocale = discordServer.getBotLanguage();
       const delegatorRoleFields = delegatorRoles.map((delegatorRole) => {
         // TODO: Share Code across delegator role modules

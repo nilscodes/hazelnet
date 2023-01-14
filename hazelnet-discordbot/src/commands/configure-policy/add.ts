@@ -1,11 +1,11 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
-    const policyId = interaction.options.getString('policy-id');
-    const projectName = interaction.options.getString('project-name');
+    const policyId = interaction.options.getString('policy-id', true);
+    const projectName = interaction.options.getString('project-name', true);
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);

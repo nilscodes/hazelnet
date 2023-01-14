@@ -3,12 +3,12 @@ import { ApplicationCommandType, ContextMenuCommandBuilder, SlashCommandBuilder 
 import { BotCommand } from "../utility/commandtypes";
 import CID from 'cids';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
-const cardanotoken = require('../utility/cardanotoken');
-const commandbase = require('../utility/commandbase');
-const CommandTranslations = require('../utility/commandtranslations');
-const embedBuilder = require('../utility/embedbuilder');
-const adahandle = require('../utility/adahandle');
-const cardanoaddress = require('../utility/cardanoaddress');
+import cardanotoken from '../utility/cardanotoken';
+import commandbase from '../utility/commandbase';
+import CommandTranslations from '../utility/commandtranslations';
+import embedBuilder from '../utility/embedbuilder';
+import adahandle from '../utility/adahandle';
+import cardanoaddress from '../utility/cardanoaddress';
 
 interface WhoisCommand extends BotCommand {
   applyHandleBranding(embed: any): void
@@ -40,7 +40,7 @@ export default <WhoisCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const knownMarketplaces = JSON.parse(await interaction.client.services.globalsettings.getGlobalSetting('KNOWN_MARKETPLACE_ADDRESSES')) ?? {};
@@ -104,7 +104,7 @@ export default <WhoisCommand> {
   },
   async executeUserContextMenu(interaction) {
     await interaction.deferReply({ ephemeral: true });
-    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
     const locale = discordServer.getBotLanguage();
     const externalAccountOfTarget = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.targetUser.id);
     if (externalAccountOfTarget) {
@@ -139,7 +139,7 @@ export default <WhoisCommand> {
       handlesAtAddress.sort((handleA: HandleInfo, handleB: HandleInfo) => handleA.handle.length - handleB.handle.length);
       const handleList = handlesAtAddress.map((handleInfo: HandleInfo) => i18n.__({ phrase: 'whois.handlesEntry', locale }, { handle: handleInfo.handle }));
       content = i18n.__({ phrase: successMessage, locale }, { address }) + handleList.join('\n');
-      const multiAssetInfoForFirstHandle = await interaction.client.services.cardanoinfo.multiAssetInfo(process.env.HANDLE_POLICY, cardanotoken.toHex(handlesAtAddress[0].handle));
+      const multiAssetInfoForFirstHandle = await interaction.client.services.cardanoinfo.multiAssetInfo(process.env.HANDLE_POLICY!, cardanotoken.toHex(handlesAtAddress[0].handle));
       const metadata = JSON.parse(multiAssetInfoForFirstHandle.metadata);
       const ipfsV0 = metadata.image.indexOf('ipfs://') === 0 ? metadata.image.substring(7) : null;
       if (ipfsV0) {
@@ -148,7 +148,7 @@ export default <WhoisCommand> {
     }
     const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whois.messageTitle', locale }), content, 'whois');
     this.applyHandleBranding(embed);
-    if (image !== null) {
+    if (image) {
       embed.setImage(image);
     }
     await interaction.editReply({ embeds: [embed] });

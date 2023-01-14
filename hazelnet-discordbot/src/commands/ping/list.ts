@@ -1,9 +1,8 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
-import { ExternalAccountPing } from '../../utility/sharedtypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const cardanoaddress = require('../../utility/cardanoaddress');
+import embedBuilder from '../../utility/embedbuilder';
+import cardanoaddress from '../../utility/cardanoaddress';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -14,7 +13,7 @@ export default <BotSubcommand> {
 
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
-      const allPings = await interaction.client.services.pings.getPingsForExternalAccount(externalAccount.id) as ExternalAccountPing[];
+      const allPings = await interaction.client.services.pings.getPingsForExternalAccount(externalAccount.id);
       const receivedPings = allPings.filter((ping) => ping.sentTime && ping.recipient === mainAccount.id);
       const sentPings = allPings.filter((ping) => ping.sentTime && ping.sender === externalAccount.id);
       const pingFields = [{

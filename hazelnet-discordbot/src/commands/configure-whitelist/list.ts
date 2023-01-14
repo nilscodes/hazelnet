@@ -1,15 +1,14 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const whitelistFields = whitelists.map((whitelist) => {
         const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
@@ -31,7 +30,7 @@ export default <BotSubcommand> {
         });
       }
 
-      const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id);
+      const sharedWhitelists = await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, false);
       if (sharedWhitelists.length) {
         whitelistFields.push({
           name: i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelists', locale }),

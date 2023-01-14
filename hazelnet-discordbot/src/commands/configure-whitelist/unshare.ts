@@ -5,16 +5,15 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const guildNameMap = await whitelistUtil.getGuildNames(whitelists, interaction);
       const whitelistOptions = whitelists
@@ -50,7 +49,7 @@ export default <BotSubcommand> {
     if (interaction.customId === 'configure-whitelist/unshare/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistNameToUnshare = interaction.values[0];
@@ -60,7 +59,7 @@ export default <BotSubcommand> {
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild!.id, whitelistToUnshare.id, { sharedWithServer: 0 });
 
           const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist unshare', i18n.__({ phrase: 'configure.whitelist.unshare.success', locale: useLocale }, { whitelist, discordServerToUnshareWith }), 'configure-whitelist-unshare', [
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist unshare', i18n.__({ phrase: 'configure.whitelist.unshare.success', locale: useLocale }, { whitelist, discordServerToUnshareWith } as any), 'configure-whitelist-unshare', [
             {
               name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist: whitelistToUnshare } as any),
               value: detailsPhrase,

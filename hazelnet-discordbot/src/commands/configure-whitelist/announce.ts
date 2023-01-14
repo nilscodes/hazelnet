@@ -8,9 +8,8 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -18,7 +17,7 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
@@ -58,7 +57,7 @@ export default <BotSubcommand> {
     if (interaction.customId === 'configure-whitelist/announce/publish') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const [announceChannelId, whitelistId] = interaction.values[0].split('-');
       const whitelistToAnnounce = whitelists.find((whitelist) => whitelist.id === +whitelistId);

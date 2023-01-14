@@ -3,8 +3,7 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import whitelistUtil from '../../utility/whitelist';
-import { Whitelist } from 'src/utility/sharedtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface WhitelistUpdateRemoveRoleCommand extends BotSubcommand {
   cache: NodeCache
@@ -17,7 +16,7 @@ export default <WhitelistUpdateRemoveRoleCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const { components } = whitelistUtil.getDiscordWhitelistListParts(discordServer, whitelists, 'configure-whitelist/update-removerole/chooserole', 'configure.whitelist.update.removerole.chooseWhitelist');
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist update removerole', i18n.__({ phrase: 'configure.whitelist.update.removerole.purpose', locale }), 'configure-whitelist-update-removerole');
       await interaction.editReply({ embeds: [embed], components });
@@ -33,7 +32,7 @@ export default <WhitelistUpdateRemoveRoleCommand> {
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-whitelist/update-removerole/chooserole') {
       const whitelistId = +interaction.values[0].substring('configure-whitelist-'.length);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const whitelist = whitelists.find((whitelistForDetails) => whitelistForDetails.id === whitelistId);
       if (whitelist) {
         if (whitelist.requiredRoles.length) {
@@ -65,7 +64,7 @@ export default <WhitelistUpdateRemoveRoleCommand> {
       }
     } else if (interaction.customId === 'configure-whitelist/update-removerole/complete') {
       const [whitelistId, roleToRemove] = interaction.values[0].split('-');
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const whitelist = whitelists.find((whitelistForDetails) => whitelistForDetails.id === +whitelistId);
       if (whitelist) {
         const requiredRoles = whitelist.requiredRoles.filter((role) => role.roleId !== roleToRemove);

@@ -2,8 +2,7 @@ import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder }
 import i18n, { Replacements } from 'i18n';
 import { Giveaway } from '../../utility/giveaway';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const discordemoji = require('../../utility/discordemoji');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayRemoveCommand extends BotSubcommand {
   getGiveawayChoices(locale: string, giveaways: Giveaway[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]

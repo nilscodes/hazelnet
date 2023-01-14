@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import HazelnetClient from "../utility/hazelnetclient";
 import { BaseGuildVoiceChannel, PermissionsBitField } from 'discord.js';
-const cardanoaddress = require('../utility/cardanoaddress');
+import cardanoaddress from '../utility/cardanoaddress';
 
 export default {
   cron: '*/5 * * * *',

@@ -1,12 +1,11 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
-    const whitelistNameToUpdate = interaction.options.getString('whitelist-name');
+    const whitelistNameToUpdate = interaction.options.getString('whitelist-name', true);
     const whitelistDisplayName = interaction.options.getString('whitelist-displayname');
     const maxUsers = interaction.options.getInteger('max-users');
     const signupAfter = interaction.options.getString('signup-start');
@@ -18,7 +17,7 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
         const whitelistToClose = whitelists.find((whitelist) => whitelist.name === whitelistNameToUpdate);
@@ -40,9 +39,9 @@ export default <BotSubcommand> {
           });
 
           const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist update details', i18n.__({ phrase: 'configure.whitelist.update.details.success', locale }, { whitelist }), 'configure-whitelist-update-details', [
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist update details', i18n.__({ phrase: 'configure.whitelist.update.details.success', locale }, { whitelist } as any), 'configure-whitelist-update-details', [
             {
-              name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist }),
+              name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist } as any),
               value: detailsPhrase,
             },
           ], whitelist.logoUrl);

@@ -6,6 +6,7 @@ import io.hazelnet.community.data.discord.whitelists.Whitelist
 import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.shared.data.SharedWhitelist
+import io.hazelnet.shared.data.WhitelistType
 import io.mockk.CapturingSlot
 import io.mockk.every
 import io.mockk.mockk
@@ -168,6 +169,7 @@ internal class WhitelistServiceTest {
             whitelistName = "white",
             whitelistDisplayName = "Black",
             signups = emptySet(),
+            type = WhitelistType.CARDANO_ADDRESS
         )), whitelistService.getSharedWhitelists(testServer.guildId, false))
     }
 

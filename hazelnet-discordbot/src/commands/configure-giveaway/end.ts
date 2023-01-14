@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder, Butt
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import giveawayutil, { Giveaway, GiveawayDrawType, WinnerList } from '../../utility/giveaway';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayEndCommand extends BotSubcommand {
   createRedrawButton(giveaway: Giveaway, locale: string): ButtonBuilder

@@ -2,8 +2,8 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ChannelType, GuildChannel, PermissionsBitField, TextBasedChannel } from 'discord.js';
-const embedBuilder = require('../../utility/embedbuilder');
-const pollutil = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import pollutil from '../../utility/poll';
 
 interface PollAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -53,9 +53,9 @@ export default <PollAnnounceCommand> {
       const poll = polls.find((pollForDetails: any) => pollForDetails.id === pollId);
       if (poll) {
         const [announceChannelId, forcePublishResults] = (this.cache.take(`${guild.id}-${interaction.user.id}`) as string).split('-');
-        const results = await interaction.client.services.discordserver.getPollResults(guild.id, poll.id);
+        const results = await interaction.client.services.discordserver.getPollResults(guild.id, poll.id!);
         const tokenMetadata = await pollutil.getTokenMetadataFromRegistry(guild.id, poll, interaction.client);
-        const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, +forcePublishResults, tokenMetadata);
+        const { detailFields, components } = pollutil.getPollAnnouncementParts(discordServer, poll, results, forcePublishResults === '1', tokenMetadata);
 
         try {
           const announceChannel = await guild.channels.fetch(announceChannelId);
@@ -63,7 +63,7 @@ export default <PollAnnounceCommand> {
             const guildAnnounceChannel = announceChannel as TextBasedChannel;
             const embedPublic = embedBuilder.buildForUser(discordServer, poll.displayName, i18n.__({ phrase: 'configure.poll.announce.publicSuccess', locale }), 'vote', detailFields);
             const announcementMessage = await guildAnnounceChannel.send({ embeds: [embedPublic], components });
-            await interaction.client.services.discordserver.updatePoll(guild.id, poll.id, {
+            await interaction.client.services.discordserver.updatePoll(guild.id, poll.id!, {
               channelId: announceChannel.id,
               messageId: announcementMessage.id,
             });

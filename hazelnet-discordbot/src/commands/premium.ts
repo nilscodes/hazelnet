@@ -2,9 +2,9 @@ import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Mess
 import i18n from 'i18n';
 import { BotCommand } from '../utility/commandtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../utility/hazelnetclient';
-const embedBuilder = require('../utility/embedbuilder');
-const commandbase = require('../utility/commandbase');
-const CommandTranslations = require('../utility/commandtranslations');
+import embedBuilder from '../utility/embedbuilder';
+import commandbase from '../utility/commandbase';
+import CommandTranslations from '../utility/commandtranslations';
 
 type InterfaceInfo = {
   image: string
@@ -32,10 +32,10 @@ export default <PremiumCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild?.id, externalAccount.id);
+      const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild!.id, externalAccount.id);
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
@@ -112,11 +112,11 @@ export default <PremiumCommand> {
   async executeButton(interaction) {
     if (interaction.customId === 'premium/disable' || interaction.customId === 'premium/enable') {
       await interaction.deferUpdate();
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       const premiumSupport = (interaction.customId === 'premium/enable');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild?.id, externalAccount.id, { premiumSupport });
+      const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild!.id, externalAccount.id, { premiumSupport });
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
       const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);

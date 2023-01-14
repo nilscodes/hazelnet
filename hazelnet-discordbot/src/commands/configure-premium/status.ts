@@ -2,7 +2,7 @@ import { APIEmbedField } from 'discord.js';
 import i18n from 'i18n';
 import { DiscordServer } from '../../utility/sharedtypes';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface PremiumStatusCommand extends BotSubcommand {
   addBillingInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
@@ -18,7 +18,7 @@ export default <PremiumStatusCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const premiumInfo = await interaction.client.services.discordserver.getPremiumInfo(interaction.guild!.id);
-      const premiumUntilTimestamp = Math.floor(new Date(premiumInfo.premiumUntil).getTime() / 1000);
+      const premiumUntilTimestamp = premiumInfo.premiumUntil && Math.floor(new Date(premiumInfo.premiumUntil).getTime() / 1000);
       const premiumFields = [{
         name: i18n.__({ phrase: 'configure.premium.status.premiumStatus', locale }),
         value: i18n.__({ phrase: (premiumInfo.currentPremium ? 'configure.premium.status.premiumStatusYes' : 'configure.premium.status.premiumStatusNo'), locale }, { premiumUntilTimestamp } as any),

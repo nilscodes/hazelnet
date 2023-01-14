@@ -5,13 +5,12 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
-    const guildToShareWith = interaction.options.getString('guild-id');
+    const guildToShareWith = interaction.options.getString('guild-id', true);
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
@@ -19,7 +18,7 @@ export default <BotSubcommand> {
       try {
         const discordServerToShareWith = await interaction.client.services.discordserver.getDiscordServer(guildToShareWith);
         if (discordServerToShareWith.id !== discordServer.id) {
-          const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+          const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
           const whitelistOptions = whitelists
             .map((whitelist) => ({ label: whitelist.displayName, value: `${whitelist.name}-${discordServerToShareWith.guildId}` }));
           if (whitelistOptions.length) {
@@ -31,7 +30,7 @@ export default <BotSubcommand> {
                   .addOptions(whitelistOptions),
               )];
 
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist share', i18n.__({ phrase: 'configure.whitelist.share.purpose', locale }, { discordServerToShareWith }), 'configure-whitelist-share');
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist share', i18n.__({ phrase: 'configure.whitelist.share.purpose', locale }, { discordServerToShareWith } as any), 'configure-whitelist-share');
             await interaction.editReply({ components, embeds: [embed] });
           } else {
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist share', i18n.__({ phrase: 'configure.whitelist.share.noWhitelistsDetail', locale }), 'configure-whitelist-share');
@@ -54,7 +53,7 @@ export default <BotSubcommand> {
     if (interaction.customId === 'configure-whitelist/share/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const [whitelistNameToShare, sharedWithGuild] = interaction.values[0].split('-');
@@ -64,7 +63,7 @@ export default <BotSubcommand> {
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild!.id, whitelistToShare.id, { sharedWithServer: discordServerToShareWith.id });
 
           const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist share', i18n.__({ phrase: 'configure.whitelist.share.success', locale: useLocale }, { whitelist, discordServerToShareWith }), 'configure-whitelist-share', [
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist share', i18n.__({ phrase: 'configure.whitelist.share.success', locale: useLocale }, { whitelist, discordServerToShareWith } as any), 'configure-whitelist-share', [
             {
               name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist: whitelistToShare } as any),
               value: detailsPhrase,

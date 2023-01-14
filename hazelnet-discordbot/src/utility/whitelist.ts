@@ -4,9 +4,9 @@ import {
 } from 'discord.js';
 import { DiscordServer, ExternalAccount, Whitelist, WhitelistSignup, WhitelistSignupContainer } from './sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from './hazelnetclient';
-const embedBuilder = require('./embedbuilder');
-const datetime = require('./datetime');
-const cardanoaddress = require('./cardanoaddress');
+import cardanoaddress from './cardanoaddress';
+import embedBuilder from './embedbuilder';
+import datetime from './datetime';
 
 export default {
   getDetailsText(discordServer: DiscordServer, whitelist: Whitelist, noCurrentNumbers: boolean = false) {
@@ -119,7 +119,7 @@ export default {
       const phrase = `whitelist.list.${isAddressBasedWhitelist ? 'youAreRegisteredWithAddress' : 'youAreRegistered'}`;
       return `\n${i18n.__({ phrase, locale: discordServer.getBotLanguage() }, {
         signupTime: Math.floor(new Date(existingSignup.signupTime).getTime() / 1000),
-        address: includeFullAddress || !isAddressBasedWhitelist ? existingSignup.address : cardanoaddress.shorten(existingSignup.address),
+        address: includeFullAddress || !isAddressBasedWhitelist ? existingSignup.address : cardanoaddress.shorten(existingSignup.address!),
       } as any)}`;
     }
     if (this.hasSignupEnded(whitelist) || !this.hasSignupStarted(whitelist) || (whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
@@ -182,7 +182,7 @@ export default {
       return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'signup-end', value: signupUntil }), commandId);
     }
     if (launchDate && !datetime.isValidISOTimestamp(launchDate)) {
-      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'launch-date', value: launchDate }), commandId);
+      return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'launch-date', value: `${launchDate}` }), commandId);
     }
     if (logoUrl && !/(https:(?:\/\/)?)/i.test(logoUrl)) {
       return embedBuilder.buildForAdmin(discordServer, commandTitle, i18n.__({ phrase: 'errors.invalidHttpsUrl', locale }, { parameter: 'logo-url', value: logoUrl }), commandId);

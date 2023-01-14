@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const pollutil = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import pollutil from '../../utility/poll';
 
 export default <BotSubcommand> {
   async execute(interaction) {

@@ -1,7 +1,7 @@
 import i18n from 'i18n';
+import colors from '../../utility/colors';
 import { BotSubcommand } from '../../utility/commandtypes';
-const colors = require('../../utility/colors');
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface ConfigureSettingsCustomizeCommand extends BotSubcommand {
   isValidUrl(message: string): boolean

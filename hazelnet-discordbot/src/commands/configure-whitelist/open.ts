@@ -5,16 +5,15 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
-import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       const whitelistOptions = whitelists
         .filter((whitelist) => whitelist.closed)
@@ -43,7 +42,7 @@ export default <BotSubcommand> {
     if (interaction.customId === 'configure-whitelist/open/complete') {
       await interaction.deferUpdate();
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistNameToOpen = interaction.values[0];
@@ -52,7 +51,7 @@ export default <BotSubcommand> {
           const whitelist = await interaction.client.services.discordserver.updateWhitelist(interaction.guild!.id, whitelistToOpen.id, { closed: false });
 
           const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist open', i18n.__({ phrase: 'configure.whitelist.open.success', locale: useLocale }, { whitelist }), 'configure-whitelist-open', [
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist open', i18n.__({ phrase: 'configure.whitelist.open.success', locale: useLocale }, { whitelist } as any), 'configure-whitelist-open', [
             {
               name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale: useLocale }, { whitelist: whitelistToOpen } as any),
               value: detailsPhrase,

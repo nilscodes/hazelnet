@@ -2,10 +2,11 @@ import { ActionRowBuilder, APIEmbedField, ButtonBuilder, GuildMember, MessageAct
 import i18n from 'i18n';
 import { AugmentedButtonInteraction } from '../utility/hazelnetclient';
 import { BotCommand } from "../utility/commandtypes";
-import giveawayutil, { Giveaway, ParticipationData, TokenMetadata } from '../utility/giveaway';
-const commandbase = require('../utility/commandbase');
-const CommandTranslations = require('../utility/commandtranslations');
-const embedBuilder = require('../utility/embedbuilder');
+import giveawayutil, { Giveaway, ParticipationData } from '../utility/giveaway';
+import { TokenMetadata } from '../utility/sharedtypes';
+import commandbase from '../utility/commandbase';
+import CommandTranslations from '../utility/commandtranslations';
+import embedBuilder from '../utility/embedbuilder';
 
 type FieldsAndComponents = {
   detailFields: APIEmbedField[]
@@ -14,7 +15,7 @@ type FieldsAndComponents = {
 
 interface JoinCommand extends BotCommand {
   getGiveawayDetails(giveaway: Giveaway, interaction: AugmentedButtonInteraction, discordServer: any, member: GuildMember, participationOfUser: ParticipationData): Promise<FieldsAndComponents>
-  getUserParticipationText(discordServer: any, giveaway: Giveaway, totalVotingPower: number, tokenMetadata: TokenMetadata): string
+  getUserParticipationText(discordServer: any, giveaway: Giveaway, totalVotingPower: number, tokenMetadata: TokenMetadata | null): string
 }
 
 export default <JoinCommand> {

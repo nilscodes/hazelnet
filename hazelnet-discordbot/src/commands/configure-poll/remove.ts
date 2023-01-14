@@ -2,8 +2,8 @@ import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder }
 import i18n, { Replacements } from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { Poll } from '../../utility/polltypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const discordemoji = require('../../utility/discordemoji');
+import embedBuilder from '../../utility/embedbuilder';
+import discordemoji from '../../utility/discordemoji';
 
 interface PollRemoveCommand extends BotSubcommand {
   getPollChoices(locale: string, polls: any[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -40,7 +40,7 @@ export default <PollRemoveCommand> {
       const polls = await interaction.client.services.discordserver.getPolls(guildId) as Poll[];
       const poll = polls.find((pollForDetails: Poll) => pollForDetails.id === pollId);
       if (poll) {
-        await interaction.client.services.discordserver.deletePoll(guildId, poll.id);
+        await interaction.client.services.discordserver.deletePoll(guildId, poll.id!);
         const removedFields = [
           {
             name: i18n.__({ phrase: 'configure.poll.list.detailsName', locale }),
@@ -52,7 +52,7 @@ export default <PollRemoveCommand> {
           },
           {
             name: i18n.__({ phrase: 'configure.poll.list.detailsChoices', locale }),
-            value: poll.options.map((option, idx) => `**${idx + 1}:** ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`).join('\n'),
+            value: poll.options!.map((option, idx) => `**${idx + 1}:** ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}`).join('\n'),
           },
         ];
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.success', locale }), 'configure-poll-remove', removedFields);

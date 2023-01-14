@@ -4,11 +4,11 @@ import { BotSubcommand } from '../../utility/commandtypes';
 import { Poll, PollOption, PollPartial } from '../../utility/polltypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
-const datetime = require('../../utility/datetime');
-const embedBuilder = require('../../utility/embedbuilder');
-const discordemoji = require('../../utility/discordemoji');
-const cardanotoken = require('../../utility/cardanotoken');
-const poll = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import cardanotoken from '../../utility/cardanotoken';
+import poll from '../../utility/poll';
+import datetime from '../../utility/datetime';
+import discordemoji from '../../utility/discordemoji';
 
 interface PollAddCommand extends BotSubcommand {
   cache: NodeCache
@@ -61,7 +61,7 @@ export default <PollAddCommand> {
             openAfter: pollOpenTime,
             openUntil: pollCloseTime,
             channelId: publishChannel?.id,
-          } as Poll;
+          } as PollPartial;
           if (requiredRole) {
             pollObject.requiredRoles = [{ roleId: requiredRole.id }];
           }
@@ -93,9 +93,9 @@ export default <PollAddCommand> {
       content.push(i18n.__({ phrase: 'configure.poll.add.previewPhase1Details', locale }, {
         name: pollObject.name,
         displayName: pollObject.displayName,
-        pollOpenTime: pollObject.openAfter.replace('T', ' ').replace('Z', ''),
-        pollCloseTime: pollObject.openUntil.replace('T', ' ').replace('Z', ''),
-      }));
+        pollOpenTime: pollObject.openAfter!.replace('T', ' ').replace('Z', ''),
+        pollCloseTime: pollObject.openUntil!.replace('T', ' ').replace('Z', ''),
+      } as any));
     }
 
     if (pollObject.channelId) {
@@ -398,7 +398,7 @@ export default <PollAddCommand> {
         const scheduledSnapshot = await interaction.client.services.snapshots.scheduleSnapshot(new Date().toISOString(), pollObject.policyId, pollObject.assetFingerprint);
         pollObject.snapshotId = scheduledSnapshot.id;
       }
-      await interaction.client.services.discordserver.createPoll(interaction.guild!.id, pollObject);
+      await interaction.client.services.discordserver.createPoll(interaction.guild!.id, pollObject as Poll);
       const content = this.buildContent(locale, interaction.channel!.id, pollObject, 7);
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
       await interaction.update({ embeds: [embed], components: [] });

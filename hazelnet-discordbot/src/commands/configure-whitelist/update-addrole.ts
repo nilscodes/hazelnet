@@ -1,9 +1,8 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Whitelist } from 'src/utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface WhitelistUpdateAddRoleCommand extends BotSubcommand {
   cache: NodeCache
@@ -17,7 +16,7 @@ export default <WhitelistUpdateAddRoleCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const { components } = whitelistUtil.getDiscordWhitelistListParts(discordServer, whitelists, 'configure-whitelist/update-addrole/complete', 'configure.whitelist.update.addrole.chooseWhitelist');
       this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, `${requiredRole.id}`);
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist update addrole', i18n.__({ phrase: 'configure.whitelist.update.addrole.purpose', locale }, { roleId: requiredRole.id }), 'configure-whitelist-update-addrole');
@@ -34,7 +33,7 @@ export default <WhitelistUpdateAddRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
       const whitelistId = +interaction.values[0].substring('configure-whitelist-'.length);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const whitelist = whitelists.find((whitelistForDetails) => whitelistForDetails.id === whitelistId);
       if (whitelist) {
         if (whitelist.requiredRoles.length < 20) {

@@ -2,9 +2,9 @@ import { SlashCommandBuilder, APIEmbedField, ActionRowBuilder, ButtonBuilder, Me
 import i18n from 'i18n';
 import { Stakepool } from '../utility/sharedtypes';
 import { BotCommand } from '../utility/commandtypes';
-const embedBuilder = require('../utility/embedbuilder');
-const commandbase = require('../utility/commandbase');
-const CommandTranslations = require('../utility/commandtranslations');
+import embedBuilder from '../utility/embedbuilder';
+import commandbase from '../utility/commandbase';
+import CommandTranslations from '../utility/commandtranslations';
 
 export default <BotCommand> {
   getCommandData(locale) {
@@ -18,7 +18,7 @@ export default <BotCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id) as Stakepool[];
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       const guild = await interaction.client.guilds.fetch(discordServer.guildId);
       const locale = discordServer.getBotLanguage();
       let infoText = i18n.__({ phrase: 'info.infoBaseText', locale });

@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -10,8 +10,8 @@ export default <BotSubcommand> {
       const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const tokenPoliciesFields = tokenPolicies
-        .sort((policyA: any, policyB: any) => policyA.projectName.localeCompare(policyB.projectName))
-        .map((tokenPolicy: any) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: tokenPolicy.policyId }) }));
+        .sort((policyA, policyB) => policyA.projectName.localeCompare(policyB.projectName))
+        .map((tokenPolicy) => ({ name: tokenPolicy.projectName, value: i18n.__({ phrase: 'policyid.projectPolicyId', locale }, { policyId: tokenPolicy.policyId }) }));
       if (!tokenPoliciesFields.length) {
         tokenPoliciesFields.push({ name: i18n.__({ phrase: 'policyid.noProjectName', locale }), value: i18n.__({ phrase: 'policyid.noPolicies', locale }) });
       }
