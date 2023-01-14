@@ -11,7 +11,7 @@ import {
   PermissionsBitField,
   MessageActionRowComponentBuilder,
 } from 'discord.js';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface VerifyAnnounceCommand extends BotSubcommand {
   cache: NodeCache

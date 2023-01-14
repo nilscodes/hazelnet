@@ -4,7 +4,7 @@ import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageAct
 import { DiscordServer, SummarizedWhitelistSignup, Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface WhitelistSendCommand extends BotSubcommand {
   getWhitelists(discordServer: DiscordServer, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, signups: WhitelistSignupContainer[], includeAddresses: boolean): Promise<APIEmbedField[]>

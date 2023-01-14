@@ -2,13 +2,13 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
-import { DelegatorRole, DiscordServer, Stakepool } from '../../utility/sharedtypes';
+import { DelegatorRole, DiscordServer } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface DelegatorRoleAddCommand extends BotSubcommand {
   cache: NodeCache
-  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null | undefined, minimumStakeAda: number, roleId: string): any
+  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null, minimumStakeAda: number, roleId: string): any
   confirm(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
   cancel(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
 }
@@ -24,44 +24,55 @@ export default <DelegatorRoleAddCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id) as DelegatorRole[];
       const locale = discordServer.getBotLanguage();
-      if (discordServer.premium || delegatorRoles.length === 0) {
-        if (minimumStakeAda > 0) {
-          const minimumStake = minimumStakeAda * 1000000;
-          const guild = await interaction.client.guilds.fetch(interaction.guild!.id);
-          const allUsers = await guild.members.fetch();
-          const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
-          if (usersWithRole.size === 0) {
-            const embed = await this.createDelegatorRole(interaction, discordServer, poolHash, minimumStake, role.id);
-            await interaction.editReply({ embeds: [embed] });
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
+      if (stakepools.length) {
+        if (poolHash === null || stakepools.find((stakepool) => stakepool.poolHash === poolHash)) {
+          if (discordServer.premium || delegatorRoles.length === 0) {
+            if (minimumStakeAda > 0) {
+              const minimumStake = minimumStakeAda * 1000000;
+              const guild = await interaction.client.guilds.fetch(interaction.guild!.id);
+              const allUsers = await guild.members.fetch();
+              const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
+              if (usersWithRole.size === 0) {
+                const embed = await this.createDelegatorRole(interaction, discordServer, poolHash, minimumStake, role.id);
+                await interaction.editReply({ embeds: [embed] });
+              } else {
+                // Register add data in cache, as we cannot send it along with the button data.
+                this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
+                  poolHash,
+                  minimumStake,
+                  roleId: role.id,
+                });
+
+                const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
+                  .addComponents(
+                    new ButtonBuilder()
+                      .setCustomId('configure-delegatorroles/add/confirm')
+                      .setLabel(i18n.__({ phrase: 'configure.delegatorroles.add.confirmRole', locale }))
+                      .setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder()
+                      .setCustomId('configure-delegatorroles/add/cancel')
+                      .setLabel(i18n.__({ phrase: 'generic.cancel', locale }))
+                      .setStyle(ButtonStyle.Secondary),
+                  )];
+
+                const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseWarning', locale }), i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseDetails', locale }, { roleId: role.id, memberCount: usersWithRole.size } as any), 'configure-delegatorroles-add');
+                await interaction.editReply({ components, embeds: [embed] });
+              }
+            } else {
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.errorMinimumStake', locale }), 'configure-delegatorroles-add');
+              await interaction.editReply({ embeds: [embed] });
+            }
           } else {
-            // Register add data in cache, as we cannot send it along with the button data.
-            this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
-              poolHash,
-              minimumStake,
-              roleId: role.id,
-            });
-
-            const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
-              .addComponents(
-                new ButtonBuilder()
-                  .setCustomId('configure-delegatorroles/add/confirm')
-                  .setLabel(i18n.__({ phrase: 'configure.delegatorroles.add.confirmRole', locale }))
-                  .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                  .setCustomId('configure-delegatorroles/add/cancel')
-                  .setLabel(i18n.__({ phrase: 'generic.cancel', locale }))
-                  .setStyle(ButtonStyle.Secondary),
-              )];
-
-            const embed = embedBuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseWarning', locale }), i18n.__({ phrase: 'configure.delegatorroles.add.roleInUseDetails', locale }, { roleId: role.id, memberCount: usersWithRole.size } as any), 'configure-delegatorroles-add');
-            await interaction.editReply({ components, embeds: [embed] });
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.noPremium', locale }), 'configure-delegatorroles-add');
+            await interaction.editReply({ embeds: [embed] });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.errorMinimumStake', locale }), 'configure-delegatorroles-add');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.noMatchingStakepool', locale }, { poolHash }), 'configure-delegatorroles-add');
           await interaction.editReply({ embeds: [embed] });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.noPremium', locale }), 'configure-delegatorroles-add');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.noStakepools', locale }), 'configure-delegatorroles-add');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
@@ -72,7 +83,7 @@ export default <DelegatorRoleAddCommand> {
   async createDelegatorRole(interaction, discordServer, poolHash, minimumStake, roleId) {
     const locale = discordServer.getBotLanguage();
     const newDelegatorRolePromise = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild!.id, poolHash, minimumStake, roleId);
-    const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id) as Stakepool[];
+    const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
     const newDelegatorRole = newDelegatorRolePromise.data;
 
     let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
@@ -104,7 +115,7 @@ export default <DelegatorRoleAddCommand> {
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {
-    const embed = await this.createDelegatorRole(interaction, discordServer, roleToAdd.poolHash, roleToAdd.minimumStake, roleToAdd.roleId);
+    const embed = await this.createDelegatorRole(interaction, discordServer, roleToAdd.poolHash ?? null, roleToAdd.minimumStake, roleToAdd.roleId);
     await interaction.update({ embeds: [embed], components: [] });
   },
   async cancel(interaction, discordServer, roleToAdd) {

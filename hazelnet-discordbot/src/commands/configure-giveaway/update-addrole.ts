@@ -2,7 +2,7 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import giveawayutil, { Giveaway } from '../../utility/giveaway';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayUpdateAddRoleCommand extends BotSubcommand {
   cache: NodeCache

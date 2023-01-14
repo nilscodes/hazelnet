@@ -3,10 +3,10 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
-import giveaway, { GiveawayDrawType, GiveawayPartial } from '../../utility/giveaway';
-const datetime = require('../../utility/datetime');
-const embedBuilder = require('../../utility/embedbuilder');
-const cardanotoken = require('../../utility/cardanotoken');
+import giveaway, { Giveaway, GiveawayDrawType, GiveawayPartial } from '../../utility/giveaway';
+import embedBuilder from '../../utility/embedbuilder';
+import cardanotoken from '../../utility/cardanotoken';
+import datetime from '../../utility/datetime';
 
 interface GiveawayAddCommand extends BotSubcommand {
   cache: NodeCache
@@ -56,7 +56,7 @@ export default <GiveawayAddCommand> {
           const giveawayObject = {
             name: giveawayName,
             displayName: giveawayDisplayName,
-            creator: externalAccount.id,
+            creator: +externalAccount.id,
             openAfter: giveawayOpenTime,
             openUntil: giveawayCloseTime,
             snapshotTime,
@@ -340,9 +340,9 @@ export default <GiveawayAddCommand> {
     try {
       if (giveawayObject.policyId) {
         const scheduledSnapshot = await interaction.client.services.snapshots.scheduleSnapshot(giveawayObject.snapshotTime ?? new Date().toISOString(), giveawayObject.policyId, giveawayObject.assetFingerprint);
-        giveawayObject.snapshotIds = [scheduledSnapshot.id];
+        giveawayObject.snapshotIds = [scheduledSnapshot.id!];
       }
-      await interaction.client.services.discordserver.createGiveaway(interaction.guild!.id, giveawayObject);
+      await interaction.client.services.discordserver.createGiveaway(interaction.guild!.id, giveawayObject as Giveaway);
       const content = this.buildContent(locale, interaction.channel!.id, giveawayObject, 7);
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', content.join('\n\n'), 'configure-giveaway-add');
       await interaction.update({ embeds: [embed], components: [] });

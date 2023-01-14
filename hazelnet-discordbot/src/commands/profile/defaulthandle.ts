@@ -2,18 +2,12 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActi
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "../../utility/hazelnetclient";
-const adahandle = require('../../utility/adahandle');
-const embedBuilder = require('../../utility/embedbuilder');
+import adahandle  from '../../utility/adahandle';
+import embedBuilder from '../../utility/embedbuilder';
 
 interface DefaultHandleCommand extends BotSubcommand {
   getInteractionComponents(availableHandles: string[], currentDefaultHandle: string, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
   setNewDefaultHandle(interaction: AugmentedSelectMenuInteraction | AugmentedCommandInteraction, mainAccount: any, newDefaultHandle: string, discordServer: any): Promise<EmbedBuilder>
-}
-
-interface Handle {
-  handle: string
-  address: string
-  resolved: boolean
 }
 
 const DEFAULT_HANDLE_SETTING = 'DEFAULT_HANDLE';
@@ -22,13 +16,13 @@ export default <DefaultHandleCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       let newDefaultHandle = interaction.options.getString('handle');
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
       const allAvailableHandles: string[] = (await interaction.client.services.accounts.getHandlesForAccount(mainAccount.id))
-        .map((handleData: Handle) => `\$${handleData.handle}`)
+        .map((handleData) => `\$${handleData.handle}`)
         .sort((handleA: string, handleB: string) => handleA.length - handleB.length);
       const availableHandles = allAvailableHandles.slice(0, 25);
       const handleFields = [];
@@ -95,7 +89,7 @@ export default <DefaultHandleCommand> {
   },
   async executeButton(interaction) {
     if (interaction.customId === 'profile/defaulthandle/reset') {
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
@@ -108,7 +102,7 @@ export default <DefaultHandleCommand> {
   },
   async executeSelectMenu(interaction) {
     if (interaction.customId === 'profile/defaulthandle/complete') {
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
 

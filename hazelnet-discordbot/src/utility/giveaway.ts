@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponent
 import { DiscordRequiredRole } from "./polltypes"
 import i18n from 'i18n';
 import HazelnetClient from "./hazelnetclient";
-import { DiscordServer } from "./sharedtypes";
+import { DiscordServer, TokenMetadata } from "./sharedtypes";
 
 export type Giveaway = {
   name: string
@@ -10,9 +10,9 @@ export type Giveaway = {
   id: number
   description: string,
   requiredRoles: DiscordRequiredRole[]
-  createTime: string
-  openAfter: string
-  openUntil: string
+  createTime?: string
+  openAfter?: string
+  openUntil?: string
   snapshotTime?: string
   weighted?: boolean
   uniqueWinners?: boolean
@@ -42,31 +42,19 @@ export enum GiveawayDrawType {
   CARDANO_ADDRESS = 'CARDANO_ADDRESS',
 }
 
-export interface GiveawayPartial extends Omit<Giveaway, 'description'> {
+export interface GiveawayPartial extends Omit<Giveaway, 'description' | 'id' | 'createTime' | 'snapshotIds' | 'archived' | 'name' | 'winnerCount' | 'displayName' | 'creator' | 'drawType' | 'requiredRoles'> {
+  name?: string
+  displayName?: string,
   description?: string
   tokenType?: string
   assetFingerprint?: string
   policyId?: string
-  snapshotId?: number
-}
-
-export type TokenMetadata = {
-  subject: string,
-  policy: string,
-  name?: object,
-  description?: object,
-  url?: object,
-  ticker?: TickerTokenMetadata,
-  decimals?: DecimalsTokenMetadata,
-  logo?: object,
-}
-
-type TickerTokenMetadata = {
-  value?: string
-}
-
-type DecimalsTokenMetadata = {
-  value?: number
+  snapshotIds?: number[]
+  requiredRoles?: DiscordRequiredRole[]
+  drawType?: GiveawayDrawType
+  winnerCount?: number
+  creator?: number
+  archived?: boolean
 }
 
 export default {
@@ -173,7 +161,7 @@ export default {
       },
       {
         name: i18n.__({ phrase: 'configure.giveaway.list.detailsCreation', locale }),
-        value: i18n.__({ phrase: 'configure.giveaway.list.creationDate', locale }, { createTime: `${Math.floor(new Date(giveaway.createTime).getTime() / 1000)}` }),
+        value: i18n.__({ phrase: 'configure.giveaway.list.creationDate', locale }, { createTime: `${Math.floor(new Date(giveaway.createTime!).getTime() / 1000)}` }),
       },
     ];
 
@@ -217,13 +205,13 @@ export default {
       });
     }
   },
-  augmentCurrentParticipation(giveaway: Giveaway, detailFields: APIEmbedField[], discordServer: any, participation: ParticipationData, tokenMetadata: TokenMetadata) {
+  augmentCurrentParticipation(giveaway: Giveaway, detailFields: APIEmbedField[], discordServer: any, participation: ParticipationData, tokenMetadata: TokenMetadata | null) {
     detailFields.push({
       name: i18n.__({ phrase: 'join.currentParticipants', locale: discordServer.getBotLanguage() }),
       value: this.getCurrentParticipation(discordServer, giveaway, participation, tokenMetadata),
     });
   },
-  getCurrentParticipation(discordServer: any, giveaway: Giveaway, participation: ParticipationData, tokenMetadata: TokenMetadata) {
+  getCurrentParticipation(discordServer: any, giveaway: Giveaway, participation: ParticipationData, tokenMetadata: TokenMetadata | null) {
     const locale = discordServer.getBotLanguage();
     const decimals = (giveaway.weighted && tokenMetadata?.decimals?.value) || 0;
     const formattedEntries = discordServer.formatNumber(this.calculateParticipationCountNumber(participation.totalEntries, decimals));
@@ -236,7 +224,7 @@ export default {
   calculateParticipationCountNumber(votingPower: number, decimals: number) {
     return Math.floor(votingPower / (10 ** decimals));
   },
-  getGiveawayAnnouncementParts(discordServer: any, giveaway: Giveaway, participation: ParticipationData, tokenMetadata: TokenMetadata) {
+  getGiveawayAnnouncementParts(discordServer: any, giveaway: Giveaway, participation: ParticipationData, tokenMetadata: TokenMetadata | null) {
     const locale = discordServer.getBotLanguage();
     const detailFields = [
       {

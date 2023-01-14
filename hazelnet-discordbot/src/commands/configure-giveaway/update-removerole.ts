@@ -3,7 +3,7 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import giveawayutil, { Giveaway } from '../../utility/giveaway';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayUpdateRemoveRoleCommand extends BotSubcommand {
   cache: NodeCache

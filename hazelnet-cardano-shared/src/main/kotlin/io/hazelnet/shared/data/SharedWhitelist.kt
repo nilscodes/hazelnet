@@ -9,5 +9,6 @@ data class SharedWhitelist(
     val guildName: String,
     val whitelistName: String,
     val whitelistDisplayName: String,
+    val type: WhitelistType,
     val signups: Set<WhitelistSignup>,
 )

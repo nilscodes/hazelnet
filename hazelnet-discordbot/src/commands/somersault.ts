@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { BotCommand } from "../utility/commandtypes";
-const embedBuilder = require('../utility/embedbuilder');
-const commandbase = require('../utility/commandbase');
+import embedBuilder from '../utility/embedbuilder';
+import commandbase from '../utility/commandbase';
 
 export default <BotCommand> {
   getCommandData() {
@@ -14,8 +14,8 @@ export default <BotCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply();
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
-      const embed = embedBuilder.buildForUser(discordServer, 'Wen Somersault?', 'LFG!', 'somersault', null, 'https://media.giphy.com/media/4NrwipHkVEvpEsCoRP/giphy.gif');
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const embed = embedBuilder.buildForUser(discordServer, 'Wen Somersault?', 'LFG!', 'somersault', [], 'https://media.giphy.com/media/4NrwipHkVEvpEsCoRP/giphy.gif');
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);

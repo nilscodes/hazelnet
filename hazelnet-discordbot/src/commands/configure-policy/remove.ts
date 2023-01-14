@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -11,7 +11,7 @@ export default <BotSubcommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const policyToRemove = tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyIdToRemove);
+      const policyToRemove = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToRemove);
       if (policyToRemove) {
         await interaction.client.services.discordserver.deleteTokenPolicy(interaction.guild!.id, policyToRemove.policyId);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-policy remove', i18n.__({ phrase: 'configure.policy.remove.success', locale: locale }), 'configure-policy-remove', [

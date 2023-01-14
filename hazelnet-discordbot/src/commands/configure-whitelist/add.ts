@@ -1,14 +1,14 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Whitelist } from '../../utility/sharedtypes';
+import { WhitelistType } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
     const whitelistName = interaction.options.getString('whitelist-name', true);
     const whitelistDisplayName = interaction.options.getString('whitelist-displayname', true);
-    const whitelistType = interaction.options.getString('type', true);
+    const whitelistType = interaction.options.getString('type', true) as WhitelistType;
     const requiredRole = interaction.options.getRole('required-role');
     const awardedRole = interaction.options.getRole('awarded-role');
     const maxUsers = interaction.options.getInteger('max-users');
@@ -20,7 +20,7 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium) {
         const whitelistWithNameExists = whitelists.some((whitelist) => whitelist.name === whitelistName);

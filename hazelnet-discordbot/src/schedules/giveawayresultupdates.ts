@@ -3,7 +3,7 @@ import i18n from 'i18n';
 import giveawayutil from '../utility/giveaway';
 import HazelnetClient from "../utility/hazelnetclient";
 import { GuildTextBasedChannel, PermissionsBitField } from 'discord.js';
-const embedBuilder = require('../utility/embedbuilder');
+import embedBuilder from '../utility/embedbuilder';
 
 export default {
   cron: '*/5 * * * *',

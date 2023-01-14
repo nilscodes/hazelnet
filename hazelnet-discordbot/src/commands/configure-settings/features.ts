@@ -1,17 +1,12 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { DiscordServer } from '../../utility/sharedtypes';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
+import { DiscordServer, EmbedAndComponents } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
-const embedBuilder = require('../../utility/embedbuilder');
-const botfeatures = require('../../utility/botfeatures');
-const commandregistration = require('../../utility/commandregistration');
-
-type EmbedAndComponents = {
-  embed: APIEmbed
-  components: ActionRowBuilder<MessageActionRowComponentBuilder>[]
-}
+import embedBuilder from '../../utility/embedbuilder';
+import botfeatures from '../../utility/botfeatures';
+import commandregistration from '../../utility/commandregistration';
 
 interface ConfigureSettingsFeaturesCommand extends BotSubcommand {
   cache: NodeCache
@@ -100,7 +95,7 @@ export default <ConfigureSettingsFeaturesCommand> {
   },
   async saveSettings(interaction, newFeatures, discordServer) {
     const locale = discordServer.getBotLanguage();
-    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild!.id, 'ENABLED_COMMAND_TAGS', newFeatures);
+    await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild!.id, 'ENABLED_COMMAND_TAGS', newFeatures.join(','));
     await commandregistration.registerMainCommands(newFeatures, interaction.client, interaction.guild!.id);
     const selectedFeatures = this.buildFeatureList(newFeatures, locale);
     const settingFields = [

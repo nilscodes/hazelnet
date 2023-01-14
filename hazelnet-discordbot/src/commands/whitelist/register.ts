@@ -4,9 +4,9 @@ import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import { StakeAddressAndHandle, Verification, Whitelist, WhitelistSignupContainer, WhitelistType } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
-const adahandle = require('../../utility/adahandle');
-const cardanoaddress = require('../../utility/cardanoaddress');
+import embedBuilder from '../../utility/embedbuilder';
+import adahandle  from '../../utility/adahandle';
+import cardanoaddress from '../../utility/cardanoaddress';
 
 interface WhitelistRegisterCommand extends BotSubcommand {
   cache: NodeCache
@@ -24,7 +24,7 @@ export default <WhitelistRegisterCommand> {
       const addressOrHandle = interaction.options.getString('address-or-handle');
       let addressToWhitelist = null;
       let handle = null;
-      if (adahandle.isHandle(addressOrHandle)) {
+      if (addressOrHandle && adahandle.isHandle(addressOrHandle)) {
         handle = addressOrHandle;
         addressToWhitelist = (await interaction.client.services.cardanoinfo.resolveHandle(handle)).address;
       } else {
@@ -33,8 +33,8 @@ export default <WhitelistRegisterCommand> {
 
       const cardanoAddress = /^addr1[a-zA-Z0-9]{10,100}$/;
       if (addressToWhitelist === null || cardanoAddress.test(addressToWhitelist)) {
-        const externalAccount = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.user.id);
-        const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+        const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+        const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
         const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction) as WhitelistSignupContainer[];
         const signupsText = this.getSignupsText(signups, whitelists, locale);
 
@@ -180,11 +180,11 @@ export default <WhitelistRegisterCommand> {
           const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id) as Verification[];
           const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
           if (existingConfirmedVerifications.length) {
-            const stakeAddressesToHandles = await adahandle.getHandleMapFromStakeAddresses(interaction.client.services.cardanoinfo, existingConfirmedVerifications.map((verification) => verification.cardanoStakeAddress));
+            const stakeAddressesToHandles = await adahandle.getHandleMapFromStakeAddresses(interaction.client.services.cardanoinfo, existingConfirmedVerifications.map((verification) => verification.cardanoStakeAddress!));
             const registerOptions = existingConfirmedVerifications.map((verification) => {
-              const handleForStakeAddress = stakeAddressesToHandles.find((handleForStake: StakeAddressAndHandle) => handleForStake.handle.resolved && handleForStake.stakeAddress === verification.cardanoStakeAddress);
+              const handleForStakeAddress = stakeAddressesToHandles.find((handleForStake) => handleForStake && (handleForStake.handle.resolved && handleForStake.stakeAddress === verification.cardanoStakeAddress));
               return {
-                label: handleForStakeAddress ? `$${handleForStakeAddress.handle.handle}` : `${cardanoaddress.shorten(verification.address)} (${cardanoaddress.shorten(verification.cardanoStakeAddress)})`,
+                label: handleForStakeAddress ? `$${handleForStakeAddress.handle.handle}` : `${cardanoaddress.shorten(verification.address)} (${cardanoaddress.shorten(verification.cardanoStakeAddress!)})`,
                 value: `${whitelistId}-${verification.id}`,
               };
             });
@@ -201,7 +201,7 @@ export default <WhitelistRegisterCommand> {
             const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), i18n.__({ phrase: registerPhrase, locale }, {
               whitelist: whitelistToRegisterFor,
               signupTime: existingSignup ? Math.floor(new Date(existingSignup.signup.signupTime!).getTime() / 1000) : 0,
-              addressShort: existingSignup ? cardanoaddress.shorten(existingSignup.signup.address) : '',
+              addressShort: existingSignup && existingSignup.signup.address ? cardanoaddress.shorten(existingSignup.signup.address) : '',
             } as any), 'whitelist-register');
             await interaction.editReply({ embeds: [embed], components });
           } else {
@@ -209,7 +209,7 @@ export default <WhitelistRegisterCommand> {
             const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), i18n.__({ phrase: registerPhrase, locale }, {
               whitelist: whitelistToRegisterFor,
               signupTime: existingSignup ? Math.floor(new Date(existingSignup.signup.signupTime!).getTime() / 1000) : 0,
-              addressShort: existingSignup ? cardanoaddress.shorten(existingSignup.signup.address) : '',
+              addressShort: existingSignup && existingSignup.signup.address ? cardanoaddress.shorten(existingSignup.signup.address) : '',
             } as any), 'whitelist-register');
             await interaction.editReply({ embeds: [embed] });
           }

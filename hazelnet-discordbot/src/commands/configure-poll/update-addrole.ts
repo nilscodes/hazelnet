@@ -2,8 +2,8 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { Poll } from '../../utility/polltypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const pollutil = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import pollutil from '../../utility/poll';
 
 interface PollUpdateAddRoleCommand extends BotSubcommand {
   cache: NodeCache
@@ -37,12 +37,12 @@ export default <PollUpdateAddRoleCommand> {
       const polls = await interaction.client.services.discordserver.getPolls(guildId) as Poll[];
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
-        if (poll.requiredRoles.length < 20) {
+        if (poll.requiredRoles && poll.requiredRoles.length < 20) {
           const roleToAdd = this.cache.take(`${guildId}-${interaction.user.id}`) as string;
           const roleAlreadyExists = poll.requiredRoles.find((role) => role.roleId === roleToAdd);
           if (!roleAlreadyExists) {
             const requiredRoles = poll.requiredRoles.concat([{ roleId: roleToAdd }]);
-            await interaction.client.services.discordserver.updatePoll(guildId, poll.id, { requiredRoles });
+            await interaction.client.services.discordserver.updatePoll(guildId, poll.id!, { requiredRoles });
             const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-poll update addrole', i18n.__({ phrase: 'configure.poll.update.addrole.success', locale }, { roleId: roleToAdd, poll } as any), 'configure-poll-update-addrole');
             await interaction.editReply({ embeds: [embedAdmin], components: [] });
           } else {

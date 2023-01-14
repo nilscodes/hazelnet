@@ -3,8 +3,8 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { Poll } from '../../utility/polltypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-const embedBuilder = require('../../utility/embedbuilder');
-const pollutil = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import pollutil from '../../utility/poll';
 
 interface PollUpdateRemoveRoleCommand extends BotSubcommand {
   cache: NodeCache
@@ -36,7 +36,7 @@ export default <PollUpdateRemoveRoleCommand> {
       const polls = await interaction.client.services.discordserver.getPolls(guild.id) as Poll[];
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
-        if (poll.requiredRoles.length) {
+        if (poll.requiredRoles && poll.requiredRoles.length) {
           const roles = [];
           for (let i = 0; i < poll.requiredRoles.length; i += 1) {
             // eslint-disable-next-line no-await-in-loop
@@ -67,10 +67,10 @@ export default <PollUpdateRemoveRoleCommand> {
       const [pollId, roleToRemove] = interaction.values[0].split('-');
       const polls = await interaction.client.services.discordserver.getPolls(guild.id) as Poll[];
       const poll = polls.find((pollForDetails) => pollForDetails.id === +pollId);
-      if (poll) {
+      if (poll && poll.requiredRoles) {
         const requiredRoles = poll.requiredRoles.filter((role) => role.roleId !== roleToRemove);
         if (requiredRoles.length !== poll.requiredRoles.length) {
-          await interaction.client.services.discordserver.updatePoll(guild.id, poll.id, { requiredRoles });
+          await interaction.client.services.discordserver.updatePoll(guild.id, poll.id!, { requiredRoles });
           const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-poll update removerole', i18n.__({ phrase: 'configure.poll.update.removerole.success', locale }, { roleId: roleToRemove, poll } as any), 'configure-poll-update-addrole');
           await interaction.editReply({ embeds: [embedAdmin], components: [] });
         }

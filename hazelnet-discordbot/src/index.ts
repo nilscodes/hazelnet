@@ -3,10 +3,10 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 import * as fs from 'fs';
-const path = require('path');
+import path from 'path';
 import { Collection, GatewayIntentBits, Partials } from 'discord.js';
-const i18n = require('i18n');
-const cron = require('node-cron');
+import i18n from 'i18n';
+import cron from 'node-cron'
 import express from 'express';
 import prometheus from 'prom-client';
 import pino from 'pino'
@@ -21,7 +21,6 @@ import messageCreate from './events/messageCreate';
 import guildMemberAdd from './events/guildMemberAdd';
 import ready from './events/ready';
 import { DiscordEvent } from './utility/commandtypes';
-const commandbase = require('./utility/commandbase');
 
 // Configure localization singleton
 i18n.configure({
@@ -43,26 +42,16 @@ const client = new HazelnetClient(
 const commandFiles = fs.readdirSync(__dirname + '/commands').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
 
 commandFiles.forEach(async (file) => {
-  let command: any;
   const importName = file.substring(0, file.lastIndexOf('.'));
-  if (commandbase.typescriptCommands.includes(importName)) {
-    command = (await import(`./commands/${importName}`)).default;
-  } else {
-    command = require(`./commands/${importName}`);
-  }
+  const command = (await import(`./commands/${importName}`)).default;
   const commandData = command.getCommandData('en');
   // Find and add any subcommands, if present
   if (fs.existsSync(__dirname + `/commands/${commandData.name}`)) {
     const subCommandFiles = fs.readdirSync(__dirname + `/commands/${commandData.name}`).filter((fileFilter) => fileFilter.endsWith('.js') || fileFilter.endsWith('.ts'));
     command.subcommands = {};
     subCommandFiles.forEach(async (subcommandFile) => {
-      let subcommand: any;
       const subcommandName = subcommandFile.substring(0, subcommandFile.lastIndexOf('.'));
-      if (commandbase.typescriptCommands.includes(importName)) {
-        subcommand = (await import(`./commands/${commandData.name}/${subcommandName}`)).default;
-      } else {
-        subcommand = require(`./commands/${commandData.name}/${subcommandName}`);
-      }
+      const subcommand = (await import(`./commands/${commandData.name}/${subcommandName}`)).default;
       command.subcommands[subcommandName] = subcommand;
     });
   }
@@ -84,16 +73,10 @@ eventFiles.forEach((event: DiscordEvent) => {
 });
 
 const scheduleFiles = fs.readdirSync(__dirname + '/schedules').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptSchedules = ['giveawayanouncements', 'giveawayresultupdates', 'epochclockupdates', 'mintcountupdates', 'activityupdater', 'delegatorroles', 'tokenroles', 'whitelistroles'];
 
 scheduleFiles.forEach(async (file) => {
-  let schedule: any;
   const importName = file.substring(0, file.lastIndexOf('.'));
-  if (typescriptSchedules.includes(importName)) {
-    schedule = (await import(`./schedules/${importName}`)).default;
-  } else {
-    schedule = require(`./schedules/${file}`)
-  }
+  const schedule = (await import(`./schedules/${importName}`)).default;
   if (schedule.cron && schedule.execute) {
     cron.schedule(schedule.cron, () => schedule.execute(client));
   }
@@ -104,7 +87,6 @@ client.login(process.env.TOKEN);
 
 // Connect to AMQP queues
 const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
-const typescriptQueues = ['activityreminders', 'whitelistroles', 'delegatorroles', 'tokenroles'];
 
 if (queueFiles.length) {
   const connectToAmqp = async () => {
@@ -112,13 +94,8 @@ if (queueFiles.length) {
     try {
       const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}`);
       queueFiles.forEach(async (file) => {
-        let queue: any;
         const importName = file.substring(0, file.lastIndexOf('.'));
-        if (typescriptQueues.includes(importName)) {
-          queue = (await import(`./queues/${importName}`)).default;
-        } else {
-          queue = require(`./queues/${file}`)
-        }
+        const queue = (await import(`./queues/${importName}`)).default;
         if (queue.name && queue.consume) {
           const queueChannel = await conn.createChannel();
           await queueChannel.assertQueue(queue.name);

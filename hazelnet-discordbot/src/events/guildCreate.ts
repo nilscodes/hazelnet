@@ -1,12 +1,11 @@
+import commandregistration from "../utility/commandregistration";
 import { GuildDiscordEvent } from "../utility/commandtypes";
-
-const commandRegistration = require('../utility/commandregistration');
 
 export default <GuildDiscordEvent> {
   name: 'guildCreate',
   async execute(client, guild) {
     try {
-      await commandRegistration.registerStartCommand(client, guild.id);
+      await commandregistration.registerStartCommand(client, guild.id);
       let discordServer = null;
       try {
         discordServer = await client.services.discordserver.getDiscordServer(guild.id);

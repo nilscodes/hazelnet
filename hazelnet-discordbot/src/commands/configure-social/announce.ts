@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 interface SocialAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -20,8 +20,8 @@ interface SocialAnnounceCommand extends BotSubcommand {
 export default <SocialAnnounceCommand> {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
-    const announceChannel = interaction.options.getChannel('channel');
-    const title = interaction.options.getString('title');
+    const announceChannel = interaction.options.getChannel('channel', true);
+    const title = interaction.options.getString('title', true);
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);

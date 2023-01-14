@@ -3,7 +3,7 @@ import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import { Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -11,8 +11,8 @@ export default <BotSubcommand> {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
     const useLocale = discordServer.getBotLanguage();
     try {
-      const externalAccount = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.user.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const signups = (await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction)) as WhitelistSignupContainer[];
       const whitelistOptions = whitelists.filter((whitelist) => (signups.some((signup) => signup?.whitelistId === whitelist.id)))
         .map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));

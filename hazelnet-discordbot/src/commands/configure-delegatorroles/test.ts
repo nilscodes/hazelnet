@@ -1,9 +1,8 @@
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
-import { DiscordServerMember } from '../../utility/sharedtypes';
-const roleassignments = require('../../utility/roleassignments');
-const embedBuilder = require('../../utility/embedbuilder');
+import roleassignments from '../../utility/roleassignments';
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -16,7 +15,7 @@ export default <BotSubcommand> {
       if (externalAccountOfOtherUser) {
         const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccountOfOtherUser.id);
         if (mainAccount.settings?.BLACKLISTED !== 'true') {
-          const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id) as DiscordServerMember[];
+          const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id);
           const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccountOfOtherUser.id);
           if (currentMemberData) {
             const roleAssignments = await interaction.client.services.discordserver.getEligibleDelegatorRolesOfUser(interaction.guild!.id, externalAccountOfOtherUser.id);
@@ -37,7 +36,7 @@ export default <BotSubcommand> {
               '/configure-delegatorroles test',
               i18n.__({ phrase: 'configure.delegatorroles.test.purpose', locale }, { user, roleData } as any),
               'configure-delegatorroles-test',
-              missingRoleField,
+              (missingRoleField && [missingRoleField]) ?? [],
             );
             await interaction.editReply({ embeds: [embed], components });
           } else {

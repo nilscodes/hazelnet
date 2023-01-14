@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import io.hazelnet.community.data.discord.DiscordRequiredRole
+import io.hazelnet.shared.data.WhitelistType
 import org.springframework.lang.NonNull
 import java.util.*
 import javax.persistence.*

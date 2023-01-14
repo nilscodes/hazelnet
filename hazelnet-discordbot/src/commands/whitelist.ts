@@ -1,7 +1,7 @@
 import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
-const commandbase = require('../utility/commandbase');
-const CommandTranslations = require('../utility/commandtranslations');
+import commandbase from '../utility/commandbase';
+import CommandTranslations from '../utility/commandtranslations';
 
 export default <BotCommand> {
   getCommandData(locale) {

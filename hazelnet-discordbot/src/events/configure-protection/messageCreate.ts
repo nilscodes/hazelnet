@@ -1,10 +1,9 @@
 import HazelnetClient from '../../utility/hazelnetclient';
 import { Message, TextBasedChannel } from "discord.js";
-const adahandle = require('../../utility/adahandle');
-const cardanoaddress = require('../../utility/cardanoaddress');
-const embedBuilder = require('../../utility/embedbuilder');
-const ethereumaddress = require('../../utility/ethereumaddress');
-
+import adahandle  from '../../utility/adahandle';
+import cardanoaddress from '../../utility/cardanoaddress';
+import embedBuilder from '../../utility/embedbuilder';
+import ethereumaddress from '../../utility/ethereumaddress';
 
 interface ProtectionInteractionHandler {
   applyProtection(client: HazelnetClient, message: Message, discordServer: any): void

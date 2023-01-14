@@ -3,10 +3,10 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import { ExternalAccountPing } from '../../utility/sharedtypes';
-const adahandle = require('../../utility/adahandle');
-const cardanoaddress = require('../../utility/cardanoaddress');
-const cardanotoken = require('../../utility/cardanotoken');
-const embedBuilder = require('../../utility/embedbuilder');
+import adahandle  from '../../utility/adahandle';
+import cardanoaddress from '../../utility/cardanoaddress';
+import cardanotoken from '../../utility/cardanotoken';
+import embedBuilder from '../../utility/embedbuilder';
 
 interface PingSendCommand extends BotSubcommand {
   cache: NodeCache
@@ -167,7 +167,7 @@ export default <PingSendCommand> {
       }
     } else if (interaction.customId.indexOf('ping/send/report-') === 0) {
       const [, pingToReport, discordServerId] = interaction.customId.split('-');
-      const discordServer = await interaction.client.services.discordserver.getDiscordServerByInternalId(discordServerId);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServerByInternalId(+discordServerId);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       await interaction.client.services.pings.updateExternalAccountPing(externalAccount.id, pingToReport, { reported: true });

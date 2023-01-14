@@ -1,7 +1,6 @@
-import HazelnetClient from '../utility/hazelnetclient';
-
 /* eslint-disable no-await-in-loop */
-const roleassignments = require('../utility/roleassignments');
+import HazelnetClient from '../utility/hazelnetclient';
+import roleassignments from '../utility/roleassignments';
 
 export default {
   cron: '45 * * * * *',
@@ -14,7 +13,7 @@ export default {
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
-        if (discordServer.active && discordServer.guildId % 120 === minutesInDay % 120) {
+        if (discordServer.active && +discordServer.guildId % 120 === minutesInDay % 120) {
           try {
             const removeInvalid = discordServer.settings?.REMOVE_INVALID_WHITELISTROLES !== 'false';
             const expectedRoleAssignments = await client.services.discordserver.getCurrentWhitelistRoleAssignments(discordServer.guildId);

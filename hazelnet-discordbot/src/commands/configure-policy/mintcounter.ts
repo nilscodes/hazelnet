@@ -2,7 +2,7 @@ import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import { BaseGuildVoiceChannel, ChannelType } from "discord.js";
 import cardanotoken from "../../utility/cardanotoken";
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {

@@ -1,15 +1,14 @@
 /* eslint-disable no-await-in-loop */
-import { APIEmbedField } from 'discord-api-types';
-import { GuildMember, GuildTextBasedChannel } from 'discord.js';
+import { GuildMember, GuildTextBasedChannel, APIEmbedField } from 'discord.js';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
 import { DelegatorRole, DiscordServer, TokenOwnershipRole } from '../utility/sharedtypes';
 import { BotCommand } from '../utility/commandtypes';
 import { SlashCommandBuilder, PermissionsBitField } from 'discord.js';
 import i18n from 'i18n';
-const commandbase = require('../utility/commandbase');
-const embedBuilder = require('../utility/embedbuilder');
-const commandpermissions = require('../utility/commandpermissions');
-const CommandTranslations = require('../utility/commandtranslations');
+import commandbase from '../utility/commandbase';
+import embedBuilder from '../utility/embedbuilder';
+import commandpermissions from '../utility/commandpermissions';
+import CommandTranslations from '../utility/commandtranslations';
 
 interface ConfigureHealthCheckCommand extends BotCommand {
   healthCheckRoles(interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string, roleProperty: string, roles: DelegatorRole[] | TokenOwnershipRole[], botObject: GuildMember): Promise<Boolean>

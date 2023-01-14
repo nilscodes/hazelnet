@@ -1,7 +1,6 @@
 import i18n from 'i18n';
-import { DiscordServer, Stakepool } from '../../utility/sharedtypes';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -9,8 +8,8 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
 
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id) as DiscordServer;
-      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id) as Stakepool[];
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id) ;
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       const locale = discordServer.getBotLanguage();
       const stakepoolToRemove = stakepools.find((stakepool) => stakepool.poolHash === stakepoolHash);
       if (stakepoolToRemove) {

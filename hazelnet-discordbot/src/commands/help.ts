@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
 import i18n from 'i18n';
 import { BotCommand } from '../utility/commandtypes';
-const embedBuilder = require('../utility/embedbuilder');
-const commandbase = require('../utility/commandbase');
-const commandPermissions = require('../utility/commandpermissions');
-const CommandTranslations = require('../utility/commandtranslations');
+import embedBuilder from '../utility/embedbuilder';
+import commandbase from '../utility/commandbase';
+import commandPermissions from '../utility/commandpermissions';
+import CommandTranslations from '../utility/commandtranslations';
 
 export default <BotCommand> {
   getCommandData(locale) {

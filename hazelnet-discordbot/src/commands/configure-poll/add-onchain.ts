@@ -1,7 +1,8 @@
 import i18n from 'i18n';
+import { Poll } from '../../utility/polltypes';
 import { BotSubcommand } from '../../utility/commandtypes';
-const embedBuilder = require('../../utility/embedbuilder');
-const pollutil = require('../../utility/poll');
+import embedBuilder from '../../utility/embedbuilder';
+import pollutil from '../../utility/poll';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -21,16 +22,16 @@ export default <BotSubcommand> {
           name: pollName,
           displayName: pollName,
           description: 'N/A',
-          creator: externalAccount.id,
+          creator: +externalAccount.id,
           openAfter: new Date().toISOString(),
           openUntil: new Date().toISOString(),
           channelId: publishChannel?.id,
           voteaireUUID,
-        };
+        } as Poll;
 
         const poll = await interaction.client.services.discordserver.createPoll(interaction.guild!.id, pollObject);
         const detailFields = pollutil.getPollDetails(locale, poll);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add-onchain', i18n.__({ phrase: 'configure.poll.add-onchain.success', locale }, { poll }), 'configure-poll-add-onchain', detailFields);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add-onchain', i18n.__({ phrase: 'configure.poll.add-onchain.success', locale }, { poll } as any), 'configure-poll-add-onchain', detailFields);
         await interaction.editReply({ embeds: [embed] });
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add-onchain', i18n.__({ phrase: 'configure.poll.add.invalidName', locale }, { pollName: voteaireUUID }), 'configure-poll-add-onchain');

@@ -1,7 +1,6 @@
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-const commandpermissions = require('../../utility/commandpermissions');
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
   async execute(interaction) {

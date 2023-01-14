@@ -4,7 +4,7 @@ import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.data.discord.whitelists.Whitelist
 import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
 import io.hazelnet.community.data.discord.whitelists.WhitelistRequirementNotMetException
-import io.hazelnet.community.data.discord.whitelists.WhitelistType
+import io.hazelnet.shared.data.WhitelistType
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.shared.data.SharedWhitelist
@@ -121,6 +121,7 @@ class WhitelistService(
                 guildName = sharingServer.guildName,
                 whitelistName = it.name,
                 whitelistDisplayName = it.displayName,
+                type = it.type,
                 signups = if (withSignups) it.signups.map { signup ->
                     buildWhitelistSignup(it, signup)
                 }.toSet() else emptySet()

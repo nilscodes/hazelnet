@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import HazelnetClient from "../utility/hazelnetclient";
 import { BaseGuildVoiceChannel, PermissionsBitField } from 'discord.js';
-const cardanotoken = require("../utility/cardanotoken");
+import cardanotoken from "../utility/cardanotoken";
 
 export default {
   cron: '*/5 * * * *',
@@ -21,7 +21,7 @@ export default {
                 try {
                   const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
                   const locale = discordServer.getBotLanguage();
-                  await mintCounterChannel.setName(cardanotoken.getMintCountText({ tokenCount: mintCounterUpdateInfo.tokenCount }, mintCounterUpdateInfo.maxCount, locale));
+                  await mintCounterChannel.setName(cardanotoken.getMintCountText(mintCounterUpdateInfo, mintCounterUpdateInfo.maxCount, locale));
                 } catch (discordError: any) {
                   client.logger.error({ guildId: mintCounterUpdateInfo.guildId, msg: `Channel ${mintCounterUpdateInfo.channelId} was not updated with mint count info due to unknown error.` });
                 }

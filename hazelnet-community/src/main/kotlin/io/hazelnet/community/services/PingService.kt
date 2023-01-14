@@ -111,7 +111,7 @@ class PingService(
             }
     }
 
-    fun updateExternalAccountPing(externalAccountId: Long, pingId: Long, externalAccountPingPartial: ExternalAccountPingPartial): Any {
+    fun updateExternalAccountPing(externalAccountId: Long, pingId: Long, externalAccountPingPartial: ExternalAccountPingPartial): ExternalAccountPing {
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId) // Ensure account exists
         val account = accountService.setAccountForExternalAccount(externalAccountId) // Ensure main account exists
         val sentPings = pingRepository.findAllBySender(externalAccount)

@@ -1,8 +1,8 @@
 import HazelnetClient from "../utility/hazelnetclient";
 import { DiscordRoleAssignmentListForGuildMember } from "../utility/sharedtypes";
-const roleassignments = require('../utility/roleassignments');
+import roleassignments from '../utility/roleassignments';
 
-module.exports = {
+export default {
   name: 'delegatorroles',
   async consume(client: HazelnetClient, roleAssignmentsForUser: DiscordRoleAssignmentListForGuildMember) {
     try {

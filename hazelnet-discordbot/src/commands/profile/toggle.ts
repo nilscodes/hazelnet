@@ -1,7 +1,7 @@
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, APIEmbedField, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-const embedBuilder = require('../../utility/embedbuilder');
+import embedBuilder from '../../utility/embedbuilder';
 
 type ToggleSetting = {
   name: string
@@ -9,7 +9,7 @@ type ToggleSetting = {
 }
 
 interface ToggleCommand extends BotSubcommand {
-  getProfileFields(accountSettings: any, locale: string): object
+  getProfileFields(accountSettings: any, locale: string): APIEmbedField[]
   getSelectMenu(accountSettings: any, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
   getToggleSettings(): ToggleSetting[]
 }
@@ -18,7 +18,7 @@ export default <ToggleCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
@@ -64,7 +64,7 @@ export default <ToggleCommand> {
   async executeSelectMenu(interaction) {
     if (interaction.customId === 'profile/toggle/complete') {
       const [settingName, settingValue] = interaction.values[0].split('-');
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild?.id);
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
