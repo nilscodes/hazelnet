@@ -18,7 +18,7 @@ export default <BotSubcommand> {
       const locale = discordServer.getBotLanguage();
       const tokenRoleToAddFilterTo = tokenRoles.find((tokenRole) => tokenRole.id === tokenRoleId);
       if (tokenRoleToAddFilterTo) {
-        const maxFiltersPerTokenRole = +discordServer.settings?.MAX_FILTERS_PER_TOKEN_ROLE ?? 3;
+        const maxFiltersPerTokenRole = +(discordServer.settings?.MAX_FILTERS_PER_TOKEN_ROLE ?? 3);
         if (!tokenRoleToAddFilterTo.filters || tokenRoleToAddFilterTo.filters.length < maxFiltersPerTokenRole) {
           if (attributeName.length <= 64) {
             if (attributeValue.length <= 128) {

@@ -25,7 +25,7 @@ export default <ConfigureMarketplaceMintAddCommand> {
       if (discordServer.premium) {
         const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id))
           .filter((channel) => channel.type === DiscordMarketplaceChannelType.MINT);
-        const maxMintTrackerCount = +discordServer.settings?.MAXIMUM_MINT_TRACKERS ?? 1;
+        const maxMintTrackerCount = +(discordServer.settings?.MAXIMUM_MINT_TRACKERS ?? 1);
         if (marketplaceChannels.length < maxMintTrackerCount) {
           if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
             const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
