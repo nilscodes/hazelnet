@@ -5,7 +5,6 @@ import io.hazelnet.community.data.discord.marketplace.DiscordMarketplaceChannel
 import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
 import io.hazelnet.community.persistence.DiscordMarketplaceChannelRepository
 import io.hazelnet.community.persistence.DiscordTrackerMetadataFilterRepository
-import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -13,8 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
-
-private val logger = KotlinLogging.logger {}
+import kotlin.math.absoluteValue
 
 @Service
 class DiscordMarketplaceService(
@@ -71,31 +69,23 @@ class DiscordMarketplaceService(
         throw NoSuchElementException("No marketplace channel with ID $marketplaceChannelId found on Discord server with guild ID ${discordServer.guildId}")
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedRate = 60000)
     fun publishPoliciesForSalesAggregation() {
         val shard = Calendar.getInstance().get(Calendar.MINUTE) % 5L
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter {
-                val publish = it.policyId.hashCode() % 5L == shard
-                logger.info { "Policy with ID ${it.policyId} and hash ${it.policyId.hashCode()} compared to shard #$shard. Publishing for sales channel ${it.id} on discord server ${it.discordServerId}: $publish" }
-                publish
-            }
+            .filter { (it.policyId.hashCode() % 5L).absoluteValue == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedRate = 60000)
     fun publishPoliciesForListingsAggregation() {
         val shard = Calendar.getInstance().get(Calendar.MINUTE) % 5L
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter {
-                val publish = it.policyId.hashCode() % 5L == shard
-                logger.info { "Policy with ID ${it.policyId} and hash ${it.policyId.hashCode()} compared to shard #$shard. Publishing for listings channel ${it.id} on discord server ${it.discordServerId}: $publish" }
-                publish
-            }
+            .filter { (it.policyId.hashCode() % 5L).absoluteValue == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }
