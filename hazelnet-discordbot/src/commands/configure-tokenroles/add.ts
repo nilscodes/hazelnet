@@ -27,7 +27,7 @@ export default <ConfigureTokenRoleAddCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild!.id);
-      const maxTokenRoles = +discordServer.settings?.MAXIMUM_TOKEN_ROLES ?? 30;
+      const maxTokenRoles = +(discordServer.settings?.MAXIMUM_TOKEN_ROLES ?? 30);
       const locale = discordServer.getBotLanguage();
       if (discordServer.premium || tokenRoles.length === 0) {
         if (parseInt(minimumTokenQuantity, 10) > 0) {

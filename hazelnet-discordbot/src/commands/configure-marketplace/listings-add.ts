@@ -29,7 +29,7 @@ export default <ConfigureMarketplaceListingsAddCommand> {
         if (minimumPriceAda >= 1) {
           const marketplaceChannels = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id))
             .filter((channel) => channel.type === DiscordMarketplaceChannelType.LISTINGS);
-          const maxListingsTrackerCount = +discordServer.settings?.MAXIMUM_LISTINGS_TRACKERS ?? 5;
+          const maxListingsTrackerCount = +(discordServer.settings?.MAXIMUM_LISTINGS_TRACKERS ?? 5);
           if (marketplaceChannels.length < maxListingsTrackerCount) {
             if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
               const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
