@@ -9,9 +9,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Flux
+import reactor.core.publisher.SignalType
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
+
+private val policiesToInfoLog: List<String> = listOf()
 
 @Service
 class AggregationService(
@@ -40,8 +43,11 @@ class AggregationService(
     @RabbitListener(queues = ["salespolicies"])
     fun processSalesForPolicies(policyId: String) {
         val lastSyncTimeBeforeCall = lastSalesSyncTimeForPolicy[policyId] ?: Date()
-        lastSalesSyncTimeForPolicy[policyId] = Date()
-        logger.info { "Tracking sales for policy $policyId. Previous sync was $lastSyncTimeBeforeCall, this sync is at ${lastSalesSyncTimeForPolicy[policyId]}." }
+        val now = Date()
+        val track = policiesToInfoLog.contains(policyId)
+        if (track) {
+            logger.info { "Tracking sales for policy $policyId. Previous sync was $lastSyncTimeBeforeCall, this sync is at $now." }
+        }
         jpgStoreSalesRequestCounter.increment()
         jpgStoreService.getSales(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
@@ -51,7 +57,18 @@ class AggregationService(
                     .register(meterRegistry)
                     .increment()
             }
-            .filter { it.saleDate != null && it.saleDate.after(lastSyncTimeBeforeCall) }
+            .filter {
+                val sold = it.saleDate != null && it.saleDate.after(lastSyncTimeBeforeCall)
+                if (track) {
+                    logger.info { "Found sale with listing ID ${it.listingId} for item ${it.displayName} and sale date ${it.saleDate}. With last sync at $lastSyncTimeBeforeCall this is considered sold: $sold" }
+                }
+                sold
+            }
+            .doFinally {
+                if (it == SignalType.ON_COMPLETE) {
+                    lastSalesSyncTimeForPolicy[policyId] = now
+                }
+            }
             .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo()) }
         jpgStoreService.getTransactionsForCollection(listOf(policyId), 1)
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
@@ -62,18 +79,33 @@ class AggregationService(
                     .increment()
             }
             .flatMap { Flux.fromIterable(it.transactions) }
-            .filter { it.transactionConfirmationDate != null
+            .filter {
+                val offerSold = it.transactionConfirmationDate != null
                     && it.transactionConfirmationDate.after(lastSyncTimeBeforeCall)
-                    && it.action == JpgStoreTransactionAction.ACCEPT_OFFER }
+                    && it.action == JpgStoreTransactionAction.ACCEPT_OFFER
+                if (track) {
+                    logger.info { "Found ${it.action} for asset ${it.displayName} with confirmation date ${it.transactionConfirmationDate}. With last sync at $lastSyncTimeBeforeCall this offer is considered sold: $offerSold" }
+                }
+                offerSold
+            }
+            .doFinally {
+                if (it == SignalType.ON_COMPLETE) {
+                    lastSalesSyncTimeForPolicy[policyId] = now
+                }
+            }
             .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo()) }
     }
 
     @RabbitListener(queues = ["listingspolicies"])
     fun processListingsForPolicies(policyId: String) {
         val lastSyncTimeBeforeCall = lastListingsSyncTimeForPolicy[policyId] ?: Date()
-        lastListingsSyncTimeForPolicy[policyId] = Date()
+        val now = Date()
+        val track = policiesToInfoLog.contains(policyId);
+        if (track) {
+            logger.info { "Tracking listings for policy ${policyId}. Previous sync was ${lastSyncTimeBeforeCall}, this sync is at $now." }
+        }
         jpgStoreListingsRequestCounter.increment()
-        jpgStoreService.getListings(listOf(policyId), 1)
+        jpgStoreService.getListings(listOf(policyId))
             .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
                 logger.info(e) { "Failed getting jpg.store listings for policy $policyId" }
                 jpgStoreListingsStatusCounter
@@ -81,7 +113,20 @@ class AggregationService(
                     .register(meterRegistry)
                     .increment()
             }
-            .filter { it.listingDate.after(lastSyncTimeBeforeCall) }
+            .flatMap { Flux.fromIterable(it.listings) }
+            .filter {
+                 // Only update on successful retrieval
+                val listed = it.listingDate.after(lastSyncTimeBeforeCall)
+                if (track) {
+                    logger.info { "Found listed with listing ID ${it.listingId} for item ${it.displayName} and listing date ${it.listingDate}. With last sync at $lastSyncTimeBeforeCall this is considered listed: $listed" }
+                }
+                listed
+            }
+            .doFinally {
+                if (it == SignalType.ON_COMPLETE) {
+                    lastListingsSyncTimeForPolicy[policyId] = now
+                }
+            }
             .subscribe { rabbitTemplate.convertAndSend("listings", it.toListingsInfo()) }
     }
 }
