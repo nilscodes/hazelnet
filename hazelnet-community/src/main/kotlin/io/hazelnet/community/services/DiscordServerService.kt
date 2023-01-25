@@ -515,7 +515,7 @@ class DiscordServerService(
                 if (activityThresholdString.isNotBlank()) {
                     val activityThreshold = Date(System.currentTimeMillis() - activityThresholdString.toLong() * 1000)
                     val channelId = channelIdString.toLong()
-                    val userIdsOfInactiveUsers = discordMemberActivityRepository.findUsersThatNeedActivityReminder(activityThreshold)
+                    val userIdsOfInactiveUsers = discordMemberActivityRepository.findUsersThatNeedActivityReminder(discordServer.id!!, activityThreshold)
                     userIdsOfInactiveUsers.forEach {
                         rabbitTemplate.convertAndSend(
                             "activityreminders", DiscordActivityReminder(
