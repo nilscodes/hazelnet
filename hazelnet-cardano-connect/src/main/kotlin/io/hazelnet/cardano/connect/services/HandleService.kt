@@ -12,20 +12,12 @@ import org.springframework.stereotype.Service
 class HandleService(
         @Value("\${io.hazelnet.connect.cardano.handlepolicy}")
         private val handlePolicy: String,
-        @Value("\${io.hazelnet.connect.ipfslink}")
-        private val ipfslink: String,
         private val handleDao: HandleDaoCardanoDbSync,
         private val tokenDao: TokenDao,
 ) {
     fun resolveHandle(handleName: String): Handle {
         val handle = handleDao.resolveHandle(handlePolicy, handleName)
         val handleInfo = tokenDao.getMultiAssetInfo(handlePolicy, handleName)
-        val handleImage = try {
-            val ipfsHashv0 = JsonPath.read<String>(handleInfo.metadata, "$.image").replace("ipfs://", "", true)
-            ipfslink.replace("%ipfs", ipfsHashv0)
-        } catch(pnfe: PathNotFoundException) {
-            ""
-        }
-        return handle.augmentWithImage(handleImage)
+        return handle.augmentWithAssetFingerprint(handleInfo.assetFingerprint)
     }
 }

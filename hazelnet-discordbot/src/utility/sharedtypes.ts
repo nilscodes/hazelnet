@@ -266,7 +266,7 @@ export type Handle = {
     handle: string
     address?: string
     resolved: boolean
-    image?: string
+    assetFingerprint?: string
 }
 
 export type DiscordRoleAssignment = {

@@ -1,10 +1,10 @@
 import axios from "axios";
-import { EpochDetails, PolicyInfo } from "../utility/sharedtypes";
+import { EpochDetails, Handle, PolicyInfo } from "../utility/sharedtypes";
 
 const hazelCardanoConnectUrl = process.env.HAZELNET_CONNECT_URL;
 
 export default {
-  async resolveHandle(handle: string) {
+  async resolveHandle(handle: string): Promise<Handle> {
     const handleToResolve = handle.replace('$', '');
     const handleAddress = await axios.get(`${hazelCardanoConnectUrl}/handles/${handleToResolve}`);
     return handleAddress.data;
