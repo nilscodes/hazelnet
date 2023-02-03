@@ -1,10 +1,12 @@
 package io.hazelnet.cardano.connect.data.address
 
-data class Handle(val handle: String, val address: String? = null, val resolved: Boolean = true, val image: String? = null) {
+import io.hazelnet.cardano.connect.data.token.AssetFingerprint
+
+data class Handle(val handle: String, val address: String? = null, val resolved: Boolean = true, val assetFingerprint: String? = null) {
     override fun toString(): String {
-        return "Handle(handle='$handle', address=$address, resolved=$resolved, image=$image)"
+        return "Handle(handle='$handle', address=$address, resolved=$resolved, assetFingerprint=$assetFingerprint)"
     }
 
-    fun augmentWithImage(image: String) = Handle(handle, address, resolved, image)
+    fun augmentWithAssetFingerprint(assetFingerprint: AssetFingerprint) = Handle(handle, address, resolved, assetFingerprint.assetFingerprint)
 
 }

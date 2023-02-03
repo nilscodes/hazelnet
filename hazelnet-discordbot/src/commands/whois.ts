@@ -9,9 +9,11 @@ import CommandTranslations from '../utility/commandtranslations';
 import embedBuilder from '../utility/embedbuilder';
 import adahandle from '../utility/adahandle';
 import cardanoaddress from '../utility/cardanoaddress';
+import marketplace from '../utility/marketplace';
 
 interface WhoisCommand extends BotCommand {
   applyHandleBranding(embed: any): void
+  getHandleImage(assetFingerprint: string): string
   showAddressList(address: string, handlesAtAddress: any, successMessage: string, failureMessage: string, interaction: AugmentedCommandInteraction, discordServer: any): void
 }
 
@@ -86,7 +88,7 @@ export default <WhoisCommand> {
             name: i18n.__({ phrase: 'whois.handleFoundTitle', locale }),
             value: i18n.__({ phrase: 'whois.handleFoundText', locale }, { handleWithoutPrefix: handle.substring(1) }),
           }]);
-          embed.setImage(resolvedHandle.image);
+          embed.setImage(this.getHandleImage(resolvedHandle?.assetFingerprint!!));
           this.applyHandleBranding(embed);
           await interaction.editReply({ embeds: [embed] });
         }
@@ -113,12 +115,12 @@ export default <WhoisCommand> {
       if (handle) {
         const resolvedHandle = await interaction.client.services.cardanoinfo.resolveHandle(handle);
         const resolvedAddress = resolvedHandle.address;
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whois.messageTitle', locale }), i18n.__({ phrase: 'whois.handleResolvedSuccessForUser', locale }, { handle, resolvedAddress, user: interaction.targetUser.id }), 'whois', [{
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whois.messageTitle', locale }), i18n.__({ phrase: 'whois.handleResolvedSuccessForUser', locale }, { handle, resolvedAddress, user: interaction.targetUser.id } as any), 'whois', [{
           name: i18n.__({ phrase: 'whois.handleFoundTitle', locale }),
           value: i18n.__({ phrase: 'whois.handleFoundText', locale }, { handleWithoutPrefix: handle.substring(1) }),
         }]);
         this.applyHandleBranding(embed);
-        embed.setImage(resolvedHandle.image);
+        embed.setImage(this.getHandleImage(resolvedHandle.assetFingerprint!!));
         await interaction.editReply({ embeds: [embed] });
         return;
       }
@@ -131,6 +133,13 @@ export default <WhoisCommand> {
     embed.setThumbnail('https://i.postimg.cc/QC0r2Kyq/Logo.png');
     embed.setColor('#00CE5A');
   },
+  getHandleImage(assetFingerprint) {
+    if (assetFingerprint) {
+      const [domain, key] = [process.env.NFTCDN_DOMAIN!, Buffer.from(process.env.NFTCDN_KEY!, 'base64')];
+      return marketplace.nftcdnUrl(domain, key, assetFingerprint, '/image', { size: 1024 });
+    }
+    return null;
+  },
   async showAddressList(address, handlesAtAddress, successMessage, failureMessage, interaction, discordServer) {
     const locale = discordServer.getBotLanguage();
     let content = i18n.__({ phrase: failureMessage, locale }, { address });
@@ -140,11 +149,7 @@ export default <WhoisCommand> {
       const handleList = handlesAtAddress.map((handleInfo: HandleInfo) => i18n.__({ phrase: 'whois.handlesEntry', locale }, { handle: handleInfo.handle }));
       content = i18n.__({ phrase: successMessage, locale }, { address }) + handleList.join('\n');
       const multiAssetInfoForFirstHandle = await interaction.client.services.cardanoinfo.multiAssetInfo(process.env.HANDLE_POLICY!, cardanotoken.toHex(handlesAtAddress[0].handle));
-      const metadata = JSON.parse(multiAssetInfoForFirstHandle.metadata);
-      const ipfsV0 = metadata.image.indexOf('ipfs://') === 0 ? metadata.image.substring(7) : null;
-      if (ipfsV0) {
-        image = process.env.IPFS_LINK?.replaceAll('%s', new CID(ipfsV0).toV1().toString('base32'));
-      }
+      image = this.getHandleImage(multiAssetInfoForFirstHandle.assetFingerprint);
     }
     const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whois.messageTitle', locale }), content, 'whois');
     this.applyHandleBranding(embed);

@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
-import { Account, DiscordServerMember, ExternalAccount, Verification } from '../../utility/sharedtypes';
+import { Account, ExternalAccount, Verification } from '../../utility/sharedtypes';
 import { BotSubcommand } from '../../utility/commandtypes';
 const wait = require('util').promisify(setTimeout);
 import embedBuilder from '../../utility/embedbuilder';
@@ -19,7 +19,7 @@ export default <BotSubcommand> {
       let handle = null;
       if (adahandle.isHandle(addressOrHandle)) {
         handle = addressOrHandle;
-        addressToVerify = (await interaction.client.services.cardanoinfo.resolveHandle(handle)).address;
+        addressToVerify = (await interaction.client.services.cardanoinfo.resolveHandle(handle)).address ?? '';
       } else {
         addressToVerify = addressOrHandle;
       }

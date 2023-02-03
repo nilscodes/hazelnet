@@ -26,7 +26,7 @@ export default <WhitelistRegisterCommand> {
       let handle = null;
       if (addressOrHandle && adahandle.isHandle(addressOrHandle)) {
         handle = addressOrHandle;
-        addressToWhitelist = (await interaction.client.services.cardanoinfo.resolveHandle(handle)).address;
+        addressToWhitelist = (await interaction.client.services.cardanoinfo.resolveHandle(handle)).address ?? '';
       } else {
         addressToWhitelist = addressOrHandle;
       }
@@ -74,7 +74,7 @@ export default <WhitelistRegisterCommand> {
           address: addressToWhitelist,
           blockchain: 'Cardano',
           example: 'addr1qxqhukr5nhsa0qm7uj9zv6h9xvf698m5u9k8gh8wl3mpetsfuzpzq2vy24qehs92d4zlz8af96c8tzcukkzarqfa0q8s7t255v',
-        }), 'whitelist-register');
+        } as any), 'whitelist-register');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
