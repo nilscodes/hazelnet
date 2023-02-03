@@ -16,7 +16,7 @@ export default <BotCommand> {
         .setName('announce')
         .setDescription(ci18n.subDescription('announce'))
         .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
-        .addStringOption((option) => option.setName('welcome-text').setDescription(ci18n.option('welcome-text')).setRequired(true))
+        .addStringOption((option) => option.setName('welcome-text').setDescription(ci18n.option('welcome-text')).setRequired(false))
         .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)));
   },
   commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],

@@ -725,7 +725,6 @@
 				"success": "✅ Verification widget successfully published in <#{{channel}}>.",
 				"publicSuccessTitle": "✅ Verify here!",
 				"publicSuccess": "You can verify your wallet here, or quickly link your already verified wallets with this Discord by clicking the below button.",
-				"welcomeMessage": "Welcome Message",
 				"publish": "Create announcement",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for verification announcements."

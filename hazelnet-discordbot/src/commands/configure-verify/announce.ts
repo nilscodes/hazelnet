@@ -22,7 +22,7 @@ export default <VerifyAnnounceCommand> {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
     const announceChannel = interaction.options.getChannel('channel', true);
-    const welcomeText = interaction.options.getString('welcome-text', true);
+    const welcomeText = interaction.options.getString('welcome-text');
     const logoUrl = interaction.options.getString('logo-url');
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -33,7 +33,7 @@ export default <VerifyAnnounceCommand> {
         const guildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = guildChannel.permissionsFor(interaction.client.application!.id);
         if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
-          const welcomeTextToUse = welcomeText.substring(0, 1000);
+          const welcomeTextToUse = welcomeText?.substring(0, 1000) ?? i18n.__({ phrase: 'configure.verify.announce.publicSuccess', locale });
           this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
             announceChannelId: announceChannel.id,
             welcomeText: welcomeTextToUse,
@@ -79,15 +79,8 @@ export default <VerifyAnnounceCommand> {
       const { announceChannelId, welcomeText, logoUrl } = this.cache.take(`${guild.id}-${interaction.user.id}`) as any;
       const announceChannel = await guild.channels.fetch(announceChannelId) as GuildTextBasedChannel;
       if (announceChannel) {
-        const successText = i18n.__({ phrase: 'configure.verify.announce.publicSuccess', locale });
-        const detailFields = [{
-          name: i18n.__({ phrase: 'configure.verify.announce.welcomeMessage', locale }),
-          value: welcomeText,
-        }];
-
         const components = this.getVerifyComponents(locale);
-
-        const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.verify.announce.publicSuccessTitle', locale }), successText, 'verify', detailFields, logoUrl);
+        const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.verify.announce.publicSuccessTitle', locale }), welcomeText, 'verify', [], logoUrl);
         await announceChannel.send({ embeds: [embedPublic], components });
         const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-verify announce', i18n.__({ phrase: 'configure.verify.announce.success', locale }, { channel: announceChannelId }), 'configure-verify-announce');
         await interaction.editReply({ embeds: [embedAdmin], components: [] });
