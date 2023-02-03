@@ -1,3 +1,4 @@
+import i18n from 'i18n';
 import HazelnetClient from '../../utility/hazelnetclient';
 import { Message, TextBasedChannel } from "discord.js";
 import adahandle  from '../../utility/adahandle';
