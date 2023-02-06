@@ -144,7 +144,7 @@ class PingService(
     fun verifyPingCanBeSent(sender: ExternalAccount) {
         val lastPing = pingRepository.getLastPingSent(sender)
         val currentTime = ZonedDateTime.now().toInstant()
-        val sendLimit = if (sender.premium) 60L else 1440L
+        val sendLimit = if (sender.premium) 5L else 60L
         val lastPingBefore = currentTime.minus(sendLimit, ChronoUnit.MINUTES)
         val canSendPing = lastPing.isEmpty || lastPing.get().before(Date.from(lastPingBefore))
         if (!canSendPing) {

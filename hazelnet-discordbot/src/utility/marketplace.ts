@@ -3,7 +3,7 @@ import { URLSearchParams } from 'url'
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
 import { DiscordServer, ListingAnnouncement, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from './sharedtypes';
-import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from './hazelnetclient';
+import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 
 export default {
