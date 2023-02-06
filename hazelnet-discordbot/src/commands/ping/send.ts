@@ -85,7 +85,7 @@ export default <PingSendCommand> {
               break;
             case 403: {
               const { minutesSinceLastPing } = pingError.response.data.messages[0].additionalData;
-              waitTime = (externalAccount.premium ? 60 : 1440) - minutesSinceLastPing;
+              waitTime = (externalAccount.premium ? 5 : 60) - minutesSinceLastPing;
               waitUnits = i18n.__({ phrase: 'ping.send.waitUnitsMinutes', locale });
               if (waitTime > 60) {
                 waitUnits = i18n.__({ phrase: 'ping.send.waitUnitsHours', locale });
