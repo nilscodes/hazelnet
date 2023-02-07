@@ -4,8 +4,7 @@ import { BaseGuildVoiceChannel, PermissionsBitField } from 'discord.js';
 import roleassignments from "../utility/roleassignments";
 
 export default {
-  // TODO
-  cron: '* * * * *',
+  cron: '*/5 * * * *',
   async execute(client: HazelnetClient) {
     client.logger.info('Running role count update job');
     try {
