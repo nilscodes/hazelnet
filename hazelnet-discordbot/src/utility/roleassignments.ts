@@ -1,4 +1,4 @@
-import { Guild, GuildMember } from 'discord.js';
+import { APIRole, Guild, GuildMember, Role } from 'discord.js';
 import i18n from 'i18n';
 import HazelnetClient from './hazelnetclient';
 import { DiscordRoleAssignment, DiscordServer, WithRoleId } from './sharedtypes';
@@ -151,4 +151,10 @@ export default {
     const roleData = roleAssignments.map((roleAssignment) => i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntry`, locale }, { roleId: roleAssignment.roleId })).join('\n');
     return { roleData, missingRoleField };
   },
+  async getRoleCountChannelName(guild: Guild, role: Role | APIRole) {
+    const allUsers = await guild.members.fetch();
+    const usersWithRoleCount = allUsers.filter((member) => member.roles.cache.some((memberRole) => memberRole.id === role.id)).size; // Can't use role.members.size since not all members might be cached
+    const roleCountChannelName = `${role.name}: ${usersWithRoleCount}`;
+    return roleCountChannelName;
+  }
 };

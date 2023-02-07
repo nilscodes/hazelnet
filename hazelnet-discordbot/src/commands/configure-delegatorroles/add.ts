@@ -32,7 +32,7 @@ export default <DelegatorRoleAddCommand> {
               const minimumStake = minimumStakeAda * 1000000;
               const guild = await interaction.client.guilds.fetch(interaction.guild!.id);
               const allUsers = await guild.members.fetch();
-              const usersWithRole = allUsers.filter((member) => member?.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
+              const usersWithRole = allUsers.filter((member) => member.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
               if (usersWithRole.size === 0) {
                 const embed = await this.createDelegatorRole(interaction, discordServer, poolHash, minimumStake, role.id);
                 await interaction.editReply({ embeds: [embed] });

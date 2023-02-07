@@ -2196,6 +2196,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordWidgetUpdate"
+  /discord/widgets/rolecounter:
+    get:
+      summary: Get all guilds and channels+roles for which to send role count updates
+      operationId: listChannelsForRoleCounterUpdate
+      tags:
+        - discord
+        - widgets
+      responses:
+        "200":
+          description: "List of guilds with channels+roles to update the role counter for"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordRoleCounterUpdate"
   /discord/widgets/mintcounter:
     get:
       summary: Get all guilds and channels for which to send mint counter updates
@@ -3492,6 +3508,19 @@ components:
           $ref: "#/components/schemas/DiscordGuild"
         channelId:
           $ref: "#/components/schemas/DiscordChannel"
+    DiscordRoleCounterUpdate:
+      type: object
+      required:
+        - guildId
+        - channelId
+        - roleId
+      properties:
+        guildId:
+          $ref: "#/components/schemas/DiscordGuild"
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        roleId:
+          $ref: "#/components/schemas/DiscordRole"
     DiscordMintCounterUpdate:
       type: object
       required:

@@ -12,4 +12,11 @@ export default {
     }
     return '';
   },
+  getMinutesInDay() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const minutesInDay = hours * 60 + minutes;
+    return minutesInDay;
+  }
 };

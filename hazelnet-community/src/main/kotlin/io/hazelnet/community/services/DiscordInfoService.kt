@@ -1,6 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.data.discord.widgets.DiscordMintCounterUpdate
+import io.hazelnet.community.data.discord.widgets.DiscordRoleCounterUpdate
 import io.hazelnet.community.data.discord.widgets.DiscordWidgetUpdate
 import io.hazelnet.community.persistence.DiscordServerRepository
 import org.springframework.stereotype.Service
@@ -15,6 +16,15 @@ class DiscordInfoService(
             DiscordWidgetUpdate(
                 guildId = it.getGuildId(),
                 channelId = it.getChannelId(),
+            )
+        }
+
+    fun listChannelsForRoleCounterUpdate() = discordServerRepository.findChannelsForRoleCounterUpdate()
+        .map {
+            DiscordRoleCounterUpdate(
+                guildId = it.getGuildId(),
+                channelId = it.getChannelId(),
+                roleId = it.getWidgetName().substringAfterLast("_").toLong()
             )
         }
 
