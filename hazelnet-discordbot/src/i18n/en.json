@@ -27,6 +27,7 @@
 			"ping-list": "List recent sent and received pings.",
 			"configure-info": "Helpful widgets and features to keep your community informed.",
 			"configure-info-epochclock": "A Cardano Epoch Clock right in your Discord.",
+			"configure-info-rolecounter": "A counter for a specific role, showing in your Discord.",
 			"configure-protection": "Configuration options around scammer protection",
 			"configure-protection-status": "Show the status of all protection-related mechanisms.",
 			"configure-protection-addressremove": "Turn on/off autoremoval of messages that contain an address/handle to protect from scammers.",
@@ -159,7 +160,8 @@
 			},
 			"configure-info": {
 				"channel": "The channel you want to update with the respective info.",
-				"status": "Set to False to turn this feature off."
+				"status": "Set to False to turn this feature off.",
+				"role": "The role you want to display the count for."
 			},
 			"configure-protection": {
 				"status": "Set to False to turn this feature off.",
@@ -736,6 +738,13 @@
 				"epochclockOff": "❌ The Epoch clock has been turned off on your server.",
 				"errorWrongChannelType": "⚠ Only guild voice channels can be used for this type of widget.",
 				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name."
+			},
+			"rolecounter": {
+				"rolecounterOn": "✅ The voice channel <#{{rolecounter}}> has been turned into an role counter for the role <@&{{roleId}}>. Watch the roles roll in ☺",
+				"rolecounterOff": "❌ The role counter for <@&{{roleId}}> has been turned off on your server.",
+				"errorWrongChannelType": "⚠ Only guild voice channels can be used for this type of widget.",
+				"errorChannelPermissions": "⚠ It looks like the bot does not have permissions to change the channel. Please make sure to grant the bot role **View Channel**, **Connect** and **Manage Channel** permissions at the role or voice channel level, so it can adjust the name.",
+				"noPremium": "🙀 You currently can not configure role counters as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			}
 		},
 		"policy": {

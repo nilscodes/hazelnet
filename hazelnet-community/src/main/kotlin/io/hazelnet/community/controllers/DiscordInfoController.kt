@@ -16,6 +16,10 @@ class DiscordInfoController(
     @ResponseStatus(HttpStatus.OK)
     fun listChannelsForEpochClockUpdate() = discordInfoService.listChannelsForEpochClockUpdate()
 
+    @GetMapping("/widgets/rolecounter")
+    @ResponseStatus(HttpStatus.OK)
+    fun listChannelsForRoleCounterUpdate() = discordInfoService.listChannelsForRoleCounterUpdate()
+
     @GetMapping("/widgets/mintcounter")
     @ResponseStatus(HttpStatus.OK)
     fun listChannelsForMintCounterUpdate() = discordInfoService.listChannelsForMintCounterUpdate()

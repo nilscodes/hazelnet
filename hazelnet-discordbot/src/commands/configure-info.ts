@@ -13,6 +13,12 @@ export default <BotCommand> {
         .setName('epochclock')
         .setDescription(ci18n.subDescription('epochclock'))
         .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+        .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false)))
+      .addSubcommand((subcommand) => subcommand
+        .setName('rolecounter')
+        .setDescription(ci18n.subDescription('rolecounter'))
+        .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(true))
+        .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
         .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false)));
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,

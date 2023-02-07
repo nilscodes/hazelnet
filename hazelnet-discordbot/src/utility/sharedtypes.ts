@@ -552,6 +552,12 @@ export type DiscordWidgetUpdate = {
     channelId: string
 }
 
+export type DiscordRoleCounterUpdate = {
+    guildId: string
+    channelId: string
+    roleId: string
+}
+
 export type DiscordGiveawayUpdate = {
     guildId: string
     giveawayId: number

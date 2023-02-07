@@ -2,7 +2,7 @@ import axios from "axios";
 import NodeCache from "node-cache";
 import { Giveaway, GiveawayPartial, ParticipationData, WinnerList } from "../utility/giveaway";
 import { DiscordRequiredRole, Poll, PollPartial } from "../utility/polltypes";
-import { ActivityMap, AttributeOperatorType, DelegatorRole, DiscordGiveawayUpdate, DiscordMarketplaceChannelType, DiscordMemberPartial, DiscordMintCounterUpdate, DiscordPollUpdate, DiscordRoleAssignment, DiscordServer, DiscordServerMember as DiscordMember, DiscordServerPartial, DiscordServerPremiumInfo, DiscordWidgetUpdate, IncomingDiscordPayment, Marketplace, MarketplaceChannel, MetadataFilter, SharedWhitelist, SharedWhitelistSignup, Stakepool, TokenMetadata, TokenOwnershipAggregationType, TokenOwnershipRole, TokenOwnershipRolePartial, TokenPolicy, TokenRoleAssetInfo, TokenStakingType, VoteData, Whitelist, WhitelistPartial, WhitelistType } from "../utility/sharedtypes";
+import { ActivityMap, AttributeOperatorType, DelegatorRole, DiscordGiveawayUpdate, DiscordMarketplaceChannelType, DiscordMemberPartial, DiscordMintCounterUpdate, DiscordPollUpdate, DiscordRoleAssignment, DiscordRoleCounterUpdate, DiscordServer, DiscordServerMember as DiscordMember, DiscordServerPartial, DiscordServerPremiumInfo, DiscordWidgetUpdate, IncomingDiscordPayment, Marketplace, MarketplaceChannel, MetadataFilter, SharedWhitelist, SharedWhitelistSignup, Stakepool, TokenMetadata, TokenOwnershipAggregationType, TokenOwnershipRole, TokenOwnershipRolePartial, TokenPolicy, TokenRoleAssetInfo, TokenStakingType, VoteData, Whitelist, WhitelistPartial, WhitelistType } from "../utility/sharedtypes";
 import globalsettings from "./globalsettings";
 
 const hazelCommunityUrl = process.env.HAZELNET_COMMUNITY_URL;
@@ -379,6 +379,10 @@ export default {
   },
   async listChannelsForEpochClockUpdate(): Promise<DiscordWidgetUpdate[]> {
     const widgetUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/widgets/epochclock`);
+    return widgetUpdatesPromise.data;
+  },
+  async listChannelsForRoleCounterUpdate(): Promise<DiscordRoleCounterUpdate[]> {
+    const widgetUpdatesPromise = await axios.get(`${hazelCommunityUrl}/discord/widgets/rolecounter`);
     return widgetUpdatesPromise.data;
   },
   async listChannelsForMintCountUpdate(): Promise<DiscordMintCounterUpdate[]> {

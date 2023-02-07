@@ -26,7 +26,7 @@ export default {
                 try {
                   await epochClockChannel.setName(epochClock);
                 } catch (discordError: any) {
-                  client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: `Channel ${epochClockUpdateInfo.channelId} was not updated with epoch clock info due to unknown error.` });
+                  client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: `Channel ${epochClockUpdateInfo.channelId} was not updated with epoch clock info due to unknown error.`, error: discordError + '' });
                 }
               } else {
                 client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: `Channel permissions for ${epochClockUpdateInfo.channelId} did not allow updating epoch clock` });
@@ -41,11 +41,11 @@ export default {
             await client.services.discordserver.updateDiscordServerSetting(epochClockUpdateInfo.guildId, 'WIDGET_EPOCHCLOCK', '');
           }
         } catch (announceError) {
-          client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: 'Failed to publish epoch clock updates', error: announceError });
+          client.logger.error({ guildId: epochClockUpdateInfo.guildId, msg: 'Failed to publish epoch clock updates', error: announceError + '' });
         }
       }
     } catch (error) {
-      client.logger.error({ msg: 'Failed to update epoch clocks', error });
+      client.logger.error({ msg: 'Failed to update epoch clocks', error: error + '' });
     }
   },
 };

@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import datetime from '../utility/datetime';
 import HazelnetClient from '../utility/hazelnetclient';
 import roleassignments from '../utility/roleassignments';
 
@@ -7,9 +8,7 @@ export default {
   async execute(client: HazelnetClient) {
     client.logger.info('Running token role assignment job');
     try {
-      const hours = new Date().getHours();
-      const minutes = new Date().getMinutes();
-      const minutesInDay = hours * 60 + minutes;
+      const minutesInDay = datetime.getMinutesInDay();
       const allServers = await client.services.discordserver.getAllDiscordServers();
       for (let i = 0; i < allServers.length; i += 1) {
         const discordServer = allServers[i];
