@@ -6,7 +6,7 @@ import embedBuilder from '../../utility/embedbuilder';
 import discordemoji from '../../utility/discordemoji';
 
 interface PollRemoveCommand extends BotSubcommand {
-  getPollChoices(locale: string, polls: any[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
+  getPollChoices(locale: string, polls: Poll[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
 }
 
 export default <PollRemoveCommand> {
@@ -70,7 +70,7 @@ export default <PollRemoveCommand> {
           .setCustomId('configure-poll/remove/complete')
           .setPlaceholder(i18n.__({ phrase: 'configure.poll.remove.choosePollDetails', locale: locale }))
           .addOptions(polls.map((poll) => ({
-            label: i18n.__({ phrase: 'configure.poll.list.adminName', locale: locale }, { poll }),
+            label: i18n.__({ phrase: 'configure.poll.list.adminName', locale: locale }, { poll } as any),
             description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
             value: `configure-poll-${poll.id}`,
           }))),

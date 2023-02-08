@@ -51,10 +51,10 @@ export default <ClaimCommand> {
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
 
-      const availableClaimLists = await interaction.client.services.claimlists.getAvailableClaimLists(interaction.guild!.id, externalAccount.id) as any;
+      const availableClaimLists = await interaction.client.services.claimlists.getAvailableClaimLists(interaction.guild!.id, externalAccount.id);
 
       const claimLists = availableClaimLists.claimLists
-        .sort((claimListA: any, claimListB: any) => claimListA.displayName.localeCompare(claimListB.displayName));
+        .sort((claimListA, claimListB) => claimListA.displayName.localeCompare(claimListB.displayName));
       if (claimLists.length) {
         this.cache.set(`${interaction.user.id}-claimlists`, availableClaimLists);
         this.cache.set(`${interaction.user.id}-order`, {
@@ -77,7 +77,7 @@ export default <ClaimCommand> {
             new SelectMenuBuilder()
               .setCustomId('claim/start')
               .setPlaceholder(i18n.__({ phrase: 'claim.chooseClaimList', locale }))
-              .addOptions(claimLists.map((claimList: any) => ({
+              .addOptions(claimLists.map((claimList) => ({
                 label: claimList.displayName,
                 description: (claimList.description ? (claimList.description.substr(0, 90) + (claimList.description.length > 90 ? '...' : '')) : '-'),
                 value: `claimlist-${claimList.id}`,
@@ -127,7 +127,7 @@ export default <ClaimCommand> {
           const locale = discordServer.getBotLanguage();
           try {
             await interaction.update({ components: [] });
-            const claimListId = +interaction.values[0].substr(interaction.values[0].lastIndexOf('-') + 1);
+            const claimListId = +interaction.values[0].substring(interaction.values[0].lastIndexOf('-') + 1);
             const claimList = this.getFromAvailableClaimLists(interaction.user.id, claimListId);
             const description = claimList.description ?? i18n.__({ phrase: 'claim.noDescription', locale });
             if (claimList.claimUrl) {

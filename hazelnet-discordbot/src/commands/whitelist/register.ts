@@ -2,16 +2,17 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { StakeAddressAndHandle, Verification, Whitelist, WhitelistSignupContainer, WhitelistType } from '../../utility/sharedtypes';
+import { Whitelist, WhitelistSignupContainer, WhitelistType } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 import adahandle  from '../../utility/adahandle';
 import cardanoaddress from '../../utility/cardanoaddress';
+import wallet from '../../utility/wallet';
 
 interface WhitelistRegisterCommand extends BotSubcommand {
   cache: NodeCache
   getSuccessText(locale: string, whitelist: Whitelist, addressToWhitelist: string | undefined | null): string
-  getSignupsText(signups: WhitelistSignupContainer[], whitelists: Whitelist[], locale: string): string
+  getSignupsText(signups: (WhitelistSignupContainer | undefined)[], whitelists: Whitelist[], locale: string): string
 }
 
 export default <WhitelistRegisterCommand> {
@@ -35,7 +36,7 @@ export default <WhitelistRegisterCommand> {
       if (addressToWhitelist === null || cardanoAddress.test(addressToWhitelist)) {
         const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
         const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
-        const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction) as WhitelistSignupContainer[];
+        const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
         const signupsText = this.getSignupsText(signups, whitelists, locale);
 
         if (discordServer.premium) {
@@ -86,7 +87,7 @@ export default <WhitelistRegisterCommand> {
   async executeSelectMenu(interaction) {
     await interaction.deferUpdate();
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-    const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+    const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'whitelist/register/complete') {
       try {
@@ -96,7 +97,7 @@ export default <WhitelistRegisterCommand> {
           const addressToWhitelist = this.cache.take(`${interaction.guild!.id}-${interaction.user.id}`) as string;
           if (addressToWhitelist || whitelistToRegisterFor.type === WhitelistType.DISCORD_ID) {
             const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-            const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction) as WhitelistSignupContainer[];
+            const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
             const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
             if (await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, existingSignup)) {
               await interaction.client.services.discordserver.registerForWhitelist(interaction.guild!.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
@@ -123,7 +124,7 @@ export default <WhitelistRegisterCommand> {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const whitelistToRegisterFor = whitelists.find((whitelist) => whitelist.id === +whitelistId);
       const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
-      const verificationToUse = existingVerifications.find((verification: any) => verification.confirmed && !verification.obsolete && verification.id === +verificationId);
+      const verificationToUse = existingVerifications.find((verification) => verification.confirmed && !verification.obsolete && verification.id === +verificationId);
       if (verificationToUse && whitelistToRegisterFor) {
         await interaction.client.services.discordserver.registerForWhitelist(interaction.guild!.id, whitelistToRegisterFor.id, externalAccount.id, verificationToUse.address);
         const successText = this.getSuccessText(locale, whitelistToRegisterFor, verificationToUse.address);
@@ -139,7 +140,7 @@ export default <WhitelistRegisterCommand> {
   },
   getSignupsText(signups, whitelists, locale) {
     let signupsText = '';
-    const confirmedSignups = signups.filter((signup) => (!!signup));
+    const confirmedSignups = signups.filter((signup) => (!!signup)) as WhitelistSignupContainer[];
     if (confirmedSignups.length) {
       signupsText = `${i18n.__({ phrase: 'whitelist.register.signedupFor', locale })}\n\n`;
       signupsText += confirmedSignups.map((signup) => {
@@ -154,12 +155,12 @@ export default <WhitelistRegisterCommand> {
     if (interaction.customId.indexOf('whitelist/register/widgetsignup-') === 0) {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       await interaction.client.services.discordserver.connectExternalAccount(interaction.guild!.id, externalAccount.id);
       const whitelistId = +interaction.customId.split('-')[1];
-      const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction) as WhitelistSignupContainer[];
+      const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
       const whitelistToRegisterFor = whitelists.find((whitelist) => whitelist.id === whitelistId);
       if (whitelistToRegisterFor) {
         const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
@@ -177,17 +178,10 @@ export default <WhitelistRegisterCommand> {
           return;
         }
         if (whitelistToRegisterFor.type === WhitelistType.CARDANO_ADDRESS) {
-          const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id) as Verification[];
+          const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
           const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
           if (existingConfirmedVerifications.length) {
-            const stakeAddressesToHandles = await adahandle.getHandleMapFromStakeAddresses(interaction.client.services.cardanoinfo, existingConfirmedVerifications.map((verification) => verification.cardanoStakeAddress!));
-            const registerOptions = existingConfirmedVerifications.map((verification) => {
-              const handleForStakeAddress = stakeAddressesToHandles.find((handleForStake) => handleForStake && (handleForStake.handle.resolved && handleForStake.stakeAddress === verification.cardanoStakeAddress));
-              return {
-                label: handleForStakeAddress ? `$${handleForStakeAddress.handle.handle}` : `${cardanoaddress.shorten(verification.address)} (${cardanoaddress.shorten(verification.cardanoStakeAddress!)})`,
-                value: `${whitelistId}-${verification.id}`,
-              };
-            });
+            const registerOptions = await wallet.getWalletRegisterOptions(interaction.client.services.cardanoinfo, existingConfirmedVerifications, `${whitelistId}`);
 
             const components = !userQualifiesForWhitelist ? [] : [new ActionRowBuilder<MessageActionRowComponentBuilder>()
               .addComponents(
@@ -226,3 +220,5 @@ export default <WhitelistRegisterCommand> {
     }
   },
 };
+
+

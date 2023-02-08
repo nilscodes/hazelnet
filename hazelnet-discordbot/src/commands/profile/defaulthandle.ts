@@ -4,10 +4,11 @@ import i18n from 'i18n';
 import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "../../utility/hazelnetclient";
 import adahandle  from '../../utility/adahandle';
 import embedBuilder from '../../utility/embedbuilder';
+import { Account, DiscordServer } from "../../utility/sharedtypes";
 
 interface DefaultHandleCommand extends BotSubcommand {
   getInteractionComponents(availableHandles: string[], currentDefaultHandle: string, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
-  setNewDefaultHandle(interaction: AugmentedSelectMenuInteraction | AugmentedCommandInteraction, mainAccount: any, newDefaultHandle: string, discordServer: any): Promise<EmbedBuilder>
+  setNewDefaultHandle(interaction: AugmentedSelectMenuInteraction | AugmentedCommandInteraction, mainAccount: Account, newDefaultHandle: string, discordServer: DiscordServer): Promise<EmbedBuilder>
 }
 
 const DEFAULT_HANDLE_SETTING = 'DEFAULT_HANDLE';

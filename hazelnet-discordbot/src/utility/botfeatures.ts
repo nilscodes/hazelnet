@@ -30,6 +30,11 @@ export default {
       description: i18n.__({ phrase: 'features.giveaway', locale }),
       value: 'giveaway',
       emoji: { name: '🎁' },
+    // }, {
+    //   label: i18n.__({ phrase: 'features.quizzesTitle', locale }),
+    //   description: i18n.__({ phrase: 'features.quiz', locale }),
+    //   value: 'quiz',
+    //   emoji: { name: '❔' },
     }, {
       label: i18n.__({ phrase: 'features.whitelistTitle', locale }),
       description: i18n.__({ phrase: 'features.whitelist', locale }),

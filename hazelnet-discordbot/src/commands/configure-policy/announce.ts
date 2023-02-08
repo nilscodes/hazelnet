@@ -1,12 +1,13 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ChannelType, GuildChannel, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder } from 'discord.js';
+import { ChannelType, GuildChannel, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder, APIEmbedField } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
+import { TokenPolicy } from 'src/utility/sharedtypes';
 
 interface PolicyAnnounceCommand extends BotSubcommand {
   cache: NodeCache
-  getPolicyFields(tokenPolicies: any, locale: string): any
+  getPolicyFields(tokenPolicies: TokenPolicy[], locale: string): APIEmbedField[]
 }
 
 export default <PolicyAnnounceCommand> {
@@ -96,7 +97,7 @@ export default <PolicyAnnounceCommand> {
     }
   },
   getPolicyFields(tokenPolicies, locale) {
-    return tokenPolicies.map((tokenPolicy: any) => ({
+    return tokenPolicies.map((tokenPolicy) => ({
       name: i18n.__({ phrase: 'configure.policy.announce.projectName', locale }, tokenPolicy),
       value: i18n.__({ phrase: 'configure.policy.announce.policyId', locale }, tokenPolicy),
     }));

@@ -2,6 +2,7 @@ import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
 import i18n from 'i18n';
 import HazelnetClient from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
+import { DiscordServer } from "../utility/sharedtypes";
 
 export type DiscordActivityReminder = {
   guildId: string
@@ -44,7 +45,7 @@ export default {
       client.logger.error({ guildId: activityReminder.guildId, msg: 'Failed to publish activity reminder', error: reminderError });
     }
   },
-  getReminderText(discordServer: any, activityReminder: DiscordActivityReminder) {
+  getReminderText(discordServer: DiscordServer, activityReminder: DiscordActivityReminder) {
     const locale = discordServer.getBotLanguage();
     let reminderText = '';
     if (discordServer.settings?.ACTIVITY_REMINDER_MESSAGE) {

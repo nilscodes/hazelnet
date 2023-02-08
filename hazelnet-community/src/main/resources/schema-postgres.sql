@@ -517,6 +517,59 @@ CREATE TABLE "oauth2_authorization"
     refresh_token_metadata        varchar(2000) DEFAULT NULL
 );
 
+CREATE TABLE "discord_quiz"
+(
+    "discord_quiz_id"          SERIAL PRIMARY KEY,
+    "discord_server_id"        int,
+    "external_account_id"      bigint,
+    "discord_channel_id"       bigint,
+    "discord_message_id"       bigint,
+    "quiz_name"                varchar(30)   NOT NULL,
+    "quiz_displayname"         varchar(256)  NOT NULL,
+    "quiz_description"         varchar(4096) NOT NULL,
+    "quiz_creation"            timestamp     NOT NULL,
+    "quiz_open_after"          timestamp,
+    "quiz_open_until"          timestamp,
+    "quiz_winner_count"        smallint      NOT NULL DEFAULT 1,
+    "quiz_archived"            boolean       NOT NULL DEFAULT false,
+    "quiz_logo_url"            varchar(1000),
+    "attempts_per_question"    smallint      NOT NULL DEFAULT 0,
+    "correct_answers_required" smallint      NOT NULL DEFAULT 0,
+    "awarded_discord_role_id"  bigint,
+    UNIQUE ("discord_server_id", "quiz_name")
+);
+
+CREATE TABLE "discord_quiz_required_roles"
+(
+    "discord_quiz_id" int,
+    "discord_role_id" bigint NOT NULL
+);
+
+CREATE TABLE "discord_quiz_questions"
+(
+    "quiz_question_id"       SERIAL,
+    "discord_quiz_id"        int          NOT NULL,
+    "question_text"          varchar(512) NOT NULL,
+    "question_order"         int          NOT NULL DEFAULT 0,
+    "answer_0"               varchar(90)  NOT NULL,
+    "answer_1"               varchar(90)  NOT NULL,
+    "answer_2"               varchar(90),
+    "answer_3"               varchar(90),
+    "correct_answer_index"   smallint     NOT NULL DEFAULT 0,
+    "correct_answer_details" varchar(512),
+    "shuffle_answers"        boolean      NOT NULL DEFAULT false
+);
+
+CREATE TABLE "discord_quiz_completion"
+(
+    "external_account_id"   bigint    NOT NULL,
+    "discord_quiz_id"       int       NOT NULL,
+    "correct_answers_given" smallint  NOT NULL,
+    "qualifies"             boolean   NOT NULL,
+    "quiz_completion_time"  timestamp NOT NULL,
+    "address"               varchar(150)
+);
+
 ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
@@ -646,3 +699,15 @@ ALTER TABLE "discord_marketplace_filters" ADD FOREIGN KEY ("marketplace_channel_
 CREATE INDEX "discord_marketplace_filters_channel_index" ON "discord_marketplace_filters" ("marketplace_channel_id");
 
 CREATE INDEX ON "verification_imports" ("external_reference_id");
+
+ALTER TABLE "discord_quiz" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_quiz" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE SET NULL;
+
+ALTER TABLE "discord_quiz_required_roles" ADD FOREIGN KEY ("discord_quiz_id") REFERENCES "discord_quiz" ("discord_quiz_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_quiz_questions" ADD FOREIGN KEY ("discord_quiz_id") REFERENCES "discord_quiz" ("discord_quiz_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_quiz_completion" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_quiz_completion" ADD FOREIGN KEY ("discord_quiz_id") REFERENCES "discord_quiz" ("discord_quiz_id") ON DELETE CASCADE;

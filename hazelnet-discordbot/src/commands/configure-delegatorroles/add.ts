@@ -1,14 +1,14 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
+import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import { DelegatorRole, DiscordServer } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 
 interface DelegatorRoleAddCommand extends BotSubcommand {
   cache: NodeCache
-  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null, minimumStakeAda: number, roleId: string): any
+  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null, minimumStakeAda: number, roleId: string): APIEmbed
   confirm(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
   cancel(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
 }

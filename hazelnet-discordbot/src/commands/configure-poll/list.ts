@@ -25,7 +25,7 @@ export default <BotSubcommand> {
       const locale = discordServer.getBotLanguage();
       const pollId = +interaction.values[0].substring(15);
       const polls = await interaction.client.services.discordserver.getPolls(interaction.guild!.id);
-      const poll = polls.find((pollForDetails: any) => pollForDetails.id === pollId);
+      const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
         const detailFields = pollutil.getPollDetails(locale, poll);
         const components = pollutil.getPollChoices(locale, polls, 'configure-poll/list/details', 'configure.poll.list.choosePollDetails');

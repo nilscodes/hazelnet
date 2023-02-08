@@ -34,7 +34,7 @@ export default <BotSubcommand> {
       if (sharedWhitelists.length) {
         whitelistFields.push({
           name: i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelists', locale }),
-          value: `${i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsDetail', locale })}\n\n${sharedWhitelists.map((sharedWhitelist: any) => i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsEntry', locale }, sharedWhitelist)).join('\n')}`,
+          value: `${i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsDetail', locale })}\n\n${sharedWhitelists.map((sharedWhitelist) => i18n.__({ phrase: 'configure.whitelist.list.sharedWhitelistsEntry', locale }, sharedWhitelist as any)).join('\n')}`,
         });
       }
 

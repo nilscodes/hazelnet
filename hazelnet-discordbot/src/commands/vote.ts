@@ -32,7 +32,7 @@ export default <VoteCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag) as ExternalAccount;
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       if (discordServer.premium) {
         const nonArchivedPolls = (await interaction.client.services.discordserver.getPolls(interaction.guild!.id) as Poll[])
           .filter((poll) => !poll.archived)
@@ -122,7 +122,7 @@ export default <VoteCommand> {
         const poll = polls.find((pollForDetails) => pollForDetails.id === pollId && !pollForDetails.archived);
         const member = await interaction.guild!.members.fetch(interaction.user.id);
         if (poll && pollutil.userCanSeePoll(member, poll)) {
-          const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag) as ExternalAccount;
+          const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
           const currentVoteData = await interaction.client.services.discordserver.setVoteForUser(interaction.guild!.id, poll.id, externalAccount.id, []);
           let resultsText = i18n.__({ phrase: 'vote.resultsNotVisible', locale });
           if (poll.resultsVisible) {

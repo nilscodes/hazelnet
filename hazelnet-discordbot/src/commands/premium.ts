@@ -1,23 +1,24 @@
-import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder } from 'discord.js';
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder, APIEmbed } from 'discord.js';
 import i18n from 'i18n';
 import { BotCommand } from '../utility/commandtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
+import { DiscordServer, DiscordServerMember } from '../utility/sharedtypes';
 
 type InterfaceInfo = {
   image: string
   text: string
 }
 type EmbedParts = {
-  embed: any
+  embed: APIEmbed
   components: ActionRowBuilder<MessageActionRowComponentBuilder>[]
 }
 
 interface PremiumCommand extends BotCommand {
   getGiveawayInfo(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction): Promise<InterfaceInfo>
-  showPremiumEmbed(discordMemberInfo: any, premiumInfo: any, locale: string, discordServer: any, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
+  showPremiumEmbed(discordMemberInfo: DiscordServerMember, premiumInfo: any, locale: string, discordServer: DiscordServer, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
 }
 
 export default <PremiumCommand> {
@@ -45,7 +46,7 @@ export default <PremiumCommand> {
         await interaction.client.services.externalaccounts.clearExternalDiscordAccountCache(interaction.user.id);
       }
 
-      const { embed, components } = this.showPremiumEmbed(discordMemberInfo, premiumInfo, locale, discordServer, stakeLink, giveawayInfo);
+      const { embed, components } = this.showPremiumEmbed(discordMemberInfo!, premiumInfo, locale, discordServer, stakeLink, giveawayInfo);
       await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
@@ -83,7 +84,7 @@ export default <PremiumCommand> {
           .addComponents(
             new ButtonBuilder()
               .setCustomId(`premium/${discordMemberInfo.premiumSupport ? 'disable' : 'enable'}`)
-              .setLabel(i18n.__({ phrase: (discordMemberInfo.premiumSupport ? 'premium.pledgeButtonNo' : 'premium.pledgeButtonYes'), locale }, discordServer))
+              .setLabel(i18n.__({ phrase: (discordMemberInfo.premiumSupport ? 'premium.pledgeButtonNo' : 'premium.pledgeButtonYes'), locale }, discordServer as any))
               .setStyle(discordMemberInfo.premiumSupport ? ButtonStyle.Danger : ButtonStyle.Primary),
           ),
         ];

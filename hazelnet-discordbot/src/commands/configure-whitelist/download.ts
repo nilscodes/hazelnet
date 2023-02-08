@@ -24,10 +24,10 @@ export default <WhitelistDownloadCommand> {
       const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const localWhitelistOptions = whitelists.map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
-      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, false)).map((sharedWhitelist: any) => ({
+      const sharedWhitelists = (await interaction.client.services.discordserver.getSharedWhitelists(interaction.guild!.id, false)).map((sharedWhitelist) => ({
         label: i18n.__({ phrase: 'configure.whitelist.download.externalWhitelist', locale }, {
-          whitelistDisplayName: sharedWhitelist.whitelistDisplayName.substr(0, 40),
-          guildName: sharedWhitelist.guildName.substr(0, 50),
+          whitelistDisplayName: sharedWhitelist.whitelistDisplayName.substring(0, 40),
+          guildName: sharedWhitelist.guildName.substring(0, 50),
         }),
         value: `${sharedWhitelist.guildId}-${sharedWhitelist.whitelistName}`,
       }));

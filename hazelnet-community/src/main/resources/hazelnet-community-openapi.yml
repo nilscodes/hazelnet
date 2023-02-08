@@ -751,6 +751,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordRoleAssignment"
+  /discord/servers/{guildId}/roleassignments/quizroles:
+    get:
+      summary: Get the current set of quiz role assignments for this server
+      operationId: getCurrentQuizRoleAssignments
+      tags:
+        - discord
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Role assignment list for quiz completions"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordRoleAssignment"
   /discord/servers/{guildId}/members:
     get:
       summary: Get the list of external accounts that are members of this discord server
@@ -1747,6 +1764,244 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenMetadata"
+  /discord/servers/{guildId}/quizzes:
+    get:
+      summary: "Get quizzes for this Discord server"
+      operationId: listQuizzes
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "All quizzes for this server"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordQuiz"
+    post:
+      summary: Create a quiz on this server
+      operationId: addQuiz
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordQuiz"
+      responses:
+        "201":
+          description: "Quiz"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuiz"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/quizzes/{quizId}:
+    get:
+      summary: "Get specific quiz for this Discord server"
+      operationId: getQuiz
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      responses:
+        "200":
+          description: "The quiz with the specified ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuiz"
+    patch:
+      summary: Update the settings and dates for this quiz
+      operationId: updateQuiz
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordQuizPartial"
+      responses:
+        "200":
+          description: "Quiz with updated details"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuiz"
+    delete:
+      summary: Remove a quiz from this Discord server, including all questions, answers provided by members etc
+      operationId: deleteQuiz
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+  /discord/servers/{guildId}/quizzes/{quizId}/questions:
+    get:
+      summary: "Get questions for a specific quiz"
+      operationId: getQuizQuestions
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      responses:
+        "200":
+          description: "The questions/answer options for the quiz with the specified ID"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordQuizQuestion"
+    post:
+      summary: Add a new question/answer combination to the quiz
+      operationId: addQuizQuestion
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordQuizQuestion"
+      responses:
+        "200":
+          description: "The created quiz question"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuizQuestion"
+  /discord/servers/{guildId}/quizzes/{quizId}/questions/{quizQuestionId}:
+    get:
+      summary: "Get one specific question for a specific quiz"
+      operationId: getQuizQuestion
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+        - $ref: "#/components/parameters/QuizQuestionIdPathParameter"
+      responses:
+        "200":
+          description: "The questions/answer for the quiz with the specified ID and question ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuizQuestion"
+    delete:
+      summary: Remove a quiz question from this quiz - including all associated, already given answers by users
+      operationId: deleteQuizQuestion
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+        - $ref: "#/components/parameters/QuizQuestionIdPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+  /discord/servers/{guildId}/quizzes/{quizId}/completions:
+    get:
+      summary: "Get all completions for a specific quiz"
+      operationId: listQuizCompletions
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      responses:
+        "200":
+          description: "The list of completions for the quiz with the specified ID"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordQuizCompletion"
+    post:
+      summary: Add a new completion event to the quiz
+      operationId: addQuizCompletion
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordQuizCompletion"
+      responses:
+        "201":
+          description: "The added quiz completion info"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuizCompletion"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/quizzes/{quizId}/completions/{externalAccountId}:
+    get:
+      summary: "Get one specific question for a specific quiz"
+      operationId: getQuizCompletionForExternalAccount
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "The completion details for the quiz with the specified ID and external account"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordQuizCompletion"
+        "404":
+          description: "This user has not completed the quiz"
+    delete:
+      summary: Remove a quiz completion for the given quiz and user
+      operationId: deleteQuizCompletionForExternalAccount
+      tags:
+        - discord
+        - quizzes
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/QuizIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
   /discord/servers/{guildId}/marketplaces/channels:
     get:
       summary: "Get marketplace channels for this Discord server"
@@ -2180,6 +2435,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DiscordGiveawayUpdate"
+  /discord/quizzes/announcements:
+    get:
+      summary: Get all quizzes that have announcements that are due to be posted
+      operationId: listQuizzesToBeAnnounced
+      tags:
+        - discord
+        - quizzes
+      responses:
+        "200":
+          description: "List of servers and corresponding quizzes to announce"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordQuizUpdate"
   /discord/widgets/epochclock:
     get:
       summary: Get all guilds and channels for which to send epoch clock updates
@@ -2355,6 +2626,26 @@ components:
       required: true
       style: simple
       example: 5124
+      schema:
+        type: integer
+        format: int64
+    QuizIdPathParameter:
+      name: quizId
+      in: path
+      description: The ID of this quiz
+      required: true
+      style: simple
+      example: 602
+      schema:
+        type: integer
+        format: int64
+    QuizQuestionIdPathParameter:
+      name: quizQuestionId
+      in: path
+      description: The ID of this quiz question
+      required: true
+      style: simple
+      example: 22612
       schema:
         type: integer
         format: int64
@@ -3407,6 +3698,196 @@ components:
           enum:
             - DISCORD_ID
             - CARDANO_ADDRESS
+    DiscordQuiz:
+      type: object
+      required:
+        - creator
+        - name
+        - displayName
+        - description
+        - openAfter
+        - openUntil
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        messageId:
+          $ref: "#/components/schemas/DiscordMessage"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        name:
+          type: string
+          pattern: "^[A-Za-z][-A-Za-z0-9]{0,29}$"
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        winnerCount:
+          type: integer
+          format: int32
+          description: Number of winners to draw at the end of the quiz
+          example: 2
+        archived:
+          type: boolean
+        requiredRoles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DiscordRequiredRole"
+        logoUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        awardedRole:
+          $ref: "#/components/schemas/DiscordRole"
+        attemptsPerQuestion:
+          type: integer
+          format: int32
+          description: How many attempts on each question the user has (0 means unlimited)
+          default: 0
+          example: 1
+        correctAnswersRequired:
+          type: integer
+          format: int32
+          description: How many questions does the user need to answer correctly to qualify for winning something (0 means all of them)
+          default: 0
+          example: 5
+    DiscordQuizQuestion:
+      type: object
+      required:
+        - text
+        - correctAnswer
+        - answer0
+        - answer1
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        order:
+          type: integer
+          format: int32
+        text:
+          type: string
+          minLength: 1
+          maxLength: 512
+          description: The question text
+        answer0:
+          $ref: "#/components/schemas/DiscordQuizAnswerText"
+        answer1:
+          $ref: "#/components/schemas/DiscordQuizAnswerText"
+        answer2:
+          $ref: "#/components/schemas/DiscordQuizAnswerText"
+        answer3:
+          $ref: "#/components/schemas/DiscordQuizAnswerText"
+        correctAnswer:
+          description: The 0-based index of the correct answer
+          type: integer
+          format: int32
+          default: 0
+        correctAnswerDetails:
+          type: string
+          minLength: 1
+          maxLength: 512
+          description: A short explanation with details about the correct answer
+    DiscordQuizAnswerText:
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: The answer text
+    DiscordQuizPartial:
+      type: object
+      properties:
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        messageId:
+          $ref: "#/components/schemas/DiscordMessage"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 256
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        openAfter:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        openUntil:
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        winnerCount:
+          type: integer
+          format: int32
+          description: Number of winners to draw at the end of the quiz
+          example: 2
+        archived:
+          type: boolean
+        requiredRoles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DiscordRequiredRole"
+        logoUrl:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        awardedRole:
+          $ref: "#/components/schemas/DiscordRole"
+        attemptsPerQuestion:
+          type: integer
+          format: int32
+          description: How many attempts on each question the user has (0 means unlimited)
+          example: 1
+        correctAnswersRequired:
+          type: integer
+          format: int32
+          description: How many questions does the user need to answer correctly to qualify for winning something (0 means all of them)
+          default: 0
+          example: 5
+    DiscordQuizCompletion:
+      type: object
+      required:
+        - externalAccountId
+        - correctAnswers
+      properties:
+        externalAccountId:
+          type: integer
+          format: int64
+        time:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        correctAnswers:
+          type: integer
+          format: int32
+        qualifies:
+          type: boolean
+          description: If the user met the quiz completion criteria at the time of submission
+        address:
+          $ref: "#/components/schemas/WalletAddress"
     DiscordRequiredRole:
       type: object
       required:
@@ -3491,6 +3972,23 @@ components:
         guildId:
           $ref: "#/components/schemas/DiscordGuild"
         giveawayId:
+          readOnly: true
+          type: integer
+          format: int64
+        channelId:
+          $ref: "#/components/schemas/DiscordChannel"
+        messageId:
+          $ref: "#/components/schemas/DiscordMessage"
+    DiscordQuizUpdate:
+      type: object
+      required:
+        - guildId
+        - quizId
+        - channelId
+      properties:
+        guildId:
+          $ref: "#/components/schemas/DiscordGuild"
+        quizId:
           readOnly: true
           type: integer
           format: int64

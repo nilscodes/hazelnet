@@ -9,19 +9,20 @@ import cardanotoken from '../../utility/cardanotoken';
 import poll from '../../utility/poll';
 import datetime from '../../utility/datetime';
 import discordemoji from '../../utility/discordemoji';
+import { DiscordServer } from '../../utility/sharedtypes';
 
 interface PollAddCommand extends BotSubcommand {
   cache: NodeCache
   buildContent(locale: string, currentChannel: string, pollObject: PollPartial, step: number): string[]
-  startPhase2(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: any, pollObject: PollPartial): void
-  startPhase3(interaction: AugmentedButtonInteraction, discordServer: any, pollObject: PollPartial): void
-  startPhase4(interaction: AugmentedButtonInteraction | AugmentedSelectMenuInteraction, discordServer: any, pollObject: PollPartial): void
-  startPhase5(interaction: AugmentedButtonInteraction, discordServer: any, pollObject: PollPartial): void
+  startPhase2(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, pollObject: PollPartial): void
+  startPhase3(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, pollObject: PollPartial): void
+  startPhase4(interaction: AugmentedButtonInteraction | AugmentedSelectMenuInteraction, discordServer: DiscordServer, pollObject: PollPartial): void
+  startPhase5(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, pollObject: PollPartial): void
   getVoteOptionComponents(locale: string, pollOptions: PollPartial): ActionRowBuilder<MessageActionRowComponentBuilder>[]
   validateOptions(options: PollOption[]): boolean
   getYesNoOptions(locale: string, yesIsSelected: boolean, yesLabel: string, yesDescription: string, yesEmoji: string, noLabel: string, noDescription: string, noEmoji: string): SelectMenuComponentOptionData[]
   getTokenOwnershipOptions(locale: string, tokenType: string): SelectMenuComponentOptionData[]
-  createPoll(interaction: AugmentedButtonInteraction, discordServer: any): void
+  createPoll(interaction: AugmentedButtonInteraction, discordServer: DiscordServer): void
 }
 
 export default <PollAddCommand> {

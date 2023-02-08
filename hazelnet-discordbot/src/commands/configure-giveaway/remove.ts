@@ -15,7 +15,7 @@ export default <GiveawayRemoveCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const giveaways = (await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id))
-        .sort((giveawayA: Giveaway, giveawayB: Giveaway) => giveawayA.displayName.localeCompare(giveawayB.displayName)) as Giveaway[];
+        .sort((giveawayA, giveawayB) => giveawayA.displayName.localeCompare(giveawayB.displayName));
       if (giveaways.length) {
         const components = this.getGiveawayChoices(locale, giveaways);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.purpose', locale }), 'configure-giveaway-remove');
@@ -36,7 +36,7 @@ export default <GiveawayRemoveCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
       const giveawayId = +interaction.values[0].substring(19);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId) as Giveaway[];
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId) ;
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         await interaction.client.services.discordserver.deleteGiveaway(guildId, giveaway.id);
