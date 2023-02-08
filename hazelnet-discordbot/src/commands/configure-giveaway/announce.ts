@@ -49,7 +49,7 @@ export default <GiveawayAnnounceCommand> {
       const locale = discordServer.getBotLanguage();
       const giveawayId = +interaction.values[0].substring(19);
       const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id);
-      const giveaway = giveaways.find((giveawayForDetails: any) => giveawayForDetails.id === giveawayId);
+      const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         const announceChannelId = this.cache.take(`${guild.id}-${interaction.user.id}`) as string;
         const participation = await interaction.client.services.discordserver.getParticipationForGiveaway(guild.id, giveaway.id);

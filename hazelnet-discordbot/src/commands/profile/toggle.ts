@@ -2,6 +2,7 @@ import { ActionRowBuilder, APIEmbedField, MessageActionRowComponentBuilder, Sele
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import embedBuilder from '../../utility/embedbuilder';
+import { Settings } from "../../utility/sharedtypes";
 
 type ToggleSetting = {
   name: string
@@ -9,8 +10,8 @@ type ToggleSetting = {
 }
 
 interface ToggleCommand extends BotSubcommand {
-  getProfileFields(accountSettings: any, locale: string): APIEmbedField[]
-  getSelectMenu(accountSettings: any, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
+  getProfileFields(accountSettings: Settings, locale: string): APIEmbedField[]
+  getSelectMenu(accountSettings: Settings, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
   getToggleSettings(): ToggleSetting[]
 }
 

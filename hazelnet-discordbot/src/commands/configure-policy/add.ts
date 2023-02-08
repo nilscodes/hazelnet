@@ -11,7 +11,7 @@ export default <BotSubcommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const existingTokenPolicy = tokenPolicies.find((tokenPolicy: any) => tokenPolicy.policyId === policyId);
+      const existingTokenPolicy = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyId);
       if (!existingTokenPolicy) {
         const newPolicyPromise = await interaction.client.services.discordserver.addTokenPolicy(interaction.guild!.id, policyId, projectName);
         const newPolicyData = newPolicyPromise.data;

@@ -7,6 +7,7 @@ import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
@@ -23,6 +24,7 @@ class RoleAssignmentService(
     private val discordServerRepository: DiscordServerRepository,
     private val mutantStakingService: MutantStakingService,
     private val whitelistRepository: DiscordWhitelistRepository,
+    private val quizRepository: DiscordQuizRepository,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -404,6 +406,11 @@ class RoleAssignmentService(
             .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
             .toSet()
 
+    fun getAllCurrentQuizRoleAssignmentsForGuild(discordServer: DiscordServer) =
+        quizRepository.findAwardedRoleAssignments(discordServer.id!!)
+            .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
+            .toSet()
+
     fun getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
         return if (discordServer.tokenRoles.isNotEmpty()) {
             val allVerificationsOfMember =
@@ -430,6 +437,11 @@ class RoleAssignmentService(
             .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
             .toSet()
 
+    fun getAllCurrentQuizRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long) =
+        quizRepository.findAwardedRoleAssignmentsForExternalAccount(discordServer.id!!, externalAccountId)
+            .map { DiscordRoleAssignment(discordServer.guildId, it.getExternalReferenceId(), it.getAwardedRole()) }
+            .toSet()
+
     @Async
     @Transactional
     fun publishRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
@@ -453,6 +465,18 @@ class RoleAssignmentService(
         if (discordServer.whitelists.any { it.awardedRole != null }) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             publishWhitelistRoleAssignmentsForGuildMember(discordServer, externalAccount)
+        }
+    }
+
+    // Cannot be @Async for now because if it is called from external, the transaction that updates the whitelist is not yet committed while this thread starts immediately
+    @Transactional
+    fun publishQuizRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = discordServerRepository.findByGuildId(guildId)
+            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        val quizzes = quizRepository.findByDiscordServerId(discordServer.id!!)
+        if (quizzes.any { it.awardedRole != null }) {
+            val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
+            publishQuizRoleAssignmentsForGuildMember(discordServer, externalAccount)
         }
     }
 
@@ -522,6 +546,19 @@ class RoleAssignmentService(
                 guildId = discordServer.guildId,
                 userId = externalAccount.referenceId.toLong(),
                 assignments = getAllCurrentWhitelistRoleAssignmentsForGuildMember(discordServer, externalAccount.id!!)
+            )
+        )
+    }
+
+    private fun publishQuizRoleAssignmentsForGuildMember(
+        discordServer: DiscordServer,
+        externalAccount: ExternalAccount
+    ) {
+        rabbitTemplate.convertAndSend(
+            "quizroles", DiscordRoleAssignmentListForGuildMember(
+                guildId = discordServer.guildId,
+                userId = externalAccount.referenceId.toLong(),
+                assignments = getAllCurrentQuizRoleAssignmentsForGuildMember(discordServer, externalAccount.id!!)
             )
         )
     }

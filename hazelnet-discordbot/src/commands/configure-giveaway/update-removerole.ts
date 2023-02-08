@@ -32,7 +32,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-giveaway/update-removerole/chooserole') {
       const giveawayId = +interaction.values[0].substring('configure-giveaway-'.length);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) as Giveaway[];
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) ;
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         if (giveaway.requiredRoles.length) {
@@ -64,7 +64,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
       }
     } else if (interaction.customId === 'configure-giveaway/update-removerole/complete') {
       const [giveawayId, roleToRemove] = interaction.values[0].split('-');
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) as Giveaway[];
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) ;
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === +giveawayId);
       if (giveaway) {
         const requiredRoles = giveaway.requiredRoles.filter((role) => role.roleId !== roleToRemove);

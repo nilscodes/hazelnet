@@ -53,7 +53,6 @@ export interface GiveawayPartial extends Omit<Giveaway, 'description' | 'id' | '
   requiredRoles?: DiscordRequiredRole[]
   drawType?: GiveawayDrawType
   winnerCount?: number
-  creator?: number
   archived?: boolean
 }
 
@@ -248,8 +247,8 @@ export default {
     const components = [];
     if (!this.hasGiveawayEnded(giveaway)) {
       const buttons = [new ButtonBuilder()
-        .setCustomId(`join/widgetjoin/${giveaway.id}`)
-        .setLabel(i18n.__({ phrase: 'join.joinButton', locale }))
+        .setCustomId(`join/widgetjoin/giveaway/${giveaway.id}`)
+        .setLabel(i18n.__({ phrase: 'join.joinGiveawayButton', locale }))
         .setStyle(ButtonStyle.Primary)
       ];
 

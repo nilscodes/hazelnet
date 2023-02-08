@@ -293,6 +293,10 @@ class DiscordServerController(
     @ResponseStatus(HttpStatus.OK)
     fun getCurrentWhitelistRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentWhitelistRoleAssignmentsForGuild(guildId)
 
+    @GetMapping("/{guildId}/roleassignments/quizroles")
+    @ResponseStatus(HttpStatus.OK)
+    fun getCurrentQuizRoleAssignments(@PathVariable guildId: Long) = discordServerService.getAllCurrentQuizRoleAssignmentsForGuild(guildId)
+
     @PostMapping("/{guildId}/accesstoken")
     @ResponseStatus(HttpStatus.OK)
     fun regenerateAccessToken(@PathVariable guildId: Long) = discordServerService.regenerateAccessToken(guildId)

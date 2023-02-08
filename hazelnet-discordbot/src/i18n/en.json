@@ -50,12 +50,23 @@
 			"configure-giveaway": "Manage giveaways for people to participate in",
 			"configure-giveaway-list": "List all giveaways that are set up on this Discord server.",
 			"configure-giveaway-add": "Adds a new giveaway to the server. You will be able to determine conditions.",
-			"configure-giveaway-announce": "Announce the winner(s) of a giveaway.",
+			"configure-giveaway-announce": "Create a participation widget for a giveaway.",
 			"configure-giveaway-end": "Draw the winner for an existing giveaway.",
 			"configure-giveaway-remove": "Select and remove an existing giveaway. ⚠ This will also remove all participants and winners.",
 			"configure-giveaway-update": "Change advanced options on your existing giveaway.",
 			"configure-giveaway-update-addrole": "Adds a new eligible role that can participate in an existing giveaway.",
 			"configure-giveaway-update-removerole": "Removes a currently eligible role from an existing giveaway.",
+			"configure-quiz": "Manage quizzes for people to participate in",
+			"configure-quiz-list": "List all quizs that are set up on this Discord server.",
+			"configure-quiz-add": "Adds a new quiz to the server. You will be able to determine conditions.",
+			"configure-quiz-announce": "Create a participation widget for a quiz.",
+			"configure-quiz-end": "Draw the winner(s) for an existing quiz.",
+			"configure-quiz-remove": "Select and remove an existing quiz. ⚠ This will also remove all participants and winners.",
+			"configure-quiz-update": "Change advanced options on your existing quiz.",
+			"configure-quiz-update-addrole": "Adds a new eligible role that can participate in an existing quiz.",
+			"configure-quiz-update-removerole": "Removes a currently eligible role from an existing quiz.",
+			"configure-quiz-update-addquestion": "Adds a new question/answer combination to an existing quiz.",
+			"configure-quiz-update-removequestion": "Removes a question/answer combination from an existing quiz.",
 			"configure-whitelist": "Manage whitelists for people to submit addresses for",
 			"configure-whitelist-add": "Adds a new whitelist that people on this Discord can sign up for, depending on if they meet the required criteria.",
 			"configure-whitelist-list": "List all whitelists that are defined on this Discord server.",
@@ -427,7 +438,8 @@
 		"errorNotEligible": "⚠ We are sorry, but this poll is archived or you are not eligible to vote at this time."
 	},
 	"join": {
-		"joinButton": "Join giveaway",
+		"joinGiveawayButton": "Join giveaway",
+		"joinQuizButton": "Take quiz",
 		"giveawayInfoTitle": "Information about this giveaway",
 		"errorNotEligible": "⚠ We are sorry, but this giveaway is archived or you are not eligible to participate at this time.",
 		"success": "✅ You have successfully entered this giveaway!",
@@ -443,7 +455,27 @@
 		"totalEntriesNone": "You do not have any verified wallets that contained these tokens at the time of snapshot. If you think you had tokens at snapshot time, make sure to verify the respective wallet via **/verify add**.",
 		"totalEntriesTokenInfo": "💡 If you feel your giveaway entry count is not accurate, ensure all your wallets are linked. The snapshot for this giveaway may also be different from the current token count in your wallet.",
 		"removeEntry": "Remove your entry",
-		"addEntry": "Join the giveaway"
+		"addEntry": "Join the giveaway",
+		"startQuizText": "👋 Hello and welcome to our quiz **{{quiz.displayName}}**! We have a total of {{questionCount}} questions for you to answer. Make sure to answer within 15 minutes or you will have to redo all questions from the beginning.",
+		"quizOutcomes": "Outcomes",
+		"quizAwardedRole": "If you manage to answer all questions correctly, you will be awarded the role <@&{{quiz.awardedRole}}>.",
+		"quizAddressWhitelist": "Completing the quiz will enable you to provide one of your verified addresses and give you a chance to win what is listed in the quiz description above.",
+		"quizNoVerifiedAddresses": "⚠ You have no verified addresses, but will need to provide at least one address at the end of this quiz. Please verify first using the below button on the quiz announcement or the command **/verify add**.",
+		"alreadyCompleted": "🙌 You have already completed this quiz on <t:{{completionTime}}> and provided the address *{{address}}*. Congratulations!",
+		"alreadyCompletedNotQualified": "😅 You have already completed this quiz on <t:{{completionTime}}>. Thanks for participating!",
+		"quizNotEnoughCorrectAnswers": "😅 You have completed the quiz! You had **{{correct}} out of {{total}}** correct answers. A minimum of **{{minimumCorrect}}** questions was needed to qualify for the prize. Best of luck next time!",
+		"quizCompleteWithoutRole": "🙌 You have completed the quiz! You had **{{correct}} out of {{total}}** correct answers. You can now submit your address to complete your participation.",
+		"quizCompleteWithRole": "🙌 You have completed the quiz! You had **{{correct}} out of {{total}}** correct answers. You can now submit your address and will receive your role <@&{{quiz.awardedRole}}> a few minutes after selecting your address/handle.",
+		"quizAddressSubmitted": "🏁 You quiz completion was submitted successfully! Check our announcements regularly - you might find a prize in your wallet under the address *{{address}}* soon 😊",
+		"firstQuestion": "▶ Alright, let's get started with question #{{questionNumber}}",
+		"quizComplete": "🏁 Quiz complete!",
+		"genericCompletionText": "You managed to get through all questions.",
+		"correctAnswer": "✅ That's correct!",
+		"correctAnswerNextQuestionTitle": "OK, here comes question #{{questionNumber}}",
+		"attemptsReached": "❌ Unfortunately not",
+		"attemptsReachedNextQuestionTitle": "Let us try question #{{questionNumber}}",
+		"retryQuestion": "⏪ Unfortunately not, but let us try again",
+		"chooseAddressForQuizPrize": "Select an address to receive your potential prize at"
 	},
 	"claim": {
 		"messageTitle": "Claim your physical items",
@@ -1589,6 +1621,82 @@
 					"noRoles": "⚠ No roles to remove exist on this giveaway."
 				}
 			}
+		},
+		"quiz": {
+			"list": {
+				"purpose": "This is the list of all existing quizzes for this Discord server.",
+				"noQuizzesTitle": "No quizzes",
+				"noQuizzes": "Currently, no available quizzes were found for this server.",
+				"quizInfo": "Winner count: {{winnerCount}}",
+				"quizInfoOpen": "\nOpens on: <t:{{timestamp}}>",
+				"quizInfoClose": "\nCloses on: <t:{{timestamp}}>",
+				"chooseQuizDetails": "Choose the quiz you want more details on",
+				"details": "Quiz Details",
+				"detailsName": "Display name (Internal name)",
+				"detailsDescription": "Description",
+				"detailsDescriptionEmpty": "N/A",
+				"detailsCreation": "Created at",
+				"creationDate": "<t:{{createTime}}>",
+				"detailsDates": "Starts/Ends",
+				"detailsConfiguration": "Quiz configuration",
+				"detailsRoles": "User has to have one of the following roles",
+				"requiredRoleEntry": "• <@&{{role.roleId}}>",
+				"detailsChannel": "Announcement info",
+				"announcementNone": "No quiz announcement will be made by the bot.",
+				"announcementChannel": "A quiz announcement with info on how to participate will be posted in <#{{quiz.channelId}}> when the quiz starts.",
+				"adminName": "{{{quiz.displayName}}} ({{quiz.name}})",
+				"noPremium": "🙀 Users currently can not participate in or view any quizzes as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"winnerCountDescription": "Winner count",
+				"winnerCount": "When the quiz is closed, **{{winnerCount}} winners** will be drawn."
+			},
+			"add": {},
+			"announce": {
+				"purpose": "👇 Pick a quiz from the list of available quizzes to announce. If the quiz is still open, a vote button will also be added to the widget.\n\n{{{participationPublishingInfo}}}\n\n💡 You can only have one announcement for each quiz at a time. The announcement will automatically be updated with the current participation counts every 5 minutes.",
+				"participationPublishYes": "📢 The (current) entry counts will be published along with the quiz announcement.",
+				"success": "✅ Results successfully published in <#{{channel}}>.",
+				"publicSuccess": "❔ The team shared the following quiz with you.",
+				"chooseQuiz": "Pick the quiz you'd like to announce",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
+				"errorWrongChannelType": "This channel cannot be used for quiz announcements."
+			},
+			"end": {
+				"purpose": "👇 Pick a quiz from the list of available quizzes to end and draw winners for. If the quiz is already closed, you will be asked if you want to redraw in a separate step.",
+				"success": "✅ Successfully picked the winners for **{{{displayName}}}**:",
+				"successRedraw": "✅ Successfully reset and picked the winners for **{{{displayName}}}**:",
+				"successPublish": "✅ Successfully published quiz winners for **{{{displayName}}}**.",
+				"redrawWarning": "⚠ The winners for the quiz **{{{displayName}}}** have already been drawn. Would you like to redraw them?",
+				"redrawButton": "Redraw winners",
+				"winnerList": "{{winnerCount}} winners drawn",
+				"chooseQuizDetails": "Choose the quiz you want to draw winners for",
+				"publishButton": "Publish winners",
+				"winnerDrawDiscordId": "{{place}}. <@{{userId}}>",
+				"winnerDrawError": "{{place}}. ⚠ UNKNOWN DISCORD USER",
+				"winnerDrawCardanoAddress": "{{place}}. **{{winnerAddress}}**",
+				"errorDraw": "⚠ Error drawing your winners for quiz **{{{displayName}}}**. Likely there are not enough entrants to match your winner count and uniqueness conditions for this quiz."
+			},
+			"remove": {
+				"success": "🗑️ Removed the following quiz from this server:",
+				"purpose": "Select the quiz to remove from your Discord server.\n\n⚠ **ALL REGISTERED PARTICIPANTS AND QUESTIONS WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE QUIZ**.\n\nOnly do this after you have processed this quiz.",
+				"errorNotFound": "⚠ No quiz with the ID **{{quizId}}** was found for this server. Nothing was removed.",
+				"chooseQuizDetails": "Choose the quiz you want to irrevocably delete"
+			},
+			"update": {
+				"addrole": {
+					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to participate in the quiz **{{{quiz.displayName}}}**.",
+					"purpose": "Select the quiz you would like the role <@&{{roleId}}> to be able to participate in.\n\n💡 All other requirements, like quiz times, remain in place in addition to the existing role requirements.",
+					"chooseQuiz": "Choose the quiz you want to allow this role to participate in",
+					"tooManyRoles": "⚠ Cannot add more than 20 roles to a quiz.",
+					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to participate in this quiz and was not added again."
+				},
+				"removerole": {
+					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to participate in the quiz **{{{quiz.displayName}}}**.",
+					"purpose": "Select the quiz you would like to remove a role from being allowed to participate in.\n\n💡 All other requirements, like quiz times, remain in place in addition to the existing role requirements.",
+					"chooseQuiz": "Choose the quiz you want to remove this role from",
+					"chooseRolePurpose": "Choose which role you would like to remove from the quiz {{{displayName}}}:",
+					"chooseRole": "Choose role to remove",
+					"noRoles": "⚠ No roles to remove exist on this quiz."
+				}
+			}
 		}
 	},
 	"start": {
@@ -1629,6 +1737,8 @@
 		"pollvoteaire": "Integration with the on-chain voting tool Voteaire",
 		"giveawayTitle": "Giveaways (Black Edition only)",
 		"giveaway": "Custom and weighted giveaways for your community",
+		"quizzesTitle": "Quizzes (Black Edition only)",
+		"quiz": "Build custom quizzes for your community",
 		"claimphysicalTitle": "Physical Item Claiming (Black Edition only)",
 		"claimphysical": "Claiming physical items via verified lists",
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",

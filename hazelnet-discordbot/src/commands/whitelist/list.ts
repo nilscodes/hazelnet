@@ -7,7 +7,7 @@ import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 
 interface WhitelistSendCommand extends BotSubcommand {
-  getWhitelists(discordServer: DiscordServer, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, signups: WhitelistSignupContainer[], includeAddresses: boolean): Promise<APIEmbedField[]>
+  getWhitelists(discordServer: DiscordServer, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, signups: (WhitelistSignupContainer | undefined)[], includeAddresses: boolean): Promise<APIEmbedField[]>
 }
 
 export default <WhitelistSendCommand> {
@@ -17,8 +17,8 @@ export default <WhitelistSendCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
-      const signups = ((await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction)) as WhitelistSignupContainer[]).filter((signup) => signup !== undefined);
+      const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
+      const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
       const whitelistFields = await this.getWhitelists(discordServer, whitelists, interaction, signups, false);
       const components = [];
       if (signups.length) {
@@ -61,7 +61,7 @@ export default <WhitelistSendCommand> {
   async getWhitelists(discordServer, whitelists, interaction, signups, includeAddresses) {
     const whitelistFieldsPromise = whitelists.map(async (whitelist) => {
       const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
-      const existingSignup = signups.find((signup) => signup.whitelistId === whitelist.id);
+      const existingSignup = signups.find((signup) => signup?.whitelistId === whitelist.id);
       const qualifyText = await whitelistUtil.getQualifyText(interaction, discordServer, whitelist, existingSignup?.signup, includeAddresses);
       return {
         name: whitelist.displayName,

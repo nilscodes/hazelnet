@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
+import { Whitelist } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 
@@ -13,7 +13,7 @@ export default <BotSubcommand> {
     try {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
-      const signups = (await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction)) as WhitelistSignupContainer[];
+      const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
       const whitelistOptions = whitelists.filter((whitelist) => (signups.some((signup) => signup?.whitelistId === whitelist.id)))
         .map((whitelist) => ({ label: whitelist.displayName, value: whitelist.name }));
       if (whitelistOptions.length) {
@@ -44,7 +44,7 @@ export default <BotSubcommand> {
       const useLocale = discordServer.getBotLanguage();
       try {
         const whitelistName = interaction.values[0];
-        const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id) as Whitelist[];
+        const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
         const whitelistToUnregisterFrom = whitelists.find((whitelist) => whitelist.name === whitelistName);
         if (whitelistToUnregisterFrom) {
           const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);

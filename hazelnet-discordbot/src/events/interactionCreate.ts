@@ -25,8 +25,8 @@ export default <InteractionCreateDiscordEvent> {
           if (!command) return;
           await command.executeUserContextMenu(interaction);
         } catch (error) {
-          client.logger.error({ guildId: interaction.guild?.id, error });
-          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+          client.logger.error({ guildId: interaction.guild?.id, error: error + '' });
+          await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
         }
       } else if (interaction.isCommand()) {
         const commandInteraction = interaction as AugmentedCommandInteraction
@@ -40,8 +40,8 @@ export default <InteractionCreateDiscordEvent> {
         try {
           await command.execute(interaction);
         } catch (error) {
-          client.logger.error({ guildId: interaction.guild?.id, error });
-          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+          client.logger.error({ guildId: interaction.guild?.id, error: error + '' });
+          await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
         }
         const durationInMs = new Date().getTime() - startRun.getTime();
         client.metrics.commandDuration
@@ -58,8 +58,8 @@ export default <InteractionCreateDiscordEvent> {
         try {
           await command.executeSelectMenu(interaction);
         } catch (error) {
-          client.logger.error({ guildId: interaction.guild?.id, error });
-          await interaction.reply({ content: `There was an error while executing the select menu action ${interaction.customId} for this command!`, ephemeral: true });
+          client.logger.error({ guildId: interaction.guild?.id, error: error + '' });
+          await interaction.followUp({ content: `There was an error while executing the select menu action ${interaction.customId} for this command!`, ephemeral: true });
         }
       } else if (interaction.isButton()) {
         const commandForButton = interaction.customId.split('/')[0];
@@ -69,12 +69,12 @@ export default <InteractionCreateDiscordEvent> {
         try {
           await command.executeButton(interaction);
         } catch (error) {
-          client.logger.error({ guildId: interaction.guild?.id, error });
-          await interaction.reply({ content: `There was an error while executing the button action ${interaction.customId} for this command!`, ephemeral: true });
+          client.logger.error({ guildId: interaction.guild?.id, error: error + '' });
+          await interaction.followUp({ content: `There was an error while executing the button action ${interaction.customId} for this command!`, ephemeral: true });
         }
       }
     } catch (fatalError) {
-      client.logger.error({ guildId: interaction.guild?.id, error: fatalError });
+      client.logger.error({ guildId: interaction.guild?.id, error: fatalError + '' });
     }
   },
 };

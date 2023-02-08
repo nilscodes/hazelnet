@@ -115,7 +115,7 @@ export default <ConfigureMarketplaceMintAddCommand> {
     }
   },
   async createMintChannel(interaction, marketplaceChannelData, policyIdToTrack, discordServer) {
-    const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag) as ExternalAccount;
+    const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
 
     const newMarketplaceChannel = await interaction.client.services.discordserver.createMarketplaceChannel(
       interaction.guild!.id,

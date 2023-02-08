@@ -9,7 +9,7 @@ import embedBuilder from './embedbuilder';
 import datetime from './datetime';
 
 export default {
-  getDetailsText(discordServer: DiscordServer, whitelist: Whitelist, noCurrentNumbers: boolean = false) {
+  getDetailsText(discordServer: DiscordServer, whitelist: Whitelist, noCurrentNumbers: boolean = false): string {
     const locale = discordServer.getBotLanguage();
     const started = this.hasSignupStarted(whitelist);
     const ended = this.hasSignupEnded(whitelist);
@@ -33,22 +33,22 @@ export default {
 
     return `${lockIcon} ${rolePart}${datePart} ${memberPart} ${launchDate} ${manualClose}`;
   },
-  hasSignupEnded(whitelist: Whitelist) {
+  hasSignupEnded(whitelist: Whitelist): boolean {
     if (whitelist.signupUntil) {
       return new Date(whitelist.signupUntil) < new Date();
     }
     return false;
   },
-  hasSignupStarted(whitelist: Whitelist) {
+  hasSignupStarted(whitelist: Whitelist): boolean {
     if (whitelist.signupAfter) {
       return new Date(whitelist.signupAfter) < new Date();
     }
     return true;
   },
-  isSignupPaused(whitelist: Whitelist) {
+  isSignupPaused(whitelist: Whitelist): boolean {
     return !!whitelist.closed;
   },
-  getDatePhrase(whitelist: Whitelist, ended: boolean, started: boolean, running: boolean) {
+  getDatePhrase(whitelist: Whitelist, ended: boolean, started: boolean, running: boolean): string {
     let datePhrase = 'whitelist.list.openWhitelist';
     if (whitelist.signupUntil && !whitelist.signupAfter) {
       datePhrase = 'whitelist.list.whitelistWithEndDateOpen';
@@ -70,7 +70,7 @@ export default {
     }
     return datePhrase;
   },
-  getRolePart(locale: string, whitelist: Whitelist) {
+  getRolePart(locale: string, whitelist: Whitelist): string {
     let rolePart = i18n.__({ phrase: 'whitelist.list.whitelistNoRoleRequirement', locale });
     if (whitelist.requiredRoles?.length === 1) {
       rolePart = `${i18n.__({ phrase: 'whitelist.list.whitelistRoleRequirementSingle', locale }, whitelist.requiredRoles[0])} `;
@@ -82,7 +82,7 @@ export default {
     }
     return rolePart;
   },
-  getMemberPhrase(whitelist: Whitelist, noCurrentNumbers: boolean) {
+  getMemberPhrase(whitelist: Whitelist, noCurrentNumbers: boolean): string {
     let memberPhrase = 'whitelist.list.whitelistMembersNoLimit';
     if (whitelist.maxUsers > 0) {
       if (noCurrentNumbers) {
@@ -96,7 +96,7 @@ export default {
     }
     return memberPhrase;
   },
-  async userQualifies(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction, whitelist: Whitelist, existingSignup: WhitelistSignupContainer | undefined) {
+  async userQualifies(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction, whitelist: Whitelist, existingSignup: WhitelistSignupContainer | undefined): Promise<boolean> {
     if (!existingSignup) {
       if (!this.isSignupPaused(whitelist) && !this.hasSignupEnded(whitelist) && this.hasSignupStarted(whitelist) && !(whitelist.maxUsers > 0 && whitelist.currentUsers >= whitelist.maxUsers)) {
         return this.userHasRequiredRole(interaction, whitelist);
@@ -104,7 +104,7 @@ export default {
     }
     return false;
   },
-  async userHasRequiredRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction, whitelist: Whitelist) {
+  async userHasRequiredRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction, whitelist: Whitelist): Promise<boolean> {
     if (whitelist.requiredRoles?.length) {
       const needsAnyOfRoleIds = whitelist.requiredRoles.map((role) => role.roleId);
       const { guild } = interaction;
@@ -113,7 +113,7 @@ export default {
     }
     return true;
   },
-  async getQualifyText(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, whitelist: Whitelist, existingSignup: WhitelistSignup | undefined, includeFullAddress: boolean) {
+  async getQualifyText(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, whitelist: Whitelist, existingSignup: WhitelistSignup | undefined, includeFullAddress: boolean): Promise<string> {
     const isAddressBasedWhitelist = whitelist.type === 'CARDANO_ADDRESS';
     if (existingSignup) {
       const phrase = `whitelist.list.${isAddressBasedWhitelist ? 'youAreRegisteredWithAddress' : 'youAreRegistered'}`;
@@ -131,7 +131,7 @@ export default {
     }
     return `\n${i18n.__({ phrase: 'whitelist.list.youDontQualify', locale: discordServer.getBotLanguage() })}`;
   },
-  async getExistingSignups(externalAccount: ExternalAccount, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction) {
+  async getExistingSignups(externalAccount: ExternalAccount, whitelists: Whitelist[], interaction: AugmentedCommandInteraction | AugmentedButtonInteraction | AugmentedSelectMenuInteraction): Promise<(WhitelistSignupContainer | undefined)[]> {
     if (externalAccount) {
       const signupsPromise = whitelists.map((whitelist) => interaction.client.services.discordserver.getWhitelistSignupsForExternalAccount(interaction.guild!.id, whitelist.id, externalAccount.id));
       return Promise.all(signupsPromise.map((p) => p.catch(() => undefined)));

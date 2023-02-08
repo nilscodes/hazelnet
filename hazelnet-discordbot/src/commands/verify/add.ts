@@ -13,7 +13,7 @@ export default <BotSubcommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag) as ExternalAccount;
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const addressOrHandle = interaction.options.getString('address-or-handle', true);
       let addressToVerify: string;
       let handle = null;
@@ -27,7 +27,7 @@ export default <BotSubcommand> {
         const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id) as Account;
         if (mainAccount.settings?.BLACKLISTED !== 'true') {
           const walletInfo = await interaction.client.services.cardanoinfo.walletInfo(addressToVerify);
-          const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id) as Verification[];
+          const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
           const existingConfirmedVerification = existingVerifications
             .find((verification) => verification.confirmed && !verification.obsolete && (verification.address === addressToVerify || walletInfo?.stakeAddress === verification.cardanoStakeAddress));
           if (existingConfirmedVerification) {
@@ -115,8 +115,8 @@ export default <BotSubcommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag) as ExternalAccount;
-      const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id) as Verification[];
+      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+      const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
       const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
       const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id);
       const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);

@@ -368,6 +368,11 @@ class DiscordServerService(
             getDiscordServer(guildId)
         )
 
+    fun getAllCurrentQuizRoleAssignmentsForGuild(guildId: Long) =
+        roleAssignmentService.getAllCurrentQuizRoleAssignmentsForGuild(
+            getDiscordServer(guildId)
+        )
+
     fun regenerateAccessToken(guildId: Long): String {
         val discordServer = getDiscordServer(guildId)
         val snowflakeId = discordServer.guildId.toString()

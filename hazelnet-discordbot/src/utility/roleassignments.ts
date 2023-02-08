@@ -39,6 +39,9 @@ export default {
     if (roleProperty === 'whitelistRoles') {
       const whitelists = await client.services.discordserver.listWhitelists(guildId);
       return whitelists.filter((whitelist) => !!whitelist.awardedRole).map((whitelist) => ({ roleId: whitelist.awardedRole! }));
+    } else if (roleProperty === 'quizRoles') {
+      const quizzes = await client.services.discordquiz.getQuizzes(guildId);
+      return quizzes.filter((quiz) => !!quiz.awardedRole).map((quiz) => ({ roleId: quiz.awardedRole! }));
     }
     return client.services.discordserver.listTokenOwnershipRoles(guildId);
   },

@@ -1,6 +1,8 @@
+import { DiscordServer } from "./sharedtypes";
+
 interface EngagementInteractionHandler {
   activity: Map<String, Number>
-  applyActivityTracking(userId: string, discordServer: any): void
+  applyActivityTracking(userId: string, discordServer: DiscordServer): void
   swapActivityData(): Map<String, Number>
 }
 

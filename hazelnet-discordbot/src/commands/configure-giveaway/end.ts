@@ -15,7 +15,7 @@ export default <GiveawayEndCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id) as Giveaway[];
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id) ;
       const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/end/draw', 'configure.giveaway.end.chooseGiveawayDetails');
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.purpose', locale }), 'configure-giveaway-end', giveawayFields);
       await interaction.editReply({ embeds: [embed], components });
@@ -30,7 +30,7 @@ export default <GiveawayEndCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const giveawayId = +interaction.values[0].substring(19);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id) as Giveaway[];
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id) ;
       const giveaway = giveaways.find((giveawayForDraw) => giveawayForDraw.id === giveawayId);
       if (giveaway) {
         const existingWinners = await interaction.client.services.discordserver.getWinnerList(interaction.guild!.id, giveaway.id);
@@ -65,7 +65,7 @@ export default <GiveawayEndCommand> {
     const discordServer = await interaction.client.services.discordserver.getDiscordServer(guild.id);
     const locale = discordServer.getBotLanguage();
     const giveawayId = +(interaction.customId.split('.')[1]);
-    const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) as Giveaway[];
+    const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) ;
     const giveaway = giveaways.find((giveawayForRedraw) => giveawayForRedraw.id === giveawayId);
     if (giveaway) {
       if (interaction.customId.indexOf('configure-giveaway/end/redraw') === 0) {

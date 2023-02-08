@@ -83,6 +83,9 @@ class ConnectivityConfiguration {
     fun whitelistRolesQueue() = Queue("whitelistroles")
 
     @Bean
+    fun quizRolesQueue() = Queue("quizroles")
+
+    @Bean
     fun adminAnnouncementsQueue() = Queue("adminannouncements")
 
     @Bean
@@ -130,6 +133,10 @@ class ConnectivityConfiguration {
     @Bean
     fun whitelistRolesBinding(@Qualifier("whitelistRolesQueue") whitelisttRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(whitelisttRolesQueue).to(exchange)
+
+    @Bean
+    fun quizRolesBinding(@Qualifier("quizRolesQueue") quiztRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(quiztRolesQueue).to(exchange)
 
     @Bean
     fun announcementsBinding(@Qualifier("adminAnnouncementsQueue") adminAnnouncementsQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer

@@ -237,7 +237,7 @@ export type Account = {
     settings: Settings
 }
 
-type Settings = {
+export type Settings = {
     [index: string]: string
 }
 

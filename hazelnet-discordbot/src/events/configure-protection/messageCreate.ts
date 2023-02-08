@@ -5,9 +5,10 @@ import adahandle  from '../../utility/adahandle';
 import cardanoaddress from '../../utility/cardanoaddress';
 import embedBuilder from '../../utility/embedbuilder';
 import ethereumaddress from '../../utility/ethereumaddress';
+import { DiscordServer } from '../../utility/sharedtypes';
 
 interface ProtectionInteractionHandler {
-  applyProtection(client: HazelnetClient, message: Message, discordServer: any): void
+  applyProtection(client: HazelnetClient, message: Message, discordServer: DiscordServer): void
 }
 
 export default<ProtectionInteractionHandler> {

@@ -7,17 +7,18 @@ import giveaway, { Giveaway, GiveawayDrawType, GiveawayPartial } from '../../uti
 import embedBuilder from '../../utility/embedbuilder';
 import cardanotoken from '../../utility/cardanotoken';
 import datetime from '../../utility/datetime';
+import { DiscordServer } from '../../utility/sharedtypes';
 
 interface GiveawayAddCommand extends BotSubcommand {
   cache: NodeCache
   buildContent(locale: string, currentChannel: string, giveawayObject: GiveawayPartial, step: number): string[]
-  startPhase2(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: any, giveawayObject: GiveawayPartial): void
-  startPhase3(interaction: AugmentedButtonInteraction | AugmentedSelectMenuInteraction, discordServer: any, giveawayObject: GiveawayPartial): void
-  startPhase4(interaction: AugmentedButtonInteraction, discordServer: any, giveawayObject: GiveawayPartial): void
+  startPhase2(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, giveawayObject: GiveawayPartial): void
+  startPhase3(interaction: AugmentedButtonInteraction | AugmentedSelectMenuInteraction, discordServer: DiscordServer, giveawayObject: GiveawayPartial): void
+  startPhase4(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, giveawayObject: GiveawayPartial): void
   getYesNoOptions(locale: string, yesIsSelected: boolean, yesLabel: string, yesDescription: string, yesEmoji: string, noLabel: string, noDescription: string, noEmoji: string): SelectMenuComponentOptionData[]
   getDrawTypeOptions(locale: string, drawType: string): SelectMenuComponentOptionData[]
   getTokenOwnershipOptions(locale: string, tokenType: string): SelectMenuComponentOptionData[]
-  createGiveaway(interaction: AugmentedButtonInteraction, discordServer: any): void
+  createGiveaway(interaction: AugmentedButtonInteraction, discordServer: DiscordServer): void
 }
 
 export default <GiveawayAddCommand> {

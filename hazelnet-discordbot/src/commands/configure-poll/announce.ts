@@ -50,7 +50,7 @@ export default <PollAnnounceCommand> {
       const locale = discordServer.getBotLanguage();
       const pollId = +interaction.values[0].substring(15);
       const polls = await interaction.client.services.discordserver.getPolls(guild.id);
-      const poll = polls.find((pollForDetails: any) => pollForDetails.id === pollId);
+      const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
         const [announceChannelId, forcePublishResults] = (this.cache.take(`${guild.id}-${interaction.user.id}`) as string).split('-');
         const results = await interaction.client.services.discordserver.getPollResults(guild.id, poll.id!);

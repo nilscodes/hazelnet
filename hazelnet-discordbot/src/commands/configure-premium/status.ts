@@ -1,14 +1,14 @@
 import { APIEmbedField } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer } from '../../utility/sharedtypes';
+import { DiscordServer, DiscordServerPremiumInfo } from '../../utility/sharedtypes';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 
 interface PremiumStatusCommand extends BotSubcommand {
-  addBillingInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
-  addCostInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
-  addBalanceInfo(premiumInfo: any, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
-  addBenefitsInfo(premiumInfo: any, locale: string): void
+  addBillingInfo(premiumInfo: DiscordServerPremiumInfo, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addCostInfo(premiumInfo: DiscordServerPremiumInfo, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addBalanceInfo(premiumInfo: DiscordServerPremiumInfo, premiumFields: APIEmbedField[], discordServer: DiscordServer, locale: string): void
+  addBenefitsInfo(premiumFields: APIEmbedField[], locale: string): void
 }
 
 export default <PremiumStatusCommand> {
@@ -44,7 +44,7 @@ export default <PremiumStatusCommand> {
           lastBillingAmount: Math.round(premiumInfo.lastBillingAmount / 100000) / 10,
           lastBillingGuildMemberCountFormatted: discordServer.formatNumber(premiumInfo.lastBillingGuildMemberCount),
           lastBillingTimeTimestamp,
-        }),
+        } as any),
       });
     }
   },
@@ -57,7 +57,7 @@ export default <PremiumStatusCommand> {
         monthlyCostFormatted: Math.round(premiumInfo.monthlyCost / 100000) / 10,
         discount: Math.min(100, Math.round(Math.round((premiumInfo.totalDelegation / premiumInfo.maxDelegation) * 100))),
         actualMonthlyCostFormatted: Math.round(premiumInfo.actualMonthlyCost / 100000) / 10,
-      }),
+      } as any),
     });
     premiumFields.push({
       name: i18n.__({ phrase: 'configure.premium.status.discount', locale }),
