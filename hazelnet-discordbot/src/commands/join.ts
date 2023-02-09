@@ -32,16 +32,18 @@ interface JoinCommand extends BotCommand {
   cache: NodeCache
   getGiveawayDetails(giveaway: Giveaway, interaction: AugmentedButtonInteraction, discordServer: any, member: GuildMember, participationOfUser: ParticipationData): Promise<FieldsAndComponents>
   getUserParticipationText(discordServer: DiscordServer, giveaway: Giveaway, totalVotingPower: number, tokenMetadata: TokenMetadata | null): string
-  startQuiz(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, quiz: Quiz, member: GuildMember): void
+  startQuiz(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, quiz: Quiz): void
   getQuizParticipation(userId: string, quizId: number): QuizParticipation
   getQuestionEmbed(discordServer: DiscordServer, quiz: Quiz, question: QuizQuestion, questionNumber: number, wrongAnswersGiven: number[], infoPhrase: string, followUpTitle?: string, answerDetails?: string): QuestionEmbedParts
   answerQuizQuestion(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, quiz: Quiz, questionId: number, answerIndex: number): Promise<void>
-  finalizeQuiz(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, quiz: Quiz, allAnsweredQuestions: QuizAnswer[], questions: QuizQuestion[], lastAnsweredQuestion?: QuizQuestion, update?: boolean): Promise<void>
+  finalizeQuiz(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, quiz: Quiz, allAnsweredQuestions: QuizAnswer[], questions: QuizQuestion[], lastAnsweredQuestion?: QuizQuestion): Promise<void>
   determineMainContentBasedOnLastAnsweredQuestion(locale: string, allAnsweredQuestions: QuizAnswer[], lastAnsweredQuestion?: QuizQuestion): QuizFinalizeContent
 }
 
+const QUIZ_CACHE_DURATION = 900;
+
 export default <JoinCommand> {
-  cache: new NodeCache({ stdTTL: 900 }),
+  cache: new NodeCache({ stdTTL: QUIZ_CACHE_DURATION }),
   getCommandData(locale) {
     const ci18n = new CommandTranslations('join', locale);
     const builder = new SlashCommandBuilder();
@@ -103,10 +105,21 @@ export default <JoinCommand> {
         const member = await interaction.guild!.members.fetch(interaction.user.id);
         if (joinInfo[1] === 'widgetjoin') {
           if (quizutil.userCanParticipateInQuiz(member, quiz)) {
-            await this.startQuiz(interaction, discordServer, quiz, member);
+            await this.startQuiz(interaction, discordServer, quiz);
           } else {
             const embed = embedBuilder.buildForUser(discordServer, quiz.displayName, i18n.__({ phrase: 'join.errorNotEligible', locale }), 'join');
             await interaction.reply({ embeds: [embed], ephemeral: true });
+          }
+        } else if (joinInfo[1] === 'start') {
+          const questions = await quizutil.getOrderedQuestions(interaction.client, discordServer.guildId, quiz.id);
+          const userParticipation = this.getQuizParticipation(member.user.id, quiz.id);
+          const answeredQuestions = userParticipation.answers.map(answer => answer.questionId);
+          const firstUnansweredQuestion = questions.find(question => !answeredQuestions.includes(question.id));
+          if (firstUnansweredQuestion) {
+            const { questionEmbed, questionComponents } = this.getQuestionEmbed(discordServer, quiz, firstUnansweredQuestion, answeredQuestions.length + 1, [], 'join.firstQuestion');
+            await interaction.update({ embeds: [questionEmbed], components: questionComponents });
+          } else {
+            await this.finalizeQuiz(interaction, discordServer, quiz, userParticipation.answers, questions);
           }
         } else if (joinInfo[1] === 'answer') {
           const questionId = +(joinInfo[4]);
@@ -207,7 +220,7 @@ export default <JoinCommand> {
     }
     return i18n.__({ phrase: 'join.totalEntriesSingleNoToken', locale });
   },
-  async startQuiz(interaction, discordServer, quiz, member) {
+  async startQuiz(interaction, discordServer, quiz) {
     const locale = discordServer.getBotLanguage();
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
     const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
@@ -235,17 +248,18 @@ export default <JoinCommand> {
         const embed = embedBuilder.buildForUser(discordServer, quiz.displayName, i18n.__({ phrase: completionPhrase, locale }, { quiz, address, completionTime } as any), 'join');
         await interaction.reply({ embeds: [embed], ephemeral: true });
       } else {
-        const embed = embedBuilder.buildForUser(discordServer, quiz.displayName, i18n.__({ phrase: 'join.startQuizText', locale }, { quiz, questionCount: questions.length } as any), 'join', quizFields);
-        await interaction.reply({ embeds: [embed], ephemeral: true });
-        const userParticipation = this.getQuizParticipation(member.user.id, quiz.id);
-        const answeredQuestions = userParticipation.answers.map(answer => answer.questionId);
-        const firstUnansweredQuestion = questions.find(question => !answeredQuestions.includes(question.id));
-        if (firstUnansweredQuestion) {
-          const { questionEmbed, questionComponents } = this.getQuestionEmbed(discordServer, quiz, firstUnansweredQuestion, answeredQuestions.length + 1, [], 'join.firstQuestion');
-          await interaction.followUp({ embeds: [questionEmbed], ephemeral: true, components: questionComponents });
-        } else {
-          await this.finalizeQuiz(interaction, discordServer, quiz, userParticipation.answers, questions, undefined, false);
-        }
+        const minimumCorrect = quiz.correctAnswersRequired > 0 ? Math.min(quiz.correctAnswersRequired, questions.length) : questions.length;
+        const attemptsText = i18n.__({ phrase: (quiz.attemptsPerQuestion > 0 ? 'join.startQuizAttemptCount' : 'join.startQuizUnlimitedAttempts'), locale }, { attemptsPerQuestion: `${quiz.attemptsPerQuestion}` });
+        const embed = embedBuilder.buildForUser(discordServer, quiz.displayName, i18n.__({ phrase: 'join.startQuizText', locale }, { quiz, questionCount: questions.length, minimumCorrect, attemptsText, cacheDuration: QUIZ_CACHE_DURATION / 60 } as any), 'join', quizFields);
+        const components = [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents([
+            new ButtonBuilder()
+              .setCustomId(`join/start/quiz/${quiz.id}`)
+              .setLabel(i18n.__({ phrase: 'join.quizStartButton', locale }))
+              .setStyle(ButtonStyle.Primary)
+          ]),
+        ];
+        await interaction.reply({ embeds: [embed], components, ephemeral: true });
       }
       
     } else {
@@ -348,7 +362,7 @@ export default <JoinCommand> {
       await interaction.update({ embeds: [questionEmbed], components: questionComponents });
     }
   },
-  async finalizeQuiz(interaction, discordServer, quiz, allAnsweredQuestions, questions, lastAnsweredQuestion, update = true) {
+  async finalizeQuiz(interaction, discordServer, quiz, allAnsweredQuestions, questions, lastAnsweredQuestion) {
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
     const correct = allAnsweredQuestions.filter(answer => answer.correct).length;
     const minimumCorrect = quiz.correctAnswersRequired > 0 ? quiz.correctAnswersRequired : questions.length;
@@ -373,22 +387,14 @@ export default <JoinCommand> {
           name: quiz.displayName,
           value: i18n.__({ phrase: completionPhrase, locale }, { quiz, correct, total: questions.length } as any),
         }]);
-        if (update) {
-          await interaction.update({ embeds: [finishEmbed], components });
-        } else {
-          await interaction.followUp({ embeds: [finishEmbed], components, ephemeral: true });
-        }
+        await interaction.update({ embeds: [finishEmbed], components });
       } else {
         // Should not get here if verification was present before
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: titlePhrase, locale }), mainText, 'join', [{
           name: quiz.displayName,
           value: i18n.__({ phrase: 'join.quizNoVerifiedAddresses', locale }),
         }]);
-        if (update) {
-          await interaction.update({ embeds: [embed], components: [] });
-        } else {
-          await interaction.followUp({ embeds: [embed], ephemeral: true });
-        }
+        await interaction.update({ embeds: [embed], components: [] });
       }
     } else {
       quizutil.saveQuizCompletion(interaction.client.services.discordquiz, discordServer.guildId, quiz.id, correct, false, externalAccount.id);
@@ -397,11 +403,7 @@ export default <JoinCommand> {
         name: quiz.displayName,
         value: i18n.__({ phrase: 'join.quizNotEnoughCorrectAnswers', locale }, { correct, total: questions.length, minimumCorrect } as any)
       }]);
-      if (update) {
-        await interaction.update({ embeds: [embed], components: [] });
-      } else {
-        await interaction.followUp({ embeds: [embed], ephemeral: true });
-      }
+      await interaction.update({ embeds: [embed], components: [] });
     }
   },
   determineMainContentBasedOnLastAnsweredQuestion(locale, allAnsweredQuestions, lastAnsweredQuestion) {
