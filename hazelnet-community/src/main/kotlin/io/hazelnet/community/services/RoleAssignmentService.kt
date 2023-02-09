@@ -11,10 +11,13 @@ import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
+import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class RoleAssignmentService(
@@ -85,7 +88,14 @@ class RoleAssignmentService(
                         tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
                     tokenListForStakeAddressAndPolicy?.let {
                         val metadata =
-                            connectService.getMultiAssetInfo(tokenListForStakeAddressAndPolicy.assetList.map { assetName ->
+                            connectService.getMultiAssetInfo(tokenListForStakeAddressAndPolicy.assetList
+                                .filter {
+                                    if (it.isBlank()) {
+                                        logger.warn { "Ignoring asset with empty name for policy ${tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint} while aggregating assets for verification with ID ${verification.id}" }
+                                    }
+                                    it.isNotBlank()
+                                }
+                                .map { assetName ->
                                 Pair(
                                     tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
                                     assetName
