@@ -1,10 +1,9 @@
-import crypto from 'crypto'
-import { URLSearchParams } from 'url'
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
 import { DiscordServer, ListingAnnouncement, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from './sharedtypes';
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
+import nftcdn, { NftCdnAttachment } from './nftcdn';
 
 export default {
   createSaleAnnouncementFields(saleAnnouncement: SaleAnnouncement, locale: string) {
@@ -85,18 +84,8 @@ export default {
     }
     return [];
   },
-  nftcdnUrl(domain: string, key: Buffer, asset: string, uri = '/image', params = {}) {
-    const plainUrl = this.buildUrl(domain, asset, uri, { ...params, tk: '' });
-    const urlHash = crypto.createHmac('sha256', key).update(plainUrl).digest('base64url');
-    return this.buildUrl(domain, asset, uri, { ...params, tk: urlHash });
-  },
-  buildUrl(domain: string, asset: string, uri: string, params: Record<string, string | readonly string[]>) {
-    const searchParams = new URLSearchParams(params);
-    return `https://${asset}.${domain}.nftcdn.io${uri}?${searchParams.toString()}`;
-  },
-  prepareImageUrl(assetInfo: ListingAnnouncement | SaleAnnouncement | MintAnnouncement) {
-    const [domain, key] = [process.env.NFTCDN_DOMAIN!, Buffer.from(process.env.NFTCDN_KEY!, 'base64')];
-    return this.nftcdnUrl(domain, key, assetInfo.assetFingerprint, '/image', { size: 1024 });
+  async prepareImageUrl(assetInfo: ListingAnnouncement | SaleAnnouncement | MintAnnouncement): Promise<NftCdnAttachment> {
+    return nftcdn.nftcdnBlob(assetInfo.assetFingerprint, { size: 1024 });
   },
   generateLink(linkType: MarketplaceLinkType, linkData: ListingAnnouncement | SaleAnnouncement | MintAnnouncement, locale: string) {
     switch (linkType) {
