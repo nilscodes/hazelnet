@@ -1,7 +1,6 @@
 import i18n from 'i18n';
-import { ApplicationCommandType, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandType, AttachmentBuilder, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
 import { BotCommand } from "../utility/commandtypes";
-import CID from 'cids';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
 import cardanotoken from '../utility/cardanotoken';
 import commandbase from '../utility/commandbase';
@@ -9,11 +8,10 @@ import CommandTranslations from '../utility/commandtranslations';
 import embedBuilder from '../utility/embedbuilder';
 import adahandle from '../utility/adahandle';
 import cardanoaddress from '../utility/cardanoaddress';
-import marketplace from '../utility/marketplace';
+import nftcdn from '../utility/nftcdn';
 
 interface WhoisCommand extends BotCommand {
   applyHandleBranding(embed: any): void
-  getHandleImage(assetFingerprint: string): string
   showAddressList(address: string, handlesAtAddress: any, successMessage: string, failureMessage: string, interaction: AugmentedCommandInteraction, discordServer: any): void
 }
 
@@ -88,9 +86,10 @@ export default <WhoisCommand> {
             name: i18n.__({ phrase: 'whois.handleFoundTitle', locale }),
             value: i18n.__({ phrase: 'whois.handleFoundText', locale }, { handleWithoutPrefix: handle.substring(1) }),
           }]);
-          embed.setImage(this.getHandleImage(resolvedHandle?.assetFingerprint!!));
+          const { files, name } = await nftcdn.nftcdnBlob(resolvedHandle?.assetFingerprint!!, { size: 1024 })
+          embed.setImage(name);
           this.applyHandleBranding(embed);
-          await interaction.editReply({ embeds: [embed] });
+          await interaction.editReply({ embeds: [embed], files });
         }
       } else if (resolvedAddress) {
         const handlesAtWalletAddress = await interaction.client.services.cardanoinfo.handlesForWalletAddress(resolvedAddress);
@@ -120,8 +119,9 @@ export default <WhoisCommand> {
           value: i18n.__({ phrase: 'whois.handleFoundText', locale }, { handleWithoutPrefix: handle.substring(1) }),
         }]);
         this.applyHandleBranding(embed);
-        embed.setImage(this.getHandleImage(resolvedHandle.assetFingerprint!!));
-        await interaction.editReply({ embeds: [embed] });
+        const { files, name } = await nftcdn.nftcdnBlob(resolvedHandle.assetFingerprint!!, { size: 1024 })
+        embed.setImage(name);
+        await interaction.editReply({ embeds: [embed], files });
         return;
       }
     }
@@ -133,29 +133,25 @@ export default <WhoisCommand> {
     embed.setThumbnail('https://i.postimg.cc/QC0r2Kyq/Logo.png');
     embed.setColor('#00CE5A');
   },
-  getHandleImage(assetFingerprint) {
-    if (assetFingerprint) {
-      const [domain, key] = [process.env.NFTCDN_DOMAIN!, Buffer.from(process.env.NFTCDN_KEY!, 'base64')];
-      return marketplace.nftcdnUrl(domain, key, assetFingerprint, '/image', { size: 1024 });
-    }
-    return null;
-  },
   async showAddressList(address, handlesAtAddress, successMessage, failureMessage, interaction, discordServer) {
     const locale = discordServer.getBotLanguage();
     let content = i18n.__({ phrase: failureMessage, locale }, { address });
-    let image = null;
+    let useImage = null;
+    let useFiles: AttachmentBuilder[] = [];
     if (handlesAtAddress.length) {
       handlesAtAddress.sort((handleA: HandleInfo, handleB: HandleInfo) => handleA.handle.length - handleB.handle.length);
       const handleList = handlesAtAddress.map((handleInfo: HandleInfo) => i18n.__({ phrase: 'whois.handlesEntry', locale }, { handle: handleInfo.handle }));
       content = i18n.__({ phrase: successMessage, locale }, { address }) + handleList.join('\n');
       const multiAssetInfoForFirstHandle = await interaction.client.services.cardanoinfo.multiAssetInfo(process.env.HANDLE_POLICY!, cardanotoken.toHex(handlesAtAddress[0].handle));
-      image = this.getHandleImage(multiAssetInfoForFirstHandle.assetFingerprint);
+      const { files, name } = await nftcdn.nftcdnBlob(multiAssetInfoForFirstHandle.assetFingerprint, { size: 1024 })
+      useImage = name;
+      useFiles = files;
     }
     const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whois.messageTitle', locale }), content, 'whois');
     this.applyHandleBranding(embed);
-    if (image) {
-      embed.setImage(image);
+    if (useImage) {
+      embed.setImage(useImage);
     }
-    await interaction.editReply({ embeds: [embed] });
+    await interaction.editReply({ embeds: [embed], files: useFiles });
   }
 };

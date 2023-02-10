@@ -20,10 +20,10 @@ export default {
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createListingAnnouncementFields(listingAnnouncement, locale);
             const title = marketplace.getListingAnnouncementTitle(listingAnnouncement, locale);
-            const image = marketplace.prepareImageUrl(listingAnnouncement);
-            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.listings.announce.title', locale }), title, 'policyid', detailFields, image);
+            const nftcdnBlob = await marketplace.prepareImageUrl(listingAnnouncement);
+            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.listings.announce.title', locale }), title, 'policyid', detailFields, nftcdnBlob.name);
             const components = marketplace.getListingAnnouncementComponents(discordServer, listingAnnouncement);
-            await announceChannel.send({ embeds: [embedPublic], components });
+            await announceChannel.send({ embeds: [embedPublic], components, files: nftcdnBlob.files });
           } else {
             client.logger.error({ guildId: listingAnnouncement.guildId, msg: `Channel permissions for ${listingAnnouncement.channelId} did not allow publishing listing announcements for asset ${listingAnnouncement.policyId} ${listingAnnouncement.assetName}` });
           }

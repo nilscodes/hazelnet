@@ -20,10 +20,10 @@ export default {
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createMintAnnouncementFields(mintAnnouncement, locale);
             const title = marketplace.getMintAnnouncementTitle(mintAnnouncement, locale);
-            const image = marketplace.prepareImageUrl(mintAnnouncement);
-            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.mint.announce.title', locale }), title, 'policyid', detailFields, image);
+            const nftcdnBlob = await marketplace.prepareImageUrl(mintAnnouncement);
+            const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.marketplace.mint.announce.title', locale }), title, 'policyid', detailFields, nftcdnBlob.name);
             const components = marketplace.getMintAnnouncementComponents(discordServer, mintAnnouncement);
-            await announceChannel.send({ embeds: [embedPublic], components });
+            await announceChannel.send({ embeds: [embedPublic], components, files: nftcdnBlob.files });
           } else {
             client.logger.error({ guildId: mintAnnouncement.guildId, msg: `Channel permissions for ${mintAnnouncement.channelId} did not allow publishing mint announcements for asset ${mintAnnouncement.policyId} ${mintAnnouncement.assetName}` });
           }
