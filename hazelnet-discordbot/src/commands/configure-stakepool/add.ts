@@ -10,11 +10,11 @@ export default <BotSubcommand> {
       const newPoolPromise = await interaction.client.services.discordserver.addStakepool(interaction.guild!.id, poolHash);
       const newPoolData = newPoolPromise.data;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const useLocale = discordServer.getBotLanguage();
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool add', i18n.__({ phrase: 'configure.stakepool.add.success', locale: useLocale }), 'configure-stakepool-add', [
+      const locale = discordServer.getBotLanguage();
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool add', i18n.__({ phrase: 'configure.stakepool.add.success', locale }), 'configure-stakepool-add', [
         {
           name: `${newPoolData.info?.name} (${newPoolData.info?.ticker})`,
-          value: i18n.__({ phrase: 'info.stakepoolDetails', locale: useLocale }, newPoolData.info),
+          value: i18n.__({ phrase: 'info.stakepoolDetails', locale }, newPoolData.info),
         },
       ]);
       await interaction.editReply({ embeds: [embed] });

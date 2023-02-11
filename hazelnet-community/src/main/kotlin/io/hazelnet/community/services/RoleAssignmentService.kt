@@ -7,6 +7,7 @@ import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.persistence.DiscordBanRepository
 import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
@@ -28,31 +29,39 @@ class RoleAssignmentService(
     private val mutantStakingService: MutantStakingService,
     private val whitelistRepository: DiscordWhitelistRepository,
     private val quizRepository: DiscordQuizRepository,
+    private val discordBanRepository: DiscordBanRepository,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
         discordServer: DiscordServer
     ): Set<DiscordRoleAssignment> {
-        val allVerifiedStakeAddresses = verifications.mapNotNull { it.cardanoStakeAddress }
         val rolesToAssign =
             if (discordServer.getPremium()) discordServer.tokenRoles
             else listOfNotNull(discordServer.tokenRoles.minByOrNull { it.id!! })
+        val bans = discordBanRepository.findByDiscordServerId(discordServer.id!!)
+        val bannedStakeAddresses = bans.filter { it.type == DiscordBanType.STAKE_ADDRESS_BAN }.map { it.pattern }.toSet()
+        val allEligibleStakeAddresses = verifications
+            .mapNotNull { it.cardanoStakeAddress }
+            .filterNot { bannedStakeAddresses.contains(it) }
+        val bannedAssetFingerprints = bans.filter { it.type == DiscordBanType.ASSET_FINGERPRINT_BAN }.map { it.pattern }.toSet()
 
         val roleTypes = rolesToAssign.groupBy { it.filters.size > 0 }
         val countBasedRoles = roleTypes[false] ?: listOf()
 
         val countBasedRoleAssignments = getCountBasedTokenRoleAssignments(
             countBasedRoles,
-            allVerifiedStakeAddresses,
+            allEligibleStakeAddresses,
             verifications,
+            bannedAssetFingerprints,
             discordServer
         )
 
         val filterBasedRoles = roleTypes[true] ?: listOf()
         val filterBasedRoleAssignments = getMetadataBasedTokenRoleAssignments(
             filterBasedRoles,
-            allVerifiedStakeAddresses,
+            allEligibleStakeAddresses,
             verifications,
+            bannedAssetFingerprints,
             discordServer
         )
 
@@ -63,6 +72,7 @@ class RoleAssignmentService(
         filterBasedRoles: List<TokenOwnershipRole>,
         allVerifiedStakeAddresses: List<String>,
         allVerificationsOfMembers: List<Verification>,
+        bannedAssetFingerprints: Set<String>,
         discordServer: DiscordServer
     ): MutableSet<DiscordRoleAssignment> {
         val relevantPolicyIds = filterBasedRoles.map { role ->
@@ -100,7 +110,8 @@ class RoleAssignmentService(
                                     tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
                                     assetName
                                 )
-                            })
+                            }).filterNot { bannedAssetFingerprints.contains(it.assetFingerprint.assetFingerprint) }
+
                         val existingMetadata =
                             mapOfExternalAccount.computeIfAbsent(tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint) { mutableListOf() }
                         existingMetadata.addAll(metadata)
@@ -184,6 +195,7 @@ class RoleAssignmentService(
         countBasedRoles: List<TokenOwnershipRole>,
         allVerifiedStakeAddresses: List<String>,
         allVerificationsOfMembers: List<Verification>,
+        bannedAssetFingerprints: Set<String>,
         discordServer: DiscordServer
     ): Set<DiscordRoleAssignment> {
         val relevantPolicyIds = countBasedRoles.map { role ->
@@ -192,7 +204,7 @@ class RoleAssignmentService(
         if (relevantPolicyIds.isNotEmpty()) {
             val tokenStakingData = getStakingCounts(allVerifiedStakeAddresses, countBasedRoles)
             val tokenOwnershipDataInWallet =
-                connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+                connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
             val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, tokenStakingData)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
@@ -364,6 +376,8 @@ class RoleAssignmentService(
         allDelegationToAllowedPools: List<DelegationInfo>,
         discordServer: DiscordServer
     ): Set<DiscordRoleAssignment> {
+        val bans = discordBanRepository.findByDiscordServerId(discordServer.id!!)
+        val bannedStakeAddresses = bans.filter { it.type == DiscordBanType.STAKE_ADDRESS_BAN }.map { it.pattern }.toSet()
         val memberIdsToDelegationBuckets = mutableMapOf<Long, Map<String, Long>>()
         val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
         allVerificationsOfMembers.forEach { verification ->
@@ -373,7 +387,7 @@ class RoleAssignmentService(
                 memberIdsToDelegationBuckets
             )
             val delegationForStakeAddress =
-                allDelegationToAllowedPools.find { it.stakeAddress == verification.cardanoStakeAddress }
+                allDelegationToAllowedPools.find { it.stakeAddress == verification.cardanoStakeAddress && !bannedStakeAddresses.contains(verification.cardanoStakeAddress) }
             delegationForStakeAddress?.let {
                 val newAmount = delegationForStakeAddress.amount
                 mapOfExternalAccount.compute(delegationForStakeAddress.poolHash) { _, v -> (v ?: 0) + newAmount }

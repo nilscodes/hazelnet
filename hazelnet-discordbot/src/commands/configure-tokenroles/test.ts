@@ -22,7 +22,9 @@ export default <BotSubcommand> {
             const member = await interaction.guild!.members.fetch(user.id);
             const { roleData, missingRoleField } = roleassignments.getEligibleAndMissingRoles(roleAssignments, member, locale, 'tokenroles');
             const components = [];
+            const missingRoleFields = [];
             if (missingRoleField !== null) {
+              missingRoleFields.push(missingRoleField);
               components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>()
                 .addComponents(
                   new ButtonBuilder()
@@ -30,13 +32,18 @@ export default <BotSubcommand> {
                     .setLabel(i18n.__({ phrase: 'configure.tokenroles.test.assignRoles', locale }))
                     .setStyle(ButtonStyle.Primary),
                 ));
+            } else {
+              missingRoleFields.push({
+                name: i18n.__({ phrase: `configure.tokenroles.test.noMissingRolesTitle`, locale }),
+                value: i18n.__({ phrase: `configure.tokenroles.test.noMissingRoles`, locale }),
+              });
             }
             const embed = embedBuilder.buildForAdmin(
               discordServer,
               '/configure-tokenroles test',
               i18n.__({ phrase: 'configure.tokenroles.test.purpose', locale }, { user, roleData } as any),
               'configure-tokenroles-test',
-              (missingRoleField && [missingRoleField]) ?? [],
+              missingRoleFields,
             );
             await interaction.editReply({ embeds: [embed], components });
           } else {

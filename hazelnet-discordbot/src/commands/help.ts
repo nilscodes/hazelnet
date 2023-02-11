@@ -62,6 +62,8 @@ export default <BotCommand> {
         adminHelpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-healthcheck', locale })}\n`);
         adminHelpTexts.push('⚙ **/configure-settings**');
         adminHelpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-settings', locale })}\n`);
+        adminHelpTexts.push('💥 **/configure-bans**');
+        adminHelpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-bans', locale })}\n`);
         if (enabledFeatures.includes('stakepool')) {
           adminHelpTexts.push('🌊 **/configure-stakepool**');
           adminHelpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.configure-stakepool', locale })}\n`);

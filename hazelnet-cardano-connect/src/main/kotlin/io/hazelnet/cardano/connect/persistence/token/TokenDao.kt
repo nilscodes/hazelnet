@@ -5,7 +5,7 @@ import io.hazelnet.cardano.connect.data.token.*
 
 interface TokenDao {
     fun getMultiAssetCountsForStakeAddress(stakeAddress: String): List<TokenOwnershipInfoWithAssetCount>
-    fun getMultiAssetCountsWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>): List<TokenOwnershipInfoWithAssetCount>
+    fun getMultiAssetCountsWithPolicyIdForStakeAddress(stakeAddress: String, policyIds: List<PolicyId>, excludedAssetFingerprints: List<AssetFingerprint>): List<TokenOwnershipInfoWithAssetCount>
     fun getMultiAssetCountsWithPolicyIdAndAssetFingerprintForStakeAddress(stakeAddress: String, policyIdsWithAssetFingerprint: List<Pair<PolicyId, AssetFingerprint>>): List<TokenOwnershipInfoWithAssetCount>
 
     fun getMultiAssetListForStakeAddress(stakeAddress: String): List<TokenOwnershipInfoWithAssetList>

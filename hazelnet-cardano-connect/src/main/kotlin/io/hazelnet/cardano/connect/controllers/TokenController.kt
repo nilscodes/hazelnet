@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.controllers
 
+import io.hazelnet.cardano.connect.data.PolicyIdsAndExcludedAssets
 import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.services.TokenService
 import org.springframework.http.HttpStatus
@@ -12,7 +13,7 @@ class TokenController(
 ) {
     @PostMapping("/stake/{stakeAddress}")
     @ResponseStatus(HttpStatus.OK)
-    fun getMultiAssetCountsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsWithOptionalAssetFingerprint: List<String>) = tokenService.getMultiAssetCountsForStakeAddress(stakeAddress, policyIdsWithOptionalAssetFingerprint)
+    fun getMultiAssetCountsForStakeAddress(@PathVariable stakeAddress: String, @RequestBody policyIdsAndExcludedAssets: PolicyIdsAndExcludedAssets) = tokenService.getMultiAssetCountsForStakeAddress(stakeAddress, policyIdsAndExcludedAssets)
 
     @GetMapping("/stake/{stakeAddress}/besthandle")
     @ResponseStatus(HttpStatus.OK)

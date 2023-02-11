@@ -570,6 +570,19 @@ CREATE TABLE "discord_quiz_completion"
     "address"               varchar(150)
 );
 
+CREATE TABLE "discord_bans"
+(
+    "discord_ban_id"      SERIAL PRIMARY KEY,
+    "discord_server_id"   int,
+    "external_account_id" bigint,
+    "ban_creation"        timestamp    NOT NULL,
+    "ban_type"            smallint     NOT NULL,
+    "ban_response_type"   smallint     NOT NULL,
+    "ban_pattern"         varchar(256) NOT NULL,
+    "ban_reason"          varchar(256) NOT NULL,
+    "alert_channel"       bigint
+);
+
 ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
@@ -711,3 +724,7 @@ ALTER TABLE "discord_quiz_questions" ADD FOREIGN KEY ("discord_quiz_id") REFEREN
 ALTER TABLE "discord_quiz_completion" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_quiz_completion" ADD FOREIGN KEY ("discord_quiz_id") REFERENCES "discord_quiz" ("discord_quiz_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_bans" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_bans" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE SET NULL;

@@ -700,6 +700,76 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscordServer"
+  /discord/servers/{guildId}/bans:
+    get:
+      summary: Get the current set of bans active on this Discord
+      operationId: listBans
+      tags:
+        - discord
+        - bans
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Ban list for this Discord"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordBan"
+    post:
+      summary: Add a new ban to this Discord
+      operationId: addBan
+      tags:
+        - discord
+        - bans
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordBan"
+      responses:
+        "201":
+          description: "Added discord member"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordBan"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/bans/{banId}:
+    get:
+      summary: Get details of a specific ban
+      operationId: getBan
+      tags:
+        - discord
+        - bans
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/BanIdPathParameter"
+      responses:
+        "200":
+          description: Ban details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordBan"
+    delete:
+      summary: Delete a ban from this Discord server
+      operationId: deleteBan
+      tags:
+        - discord
+        - bans
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/BanIdPathParameter"
+      responses:
+        "204":
+          description: "Successful deletion"
   /discord/servers/{guildId}/roleassignments/delegatorroles:
     get:
       summary: Get the current set of delegator role assignments for this server
@@ -2553,6 +2623,16 @@ components:
       schema:
         type: integer
         format: int64
+    BanIdPathParameter:
+      name: banId
+      in: path
+      description: The ban ID
+      required: true
+      style: simple
+      example: 52
+      schema:
+        type: integer
+        format: int64
     PolicyIdPathParameter:
       name: policyId
       in: path
@@ -4081,7 +4161,6 @@ components:
           properties:
             value:
               type: string
-
     DiscordMarketplaceChannel:
       type: object
       required:
@@ -4140,6 +4219,55 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+    DiscordBan:
+      type: object
+      required:
+        - creator
+        - type
+        - responseType
+        - pattern
+        - alertChannel
+        - reason
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        type:
+          type: string
+          enum:
+            - STAKE_ADDRESS_BAN
+            - ASSET_FINGERPRINT_BAN
+            - DISCORD_ID_BAN
+            - EXACT_NAME_BAN
+            - PARTIAL_NAME_BAN
+            - FUZZY_NAME_BAN
+        responseType:
+          type: string
+          description: The reaction the bot applies when a banned pattern is detected (not all combinations are compatible)
+          enum:
+            - PREVENT_ROLES
+            - SERVER_BAN
+        pattern:
+          type: string
+          description: The pattern to use when applying the ban - depends on the type
+          example: stake1uyhvepgdsd7s07q5cdx9vdemnar4axpe0e9edw2chyd8dpgqnsffq
+        reason:
+          type: string
+          description: Explanation as to why the ban was issued
+          example: Address of a known scammer
+          minLength: 1
+          maxLength: 256
+        alertChannel:
+          $ref: "#/components/schemas/DiscordChannel"
     Whitelist:
       type: object
       required:

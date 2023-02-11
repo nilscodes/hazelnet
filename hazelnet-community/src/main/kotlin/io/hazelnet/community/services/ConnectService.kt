@@ -99,13 +99,17 @@ class ConnectService(
 
     fun getAllTokenOwnershipCountsByPolicyId(
         stakeAddresses: List<String>,
-        policyIdsWithOptionalAssetFingerprint: Set<String>
+        policyIdsWithOptionalAssetFingerprint: Set<String>,
+        excludedAssetFingerprints: Set<String>,
     ): List<TokenOwnershipInfoWithAssetCount> {
         return Flux.fromIterable(stakeAddresses)
             .flatMap {
                 connectClient.post()
                     .uri("/token/stake/{stakeAddress}", it)
-                    .bodyValue(policyIdsWithOptionalAssetFingerprint)
+                    .bodyValue(mapOf(
+                        Pair("policyIdsWithOptionalAssetFingerprint", policyIdsWithOptionalAssetFingerprint),
+                        Pair("excludedAssetFingerprints", excludedAssetFingerprints),
+                    ))
                     .retrieve()
                     .bodyToFlux(TokenOwnershipInfoWithAssetCount::class.java)
             }.collectList().block()!!

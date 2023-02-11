@@ -150,8 +150,11 @@ export default {
         name: i18n.__({ phrase: `configure.${phraseComponent}.test.missingRolesTitle`, locale }),
         value: i18n.__({ phrase: `configure.${phraseComponent}.test.missingRoles`, locale }, { roleData: missingRoleData }),
       };
+    }      
+    let roleData = roleAssignments.map((roleAssignment) => i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntry`, locale }, { roleId: roleAssignment.roleId })).join('\n');
+    if (!roleData.length) {
+      roleData = i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntryNoneEligible`, locale });
     }
-    const roleData = roleAssignments.map((roleAssignment) => i18n.__({ phrase: `configure.${phraseComponent}.test.roleEntry`, locale }, { roleId: roleAssignment.roleId })).join('\n');
     return { roleData, missingRoleField };
   },
   async getRoleCountChannelName(guild: Guild, role: Role | APIRole) {

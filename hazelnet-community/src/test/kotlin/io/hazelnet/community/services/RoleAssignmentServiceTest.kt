@@ -6,6 +6,7 @@ import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.community.data.*
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.discord.*
+import io.hazelnet.community.persistence.DiscordBanRepository
 import io.hazelnet.shared.data.ExternalAccountType
 import io.mockk.every
 import io.mockk.mockk
@@ -175,6 +176,7 @@ internal class RoleAssignmentServiceTest {
     fun getCurrentDelegatorRoleAssignments() {
         val connectService = mockk<ConnectService>()
         every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+
         val activeDelegation = listOf(
             DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 5000, "acc1_hazel"),
             DelegationInfo("9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 55000, "acc1_bloom"),
@@ -190,6 +192,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
@@ -206,6 +209,12 @@ internal class RoleAssignmentServiceTest {
                 DiscordRoleAssignment(testServer.guildId, acc4.referenceId.toLong(), 21),
             ), actual
         )
+    }
+
+    private fun makeDiscordBanRepository(discordBans: List<DiscordBan>): DiscordBanRepository {
+        val discordBanRepository = mockk<DiscordBanRepository>()
+        every { discordBanRepository.findByDiscordServerId(any()) }.returns(discordBans)
+        return discordBanRepository
     }
 
     @Test
@@ -227,7 +236,8 @@ internal class RoleAssignmentServiceTest {
                     "acc4_hazel"
                 ),
                 testServer.tokenRoles.filter { it.filters.isEmpty() }.map { r -> r.acceptedAssets.map { it.policyId } }
-                    .flatten().toSet()
+                    .flatten().toSet(),
+                emptySet(),
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetCount(
@@ -247,6 +257,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -295,7 +306,7 @@ internal class RoleAssignmentServiceTest {
             ),
         )
         every {
-            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
         } answers { emptyList() }
         val metadataMap = mapOf(
             Pair("Tavern1", METADATA_TAVERNSQUAD_1),
@@ -328,6 +339,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -371,7 +383,7 @@ internal class RoleAssignmentServiceTest {
             ),
         )
         every {
-            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
         } answers { emptyList() }
         val metadataMap = mapOf(
             Pair("PXL1", METADATA_DEADPXLZ_1),
@@ -402,6 +414,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -444,7 +457,7 @@ internal class RoleAssignmentServiceTest {
             ),
         )
         every {
-            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
         } answers { emptyList() }
         val metadataMap = mapOf(
             Pair("PXL1", METADATA_DEADPXLZ_1),
@@ -477,6 +490,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -535,7 +549,7 @@ internal class RoleAssignmentServiceTest {
             ),
         )
         every {
-            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any())
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
         } answers { emptyList() }
         val metadataMap = mapOf(
             Pair("Tavern1", METADATA_TAVERNSQUAD_1),
@@ -568,6 +582,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -596,7 +611,9 @@ internal class RoleAssignmentServiceTest {
                     "acc4_hazel"
                 ),
                 testServer.tokenRoles.filter { it.filters.isEmpty() }.map { r -> r.acceptedAssets.map { it.policyId } }
-                    .flatten().toSet()
+                    .flatten().toSet(),
+                emptySet(),
+
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetCount(
@@ -651,6 +668,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -682,7 +700,8 @@ internal class RoleAssignmentServiceTest {
                     "acc4_hazel"
                 ),
                 testServer.tokenRoles.filter { it.filters.isEmpty() }.map { r -> r.acceptedAssets.map { it.policyId } }
-                    .flatten().toSet()
+                    .flatten().toSet(),
+                emptySet(),
             )
         } returns listOf(
             TokenOwnershipInfoWithAssetCount(
@@ -722,6 +741,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
+            makeDiscordBanRepository(emptyList()),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(

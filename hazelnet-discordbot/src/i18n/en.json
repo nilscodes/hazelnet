@@ -28,6 +28,11 @@
 			"configure-info": "Helpful widgets and features to keep your community informed.",
 			"configure-info-epochclock": "A Cardano Epoch Clock right in your Discord.",
 			"configure-info-rolecounter": "A counter for a specific role, showing in your Discord.",
+			"configure-bans": "Configure bans for Discord users, wallets and assets",
+			"configure-bans-add": "Add a new ban to your server",
+			"configure-bans-list": "List all bans active on your server",
+			"configure-bans-details": "Get detailed information about a ban",
+			"configure-bans-remove": "Remove a ban from your server",
 			"configure-protection": "Configuration options around scammer protection",
 			"configure-protection-status": "Show the status of all protection-related mechanisms.",
 			"configure-protection-addressremove": "Turn on/off autoremoval of messages that contain an address/handle to protect from scammers.",
@@ -174,6 +179,12 @@
 				"status": "Set to False to turn this feature off.",
 				"role": "The role you want to display the count for."
 			},
+			"configure-bans": {
+				"ban-id": "The ID of the ban to remove/update",
+				"ban-type": "The type of ban",
+				"ban-pattern": "The name/asset/address you want to ban",
+				"ban-reason": "commands.options.configure-bans.ban-reason"
+			},
 			"configure-protection": {
 				"status": "Set to False to turn this feature off.",
 				"auditchannel": "The channel to send audit/warning messages to."
@@ -288,6 +299,10 @@
 				"PING_TYPE_NFT": "an NFT (via asset fingerprint)",
 				"PING_TYPE_ADDRESS": "an ADA wallet address (addr1…) or staking address (stake1…)"
 			},
+			"configure-bans": {
+				"STAKE_ADDRESS_BAN": "Ban a stake address (stake1…)",
+				"ASSET_FINGERPRINT_BAN": "Ban an asset (asset1…)"
+			},
 			"configure-tokenroles": {
 				"EQUALS": "equals",
 				"NOTEQUALS": "does not equal",
@@ -369,6 +384,7 @@
 		},
 		"adminCommands": {
 			"title": "The following are commands for administrators only (normal users do not get this text when using */help*)",
+			"configure-bans": "With */configure-bans* you can manage ban settings on your server, which allow exclusion of users, wallets or tokens from the server or role assignments/participation.",
 			"configure-protection": "With */configure-protection* you can view and set up the scam and fake protection of the bot. It will let you set up automatic removal of messages with **addr1** as content, as well as an optional auditing of such messages to a dedicated channel for moderators.",
 			"configure-settings": "Under */configure-settings* you can find subcommands that let you customize and control your bot to match your projects needs.",
 			"configure-stakepool": "*/configure-stakepool* provides commands to add, list and remove stakepools for this Discord server. These are needed if you intend to set up delegator roles or if you want your pool information to be listed via the */info* command.",
@@ -838,6 +854,40 @@
 				"errorNotFound": "⚠ No stakepool with the hash **{{stakepoolHash}}** was found for this server. Nothing was removed."
 			}
 		},
+		"bans": {
+			"list": {
+				"purpose": "This is the list of active bans on your server.\n\n{{{banText}}}",
+				"banEntryTitle_STAKE_ADDRESS_BAN": "Stake address (Ban ID: {{banId}})",
+				"banEntryTitle_ASSET_FINGERPRINT_BAN": "Asset Fingerprint (Ban ID: {{banId}})",
+				"banEntry_STAKE_ADDRESS_BAN_PREVENT_ROLES": "*{{pattern}}* is not considered for token/delegation roles.",
+				"banEntry_ASSET_FINGERPRINT_BAN_PREVENT_ROLES": "*{{pattern}}* is not considered for token roles.",
+				"purposeContinued": "Ban list (continued)",
+				"noBansName": "No active bans",
+				"noBans": "*Currently, this server has no active bans.*",
+				"chooseDetails": "Choose the ban you want to get details for",
+				"chooseText": "Ban-ID: {{banId}}",
+				"detailsPurpose": "Information about the ban you selected:",
+				"errorNotFound": "⚠ No ban with the ID **{{banId}}** was found for this server.",
+				"banReasonTitle": "Ban reason",
+				"banReasonNoneGiven": "*None given*",
+				"bannedByTitle": "Banned by",
+				"bannedByUnknown": "*Unknown*",
+				"banTimeTitle": "Banned at"
+			},
+			"add": {
+				"success": "✅ New ban rule added for this Discord server!",
+				"banFailStakeAddress": "⚠ The ban for stake address *{{pattern}}* was not added. A valid stake address in our accepted format **starts with stake1 and has 59 characters** total.",
+				"banFailAssetFingerprint": "⚠ The ban for asset fingerprint *{{pattern}}* was not added. A valid asset fingerprint **starts with asset1 and has 44 characters** total.",
+				"proposedBanReason": "Proposed ban reason"
+			},
+			"details": {
+				"purpose": "Here are the details on the given ban you have requested."
+			},
+			"remove": {
+				"success": "🗑️ Removed the following ban rule from this server:",
+				"errorNotFound": "⚠ No ban with the ID **{{banId}}** was found for this server. Nothing was removed."
+			}
+		},
 		"protection": {
 			"status": {
 				"purpose": "The following protection mechanisms are active on this server:",
@@ -890,7 +940,7 @@
 				"tokenRoleDetailsShortCommand": "Role <@&{{tokenRole.roleId}}> - Run */configure-tokenroles details {{tokenRole.id}}* for more info.",
 				"withStakingProvider": "\nℹ Tokens that are staked with **{{stakingProviderName}}** will also be included in the assets owned by each member.",
 				"maximumInfo": " and at most {{tokenRole.maximumTokenQuantity}}",
-				"chooseDetails": "Choose the token role you want to get details on",
+				"chooseDetails": "Choose the token role you want to get details for",
 				"chooseText": "Role-ID: {{tokenRole.id}}",
 				"noPremium": "🙀 Users currently only get the token role with the lowest ID automatically assigned (Role-ID: {{tokenRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status.",
 				"errorNotFound": "⚠ No token role with the ID **{{tokenRoleId}}** was found for this server."
@@ -968,8 +1018,11 @@
 			"test": {
 				"purpose": "The user <@{{user.id}}> is eligible for the following token roles on this Discord server:\n\n{{{roleData}}}",
 				"roleEntry": "   • <@&{{roleId}}>",
+				"roleEntryNoneEligible": "ℹ The user is not eligible for any roles. If you feel roles are missing, check your token role configuration and have them confirm their verified wallets and content.",
 				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
 				"blacklistedError": "🛑 The user is currently banned from any use of the Discord server service. Please contact your support team for further details.",
+				"noMissingRolesTitle": "No missing roles",
+				"noMissingRoles": "✅ The user is not currently missing any roles that should be assigned to them.",
 				"missingRolesTitle": "Missing roles",
 				"missingRoles": "⚠ The user is currently not assigned the following roles that they are eligible for:\n\n{{{roleData}}}\n\n💡 They can either run **/verify unlink** and immediately **/verify link** once a day to get their roles assigned, or wait for up to two hours for automatic assignments to kick in. Alternatively, click the button below to assign their roles (be warned that this will make it you will be asked to do this for your end users manually constantly).",
 				"assignRoles": "Assign missing roles",
@@ -1005,8 +1058,11 @@
 			"test": {
 				"purpose": "The user <@{{user.id}}> is eligible for the following delegator roles on this Discord server:\n\n{{{roleData}}}",
 				"roleEntry": "   • <@&{{roleId}}>",
+				"roleEntryNoneEligible": "ℹ The user is not eligible for any roles. If you feel roles are missing, check your delegator role configuration and have them confirm their verified wallets and delegated amounts.",
 				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
 				"blacklistedError": "🛑 The user is currently banned from any use of the Discord server service. Please contact your support team for further details.",
+				"noMissingRolesTitle": "No missing roles",
+				"noMissingRoles": "✅ The user is not currently missing any roles that should be assigned to them.",
 				"missingRolesTitle": "Missing roles",
 				"missingRoles": "⚠ The user is currently not assigned the following roles that they are eligible for:\n\n{{{roleData}}}\n\n💡 They can either run **/verify unlink** and immediately **/verify link** once a day to get their roles assigned, or wait for up to two hours for automatic assignments to kick in. Alternatively, click the button below to assign their roles (be warned that this will make it you will be asked to do this for your end users manually constantly).",
 				"assignRoles": "Assign missing roles",
@@ -1788,5 +1844,7 @@
 			"bot": "@HAZELnet_io on Twitter"
 		}
 	},
-	"": ""
+	"": "",
+	"banEntry_ASSET_FINGERPRINT_BAN_PREVENT_ROLES": "banEntry_ASSET_FINGERPRINT_BAN_PREVENT_ROLES",
+	"banEntry_STAKE_ADDRESS_BAN_PREVENT_ROLES": "banEntry_STAKE_ADDRESS_BAN_PREVENT_ROLES"
 }
