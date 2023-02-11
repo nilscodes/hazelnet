@@ -3,7 +3,7 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ChannelType, GuildChannel, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder, APIEmbedField } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
-import { TokenPolicy } from 'src/utility/sharedtypes';
+import { TokenPolicy } from '../../utility/sharedtypes';
 
 interface PolicyAnnounceCommand extends BotSubcommand {
   cache: NodeCache

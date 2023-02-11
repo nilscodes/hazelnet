@@ -209,9 +209,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
+              $ref: '#/components/schemas/TokenPolicyIdListWithOptionalAssetFingerprint'
       responses:
         '200':
           description: 'A filtered list of token policies and associated counts currently owned by the stake address'
@@ -239,9 +237,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
+              $ref: '#/components/schemas/PolicyIdsAndExcludedAssets'
       responses:
         '200':
           description: 'A filtered list of token policies and associated counts currently owned by the stake address'
@@ -305,9 +301,7 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
+              $ref: '#/components/schemas/TokenPolicyIdListWithOptionalAssetFingerprint'
       responses:
         '200':
           description: 'A filtered list of token policies and associated asset names currently owned by the stake address'
@@ -636,6 +630,21 @@ components:
         tokenCount:
           type: integer
           format: int64
+    PolicyIdsAndExcludedAssets:
+      type: object
+      required:
+        - policyIds
+      properties:
+        policyIdsWithOptionalAssetFingerprint:
+          $ref: '#/components/schemas/TokenPolicyIdListWithOptionalAssetFingerprint'
+        excludedAssetFingerprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetFingerprint'
+    TokenPolicyIdListWithOptionalAssetFingerprint:
+      type: array
+      items:
+        $ref: '#/components/schemas/TokenPolicyIdWithOptionalAssetFingerprint'
     HandleName:
       type: string
       example: hazelnet

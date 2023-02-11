@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.PolicyIdsAndExcludedAssets
 import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.persistence.token.TokenDao
@@ -22,20 +23,21 @@ class TokenService(
 ) {
     fun getMultiAssetCountsForStakeAddress(
         stakeAddress: String,
-        policyIdsWithOptionalAssetFingerprint: List<String>
+        policyIdsAndExcludedAssets: PolicyIdsAndExcludedAssets,
     ): List<TokenOwnershipInfoWithAssetCount> {
-        if (policyIdsWithOptionalAssetFingerprint.isEmpty()) {
+        if (policyIdsAndExcludedAssets.policyIdsWithOptionalAssetFingerprint.isEmpty()) {
             return tokenDao.getMultiAssetCountsForStakeAddress(stakeAddress)
         }
         val allTokenOwnershipInfoWithAssetCount = mutableListOf<TokenOwnershipInfoWithAssetCount>()
         val (purePolicyIds, policyIdsWithAssetFingerprint) = extractTokenConstraints(
-            policyIdsWithOptionalAssetFingerprint
+            policyIdsAndExcludedAssets.policyIdsWithOptionalAssetFingerprint
         )
         if (purePolicyIds.isNotEmpty()) {
             allTokenOwnershipInfoWithAssetCount.addAll(
                 tokenDao.getMultiAssetCountsWithPolicyIdForStakeAddress(
                     stakeAddress,
-                    purePolicyIds
+                    purePolicyIds,
+                    policyIdsAndExcludedAssets.excludedAssetFingerprints.map { AssetFingerprint(it) },
                 )
             )
         }

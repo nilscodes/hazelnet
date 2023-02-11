@@ -38,6 +38,14 @@ export default {
       return null;
     }
   },
+  async getExternalDiscordAccountFromExternalAccountId(externalAccountId: string): Promise<ExternalAccount | null> {
+    try {
+      const externalAccountResponse = await axios.get(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}`);
+      return externalAccountResponse.data;
+    } catch (error) {
+      return null;
+    }
+  },
   async getAccountForExternalAccount(externalAccountId: string): Promise<Account> {
     const mainAccountResponse = await axios.put(`${hazelCommunityUrl}/externalaccounts/${externalAccountId}/account`);
     return mainAccountResponse.data;
