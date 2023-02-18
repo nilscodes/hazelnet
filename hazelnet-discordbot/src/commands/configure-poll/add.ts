@@ -42,36 +42,49 @@ export default <PollAddCommand> {
 
       if (discordServer.premium) {
         if (poll.isValidName(pollName)) {
-          const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+          const polls = await interaction.client.services.discordserver.getPolls(interaction.guild!.id);
+          const pollWithSameName = polls.find((pollForDetails) => pollForDetails.name === pollName);
+          if (!pollWithSameName) {
+            if (new Date(pollCloseTime) > new Date()) {
+              const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
 
-          if (!datetime.isValidISOTimestamp(pollOpenTime)) {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'poll-opentime', value: pollOpenTime }), 'configure-poll-add');
+              if (!datetime.isValidISOTimestamp(pollOpenTime)) {
+                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'poll-opentime', value: pollOpenTime }), 'configure-poll-add');
+                await interaction.editReply({ embeds: [embed] });
+                return;
+              }
+              if (!datetime.isValidISOTimestamp(pollCloseTime)) {
+                const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'poll-closetime', value: pollCloseTime }), 'configure-poll-add');
+                await interaction.editReply({ embeds: [embed] });
+                return;
+              }
+
+              const pollObject = {
+                name: pollName,
+                displayName: pollDisplayName,
+                creator: externalAccount.id,
+                openAfter: pollOpenTime,
+                openUntil: pollCloseTime,
+                channelId: publishChannel?.id,
+              } as PollPartial;
+              if (requiredRole) {
+                pollObject.requiredRoles = [{ roleId: requiredRole.id }];
+              }
+
+              const content = this.buildContent(locale, interaction.channel!.id, pollObject, 1);
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
+              await interaction.editReply({ embeds: [embed] });
+
+              this.startPhase2(interaction, discordServer, pollObject);
+            } else {
+              const pollCloseTimestamp = `${Math.floor(new Date(pollCloseTime).getTime() / 1000)}`;
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'configure.poll.add.pollEndDateInPast', locale }, { pollCloseTimestamp }), 'configure-poll-add');
+              await interaction.editReply({ embeds: [embed] });
+            }
+          } else {
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'configure.poll.add.pollNameInUse', locale }, { pollName }), 'configure-poll-add');
             await interaction.editReply({ embeds: [embed] });
-            return;
           }
-          if (!datetime.isValidISOTimestamp(pollCloseTime)) {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'errors.invalidIsoDateFormat', locale }, { parameter: 'poll-closetime', value: pollCloseTime }), 'configure-poll-add');
-            await interaction.editReply({ embeds: [embed] });
-            return;
-          }
-
-          const pollObject = {
-            name: pollName,
-            displayName: pollDisplayName,
-            creator: externalAccount.id,
-            openAfter: pollOpenTime,
-            openUntil: pollCloseTime,
-            channelId: publishChannel?.id,
-          } as PollPartial;
-          if (requiredRole) {
-            pollObject.requiredRoles = [{ roleId: requiredRole.id }];
-          }
-
-          const content = this.buildContent(locale, interaction.channel!.id, pollObject, 1);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
-          await interaction.editReply({ embeds: [embed] });
-
-          this.startPhase2(interaction, discordServer, pollObject);
         } else {
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'configure.poll.add.invalidName', locale }, { pollName }), 'configure-poll-add');
           await interaction.editReply({ embeds: [embed] });

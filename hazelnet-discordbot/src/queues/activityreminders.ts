@@ -29,7 +29,7 @@ export default {
             const user = await guild.members.fetch(activityReminder.userId);
             if (user) {
               const reminderText = this.getReminderText(discordServer, activityReminder);
-              const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.engagement.activityreminder.announceTitle', locale }), reminderText, 'help');
+              const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.engagement.activityreminder.announceTitle', locale }, { userName: user.nickname ?? user.user.tag }), reminderText, 'help');
               await announceChannel.send({ embeds: [embedPublic] });
             }
           }  else {

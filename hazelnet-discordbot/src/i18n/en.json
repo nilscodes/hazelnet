@@ -911,7 +911,7 @@
 				"activityreminderOff": "⚠ No activity reminder channel has been configured. No reminders will be sent when users are inactive.",
 				"noPremium": "🙀 You currently can not configure engagement features as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
 				"minimumActivityDays": "⚠ You cannot configure activity reminders that run more frequently than once a day.",
-				"announceTitle": "Hey there!",
+				"announceTitle": "Hey there {{userName}}!",
 				"announceTextPrefixWithMention": "Hi <@{{userId}}>. ",
 				"announceText": "Long time no see, <@{{userId}}>. We are glad you joined our community and would love for you to chat with us. Swing by any of our channels to see what is new 🙂"
 			},
@@ -1138,6 +1138,8 @@
 				"success": "✅ New poll with the following settings added to this server:",
 				"errorTimeout": "The poll wizard 🧙‍♂️ timed out waiting for your input, sorry. Please restart the wizard via the */configure-poll add* command.",
 				"errorPolicyFormat": "The format of either the policy ID, the asset fingerprint, or both are incorrect.\nValid policy IDs have 56 alphanumberic characters.\nAsset fingerprints look as follows: *asset1acqu7skxpaj2k5kgnvpk96yclag4nfw48zkpek*",
+				"pollEndDateInPast": "⚠ Could not add poll because the close time <t:{{pollCloseTimestamp}}> is in the past.",
+				"pollNameInUse": "⚠ Could not add poll because the name \"{{pollName}}\" is already in use by another poll.",
 				"invalidName": "⚠ Could not add poll because the name \"{{pollName}}\" was invalid. While the display name can be any text, the internal name needs to be start with a letter and can only contain letters and numbers, no whitespaces or special characters, and 30 characters or less.",
 				"noPremium": "🙀 You currently can not add any polls as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
 			},
