@@ -76,7 +76,8 @@ export type MetadataFilter = {
     id: number
     attributeName: string
     operator: AttributeOperatorType
-    attributeValue: string
+    attributeValue: string,
+    tokenWeight: number
 }
 
 export enum AttributeOperatorType {

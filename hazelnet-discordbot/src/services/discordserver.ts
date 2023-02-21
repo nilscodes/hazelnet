@@ -152,11 +152,12 @@ export default {
       stakingType,
     } as TokenOwnershipRolePartial)).data;
   },
-  async addTokenRoleMetadataFilter(guildId: string, tokenRoleId: number, attributeName: string, operator: AttributeOperatorType, attributeValue: string): Promise<MetadataFilter> {
+  async addTokenRoleMetadataFilter(guildId: string, tokenRoleId: number, attributeName: string, operator: AttributeOperatorType, attributeValue: string, tokenWeight?: number): Promise<MetadataFilter> {
     return (await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters`, {
       attributeName,
       operator,
       attributeValue,
+      tokenWeight,
     })).data;
   },
   async deleteTokenRoleMetadataFilter(guildId: string, tokenRoleId: number, filterIdToRemove: number) {

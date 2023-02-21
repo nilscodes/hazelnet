@@ -68,7 +68,7 @@ class RoleAssignmentService(
         return countBasedRoleAssignments + filterBasedRoleAssignments
     }
 
-    private fun getMetadataBasedTokenRoleAssignments(
+    fun getMetadataBasedTokenRoleAssignments(
         filterBasedRoles: List<TokenOwnershipRole>,
         allVerifiedStakeAddresses: List<String>,
         allVerificationsOfMembers: List<Verification>,
@@ -165,14 +165,17 @@ class RoleAssignmentService(
                 role.acceptedAssets.sumOf { asset ->
                     val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
                     val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) }?.size ?: 0
+                    ownedAssets?.sumOf { assetInfo ->
+                        val filterMatchInfo = role.meetsFilterCriteria(assetInfo.metadata)
+                        if (filterMatchInfo.first) filterMatchInfo.second else 0
+                    } ?: 0
                 }.toLong()
             }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
                 val matchingAssets = role.acceptedAssets.map { asset ->
                     val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
                     val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } ?: emptyList()
+                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata).first } ?: emptyList()
                 }.flatten().toMutableList()
 
                 role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }.toLong()
@@ -181,7 +184,7 @@ class RoleAssignmentService(
                 role.acceptedAssets.sumOf { asset ->
                     val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
                     val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                    if (ownedAssets?.any { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata) } == true) {
+                    if (ownedAssets?.any { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata).first } == true) {
                         1L
                     } else {
                         0L

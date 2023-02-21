@@ -3517,6 +3517,11 @@ components:
           type: string
           minLength: 1
           maxLength: 128
+        tokenWeight:
+          type: integer
+          format: int32
+          default: 1
+          description: Gives tokens matched by this filter a different weight when used in token roles with the EVERY_POLICY_FILTERED_OR aggregation type
     DiscordPoll:
       type: object
       required:

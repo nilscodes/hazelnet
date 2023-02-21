@@ -24,14 +24,15 @@ export default {
     return assetName.split('').map((c) => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
   },
   buildMetadataFilterContentText(filters: MetadataFilter[], aggregationType: TokenOwnershipAggregationType, locale: string) {
-    const metadataFiltersList = this.getMetadataFilterContentList(filters, locale);
+    const metadataFiltersList = this.getMetadataFilterContentList(filters, aggregationType == TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR, locale);
     const joinPhraseText = this.getJoinPhraseTextForAggregationType(aggregationType, locale);
     return metadataFiltersList.length ? `\n${i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersTitle', locale })}\n${metadataFiltersList.join(joinPhraseText)}` : '';
   },
-  getMetadataFilterContentList(filters: MetadataFilter[], locale: string) {
+  getMetadataFilterContentList(filters: MetadataFilter[], tokenWeightIsRelevant: boolean, locale: string) {
+    const tokenWeightString = tokenWeightIsRelevant && filters.filter((filter) => filter.tokenWeight !== 1).length ? 'TokenWeight' : '';
     return filters.map((filter) => {
       const operatorText = i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataOperator-${filter.operator}`, locale });
-      return i18n.__({ phrase: 'configure.tokenroles.metadatafilter.add.metadataFiltersContent', locale }, { filter, operatorText, attributeValue: discordstring.escapeBackslashes(filter.attributeValue) } as any);
+      return i18n.__({ phrase: `configure.tokenroles.metadatafilter.add.metadataFiltersContent${tokenWeightString}`, locale }, { filter, operatorText, attributeValue: discordstring.escapeBackslashes(filter.attributeValue), tokenWeight: `${filter.tokenWeight}` } as any);
     });
   },
   getJoinPhraseTextForAggregationType(aggregationType: TokenOwnershipAggregationType, locale: string) {

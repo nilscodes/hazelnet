@@ -258,7 +258,8 @@
 				"attribute-value": "Value to check for (case sensitive!)",
 				"aggregation-type": "The method with which to calculate if someone qualifies for a token role",
 				"staking-type": "If set to a staking provider, include staked assets in role assignments",
-				"user": "The user to check token roles for"
+				"user": "The user to check token roles for",
+				"token-weight": "commands.options.configure-tokenroles.token-weight"
 			},
 			"configure-marketplace": {
 				"policy-id": "Policy ID (Needs to be an official policy of this server)",
@@ -952,6 +953,7 @@
 				"add": {
 					"metadataFiltersTitle": "**Active Filters**",
 					"metadataFiltersContent": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{attributeValue}}}\"",
+					"metadataFiltersContentTokenWeight": "Attribute *{{{filter.attributeName}}}* {{operatorText}} \"{{{attributeValue}}}\" will have a weight of {{tokenWeight}}",
 					"metadataOperator-EQUALS": "is",
 					"metadataOperator-NOTEQUALS": "is not",
 					"metadataOperator-CONTAINS": "contains the text",

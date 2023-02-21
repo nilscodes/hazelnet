@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import io.hazelnet.community.data.AttributeOperatorType
 import org.springframework.lang.NonNull
 import javax.persistence.*
+import javax.validation.constraints.Min
 import javax.validation.constraints.Size
 
 @Entity
@@ -28,6 +29,11 @@ class TokenRoleMetadataFilter @JsonCreator constructor(
     @field:Size(min = 1, max = 128)
     var attributeValue: String,
 
+    @Column(name = "token_weight")
+    @field:NonNull
+    @field:Min(0)
+    var tokenWeight: Int = 1,
+
     ): MetadataFilter() {
 
     fun apply(metadata: String) = super.apply(metadata, attributeName, operator, attributeValue)
@@ -42,6 +48,7 @@ class TokenRoleMetadataFilter @JsonCreator constructor(
         if (attributeName != other.attributeName) return false
         if (operator != other.operator) return false
         if (attributeValue != other.attributeValue) return false
+        if (tokenWeight != other.tokenWeight) return false
 
         return true
     }
@@ -51,11 +58,12 @@ class TokenRoleMetadataFilter @JsonCreator constructor(
         result = 31 * result + attributeName.hashCode()
         result = 31 * result + operator.hashCode()
         result = 31 * result + attributeValue.hashCode()
+        result = 31 * result + tokenWeight
         return result
     }
 
     override fun toString(): String {
-        return "MetadataFilter(id=$id, attributeName='$attributeName', operator=$operator, attributeValue='$attributeValue')"
+        return "TokenRoleMetadataFilter(id=$id, attributeName='$attributeName', operator=$operator, attributeValue='$attributeValue', tokenWeight=$tokenWeight)"
     }
 
 }
