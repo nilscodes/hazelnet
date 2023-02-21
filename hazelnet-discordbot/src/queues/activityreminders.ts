@@ -27,7 +27,7 @@ export default {
             && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)
           ) {
             const user = await guild.members.fetch(activityReminder.userId);
-            if (user) {
+            if (user && !user.user.bot) {
               const reminderText = this.getReminderText(discordServer, activityReminder);
               const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.engagement.activityreminder.announceTitle', locale }, { userName: user.nickname ?? user.user.tag }), reminderText, 'help');
               await announceChannel.send({ embeds: [embedPublic] });
