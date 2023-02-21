@@ -10,6 +10,7 @@ export default <BotSubcommand> {
     const attributeName = interaction.options.getString('attribute-path', true);
     const operator = interaction.options.getString('operator', true) as AttributeOperatorType;
     const attributeValue = interaction.options.getString('attribute-value', true);
+    const tokenWeight = interaction.options.getInteger('token-weight') ?? 1;
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
@@ -22,7 +23,7 @@ export default <BotSubcommand> {
         if (!tokenRoleToAddFilterTo.filters || tokenRoleToAddFilterTo.filters.length < maxFiltersPerTokenRole) {
           if (attributeName.length <= 64) {
             if (attributeValue.length <= 128) {
-              const newMetadataFilter = await interaction.client.services.discordserver.addTokenRoleMetadataFilter(interaction.guild!.id, tokenRoleToAddFilterTo.id, attributeName, operator, attributeValue);
+              const newMetadataFilter = await interaction.client.services.discordserver.addTokenRoleMetadataFilter(interaction.guild!.id, tokenRoleToAddFilterTo.id, attributeName, operator, attributeValue, tokenWeight);
               const effectiveFilters = [...(tokenRoleToAddFilterTo.filters ?? []), newMetadataFilter];
               tokenRoleToAddFilterTo.filters = effectiveFilters;
               const embed = embedBuilder.buildForAdmin(

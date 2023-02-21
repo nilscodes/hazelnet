@@ -54,12 +54,19 @@ class TokenOwnershipRole @JsonCreator constructor(
     var stakingType: TokenStakingType = TokenStakingType.NONE,
 ) {
 
-    fun meetsFilterCriteria(metadata: String): Boolean {
+    fun meetsFilterCriteria(metadata: String): Pair<Boolean, Int> {
         return when (aggregationType) {
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> filters.any { it.apply(metadata) }
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
-            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> Pair(filters.all { it.apply(metadata) }, 1)
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> Pair(filters.any { it.apply(metadata) }, 1)
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> {
+                if (filters.isEmpty()) {
+                    Pair(true, 1)
+                } else {
+                    val firstMatchingFilter = filters.filter { it.apply(metadata) }.firstOrNull()
+                    Pair(firstMatchingFilter != null, firstMatchingFilter?.tokenWeight ?: 1)
+                }
+            }
+            TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> Pair(filters.isEmpty() || filters.any { it.apply(metadata) }, 1)
         }
     }
 

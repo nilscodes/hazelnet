@@ -64,7 +64,8 @@ export default <BotCommand> {
               { name: ci18n.choice('REGEX'), value: 'REGEX' },
             )
             .setRequired(true))
-          .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true)))
+          .addStringOption((option) => option.setName('attribute-value').setDescription(ci18n.option('attribute-value')).setRequired(true))
+          .addIntegerOption((option) => option.setName('token-weight').setDescription(ci18n.option('token-weight')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand
           .setName('remove')
           .setDescription(ci18n.subDescription('metadatafilter-remove'))

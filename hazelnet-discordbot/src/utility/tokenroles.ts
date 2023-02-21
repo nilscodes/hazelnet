@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import cardanotoken from './cardanotoken';
 import discordstring from './discordstring';
-import { TokenOwnershipRole, TokenPolicy, TokenStakingType } from "./sharedtypes";
+import { TokenOwnershipAggregationType, TokenOwnershipRole, TokenPolicy, TokenStakingType } from "./sharedtypes";
 
 export default {
   getTokenRoleDetailsFields(tokenRole: TokenOwnershipRole, tokenPolicies: TokenPolicy[], locale: string, includeAllDetails: boolean = false, customTokenRoleMessage: string | false = false) {
@@ -62,7 +62,7 @@ export default {
         value: policyInfoText,
       });
 
-      const metadataFilterContentList = cardanotoken.getMetadataFilterContentList(tokenRole.filters, locale);
+      const metadataFilterContentList = cardanotoken.getMetadataFilterContentList(tokenRole.filters, tokenRole.aggregationType == TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR, locale);
       if (metadataFilterContentList.length) {
         const chunkSize = 10;
         const joinPhraseText = metadataFilterContentList.length < 25 ? cardanotoken.getJoinPhraseTextForAggregationType(tokenRole.aggregationType, locale) : ' **+** ';
