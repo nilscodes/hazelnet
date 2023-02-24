@@ -9,6 +9,8 @@ export default {
     if (tokenRole.filters?.length) {
       if (tokenRole.aggregationType === 'ANY_POLICY_FILTERED_ONE_EACH') {
         useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsWithFiltersEachOne';
+      } else if (tokenRole.aggregationType === 'ANY_POLICY_FILTERED_ALL_MATCHED') {
+        useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsWithFiltersAllMatched';
       } else {
         useTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsWithFilters';
       }

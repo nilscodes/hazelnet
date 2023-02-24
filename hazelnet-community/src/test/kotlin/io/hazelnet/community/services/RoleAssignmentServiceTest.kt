@@ -323,36 +323,7 @@ internal class RoleAssignmentServiceTest {
             Pair("PXL3", METADATA_DEADPXLZ_1),
             Pair("PXL4", METADATA_DEADPXLZ_2),
         )
-        val slot = slot<List<Pair<String, String>>>()
-        every {
-            connectService.getMultiAssetInfo(capture(slot))
-        } answers {
-            slot.captured.map {
-                MultiAssetInfo(
-                    PolicyId(it.first),
-                    it.second,
-                    AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
-                    metadataMap[it.second] ?: "",
-                    "",
-                    1
-                )
-            }
-        }
-        val roleAssignmentService = RoleAssignmentService(
-            connectService,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            makeDiscordBanRepository(emptyList()),
-        )
-
-        val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
-            getMockVerificationData(),
-            testServer
-        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
         Assertions.assertEquals(
             setOf(
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 16),
@@ -399,36 +370,7 @@ internal class RoleAssignmentServiceTest {
             Pair("PXL3", METADATA_DEADPXLZ_3),
             Pair("PXL4", METADATA_DEADPXLZ_4),
         )
-        val slot = slot<List<Pair<String, String>>>()
-        every {
-            connectService.getMultiAssetInfo(capture(slot))
-        } answers {
-            slot.captured.map {
-                MultiAssetInfo(
-                    PolicyId(it.first),
-                    it.second,
-                    AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
-                    metadataMap[it.second] ?: "",
-                    "",
-                    1
-                )
-            }
-        }
-        val roleAssignmentService = RoleAssignmentService(
-            connectService,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            makeDiscordBanRepository(emptyList()),
-        )
-
-        val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
-            getMockVerificationData(),
-            testServer
-        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
         Assertions.assertEquals(
             setOf(
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 18),
@@ -476,36 +418,7 @@ internal class RoleAssignmentServiceTest {
             Pair("PXL5", METADATA_DEADPXLZ_3),
             Pair("PXL6", METADATA_DEADPXLZ_4),
         )
-        val slot = slot<List<Pair<String, String>>>()
-        every {
-            connectService.getMultiAssetInfo(capture(slot))
-        } answers {
-            slot.captured.map {
-                MultiAssetInfo(
-                    PolicyId(it.first),
-                    it.second,
-                    AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
-                    metadataMap[it.second] ?: "",
-                    "",
-                    1
-                )
-            }
-        }
-        val roleAssignmentService = RoleAssignmentService(
-            connectService,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            makeDiscordBanRepository(emptyList()),
-        )
-
-        val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
-            getMockVerificationData(),
-            testServer
-        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
         Assertions.assertEquals(
             setOf(
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 18),
@@ -569,36 +482,7 @@ internal class RoleAssignmentServiceTest {
             Pair("PXL3", METADATA_DEADPXLZ_3),
             Pair("Gotchi", METADATA_ADAGOTCHI_1),
         )
-        val slot = slot<List<Pair<String, String>>>()
-        every {
-            connectService.getMultiAssetInfo(capture(slot))
-        } answers {
-            slot.captured.map {
-                MultiAssetInfo(
-                    PolicyId(it.first),
-                    it.second,
-                    AssetFingerprint("asset1796zkkayd4nxd2k9aw8epxphdeglnv86uzjpae"),
-                    metadataMap[it.second] ?: "",
-                    "",
-                    1
-                )
-            }
-        }
-        val roleAssignmentService = RoleAssignmentService(
-            connectService,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            makeDiscordBanRepository(emptyList()),
-        )
-
-        val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
-            getMockVerificationData(),
-            testServer
-        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
         Assertions.assertEquals(
             setOf(
                 DiscordRoleAssignment(testServer.guildId, acc1.referenceId.toLong(), 20),
@@ -812,6 +696,69 @@ internal class RoleAssignmentServiceTest {
             Pair("PXL4", METADATA_DEADPXLZ_4),
             Pair("PXL3", METADATA_DEADPXLZ_3),
         )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
+        Assertions.assertEquals(
+            setOf(
+                DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 22),
+            ), actual
+        )
+    }
+
+    @Test
+    fun `aggregation type one each does not count tokens twice if they match two filters`() {
+        val testServer = makeTestDiscordServer(
+            mutableSetOf(
+                TokenOwnershipRole(
+                    12,
+                    mutableSetOf(TokenRoleAssetInfo("1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601")),
+                    6, // Ignored
+                    null,
+                    mutableSetOf(
+                        TokenRoleMetadataFilter(3, "tags", AttributeOperatorType.CONTAINS, "soul patch", 1),
+                        TokenRoleMetadataFilter(4, "tags", AttributeOperatorType.CONTAINS, "not smoking", 1),
+                        TokenRoleMetadataFilter(5, "tags", AttributeOperatorType.CONTAINS, "face mask", 1),
+                    ),
+                    24,
+                    aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH,
+                )
+            )
+        )
+        val connectService = mockk<ConnectService>()
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+        every {
+            connectService.getAllTokenOwnershipAssetsByPolicyId(any(),
+                testServer.tokenRoles.filter { it.filters.isNotEmpty() }
+                    .map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
+            )
+        } returns listOf(
+            TokenOwnershipInfoWithAssetList(
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL2", "PXL3")
+            ),
+            TokenOwnershipInfoWithAssetList(
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL4")
+            ),
+        )
+        every {
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
+        } answers { emptyList() }
+        val metadataMap = mapOf(
+            Pair("PXL2", METADATA_DEADPXLZ_2),
+            Pair("PXL3", METADATA_DEADPXLZ_3),
+            Pair("PXL4", METADATA_DEADPXLZ_4),
+        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
+        Assertions.assertTrue(actual.isEmpty())
+    }
+
+    private fun runBaseFilterTest(
+        connectService: ConnectService,
+        metadataMap: Map<String, String>,
+        testServer: DiscordServer
+    ): Set<DiscordRoleAssignment> {
         val slot = slot<List<Pair<String, String>>>()
         every {
             connectService.getMultiAssetInfo(capture(slot))
@@ -838,13 +785,62 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
         )
 
-        val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
+        return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
             getMockVerificationData(),
             testServer
         )
+    }
+
+    @Test
+    fun `aggregation type for all filters need to be matched but by an arbitrary token count works`() {
+        val testServer = makeTestDiscordServer(
+            mutableSetOf(
+                TokenOwnershipRole(
+                    12,
+                    mutableSetOf(TokenRoleAssetInfo("1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601")),
+                    6, // Ignored
+                    null,
+                    mutableSetOf(
+                        TokenRoleMetadataFilter(3, "tags", AttributeOperatorType.CONTAINS, "soul patch", 1),
+                        TokenRoleMetadataFilter(4, "tags", AttributeOperatorType.CONTAINS, "not smoking", 1),
+                        TokenRoleMetadataFilter(5, "tags", AttributeOperatorType.CONTAINS, "face mask", 1),
+                    ),
+                    23,
+                    aggregationType = TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED,
+                )
+            )
+        )
+        val connectService = mockk<ConnectService>()
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+        every {
+            connectService.getAllTokenOwnershipAssetsByPolicyId(any(),
+                testServer.tokenRoles.filter { it.filters.isNotEmpty() }
+                    .map { r -> r.acceptedAssets.map { it.policyId } }.flatten().toSet()
+            )
+        } returns listOf(
+            TokenOwnershipInfoWithAssetList(
+                stakeAddress = "acc2_kaizn",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL2", "PXL3")
+            ),
+            TokenOwnershipInfoWithAssetList(
+                stakeAddress = "acc1_hazel",
+                policyIdWithOptionalAssetFingerprint = "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                assetList = setOf("PXL4")
+            ),
+        )
+        every {
+            connectService.getAllTokenOwnershipCountsByPolicyId(any(), any(), any())
+        } answers { emptyList() }
+        val metadataMap = mapOf(
+            Pair("PXL2", METADATA_DEADPXLZ_2),
+            Pair("PXL3", METADATA_DEADPXLZ_3),
+            Pair("PXL4", METADATA_DEADPXLZ_4),
+        )
+        val actual = runBaseFilterTest(connectService, metadataMap, testServer)
         Assertions.assertEquals(
             setOf(
-                DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 22),
+                DiscordRoleAssignment(testServer.guildId, acc2.referenceId.toLong(), 23),
             ), actual
         )
     }

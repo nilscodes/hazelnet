@@ -27,6 +27,7 @@ export default <BotCommand> {
             { name: ci18n.choice('ANY_POLICY_FILTERED_OR'), value: 'ANY_POLICY_FILTERED_OR' },
             { name: ci18n.choice('ANY_POLICY_FILTERED_ONE_EACH'), value: 'ANY_POLICY_FILTERED_ONE_EACH' },
             { name: ci18n.choice('EVERY_POLICY_FILTERED_OR'), value: 'EVERY_POLICY_FILTERED_OR' },
+            { name: ci18n.choice('ANY_POLICY_FILTERED_ALL_MATCHED'), value: 'ANY_POLICY_FILTERED_ALL_MATCHED' },
           )
           .setRequired(false))
         .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(false))

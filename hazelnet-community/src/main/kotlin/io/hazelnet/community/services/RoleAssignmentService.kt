@@ -143,12 +143,14 @@ class RoleAssignmentService(
         val minimum = when (role.aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> role.minimumTokenQuantity
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> role.filters.size.toLong()
             TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> role.acceptedAssets.size.toLong()
         }
         val maximum = when (role.aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> role.maximumTokenQuantity
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> null
             TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> null
         }
@@ -159,6 +161,14 @@ class RoleAssignmentService(
         role: TokenOwnershipRole,
         tokenOwnershipInfo: Map.Entry<Long, MutableMap<String, MutableList<MultiAssetInfo>>>
     ): Long {
+        fun getMatchingAssets(): MutableList<MultiAssetInfo> {
+            return role.acceptedAssets.map { asset ->
+                val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
+                val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
+                ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata).first } ?: emptyList()
+            }.flatten().toMutableList()
+        }
+
         return when (role.aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> {
@@ -172,13 +182,12 @@ class RoleAssignmentService(
                 }.toLong()
             }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
-                val matchingAssets = role.acceptedAssets.map { asset ->
-                    val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
-                    val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
-                    ownedAssets?.filter { assetInfo -> role.meetsFilterCriteria(assetInfo.metadata).first } ?: emptyList()
-                }.flatten().toMutableList()
-
+                val matchingAssets = getMatchingAssets()
                 role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }.toLong()
+            }
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED -> {
+                val matchingAssets = getMatchingAssets()
+                role.filters.count { filter -> matchingAssets.any { filter.apply(it.metadata) } }.toLong()
             }
             TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> {
                 role.acceptedAssets.sumOf { asset ->
@@ -354,7 +363,8 @@ class RoleAssignmentService(
         return when (role.aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND,
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED -> {
                 role.acceptedAssets.sumOf { asset ->
                     val policyIdWithOptionalAssetFingerprint = asset.policyId + (asset.assetFingerprint ?: "")
                     (tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint] ?: 0)
