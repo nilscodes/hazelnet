@@ -1,5 +1,5 @@
 import axios from "axios";
-import { DiscordRoleAssignment } from "src/utility/sharedtypes";
+import { DiscordRoleAssignment } from "../../utility/sharedtypes";
 import { DiscordQuizUpdate, Quiz, QuizCompletion, QuizPartial, QuizQuestion } from "../../utility/quiz";
 
 const hazelCommunityUrl = process.env.HAZELNET_COMMUNITY_URL;

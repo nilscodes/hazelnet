@@ -1,9 +1,10 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ChannelType, GuildChannel, PermissionsBitField, TextBasedChannel } from 'discord.js';
+import { ChannelType, GuildChannel, TextBasedChannel } from 'discord.js';
 import giveawayutil from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface GiveawayAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -21,7 +22,7 @@ export default <GiveawayAnnounceCommand> {
       if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceGuildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
-        if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+        if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId);
           const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/announce/publish', 'configure.giveaway.announce.chooseGiveaway');
           this.cache.set(`${guildId}-${interaction.user.id}`, `${announceChannel.id}`);

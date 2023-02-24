@@ -1,10 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
 import HazelnetClient from "../utility/hazelnetclient";
-import {  GuildTextBasedChannel, PermissionsBitField } from 'discord.js';
+import {  GuildTextBasedChannel } from 'discord.js';
 import pollutil from '../utility/poll';
 import embedBuilder from '../utility/embedbuilder';
 import { VoteData } from "../utility/sharedtypes";
+import discordpermissions from '../utility/discordpermissions';
 
 export default {
   cron: '* * * * *',
@@ -20,7 +21,7 @@ export default {
             const announceChannel = await guild.channels.fetch(pollUpdateInfo.channelId) as GuildTextBasedChannel;
             if (announceChannel) {
               const announceChannelPermissions = announceChannel.permissionsFor(client.application!.id);
-              if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+              if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
                 const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
                 const locale = discordServer.getBotLanguage();
                 const poll = await client.services.discordserver.getPoll(pollUpdateInfo.guildId, pollUpdateInfo.pollId);

@@ -3,13 +3,13 @@ import { BotSubcommand } from '../../utility/commandtypes';
 import {
   ChannelType,
   ActionRowBuilder,
-  PermissionsBitField,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
 } from 'discord.js';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
+import discordpermissions from '../../utility/discordpermissions';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -21,7 +21,7 @@ export default <BotSubcommand> {
       const locale = discordServer.getBotLanguage();
       if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
-        if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+        if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const whitelistOptions = whitelists
             .filter((whitelist) => !whitelist.closed)
             .map((whitelist) => ({ label: whitelist.displayName, value: `${announceChannel.id}-${whitelist.id}` }));

@@ -6,12 +6,12 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  PermissionsBitField,
   MessageActionRowComponentBuilder,
 } from 'discord.js';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface SocialAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -32,7 +32,7 @@ export default <SocialAnnounceCommand> {
         const guildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = guildChannel.permissionsFor(interaction.client.application!.id);
         if (announceChannelPermissions) {
-          if (announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+          if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
 
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-social announce', i18n.__({ phrase: 'configure.social.announce.purpose', locale }, { channel: announceChannel.id }), 'configure-social-announce');
             await interaction.editReply({ embeds: [embed] });

@@ -1,9 +1,10 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ChannelType, GuildChannel, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder, APIEmbedField } from 'discord.js';
+import { ChannelType, GuildChannel, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder, APIEmbedField } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
 import { TokenPolicy } from '../../utility/sharedtypes';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface PolicyAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -24,7 +25,7 @@ export default <PolicyAnnounceCommand> {
         if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
           const announceGuildChannel = announceChannel as GuildChannel;
           const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
-          if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+          if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
             const infoTextToUse = infoText ? infoText.substring(0, 1000) : '-';
             this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
               announceChannelId: announceChannel.id,
