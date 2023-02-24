@@ -44,6 +44,9 @@ export default {
       case TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH:
         joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseOneEach';
         break;
+      case TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED:
+        joinPhrase = 'configure.tokenroles.metadatafilter.add.metadataFilterJoinPhraseAllMatch';
+        break;
       case TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR:
       case TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR:
       default:

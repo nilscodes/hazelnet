@@ -57,7 +57,8 @@ class TokenOwnershipRole @JsonCreator constructor(
     fun meetsFilterCriteria(metadata: String): Pair<Boolean, Int> {
         return when (aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> Pair(filters.all { it.apply(metadata) }, 1)
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> Pair(filters.any { it.apply(metadata) }, 1)
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH,
+            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED -> Pair(filters.any { it.apply(metadata) }, 1)
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> {
                 if (filters.isEmpty()) {
                     Pair(true, 1)
