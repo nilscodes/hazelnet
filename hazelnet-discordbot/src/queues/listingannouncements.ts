@@ -5,6 +5,7 @@ import HazelnetClient from "../utility/hazelnetclient";
 import { ListingAnnouncement } from '../utility/sharedtypes';
 import embedBuilder from '../utility/embedbuilder';
 import marketplace from '../utility/marketplace';
+import discordpermissions from '../utility/discordpermissions';
 
 export default {
   name: 'listingannouncements',
@@ -15,7 +16,7 @@ export default {
         const announceChannel = await guild.channels.fetch(listingAnnouncement.channelId) as GuildTextBasedChannel;
         if (announceChannel) {
           const announceChannelPermissions = announceChannel.permissionsFor(client.application!.id);
-          if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+          if (discordpermissions.hasBasicEmbedSendAndAttachPermissions(announceChannelPermissions)) {
             const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
             const locale = discordServer.getBotLanguage();
             const detailFields = marketplace.createListingAnnouncementFields(listingAnnouncement, locale);

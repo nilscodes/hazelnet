@@ -6,6 +6,7 @@ import { DiscordMarketplaceChannelType, DiscordServer, ExternalAccount, Marketpl
 import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import marketplaceUtil from '../../utility/marketplace';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface ConfigureMarketplaceSalesAddCommand extends BotSubcommand {
   cache: NodeCache
@@ -33,7 +34,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
           if (marketplaceChannels.length < maxSalesTrackerCount) {
             if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
               const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
-              if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+              if (discordpermissions.hasBasicEmbedSendAndAttachPermissions(announceChannelPermissions)) {
                 const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
                 const minimumValue = minimumPriceAda * 1000000;
                 const maximumValue = maximumPriceAda ? maximumPriceAda * 1000000 : null;

@@ -8,10 +8,10 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  PermissionsBitField,
   MessageActionRowComponentBuilder,
 } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface VerifyAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -32,7 +32,7 @@ export default <VerifyAnnounceCommand> {
           (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement)) {
         const guildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = guildChannel.permissionsFor(interaction.client.application!.id);
-        if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+        if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const welcomeTextToUse = welcomeText?.substring(0, 1000) ?? i18n.__({ phrase: 'configure.verify.announce.publicSuccess', locale });
           this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
             announceChannelId: announceChannel.id,

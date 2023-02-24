@@ -1,8 +1,9 @@
-import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
+import { GuildTextBasedChannel } from "discord.js";
 import i18n from 'i18n';
 import HazelnetClient from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
 import { DiscordServer } from "../utility/sharedtypes";
+import discordpermissions from "../utility/discordpermissions";
 
 export type DiscordActivityReminder = {
   guildId: string
@@ -21,11 +22,7 @@ export default {
         const announceChannel = await guild.channels.fetch(activityReminder.channelId) as GuildTextBasedChannel;
         if (announceChannel) {
           const announceChannelPermissions = announceChannel.permissionsFor(client.application!.id);
-          if (announceChannelPermissions
-            && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages)
-            && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel)
-            && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)
-          ) {
+          if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
             const user = await guild.members.fetch(activityReminder.userId);
             if (user && !user.user.bot) {
               const reminderText = this.getReminderText(discordServer, activityReminder);

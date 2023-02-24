@@ -1,19 +1,20 @@
 /* eslint-disable no-await-in-loop */
-import { GuildMember, GuildTextBasedChannel, APIEmbedField } from 'discord.js';
+import { SlashCommandBuilder, GuildMember, GuildTextBasedChannel, APIEmbedField } from 'discord.js';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
-import { DelegatorRole, DiscordServer, TokenOwnershipRole } from '../utility/sharedtypes';
+import { DelegatorRole, DiscordServer, MarketplaceChannel, TokenOwnershipRole } from '../utility/sharedtypes';
 import { BotCommand } from '../utility/commandtypes';
-import { SlashCommandBuilder, PermissionsBitField } from 'discord.js';
 import i18n from 'i18n';
 import commandbase from '../utility/commandbase';
 import embedBuilder from '../utility/embedbuilder';
 import commandpermissions from '../utility/commandpermissions';
 import CommandTranslations from '../utility/commandtranslations';
+import discordpermissions from '../utility/discordpermissions';
 
 interface ConfigureHealthCheckCommand extends BotCommand {
   healthCheckRoles(interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string, roleProperty: string, roles: DelegatorRole[] | TokenOwnershipRole[], botObject: GuildMember): Promise<Boolean>
-  healthCheckAuditChannel(discordServer: DiscordServer, interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string): Promise<Boolean>
-  healthCheckBlackEdition(discordServer: DiscordServer, tokenRoles: TokenOwnershipRole[], delegatorRoles: DelegatorRole[], interaction: AugmentedCommandInteraction, healthCheckFields: APIEmbedField[], locale: string): Promise<Boolean>
+  healthCheckAuditChannel(interaction: AugmentedCommandInteraction, discordServer: DiscordServer, healthCheckFields: APIEmbedField[]): Promise<Boolean>
+  healthCheckBlackEdition(interaction: AugmentedCommandInteraction, discordServer: DiscordServer, healthCheckFields: APIEmbedField[], tokenRoles: TokenOwnershipRole[], delegatorRoles: DelegatorRole[], marketplaceChannels: MarketplaceChannel[]): Promise<Boolean>
+  healthCheckMarketplacePermissions(interaction: AugmentedCommandInteraction, discordServer: DiscordServer, healthCheckFields: APIEmbedField[], marketplaceChannels: MarketplaceChannel[]): Promise<Boolean>
 }
 
 export default<ConfigureHealthCheckCommand> {
@@ -33,20 +34,29 @@ export default<ConfigureHealthCheckCommand> {
       try {
         const tokenRoles = await interaction.client.services.discordserver.listTokenOwnershipRoles(interaction.guild!.id);
         const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id);
+        const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id);
         const healthCheckFields = [] as APIEmbedField[];
         const botObject = await interaction.guild!.members.fetch(interaction.client.application!.id);
         const tokenRoleProblem = await this.healthCheckRoles(interaction, healthCheckFields, locale, 'tokenRoles', tokenRoles, botObject);
         const delegatorRoleProblem = await this.healthCheckRoles(interaction, healthCheckFields, locale, 'delegatorRoles', delegatorRoles, botObject);
-        const auditChannelProblem = await this.healthCheckAuditChannel(discordServer, interaction, healthCheckFields, locale);
-        const blackEditionProblem = await this.healthCheckBlackEdition(discordServer, tokenRoles, delegatorRoles, interaction, healthCheckFields, locale);
-        if (!tokenRoleProblem && !delegatorRoleProblem && !auditChannelProblem && !blackEditionProblem) {
+        const auditChannelProblem = await this.healthCheckAuditChannel(interaction, discordServer, healthCheckFields);
+        const blackEditionProblem = await this.healthCheckBlackEdition(interaction, discordServer, healthCheckFields, tokenRoles, delegatorRoles, marketplaceChannels);
+        const marketplaceProblem = await this.healthCheckMarketplacePermissions(interaction, discordServer, healthCheckFields, marketplaceChannels);
+        if (!tokenRoleProblem && !delegatorRoleProblem && !auditChannelProblem && !blackEditionProblem && !marketplaceProblem) {
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.success', locale }),
             value: i18n.__({ phrase: 'configure.healthcheck.successInfo', locale }),
           });
         }
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-healthcheck', i18n.__({ phrase: 'configure.healthcheck.purpose', locale }), 'configure-healthcheck', healthCheckFields);
+        const CHUNK_SIZE = 20;
+        const firstFields = healthCheckFields.splice(0, CHUNK_SIZE);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-healthcheck', i18n.__({ phrase: 'configure.healthcheck.purpose', locale }), 'configure-healthcheck', firstFields);
         await interaction.editReply({ embeds: [embed] });
+        while (healthCheckFields.length) {
+          const additionalHealthChecks = healthCheckFields.splice(0, CHUNK_SIZE);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-healthcheck', i18n.__({ phrase: 'configure.healthcheck.purpose', locale }), 'configure-healthcheck', additionalHealthChecks);
+          await interaction.followUp({ embeds: [embed], ephemeral: true });
+        }
       } catch (error) {
         interaction.client.logger.error(error);
       }
@@ -85,15 +95,15 @@ export default<ConfigureHealthCheckCommand> {
     }
     return problems;
   },
-  async healthCheckAuditChannel(discordServer, interaction, healthCheckFields, locale) {
+  async healthCheckAuditChannel(interaction, discordServer, healthCheckFields) {
+    const locale = discordServer.getBotLanguage();
     let problems = false;
     const auditChannel = discordServer.settings?.PROTECTION_AUDIT_CHANNEL;
     if (auditChannel?.length) {
       try {
         const auditChannelObject = await interaction.guild!.channels.fetch(auditChannel) as GuildTextBasedChannel;
         const auditChannelPermissions = auditChannelObject.permissionsFor(interaction.client.application!.id);
-        if (auditChannelPermissions
-          && (!auditChannelPermissions.has(PermissionsBitField.Flags.SendMessages) || !auditChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) || !auditChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks))) {
+        if (!discordpermissions.hasBasicEmbedSendPermissions(auditChannelPermissions)) {
           problems = true;
           healthCheckFields.push({
             name: i18n.__({ phrase: 'configure.healthcheck.auditChannel', locale }),
@@ -110,12 +120,11 @@ export default<ConfigureHealthCheckCommand> {
     }
     return problems;
   },
-  async healthCheckBlackEdition(discordServer, tokenRoles, delegatorRoles, interaction, healthCheckFields, locale) {
+  async healthCheckBlackEdition(interaction, discordServer, healthCheckFields, tokenRoles, delegatorRoles, marketplaceChannels) {
+    const locale = discordServer.getBotLanguage();
     let problems = false;
     if (!discordServer.premium) {
       const polls = await interaction.client.services.discordserver.getPolls(interaction.guild!.id);
-      const marketplaceChannels = await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id);
-      // TODO Check each marketplace channel!
       const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
       const blackEditionIssues = [];
       if (polls.length) {
@@ -138,6 +147,32 @@ export default<ConfigureHealthCheckCommand> {
         healthCheckFields.push({
           name: i18n.__({ phrase: 'configure.healthcheck.blackEdition', locale }),
           value: i18n.__({ phrase: 'configure.healthcheck.blackEditionNotAvailable', locale }) + blackEditionIssues.map((blackEditionIssue) => i18n.__({ phrase: 'configure.healthcheck.blackEditionEntry', locale }, { blackEditionIssue })).join('\n'),
+        });
+      }
+    }
+    return problems;
+  },
+  async healthCheckMarketplacePermissions(interaction, discordServer, healthCheckFields, marketplaceChannels) {
+    const locale = discordServer.getBotLanguage();
+    let problems = false;
+    for (let i = 0, len = marketplaceChannels.length; i < len; i += 1) {
+      const marketplaceChannel = marketplaceChannels[i];
+      const announcementType = i18n.__({ phrase: `configure.healthcheck.marketplaceChannel${marketplaceChannel.type}`, locale });
+      try {
+        const marketplaceChannelObject = await interaction.guild!.channels.fetch(marketplaceChannel.channelId) as GuildTextBasedChannel;
+        const marketplaceChannelPermissions = marketplaceChannelObject.permissionsFor(interaction.client.application!.id);
+        if (!discordpermissions.hasBasicEmbedSendAndAttachPermissions(marketplaceChannelPermissions)) {
+          problems = true;
+          healthCheckFields.push({
+            name: i18n.__({ phrase: 'configure.healthcheck.marketplaceChannel', locale }),
+            value: i18n.__({ phrase: 'configure.healthcheck.marketplaceChannelNotWritable', locale }, { marketplaceChannel: marketplaceChannel.channelId, announcementType, marketplaceChannelId: `${marketplaceChannel.id}` }),
+          });
+        }
+      } catch (e) {
+        problems = true;
+        healthCheckFields.push({
+          name: i18n.__({ phrase: 'configure.healthcheck.marketplaceChannel', locale }),
+          value: i18n.__({ phrase: 'configure.healthcheck.marketplaceChannelDeleted', locale }, { announcementType, marketplaceChannelId: `${marketplaceChannel.id}` }),
         });
       }
     }

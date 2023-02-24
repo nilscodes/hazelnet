@@ -2,8 +2,9 @@
 import i18n from 'i18n';
 import quizutil from '../utility/quiz';
 import HazelnetClient from "../utility/hazelnetclient";
-import { GuildTextBasedChannel, PermissionsBitField } from 'discord.js';
+import { GuildTextBasedChannel } from 'discord.js';
 import embedBuilder from '../utility/embedbuilder';
+import discordpermissions from '../utility/discordpermissions';
 
 export default {
   cron: '*/5 * * * *',
@@ -19,7 +20,7 @@ export default {
             const announceChannel = await guild.channels.fetch(quizUpdateInfo.channelId) as GuildTextBasedChannel;
             if (announceChannel) {
               const announceChannelPermissions = announceChannel.permissionsFor(client.application!.id);
-              if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+              if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
                 const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
                 const locale = discordServer.getBotLanguage();
                 const quiz = await client.services.discordquiz.getQuiz(quizUpdateInfo.guildId, quizUpdateInfo.quizId);

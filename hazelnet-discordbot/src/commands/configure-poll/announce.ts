@@ -1,9 +1,10 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ChannelType, GuildChannel, PermissionsBitField, TextBasedChannel } from 'discord.js';
+import { ChannelType, GuildChannel, TextBasedChannel } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
+import discordpermissions from '../../utility/discordpermissions';
 
 interface PollAnnounceCommand extends BotSubcommand {
   cache: NodeCache
@@ -22,7 +23,7 @@ export default <PollAnnounceCommand> {
       if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
         const announceGuildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
-        if (announceChannelPermissions && announceChannelPermissions.has(PermissionsBitField.Flags.SendMessages) && announceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel) && announceChannelPermissions.has(PermissionsBitField.Flags.EmbedLinks)) {
+        if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const polls = await interaction.client.services.discordserver.getPolls(guildId);
           const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
           this.cache.set(`${guildId}-${interaction.user.id}`, `${announceChannel.id}-${publishResults ? 1 : 0}`);
