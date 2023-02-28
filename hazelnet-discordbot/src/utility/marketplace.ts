@@ -4,6 +4,7 @@ import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, Ma
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 import nftcdn, { NftCdnAttachment } from './nftcdn';
+const punycode = require('punycode/');
 
 export default {
   createSaleAnnouncementFields(saleAnnouncement: SaleAnnouncement, locale: string) {
@@ -38,10 +39,17 @@ export default {
     return fields;
   },
   getSaleAnnouncementTitle(saleAnnouncement: SaleAnnouncement, locale: string) {
+    const displayName = this.getAugmentedDisplayName(saleAnnouncement.displayName);
     if (saleAnnouncement.type === SalesType.OFFER) {
-      return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentOffer', locale }, saleAnnouncement as any);
+      return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentOffer', locale }, { displayName });
     }
-    return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentBuy', locale }, saleAnnouncement as any);
+    return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentBuy', locale }, { displayName });
+  },
+  getAugmentedDisplayName(displayName: string): string {
+    if (displayName.startsWith('$xn')) {
+      return `${displayName} (${punycode.toUnicode(displayName.substring(1))})`;
+    }
+    return displayName;
   },
   getSaleAnnouncementComponents(discordServer: DiscordServer, saleAnnouncement: SaleAnnouncement) {
     const componentsToAdd = (discordServer.settings.SALES_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.PIXLPAGE, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[];
@@ -74,7 +82,8 @@ export default {
     return fields;
   },
   getListingAnnouncementTitle(listingAnnouncement: ListingAnnouncement, locale: string) {
-    return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, listingAnnouncement as any);
+    const displayName = this.getAugmentedDisplayName(listingAnnouncement.displayName);
+    return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, { displayName });
   },
   getListingAnnouncementComponents(discordServer: DiscordServer, listingAnnouncement: ListingAnnouncement) {
     const componentsToAdd = (discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.PIXLPAGE, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[]
@@ -132,7 +141,8 @@ export default {
     return fields;
   },
   getMintAnnouncementTitle(mintAnnouncement: MintAnnouncement, locale: string) {
-    return i18n.__({ phrase: 'configure.marketplace.mint.announce.itemContentMint', locale }, mintAnnouncement as any);
+    const displayName = this.getAugmentedDisplayName(mintAnnouncement.displayName);
+    return i18n.__({ phrase: 'configure.marketplace.mint.announce.itemContentMint', locale }, { displayName });
   },
   getMintAnnouncementComponents(discordServer: DiscordServer, mintAnnouncement: MintAnnouncement) {
     const componentsToAdd = (discordServer.settings.MINT_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.PIXLPAGE, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[];
