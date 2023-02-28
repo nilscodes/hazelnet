@@ -101,6 +101,10 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
         }
     }
 
+    fun canShowForMarketplace(source: Marketplace): Boolean {
+        return marketplaces.contains(Marketplace.ALL_MARKETPLACES) || marketplaces.contains(source)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

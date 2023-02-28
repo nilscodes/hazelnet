@@ -22,7 +22,7 @@ import java.util.*
 
 @Service
 class ConnectService(
-    @field:Qualifier("connectClient")
+    @Qualifier("connectClient")
     private val connectClient: WebClient,
 ) {
     fun getWalletInfo(address: String): AddressDetails {

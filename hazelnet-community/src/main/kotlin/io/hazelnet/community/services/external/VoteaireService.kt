@@ -9,7 +9,7 @@ import java.util.*
 
 @Service
 class VoteaireService(
-    @field:Qualifier("voteaireClient")
+    @Qualifier("voteaireClient")
     private val voteaireClient: WebClient,
 ) {
 

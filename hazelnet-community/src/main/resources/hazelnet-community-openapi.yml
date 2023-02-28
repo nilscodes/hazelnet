@@ -3473,6 +3473,7 @@ components:
         - ANY_POLICY_FILTERED_OR
         - ANY_POLICY_FILTERED_ONE_EACH
         - EVERY_POLICY_FILTERED_OR
+        - ANY_POLICY_FILTERED_ALL_MATCHED
     TokenStakingType:
       type: string
       default: NONE
@@ -4618,6 +4619,9 @@ components:
       type: string
       enum:
         - JPGSTORE
+        - MINT_ONCHAIN
+        - PLUTUSART
+        - ALL_MARKETPLACES
     AccountId:
       readOnly: true
       type: integer

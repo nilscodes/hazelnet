@@ -259,11 +259,11 @@
 				"aggregation-type": "The method with which to calculate if someone qualifies for a token role",
 				"staking-type": "If set to a staking provider, include staked assets in role assignments",
 				"user": "The user to check token roles for",
-				"token-weight": "commands.options.configure-tokenroles.token-weight"
+				"token-weight": "The weight that a token for this filter should carry in the token aggregation formula"
 			},
 			"configure-marketplace": {
 				"policy-id": "Policy ID (Needs to be an official policy of this server)",
-				"marketplace": "Marketplace to use",
+				"marketplace": "Marketplace to use (defaults to all available)",
 				"minimum-price": "The minimum price for a sale to be considered",
 				"channel": "The channel to send tracking announcements to",
 				"tracker-id": "The ID of the sales/mint/listings tracker",
@@ -337,6 +337,8 @@
 			},
 			"configure-marketplace": {
 				"JPGSTORE": "jpg.store",
+				"PLUTUSART": "plutus.art",
+				"ALL_MARKETPLACES": "All marketplaces",
 				"EQUALS": "equals",
 				"NOTEQUALS": "does not equal",
 				"CONTAINS": "contains",
@@ -1820,8 +1822,9 @@
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",
-		"CNFTIO": "CNFT.io",
-		"MINT_ONCHAIN": "Minting"
+		"MINT_ONCHAIN": "Minting",
+		"PLUTUSART": "plutus.art",
+		"ALL_MARKETPLACES": "All marketplaces"
 	},
 	"stakingProviders": {
 		"MUTANT_STAKING": "Mutant Staking"
