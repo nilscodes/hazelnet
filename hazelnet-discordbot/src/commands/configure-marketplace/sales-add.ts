@@ -16,10 +16,10 @@ interface ConfigureMarketplaceSalesAddCommand extends BotSubcommand {
 export default <ConfigureMarketplaceSalesAddCommand> {
   cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
-    const marketplace = interaction.options.getString('marketplace', true) as Marketplace;
     const minimumPriceAda = interaction.options.getInteger('minimum-price', true);
     const maximumPriceAda = interaction.options.getInteger('maximum-price');
     const announceChannel = interaction.options.getChannel('channel', true) as GuildTextBasedChannel;
+    const marketplace = (interaction.options.getString('marketplace') as Marketplace) ?? Marketplace.ALL_MARKETPLACES;
     const highlightAttributeName = interaction.options.getString('highlight-attribute');
     const policyIdToTrack = interaction.options.getString('policy-id');
     try {
@@ -35,6 +35,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
             if (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement) {
               const announceChannelPermissions = announceChannel.permissionsFor(interaction.client.application!.id);
               if (discordpermissions.hasBasicEmbedSendAndAttachPermissions(announceChannelPermissions)) {
+                const marketplaces = [marketplace];
                 const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
                 const minimumValue = minimumPriceAda * 1000000;
                 const maximumValue = maximumPriceAda ? maximumPriceAda * 1000000 : null;
@@ -45,7 +46,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
                       channelId: announceChannel.id,
                       minimumValue,
                       maximumValue,
-                      marketplaces: [marketplace],
+                      marketplaces,
                       highlightAttributeName,
                       highlightAttributeDisplayName: highlightAttributeName,
                     }, policyIdToTrack, discordServer);
@@ -68,7 +69,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
                       channelId: announceChannel.id,
                       minimumValue,
                       maximumValue,
-                      marketplaces: [marketplace],
+                      marketplaces,
                       highlightAttributeName,
                       highlightAttributeDisplayName: highlightAttributeName,
                     } as MarketplaceChannel);
@@ -80,7 +81,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
                           .addOptions(officialProjects.slice(0, 25)),
                       )];
 
-                    const marketplaceNames = [marketplace].map((marketplaceKey) => i18n.__({ phrase: `marketplaces.${marketplaceKey}`, locale })).join(', ');
+                    const marketplaceNames = marketplaceUtil.getMarketplaceNames(marketplaces, locale);
                     const content = i18n.__({ phrase: 'configure.marketplace.sales.add.purpose', locale }, { marketplaceNames, channel: announceChannel.id })
                       + (minimumPriceAda ? i18n.__({ phrase: 'configure.marketplace.sales.add.minimumPriceAddon', locale }, { minimumPriceAda } as any) : '');
                     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-marketplace sales add', content, 'configure-marketplace-sales-add');
@@ -142,7 +143,7 @@ export default <ConfigureMarketplaceSalesAddCommand> {
       DiscordMarketplaceChannelType.SALES,
       marketplaceChannelData.channelId,
       policyIdToTrack,
-      marketplaceChannelData.marketplaces![0],
+      marketplaceChannelData.marketplaces!,
       marketplaceChannelData.minimumValue,
       marketplaceChannelData.maximumValue,
       marketplaceChannelData.highlightAttributeName,

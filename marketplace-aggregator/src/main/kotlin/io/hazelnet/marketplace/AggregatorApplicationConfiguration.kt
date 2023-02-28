@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties(prefix = "io.hazelnet")
 data class AggregatorApplicationConfiguration(
-        val jpgStore: ConnectConfiguration
+        val jpgStore: ConnectConfiguration,
+        val plutusArt: ConnectConfiguration,
 )
 
 data class ConnectConfiguration(

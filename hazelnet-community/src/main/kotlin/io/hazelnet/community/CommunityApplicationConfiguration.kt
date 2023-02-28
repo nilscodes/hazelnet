@@ -15,6 +15,7 @@ data class CommunityApplicationConfiguration(
         val fundedhandle: String?,
         val salesIpfslink: String?,
         val mintIpfslink: String?,
+        val marketplace: MarketplaceConfiguration,
 )
 
 data class ConnectConfiguration(
@@ -35,4 +36,8 @@ data class MutantStakingConfiguration(
 
 data class TokenRegistryConfiguration(
         val url: String
+)
+
+data class MarketplaceConfiguration(
+        val aggregationFrequency: Long = 5L
 )

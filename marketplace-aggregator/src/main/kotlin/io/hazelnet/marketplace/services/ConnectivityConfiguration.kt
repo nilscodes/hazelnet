@@ -24,6 +24,16 @@ class ConnectivityConfiguration {
                     .build()
 
     @Bean
+    fun plutusArtClient(config: AggregatorApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.plutusArt.url)
+            .exchangeStrategies(
+                ExchangeStrategies.builder().codecs {
+                    it.defaultCodecs().maxInMemorySize(10000000)
+                }.build())
+            .build()
+
+    @Bean
     fun salesPoliciesQueue() = Queue("salespolicies")
 
     @Bean

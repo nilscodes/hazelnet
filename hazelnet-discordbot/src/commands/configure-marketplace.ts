@@ -15,13 +15,15 @@ export default <BotCommand> {
         .addSubcommand((subcommand) => subcommand
           .setName('add')
           .setDescription(ci18n.subDescription('sales-add'))
-          .addStringOption((option) => option.setName('marketplace').setDescription(ci18n.option('marketplace'))
-            .addChoices(
-              { name: ci18n.choice('JPGSTORE'), value: 'JPGSTORE' },
-            )
-            .setRequired(true))
           .addIntegerOption((option) => option.setName('minimum-price').setDescription(ci18n.option('minimum-price')).setRequired(true))
           .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+          .addStringOption((option) => option.setName('marketplace').setDescription(ci18n.option('marketplace'))
+            .addChoices(
+              { name: ci18n.choice('ALL_MARKETPLACES'), value: 'ALL_MARKETPLACES' },
+              { name: ci18n.choice('JPGSTORE'), value: 'JPGSTORE' },
+              { name: ci18n.choice('PLUTUSART'), value: 'PLUTUSART' },
+            )
+            .setRequired(false))
           .addStringOption((option) => option.setName('highlight-attribute').setDescription(ci18n.option('highlight-attribute')).setRequired(false))
           .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand
@@ -36,13 +38,15 @@ export default <BotCommand> {
         .addSubcommand((subcommand) => subcommand
           .setName('add')
           .setDescription(ci18n.subDescription('listings-add'))
-          .addStringOption((option) => option.setName('marketplace').setDescription(ci18n.option('marketplace'))
-            .addChoices(
-              { name: ci18n.choice('JPGSTORE'), value: 'JPGSTORE' },
-            )
-            .setRequired(true))
           .addIntegerOption((option) => option.setName('minimum-price').setDescription(ci18n.option('minimum-price')).setRequired(true))
           .addChannelOption((option) => option.setName('channel').setDescription(ci18n.option('channel')).setRequired(true))
+          .addStringOption((option) => option.setName('marketplace').setDescription(ci18n.option('marketplace'))
+          .addChoices(
+            { name: ci18n.choice('ALL_MARKETPLACES'), value: 'ALL_MARKETPLACES' },
+            { name: ci18n.choice('JPGSTORE'), value: 'JPGSTORE' },
+            { name: ci18n.choice('PLUTUSART'), value: 'PLUTUSART' },
+          )
+          .setRequired(false))
           .addStringOption((option) => option.setName('highlight-attribute').setDescription(ci18n.option('highlight-attribute')).setRequired(false))
           .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(false)))
         .addSubcommand((subcommand) => subcommand

@@ -33,7 +33,8 @@ class DiscordMarketplaceChannelPublisher(
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || sale.price >= it.minimumValue!!)
                 && (it.maximumValue == null || sale.price <= it.maximumValue!!)
-                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)) {
+                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)
+                && it.canShowForMarketplace(sale.source)) {
                 SaleAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,
@@ -66,7 +67,8 @@ class DiscordMarketplaceChannelPublisher(
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || listing.price >= it.minimumValue!!)
                 && (it.maximumValue == null || listing.price <= it.maximumValue!!)
-                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)) {
+                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)
+                && it.canShowForMarketplace(listing.source)) {
                 ListingAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,

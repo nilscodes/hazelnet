@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Service
 class MutantStakingService(
-    @field:Qualifier("mutantStakingClient")
+    @Qualifier("mutantStakingClient")
     private val mutantStakingClient: WebClient,
 ) {
     fun getStakeablePolicies(): Set<String> {

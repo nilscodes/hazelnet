@@ -220,13 +220,13 @@ export default {
   async listMarketplaceChannels(guildId: string): Promise<MarketplaceChannel[]> {
     return (await axios.get(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`)).data;
   },
-  async createMarketplaceChannel(guildId: string, creator: string, type: DiscordMarketplaceChannelType, channelId: string, policyId: string, marketplace: Marketplace, minimumValue?: number | null, maximumValue?: number | null, highlightAttributeName?: string | null, highlightAttributeDisplayName?: string | null): Promise<MarketplaceChannel> {
+  async createMarketplaceChannel(guildId: string, creator: string, type: DiscordMarketplaceChannelType, channelId: string, policyId: string, marketplaces: Marketplace[], minimumValue?: number | null, maximumValue?: number | null, highlightAttributeName?: string | null, highlightAttributeDisplayName?: string | null): Promise<MarketplaceChannel> {
     return (await axios.post(`${hazelCommunityUrl}/discord/servers/${guildId}/marketplaces/channels`, {
       creator,
       type,
       channelId,
       policyId,
-      marketplaces: [marketplace],
+      marketplaces,
       minimumValue,
       maximumValue,
       highlightAttributeName,

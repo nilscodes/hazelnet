@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono
 
 @Service
 class CnftJungleService(
-    @field:Qualifier("cnftJungleClient")
+    @Qualifier("cnftJungleClient")
     private val cnftJungleClient: WebClient,
 ) {
 

@@ -124,7 +124,7 @@ export default <ConfigureMarketplaceMintAddCommand> {
       DiscordMarketplaceChannelType.MINT,
       marketplaceChannelData.channelId,
       policyIdToTrack,
-      Marketplace.MINT_ONCHAIN,
+      [Marketplace.MINT_ONCHAIN],
       null,
       null,
       marketplaceChannelData.highlightAttributeName,

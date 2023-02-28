@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.marketplace.DiscordMarketplaceChannel
 import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
@@ -20,6 +21,7 @@ class DiscordMarketplaceService(
     private val discordMarketplaceChannelMetadataFilterRepository: DiscordTrackerMetadataFilterRepository,
     private val discordServerService: DiscordServerService,
     private val rabbitTemplate: RabbitTemplate,
+    private val config: CommunityApplicationConfiguration
 ) {
     fun listMarketplaceChannels(guildId: Long): List<DiscordMarketplaceChannel> {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -71,10 +73,10 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedRate = 60000)
     fun publishPoliciesForSalesAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 5L
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % config.marketplace.aggregationFrequency
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { (it.policyId.hashCode() % 5L).absoluteValue == shard }
+            .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
@@ -82,10 +84,10 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedRate = 60000)
     fun publishPoliciesForListingsAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % 5L
+        val shard = Calendar.getInstance().get(Calendar.MINUTE) % config.marketplace.aggregationFrequency
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { (it.policyId.hashCode() % 5L).absoluteValue == shard }
+            .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }

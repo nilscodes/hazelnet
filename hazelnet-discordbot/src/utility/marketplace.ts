@@ -1,6 +1,6 @@
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, ListingAnnouncement, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from './sharedtypes';
+import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from './sharedtypes';
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 import nftcdn, { NftCdnAttachment } from './nftcdn';
@@ -151,7 +151,7 @@ export default {
     } catch (error) {
       // Channel deleted
     }
-    const marketplaceNames = marketplaceChannel.marketplaces?.map((marketplace) => i18n.__({ phrase: `marketplaces.${marketplace}`, locale })).join(', ');
+    const marketplaceNames = this.getMarketplaceNames(marketplaceChannel.marketplaces, locale, false);
     const channelName = announceChannel ? announceChannel.name : i18n.__({ phrase: `configure.marketplace.${subcommand}.remove.deletedChannel`, locale });
     let description = i18n.__({ phrase: `configure.marketplace.${subcommand}.remove.entry`, locale }, { channelName, marketplaceNames } as any);
     if (marketplaceChannel.type !== 'MINT' && marketplaceChannel.minimumValue) {
@@ -167,7 +167,7 @@ export default {
     const subcommand = marketplaceChannel.type.toLowerCase();
     const locale = discordServer.getBotLanguage();
     const projectName = this.getProjectName(tokenPolicies, marketplaceChannel);
-    const marketplaceNames = marketplaceChannel.marketplaces?.map((marketplace) => i18n.__({ phrase: `marketplaces.${marketplace}`, locale })).join(', ');
+    const marketplaceNames = this.getMarketplaceNames(marketplaceChannel.marketplaces, locale);
     let content = i18n.__({ phrase: `configure.marketplace.${subcommand}.${mainTextSubAttribute}`, locale }, { projectName, marketplaceNames, channel: marketplaceChannel.channelId } as any);
     if (marketplaceChannel.type !== 'MINT') {
       if (marketplaceChannel.minimumValue) {
@@ -198,4 +198,16 @@ export default {
       });
     }
   },
+  getMarketplaceNames(marketplaces: Marketplace[], locale: string, showAllMarketplaceNamesInsteadOfCatchAll: boolean = true): string {
+    let useMarketplaces = marketplaces;
+    if (showAllMarketplaceNamesInsteadOfCatchAll && marketplaces.find((marketplace) => marketplace === Marketplace.ALL_MARKETPLACES)) {
+      useMarketplaces = [];
+      for (const [_, value] of Object.entries(Marketplace)) {
+        if (value !== Marketplace.ALL_MARKETPLACES && value !== Marketplace.MINT_ONCHAIN) {
+          useMarketplaces.push(value);
+        }
+      }
+    }
+    return useMarketplaces.map((marketplaceKey) => i18n.__({ phrase: `marketplaces.${marketplaceKey}`, locale })).join(', ')
+  }
 };

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
-class ListingsInfo @JsonCreator constructor(
+data class ListingsInfo @JsonCreator constructor(
     @JsonProperty("policyId")
     val policyId: String,
     @JsonProperty("assetNameHex")
@@ -17,5 +17,4 @@ class ListingsInfo @JsonCreator constructor(
     val price: Long,
     @JsonProperty("listingDate")
     val listingDate: Date,
-) {
-}
+)

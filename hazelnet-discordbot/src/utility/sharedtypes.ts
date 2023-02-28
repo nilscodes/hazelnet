@@ -320,6 +320,8 @@ export enum DiscordMarketplaceChannelType {
 export enum Marketplace {
     JPGSTORE = 'JPGSTORE',
     MINT_ONCHAIN = 'MINT_ONCHAIN',
+    PLUTUSART = 'PLUTUSART',
+    ALL_MARKETPLACES = 'ALL_MARKETPLACES',
 }
 
 export type ListingAnnouncement = {

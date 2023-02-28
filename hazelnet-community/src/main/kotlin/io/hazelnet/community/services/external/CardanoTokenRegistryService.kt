@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Service
 class CardanoTokenRegistryService(
-    @field:Qualifier("tokenRegistryClient")
+    @Qualifier("tokenRegistryClient")
     private val tokenRegistryClient: WebClient,
     private val connectService: ConnectService,
 ) {

@@ -4619,6 +4619,9 @@ components:
       type: string
       enum:
         - JPGSTORE
+        - MINT_ONCHAIN
+        - PLUTUSART
+        - ALL_MARKETPLACES
     AccountId:
       readOnly: true
       type: integer

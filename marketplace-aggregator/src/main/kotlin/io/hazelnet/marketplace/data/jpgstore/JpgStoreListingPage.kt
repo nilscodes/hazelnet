@@ -8,5 +8,5 @@ data class JpgStoreListingPage @JsonCreator constructor(
     val listings: List<JpgStoreListingInfo>,
 
     @JsonProperty("nextPageCursor")
-    val nextPageCursor: String,
+    val nextPageCursor: String?,
 )
