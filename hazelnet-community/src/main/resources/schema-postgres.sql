@@ -477,7 +477,7 @@ CREATE TABLE "discord_marketplace_channels"
 CREATE TABLE "discord_marketplace_markets"
 (
     "marketplace_channel_id" bigint,
-    "marketplace"            varchar(50) NOT NULL
+    "marketplace"            smallint NOT NULL
 );
 
 CREATE TABLE "discord_marketplace_filters"
