@@ -19,6 +19,8 @@ data class SalesInfo @JsonCreator constructor(
     val saleDate: Date,
     @JsonProperty("type")
     val type: SalesType,
+    @JsonProperty("globalMarketplaceTracking")
+    val globalMarketplaceTracking: Boolean = false,
 )
 
 enum class SalesType {

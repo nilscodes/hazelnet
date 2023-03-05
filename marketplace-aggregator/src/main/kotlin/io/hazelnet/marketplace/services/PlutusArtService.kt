@@ -25,6 +25,8 @@ class PlutusArtService(
 ) {
     private val lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
     private val lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private var lastAllSalesSyncTimeForPolicy = Date()
+    private var lastAllListingsSyncTimeForPolicy = Date()
     private val plutusArtSalesRequestCounter = Counter
         .builder("plutusart_requestcount_sales")
         .description("Count of requests for aggregating sales from plutus.art")
@@ -104,6 +106,50 @@ class PlutusArtService(
             .subscribe { rabbitTemplate.convertAndSend("listings", it.toListingsInfo()) }
     }
 
+    fun processAllSales() {
+        val lastSyncTimeBeforeCall = lastAllSalesSyncTimeForPolicy
+        val now = Date()
+        plutusArtSalesRequestCounter.increment()
+        this.getAllActivity(PlutusArtAction.Accept)
+            .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
+                logger.info(e) { "Failed getting plutus.art sales for all-sales tracker" }
+                plutusArtSalesStatusCounter
+                    .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
+                    .register(meterRegistry)
+                    .increment()
+            }
+            .flatMap { Flux.fromIterable(it.listings) }
+            .filter {  it.state.isConfirmed && it.updatedAt != null && it.updatedAt.after(lastSyncTimeBeforeCall)  }
+            .doFinally {
+                if (it == SignalType.ON_COMPLETE) {
+                    lastAllSalesSyncTimeForPolicy = now
+                }
+            }
+            .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo(true)) }
+    }
+
+    fun processAllListings() {
+        val lastSyncTimeBeforeCall = lastAllListingsSyncTimeForPolicy
+        val now = Date()
+        plutusArtListingsRequestCounter.increment()
+        this.getAllActivity(PlutusArtAction.Offer)
+            .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
+                logger.info(e) { "Failed getting plutus.art listings for all-listings tracker" }
+                plutusArtListingsStatusCounter
+                    .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
+                    .register(meterRegistry)
+                    .increment()
+            }
+            .flatMap { Flux.fromIterable(it.listings) }
+            .filter { it.state.isConfirmed && it.createdAt.after(lastSyncTimeBeforeCall) }
+            .doFinally {
+                if (it == SignalType.ON_COMPLETE) {
+                    lastAllListingsSyncTimeForPolicy = now
+                }
+            }
+            .subscribe { rabbitTemplate.convertAndSend("listings", it.toListingsInfo(true)) }
+    }
+
     private fun getListings(policyIds: List<String>): Flux<PlutusArtListingPage> {
         return Flux.fromIterable(policyIds)
             .flatMap {
@@ -139,5 +185,21 @@ class PlutusArtService(
                     .retrieve()
                     .bodyToFlux(PlutusArtListingPage::class.java)
             }
+    }
+
+    private fun getAllActivity(action: PlutusArtAction): Flux<PlutusArtListingPage> {
+        return connectClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/search/activity")
+                    .queryParam("page", "0")
+                    .queryParam("count", "10")
+                    .queryParam("sort", "new")
+                    .queryParam("sortOrder", "desc")
+                    .queryParam("action", action.name)
+                    .build()
+            }
+            .retrieve()
+            .bodyToFlux(PlutusArtListingPage::class.java)
     }
 }

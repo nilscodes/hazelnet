@@ -17,4 +17,6 @@ data class ListingsInfo @JsonCreator constructor(
     val price: Long,
     @JsonProperty("listingDate")
     val listingDate: Date,
+    @JsonProperty("globalMarketplaceTracking")
+    val globalMarketplaceTracking: Boolean = false,
 )
