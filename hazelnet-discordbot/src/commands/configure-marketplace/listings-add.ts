@@ -41,7 +41,8 @@ export default <ConfigureMarketplaceListingsAddCommand> {
                 const maximumValue = maximumPriceAda ? maximumPriceAda * 1000000 : null;
                 if (policyIdToTrack) {
                   const officialProjectForPolicy = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdToTrack);
-                  if (officialProjectForPolicy) {
+                  const globalMarketplaceTracker = policyIdToTrack === '00000000000000000000000000000000000000000000000000000000' && discordServer.settings?.GLOBAL_MARKETPLACE_TRACKER_ENABLED === 'true'
+                  if (officialProjectForPolicy || globalMarketplaceTracker) {
                     const content = await this.createMarketplaceListingsChannel(interaction, {
                       channelId: announceChannel.id,
                       minimumValue,

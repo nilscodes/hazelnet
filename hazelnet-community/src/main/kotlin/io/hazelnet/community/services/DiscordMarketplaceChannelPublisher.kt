@@ -1,5 +1,6 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.cardano.connect.data.token.GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER
 import com.bloxbean.cardano.client.util.AssetUtil
 import io.hazelnet.cardano.connect.data.token.Cip68Token
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
@@ -33,7 +34,8 @@ class DiscordMarketplaceChannelPublisher(
 
     @RabbitListener(queues = ["sales"])
     fun processSales(sale: SalesInfo) {
-        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(sale.policyId)
+        val policyIdToUse = if (sale.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else sale.policyId
+        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(policyIdToUse)
         val combinedAssetInfo = retrieveAssetInfo(sale.policyId, sale.assetNameHex)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || sale.price >= it.minimumValue!!)
@@ -67,7 +69,8 @@ class DiscordMarketplaceChannelPublisher(
 
     @RabbitListener(queues = ["listings"])
     fun processListings(listing: ListingsInfo) {
-        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(listing.policyId)
+        val policyIdToUse = if (listing.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else listing.policyId
+        val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(policyIdToUse)
         val combinedAssetInfo = retrieveAssetInfo(listing.policyId, listing.assetNameHex)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || listing.price >= it.minimumValue!!)

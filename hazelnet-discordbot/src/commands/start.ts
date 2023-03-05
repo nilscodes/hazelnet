@@ -86,7 +86,7 @@ export default <StartCommand> {
     }
     const guildRoles = await guild.roles.fetch();
     const roleOptions = guildRoles.map((role) => ({ label: role.name, value: role.id })).slice(0, 25); // Can have max 25 options
-    const adminRoleIds = ((discordServer?.settings?.ADMIN_ROLES?.split(',')) ?? []) as string[];
+    const adminRoleIds = (discordServer?.settings?.ADMIN_ROLES?.split(',')) ?? [];
     if (!adminRoleIds.length) {
       disabled = true;
       components.push(new ActionRowBuilder()

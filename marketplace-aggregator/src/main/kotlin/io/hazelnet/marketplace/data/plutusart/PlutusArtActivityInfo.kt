@@ -40,7 +40,7 @@ data class PlutusArtActivityInfo @JsonCreator constructor(
         }
     }
 
-    fun toSalesInfo(): SalesInfo {
+    fun toSalesInfo(globalMarketplaceTracking: Boolean = false): SalesInfo {
         val firstToken = offerAssetTokens.first()
         return SalesInfo(
             policyId = firstToken.policyId,
@@ -50,10 +50,11 @@ data class PlutusArtActivityInfo @JsonCreator constructor(
             price = totalCost.lovelace,
             saleDate = updatedAt!!,
             type = SalesType.BUY,
+            globalMarketplaceTracking = globalMarketplaceTracking,
         )
     }
 
-    fun toListingsInfo(): ListingsInfo {
+    fun toListingsInfo(globalMarketplaceTracking: Boolean = false): ListingsInfo {
         val firstToken = offerAssetTokens.first()
         return ListingsInfo(
             policyId = firstToken.policyId,
@@ -62,6 +63,7 @@ data class PlutusArtActivityInfo @JsonCreator constructor(
             marketplaceAssetUrl = "https://www.plutus.art/asset/${firstToken.unit}",
             price = totalCost.lovelace,
             listingDate = createdAt,
+            globalMarketplaceTracking = globalMarketplaceTracking,
         )
     }
 }

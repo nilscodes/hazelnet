@@ -1,5 +1,6 @@
 package io.hazelnet.marketplace.services
 
+import io.hazelnet.cardano.connect.data.token.GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Service
 
@@ -13,13 +14,21 @@ class AggregationService(
 
     @RabbitListener(queues = ["salespolicies"])
     fun processSalesForPolicy(policyId: String) {
-        jpgStoreService.processSalesForPolicy(policyId, policiesToInfoLog)
-        plutusArtService.processSalesForPolicy(policyId, policiesToInfoLog)
+        if (policyId == GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER) {
+            plutusArtService.processAllSales()
+        } else {
+            jpgStoreService.processSalesForPolicy(policyId, policiesToInfoLog)
+            plutusArtService.processSalesForPolicy(policyId, policiesToInfoLog)
+        }
     }
 
     @RabbitListener(queues = ["listingspolicies"])
     fun processListingsForPolicy(policyId: String) {
-        jpgStoreService.processListingsForPolicy(policyId, policiesToInfoLog)
-        plutusArtService.processListingsForPolicy(policyId, policiesToInfoLog)
+        if (policyId == GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER) {
+            plutusArtService.processAllListings()
+        } else {
+            jpgStoreService.processListingsForPolicy(policyId, policiesToInfoLog)
+            plutusArtService.processListingsForPolicy(policyId, policiesToInfoLog)
+        }
     }
 }
