@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(("/wallets"))
+@RequestMapping("/wallets")
 class AddressController(
     private val walletService: AddressService
 ) {

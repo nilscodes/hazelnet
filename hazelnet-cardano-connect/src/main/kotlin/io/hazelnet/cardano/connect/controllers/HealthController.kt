@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
-@RequestMapping(("/health"))
+@RequestMapping("/health")
 class HealthController(
     @Value("\${io.hazelnet.connect.cardano.dbsync.outagethreshold}")
     private val dbSyncOutageThreshold: Int,

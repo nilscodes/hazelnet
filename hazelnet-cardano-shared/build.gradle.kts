@@ -30,12 +30,15 @@ dependencies {
     // Use the same version as our spring boot implementation
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
 
-    // Use the Kotlin test library.
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation("com.github.snksoft:crc:1.1.0")
 
-    // Use the Kotlin JUnit integration.
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api("org.apache.commons:commons-math3:3.6.1")
+}
+
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

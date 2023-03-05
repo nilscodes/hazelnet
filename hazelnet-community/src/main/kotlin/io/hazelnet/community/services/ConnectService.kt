@@ -197,7 +197,7 @@ class ConnectService(
         return Flux.fromIterable(assets)
             .flatMap {
                 connectClient.get()
-                    .uri("/token/assets/{policyId}/{assetNameHex}", it.first, it.second.toByteArray().toHex())
+                    .uri("/token/assets/{policyId}/{assetNameHex}", it.first, it.second)
                     .retrieve()
                     .bodyToFlux(MultiAssetInfo::class.java)
             }.collectList().block()!!

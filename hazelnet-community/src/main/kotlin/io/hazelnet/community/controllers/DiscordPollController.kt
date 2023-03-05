@@ -10,7 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/discord"))
+@RequestMapping("/discord")
 class DiscordPollController(
     private val discordPollService: DiscordPollService
 ) {

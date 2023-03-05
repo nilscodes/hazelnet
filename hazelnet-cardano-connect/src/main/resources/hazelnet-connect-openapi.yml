@@ -542,7 +542,7 @@ components:
         assetList:
           type: array
           items:
-            $ref: '#/components/schemas/AssetName'
+            $ref: '#/components/schemas/TokenAssetName'
     MultiAssetInfo:
       type: object
       required:

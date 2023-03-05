@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(("/discord"))
+@RequestMapping("/discord")
 class DiscordInfoController(
     private val discordInfoService: DiscordInfoService
 ) {

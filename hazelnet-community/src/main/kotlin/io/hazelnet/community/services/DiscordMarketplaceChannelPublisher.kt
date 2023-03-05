@@ -1,11 +1,14 @@
 package io.hazelnet.community.services
 
+import com.bloxbean.cardano.client.util.AssetUtil
+import io.hazelnet.cardano.connect.data.token.Cip68Token
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.external.cnftjungle.AssetInfo
 import io.hazelnet.community.data.getImageUrlFromAssetInfo
 import io.hazelnet.community.data.getItemNameFromAssetInfo
 import io.hazelnet.community.services.external.CnftJungleService
+import io.hazelnet.community.services.external.NftCdnService
 import io.hazelnet.marketplace.data.ListingAnnouncement
 import io.hazelnet.marketplace.data.ListingsInfo
 import io.hazelnet.marketplace.data.SaleAnnouncement
@@ -14,6 +17,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import reactor.util.function.Tuple2
 
 @Service
@@ -24,6 +28,7 @@ class DiscordMarketplaceChannelPublisher(
     private val connectService: ConnectService,
     private val rabbitTemplate: RabbitTemplate,
     private val config: CommunityApplicationConfiguration,
+    private val nftCdnService: NftCdnService,
 ) {
 
     @RabbitListener(queues = ["sales"])
@@ -94,7 +99,13 @@ class DiscordMarketplaceChannelPublisher(
     }
 
     private fun retrieveAssetInfo(policyId: String, assetNameHex: String): Tuple2<MultiAssetInfo, AssetInfo> {
-        val blockchainAssetInfo = connectService.getMultiAssetInfoSingle(policyId, assetNameHex)
+        val cip68Token = Cip68Token(assetNameHex)
+        val blockchainAssetInfo = if (cip68Token.isValidCip68Token()) {
+            Mono.just(nftCdnService.getAssetMetadata(listOf(AssetUtil.calculateFingerPrint(policyId, assetNameHex)))
+                .map { it.toMultiAssetInfo() }.first())
+        } else {
+            connectService.getMultiAssetInfoSingle(policyId, assetNameHex)
+        }
         val cnftJungleAssetInfo = cnftJungleService.getAssetInfo(policyId, assetNameHex)
             .onErrorReturn(
                 AssetInfo(

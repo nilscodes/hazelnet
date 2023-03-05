@@ -93,7 +93,7 @@ class TokenDaoCardanoDbSync(
         val policiesToAssets = mutableMapOf<String, MutableSet<String>>()
         jdbcTemplate.query(GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_ALL, { rs, _ ->
             val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
-            assetNameList.add(rs.getString("name").decodeHex())
+            assetNameList.add(rs.getString("name"))
         }, stakeAddress)
         return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
@@ -111,7 +111,7 @@ class TokenDaoCardanoDbSync(
         val policiesToAssets = mutableMapOf<String, MutableSet<String>>()
         jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
             val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
-            assetNameList.add(rs.getString("name").decodeHex())
+            assetNameList.add(rs.getString("name"))
         }
         return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
@@ -129,7 +129,7 @@ class TokenDaoCardanoDbSync(
         jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
             val assetNameList =
                 policiesToAssets.computeIfAbsent(rs.getString("policy") + rs.getString("fingerprint")) { mutableSetOf() }
-            assetNameList.add(rs.getString("name").decodeHex())
+            assetNameList.add(rs.getString("name"))
         }
         return policiesToAssets.map { TokenOwnershipInfoWithAssetList(stakeAddress = stakeAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }
@@ -147,7 +147,7 @@ class TokenDaoCardanoDbSync(
         val policiesToAssets = mutableMapOf<String, MutableSet<String>>()
         jdbcTemplate.query(sql, sqlParameters.toTypedArray(), sqlParameterTypes) { rs, _ ->
             val assetNameList = policiesToAssets.computeIfAbsent(rs.getString("policy")) { mutableSetOf() }
-            assetNameList.add(rs.getString("name").decodeHex())
+            assetNameList.add(rs.getString("name"))
         }
         return policiesToAssets.map { TokenOwnershipInfoWithAssetList(walletAddress = walletAddress, policyIdWithOptionalAssetFingerprint = it.key, assetList = it.value) }
     }

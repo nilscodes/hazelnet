@@ -10,7 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/discord"))
+@RequestMapping("/discord")
 class DiscordGiveawayController(
     private val discordGiveawayService: DiscordGiveawayService
 ) {
