@@ -86,10 +86,19 @@ class DiscordMarketplaceChannel @JsonCreator constructor(
     var highlightAttributeDisplayName: String?,
 ) {
     fun meetsFilterCriteria(metadata: String): Boolean {
-        return when (aggregationType) {
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
-            TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any { it.apply(metadata) }
-            else -> throw IllegalArgumentException("Invalid aggregation type for marketplace channel $id")
+        return if (metadata.isNotBlank()) {
+            when (aggregationType) {
+                TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> filters.all { it.apply(metadata) }
+                TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR -> filters.isEmpty() || filters.any {
+                    it.apply(
+                        metadata
+                    )
+                }
+
+                else -> throw IllegalArgumentException("Invalid aggregation type for marketplace channel $id")
+            }
+        } else {
+            filters.isEmpty() // If there is no metadata, only trackers without metadata filters consider the criteria met.
         }
     }
 

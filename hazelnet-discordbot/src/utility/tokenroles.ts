@@ -35,7 +35,7 @@ export default {
     if (policyIdCount === 1) {
       const policyIdOfFirstAsset = tokenRole.acceptedAssets[0].policyId;
       const officialProject = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === policyIdOfFirstAsset);
-      const policyIdShort = `${policyIdOfFirstAsset.substr(0, 10)}…`;
+      const policyIdShort = `${policyIdOfFirstAsset.substring(0, 10)}…`;
       const titlePhrase = (officialProject ? 'configure.tokenroles.list.tokenRoleNameOfficial' : 'configure.tokenroles.list.tokenRoleNameInofficial');
       title = i18n.__({ phrase: titlePhrase, locale }, { tokenRole, officialProject, policyIdShort } as any);
     }
