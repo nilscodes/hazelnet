@@ -101,7 +101,7 @@ class DiscordMarketplaceChannelPublisher(
     private fun retrieveAssetInfo(policyId: String, assetNameHex: String): Tuple2<MultiAssetInfo, AssetInfo> {
         val cip68Token = Cip68Token(assetNameHex)
         val blockchainAssetInfo = if (cip68Token.isValidCip68Token()) {
-            Mono.just(nftCdnService.getAssetMetadata(listOf(AssetUtil.calculateFingerPrint(policyId, assetNameHex)))
+            Mono.just(nftCdnService.getAssetMetadata(listOf(AssetUtil.calculateFingerPrint(policyId, cip68Token.getReferenceToken().toHexString())))
                 .map { it.toMultiAssetInfo() }.first())
         } else {
             connectService.getMultiAssetInfoSingle(policyId, assetNameHex)
