@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping(("/discord"))
+@RequestMapping("/discord")
 class DiscordActivityController(
     private val discordServerService: DiscordServerService
 ) {

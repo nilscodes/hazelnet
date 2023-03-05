@@ -8,11 +8,16 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.ExchangeStrategies
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.*
+import org.springframework.web.util.UriComponentsBuilder
+import java.util.Base64
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 @Configuration
-class ConnectivityConfiguration {
+class ConnectivityConfiguration(
+    private val communityApplicationConfiguration: CommunityApplicationConfiguration,
+) {
 
     @Bean
     fun connectClient(config: CommunityApplicationConfiguration) =
@@ -51,6 +56,36 @@ class ConnectivityConfiguration {
                     it.defaultCodecs().maxInMemorySize(10000000)
                 }.build())
             .build()
+
+    @Bean
+    fun nftCdnClient() =
+        WebClient.builder()
+            .filter(nftCdnHash())
+            .exchangeStrategies(
+                ExchangeStrategies.builder().codecs {
+                    it.defaultCodecs().maxInMemorySize(10000000)
+                }.build())
+            .build()
+
+    fun nftCdnHash() = { request: ClientRequest, next: ExchangeFunction ->
+        fun makeClientRequestWithTokenValue(tk: String) = ClientRequest.from(request).url(
+            UriComponentsBuilder.fromUri(request.url())
+                .replaceQueryParam("tk", tk)
+                .build()
+                .toUri()
+        ).build()
+
+        val sha256Hmac: Mac = Mac.getInstance("HmacSHA256")
+        val secretKey = SecretKeySpec(Base64.getDecoder().decode(communityApplicationConfiguration.nftcdn.key), "HmacSHA256")
+        sha256Hmac.init(secretKey)
+        val requestWithEmptyToken = makeClientRequestWithTokenValue("")
+
+        val base64Token = Base64.getUrlEncoder().withoutPadding()
+            .encodeToString(sha256Hmac.doFinal(requestWithEmptyToken.url().toString().toByteArray(Charsets.UTF_8)))
+
+        val newRequest = makeClientRequestWithTokenValue(base64Token)
+        next.exchange(newRequest)
+    }
 
     @Bean
     fun salesPoliciesQueue() = Queue("salespolicies")

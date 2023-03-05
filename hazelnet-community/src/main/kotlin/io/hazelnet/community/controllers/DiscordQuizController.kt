@@ -12,7 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/discord"))
+@RequestMapping("/discord")
 class DiscordQuizController(
     private val discordQuizService: DiscordQuizService
 ) {

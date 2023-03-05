@@ -1,9 +1,9 @@
 package io.hazelnet.community.services
 
+import com.bloxbean.cardano.client.util.AssetUtil
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
-import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetCount
-import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
+import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
@@ -12,6 +12,7 @@ import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
+import io.hazelnet.community.services.external.NftCdnService
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
@@ -30,6 +31,7 @@ class RoleAssignmentService(
     private val whitelistRepository: DiscordWhitelistRepository,
     private val quizRepository: DiscordQuizRepository,
     private val discordBanRepository: DiscordBanRepository,
+    private val nftCdnService: NftCdnService,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -97,24 +99,23 @@ class RoleAssignmentService(
                     val tokenListForStakeAddressAndPolicy =
                         tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
                     tokenListForStakeAddressAndPolicy?.let {
-                        val metadata =
-                            connectService.getMultiAssetInfo(tokenListForStakeAddressAndPolicy.assetList
-                                .filter {
-                                    if (it.isBlank()) {
-                                        logger.warn { "Ignoring asset with empty name for policy ${tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint} while aggregating assets for verification with ID ${verification.id}" }
-                                    }
-                                    it.isNotBlank()
-                                }
-                                .map { assetName ->
-                                Pair(
-                                    tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
-                                    assetName
-                                )
-                            }).filterNot { bannedAssetFingerprints.contains(it.assetFingerprint.assetFingerprint) }
-
                         val existingMetadata =
                             mapOfExternalAccount.computeIfAbsent(tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint) { mutableListOf() }
-                        existingMetadata.addAll(metadata)
+
+                        val nonCip68Tokens = tokenListForStakeAddressAndPolicy.assetList.filter { !Cip68Token(it).isValidCip68Token() }
+                        collectNonCip68TokenMetadata(
+                            nonCip68Tokens,
+                            tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
+                            bannedAssetFingerprints,
+                            existingMetadata
+                        )
+                        val cip68Tokens = tokenListForStakeAddressAndPolicy.assetList.map { Cip68Token(it) }.filter { it.isValidCip68Token() }
+                        collectCip68TokenMetadata(
+                            cip68Tokens,
+                            tokenListForStakeAddressAndPolicy.policyIdWithOptionalAssetFingerprint,
+                            bannedAssetFingerprints,
+                            existingMetadata
+                        )
                     }
                 }
             }
@@ -137,6 +138,49 @@ class RoleAssignmentService(
             }.flatten().toSet())
         }
         return filterBasedRoleAssignments
+    }
+
+    private fun collectNonCip68TokenMetadata(
+        nonCip68Tokens: List<String>,
+        policyIdWithOptionalAssetFingerprint: String,
+        bannedAssetFingerprints: Set<String>,
+        existingMetadata: MutableList<MultiAssetInfo>
+    ) {
+        if (nonCip68Tokens.isNotEmpty()) {
+            val metadata =
+                connectService.getMultiAssetInfo(nonCip68Tokens
+                    .filter {
+                        if (it.isBlank()) {
+                            logger.warn { "Ignoring asset with empty name for policy $policyIdWithOptionalAssetFingerprint while aggregating assets" }
+                        }
+                        it.isNotBlank()
+                    }
+                    .map { assetName ->
+                        Pair(
+                            policyIdWithOptionalAssetFingerprint,
+                            assetName
+                        )
+                    })
+                    .filterNot { bannedAssetFingerprints.contains(it.assetFingerprint.assetFingerprint) }
+
+            existingMetadata.addAll(metadata)
+        }
+    }
+
+    private fun collectCip68TokenMetadata(
+        cip68Tokens: List<Cip68Token>,
+        policyIdWithOptionalAssetFingerprint: String,
+        bannedAssetFingerprints: Set<String>,
+        existingMetadata: MutableList<MultiAssetInfo>
+    ) {
+        if (cip68Tokens.isNotEmpty()) {
+            val assetFingerprints = cip68Tokens
+                .map { AssetUtil.calculateFingerPrint(policyIdWithOptionalAssetFingerprint, it.getReferenceToken().toHexString()) }
+                .filterNot { bannedAssetFingerprints.contains(it) }
+            val metadata = nftCdnService.getAssetMetadata(assetFingerprints)
+                .map { it.toMultiAssetInfo() }
+            existingMetadata.addAll(metadata)
+        }
     }
 
     private fun getMinimumAndMaximumTokenCounts(role: TokenOwnershipRole): Pair<Long, Long?> {

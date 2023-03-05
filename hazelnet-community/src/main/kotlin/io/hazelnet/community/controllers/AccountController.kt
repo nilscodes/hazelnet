@@ -10,7 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/accounts"))
+@RequestMapping("/accounts")
 class AccountController(
         private val accountService: AccountService
 ) {

@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(("/snapshots"))
+@RequestMapping("/snapshots")
 class SnapshotController(
     private val multiAssetSnapshotService: MultiAssetSnapshotService
 ) {
