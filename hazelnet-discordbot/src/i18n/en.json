@@ -1012,7 +1012,9 @@
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the token ownership requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make token role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
 				"canceled": "ℹ Adding the following token role was cancelled:\n\nRole <@&{{roleId}}>\nPolicy ID: {{policyId}}\nMinimum token amount: {{minimumTokenQuantity}}",
-				"noPremium": "🙀 You currently can not add any additional token roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status."
+				"noPremium": "🙀 You currently can not add any additional token roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"nextStepsTitle": "💡 Next steps",
+				"nextStepsDetails": "Are you looking to set rules based on your token metadata or advanced weighting and aggregation methods? Find examples on what is possible in the documentation at https://www.hazelnet.io/documentation/configure-tokenroles-update and https://www.hazelnet.io/documentation/configure-tokenroles-metadatafilter-add\n\nHave fun experimenting!"
 			},
 			"update": {
 				"success": "✅ Automatic token role-assignment was successfully updated:",
@@ -1776,7 +1778,7 @@
 	},
 	"start": {
 		"welcomeTitle": "Welcome to HAZELnet!",
-		"completeTitle": "Great work!",
+		"completeTitle": "Great work! 😻",
 		"configureMessage": "The /start command will help you set up your HAZELnet bot. Select your options below:",
 		"configureLanguageTitle": "Language",
 		"configureAdminRoleTitle": "Admin Role",
@@ -1796,8 +1798,10 @@
 		"selectedFeatureItem": "• **{{{feature}}}**",
 		"finishSetupButton": "Finish setup",
 		"resetSetupButton": "Reset settings",
-		"setupRoleWarningMessage": "Thank you 😻\n\n**Your setup is complete with warnings**:\n\n❗ Please be aware the bot did not find all the necessary permissions through roles assigned to it. Make sure the bot has one or multiple roles that grant at least the following permissions: Send Messages, Read Messages, Manage Messages, Manage Roles\n\n💡 Make sure the bot role is high enough in the Discord role list, so it can assign any auto-assign roles it is configured to manage.",
-		"setupCompleteMessage": "Thank you 😻\n\n**Your setup is complete!**\n\n💡 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage.\n\n⚠ While Discord is improving the slash command permission system, make sure you also disable/enable the correct commands by going to \"Server Settings\" ➡ \"Integrations\", selecting HAZELnet and setting the permissions for **/configure-** commands for your selected admin role, and enable the user-facing commands for your normal users."
+		"setupRoleWarningMessage": "**Your setup is complete with warnings**:\n\n❗ Please be aware the bot did not find all the necessary permissions through roles assigned to it. Make sure the bot has one or multiple roles that grant at least the following permissions: Send Messages, Read Messages, Manage Messages, Manage Roles\n\n💡 Make sure the bot role is high enough in the Discord role list, so it can assign any auto-assign roles it is configured to manage.",
+		"setupCompleteMessage": "**Your setup is complete!**\n\n👉 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage.\n\nℹ Make sure you also disable/enable the correct commands by going to \"Server Settings\" - \"Integrations\", selecting HAZELnet and setting the permissions for **/configure-** commands for your selected admin role, and enable the user-facing commands for your normal users.",
+		"nextStepsTitle": "💡 Next steps",
+		"nextStepsDetails": "You are now ready to start adding token roles, verification widgets, and more…\n\nIf you are not sure where to start, some common first steps are adding a verification widget **/configure-verify announce** and adding your first token role via **/configure-tokenroles add**. You can click *Click for help* at the top of each command to get detailed info, run **/help** to see what is available, or just browse our documentation to learn more at https://www.hazelnet.io/documentation"
 	},
 	"features": {
 		"stakepoolTitle": "Stakepools",

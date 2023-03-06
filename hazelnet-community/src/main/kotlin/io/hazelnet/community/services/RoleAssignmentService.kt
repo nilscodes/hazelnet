@@ -17,6 +17,7 @@ import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import javax.transaction.Transactional
 
 private val logger = KotlinLogging.logger {}
@@ -345,21 +346,25 @@ class RoleAssignmentService(
         val policiesToRetrieveMutantInfoFor = getPoliciesToRetrieveMutantStakingInfoFor(roles)
         if (policiesToRetrieveMutantInfoFor.isNotEmpty()) {
             val mapForStakeAddresses = mutableMapOf<String, MutableMap<String, Long>>()
-            mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
-                .forEach { stakeEntry ->
-                    if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
-                        val mapForStakeAddress =
-                            mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
-                        stakeEntry.assets.forEach { asset ->
-                            mapForStakeAddress.compute(asset.policyId!!) { _, v -> (v ?: 0) + 1 }
+            try {
+                mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
+                    .forEach { stakeEntry ->
+                        if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
+                            val mapForStakeAddress =
+                                mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
+                            stakeEntry.assets.forEach { asset ->
+                                mapForStakeAddress.compute(asset.policyId!!) { _, v -> (v ?: 0) + 1 }
+                            }
                         }
                     }
-                }
-            return mapForStakeAddresses.map { stakeAddressEntry ->
-                stakeAddressEntry.value.map {
-                    TokenOwnershipInfoWithAssetCount(stakeAddressEntry.key, it.key, it.value)
-                }
-            }.flatten()
+                return mapForStakeAddresses.map { stakeAddressEntry ->
+                    stakeAddressEntry.value.map {
+                        TokenOwnershipInfoWithAssetCount(stakeAddressEntry.key, it.key, it.value)
+                    }
+                }.flatten()
+            } catch (stakingApiError: WebClientResponseException) {
+                logger.info(stakingApiError) { "Error when retrieving staking information for the following set of policies: $policiesToRetrieveMutantInfoFor" }
+            }
         }
         return emptyList()
     }
@@ -374,7 +379,7 @@ class RoleAssignmentService(
                         val mapForStakeAddress =
                             mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
                         stakeEntry.assets.forEach { asset ->
-                            mapForStakeAddress.computeIfAbsent(asset.policyId!!) { mutableSetOf() }.add(asset.assetName)
+                            mapForStakeAddress.computeIfAbsent(asset.policyId!!) { mutableSetOf() }.add(asset.assetNameHex)
                         }
                     }
                 }

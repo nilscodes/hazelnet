@@ -14,12 +14,15 @@ import io.hazelnet.marketplace.data.ListingAnnouncement
 import io.hazelnet.marketplace.data.ListingsInfo
 import io.hazelnet.marketplace.data.SaleAnnouncement
 import io.hazelnet.marketplace.data.SalesInfo
+import mu.KotlinLogging
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import reactor.util.function.Tuple2
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class DiscordMarketplaceChannelPublisher(
@@ -103,6 +106,7 @@ class DiscordMarketplaceChannelPublisher(
 
     private fun retrieveAssetInfo(policyId: String, assetNameHex: String): Tuple2<MultiAssetInfo, AssetInfo> {
         val cip68Token = Cip68Token(assetNameHex)
+        logger.debug { "Getting asset info for asset $assetNameHex on policy $policyId. CIP-0068 token: ${cip68Token.isValidCip68Token()}"}
         val blockchainAssetInfo = if (cip68Token.isValidCip68Token()) {
             Mono.just(nftCdnService.getAssetMetadata(listOf(AssetUtil.calculateFingerPrint(policyId, cip68Token.getReferenceToken().toHexString())))
                 .map { it.toMultiAssetInfo() }.first())

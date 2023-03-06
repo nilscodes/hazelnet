@@ -149,9 +149,9 @@ export default <StartCommand> {
   },
   async completeSetup(interaction, discordServer) {
     try {
-      await interaction.deferReply({ ephemeral: true });
       if (this.isSetupComplete(discordServer)) {
-        const useLocale = discordServer.getBotLanguage();
+        await interaction.update({ components: [] });
+        const locale = discordServer.getBotLanguage();
         await commandregistration.registerMainCommands(discordServer.settings.ENABLED_COMMAND_TAGS.split(','), interaction.client, interaction.guild!.id);
         // await commandpermissions.setSlashCommandPermissions(interaction.client, interaction.guild.id, discordServer);
 
@@ -166,13 +166,18 @@ export default <StartCommand> {
           await interaction.client.services.discordserver.updateDiscordServer(interaction.guild!.id, { active: true });
         }
 
-        let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale: useLocale });
+        let successMessage = i18n.__({ phrase: 'start.setupCompleteMessage', locale });
         if (await this.isBotLackingRequiredPermissions(interaction)) {
-          successMessage = `\n\n${i18n.__({ phrase: 'start.setupRoleWarningMessage', locale: useLocale })}`;
+          successMessage = i18n.__({ phrase: 'start.setupRoleWarningMessage', locale });
         }
-        const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale: useLocale }), successMessage, 'start');
-        await interaction.editReply({ embeds: [embed] });
+        const nextStepsFields = [{
+          name: i18n.__({ phrase: 'start.nextStepsTitle', locale }),
+          value: i18n.__({ phrase: 'start.nextStepsDetails', locale }),
+        }]
+        const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale }), successMessage, 'start', nextStepsFields);
+        await interaction.followUp({ embeds: [embed], ephemeral: true });
       } else {
+        await interaction.deferReply({ ephemeral: true });
         await this.editReplyWithSetupMessage(interaction);
       }
     } catch (error) {

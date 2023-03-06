@@ -50,7 +50,7 @@ export default <ConfigureTokenrolesPoliciesRemoveCommand> {
             .addOptions(tokenRole.acceptedAssets.map((acceptedAsset) => {
               const fingerprintInfo = acceptedAsset.assetFingerprint ? i18n.__({ phrase: 'configure.tokenroles.policies.add.fingerprintInfoShort', locale }, { assetFingerprint: acceptedAsset.assetFingerprint }) : '';
               const assetFingerprintSuffix = acceptedAsset.assetFingerprint ? `-${acceptedAsset.assetFingerprint}` : '';
-              const policyId = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || `${acceptedAsset.policyId.substr(0, 20)}…`;
+              const policyId = tokenPolicies.find((tokenPolicy) => tokenPolicy.policyId === acceptedAsset.policyId)?.projectName || `${acceptedAsset.policyId.substring(0, 20)}…`;
               return {
                 label: i18n.__({ phrase: 'configure.tokenroles.policies.add.policiesContent', locale }, { policyId, fingerprintInfo }).substring(0, 100),
                 value: `${tokenRole.id}-${acceptedAsset.policyId}${assetFingerprintSuffix}`.substring(0, 100),

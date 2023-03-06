@@ -99,13 +99,17 @@ export default <ConfigureTokenRoleAddCommand> {
     const newTokenRolePromise = await interaction.client.services.discordserver.createTokenRole(interaction.guild!.id, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint);
     const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
     const tokenRole = newTokenRolePromise.data;
+    const addNextStepsField = {
+      name: i18n.__({ phrase: 'configure.tokenroles.add.nextStepsTitle', locale }),
+      value: i18n.__({ phrase: 'configure.tokenroles.add.nextStepsDetails', locale }),
+    }
 
     const embed = embedBuilder.buildForAdmin(
       discordServer,
       '/configure-tokenroles add',
       i18n.__({ phrase: 'configure.tokenroles.add.success', locale }),
       'configure-tokenroles-add',
-      tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale),
+      [...tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale), addNextStepsField],
     );
     return embed;
   },

@@ -71,7 +71,7 @@ export default <PollRemoveCommand> {
           .setPlaceholder(i18n.__({ phrase: 'configure.poll.remove.choosePollDetails', locale: locale }))
           .addOptions(polls.map((poll) => ({
             label: i18n.__({ phrase: 'configure.poll.list.adminName', locale: locale }, { poll } as any),
-            description: (poll.description ? (poll.description.substr(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
+            description: (poll.description ? (poll.description.substring(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
             value: `configure-poll-${poll.id}`,
           }))),
       ),

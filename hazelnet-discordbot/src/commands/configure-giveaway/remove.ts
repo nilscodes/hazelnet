@@ -66,7 +66,7 @@ export default <GiveawayRemoveCommand> {
           .setPlaceholder(i18n.__({ phrase: 'configure.giveaway.remove.chooseGiveawayDetails', locale }))
           .addOptions(giveaways.map((giveaway) => ({
             label: i18n.__({ phrase: 'configure.giveaway.list.adminName', locale }, { giveaway } as any),
-            description: (giveaway.description ? (giveaway.description.substr(0, 90) + (giveaway.description.length > 90 ? '...' : '')) : ''),
+            description: (giveaway.description ? (giveaway.description.substring(0, 90) + (giveaway.description.length > 90 ? '…' : '')) : ''),
             value: `configure-giveaway-${giveaway.id}`,
           }))),
       ),

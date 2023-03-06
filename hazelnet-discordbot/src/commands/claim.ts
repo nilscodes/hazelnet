@@ -79,7 +79,7 @@ export default <ClaimCommand> {
               .setPlaceholder(i18n.__({ phrase: 'claim.chooseClaimList', locale }))
               .addOptions(claimLists.map((claimList) => ({
                 label: claimList.displayName,
-                description: (claimList.description ? (claimList.description.substr(0, 90) + (claimList.description.length > 90 ? '...' : '')) : '-'),
+                description: (claimList.description ? (claimList.description.substring(0, 90) + (claimList.description.length > 90 ? '…' : '')) : '-'),
                 value: `claimlist-${claimList.id}`,
               }))),
           ),
@@ -398,7 +398,7 @@ export default <ClaimCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(currentOrder.guildId);
       const locale = discordServer.getBotLanguage();
       currentOrder.items = currentOrder.items ?? [];
-      const itemDetails = itemToAdd.substr(1).split('-');
+      const itemDetails = itemToAdd.substring(1).split('-');
       const newItem = {
         productId: +itemDetails[0],
         count: 1,
