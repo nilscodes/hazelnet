@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Flux
+
+const val MAX_POLICIES_PER_MUTANT_API_CALL = 5
 
 @Service
 class MutantStakingService(
@@ -23,12 +26,15 @@ class MutantStakingService(
     fun getStakedAssetsForPolicies(
         policyIds: Set<String>
     ) : List<StakeEntry> {
-        return mutantStakingClient.post()
-            .uri("/stakes")
-            .bodyValue(mapOf(Pair("policies", policyIds)))
-            .retrieve()
-            .bodyToMono(object : ParameterizedTypeReference<List<StakeEntry>>() {})
-            .block()!!
+        return Flux.fromIterable(policyIds.chunked(MAX_POLICIES_PER_MUTANT_API_CALL))
+            .flatMap {
+                mutantStakingClient.post()
+                    .uri("/stakes")
+                    .bodyValue(mapOf(Pair("policies", it)))
+                    .retrieve()
+                    .bodyToMono(object : ParameterizedTypeReference<List<StakeEntry>>() {})
+            }.flatMap { Flux.fromIterable(it) }
+            .collectList().block()!!
     }
 
     fun getStakedAssetsForStakeAddress(
