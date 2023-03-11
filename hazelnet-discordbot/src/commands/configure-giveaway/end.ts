@@ -44,7 +44,8 @@ export default <GiveawayEndCommand> {
         if (existingWinners === null) {
           try {
             const winners = await interaction.client.services.discordserver.drawWinners(interaction.guild!.id, giveaway.id);
-            detailFields.push(await giveawayutil.getWinnerInfo(giveaway, locale, winners, interaction.guild!));
+            const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, interaction.guild!);
+            detailFields.push(...winnerFields);
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.success', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
             await interaction.editReply({ embeds: [embed], components });
           } catch (e) {
@@ -52,7 +53,8 @@ export default <GiveawayEndCommand> {
             await interaction.editReply({ embeds: [embed], components: [] });
           }
         } else {
-          detailFields.push(await giveawayutil.getWinnerInfo(giveaway, locale, existingWinners, interaction.guild!));
+          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, existingWinners, interaction.guild!);
+          detailFields.push(...winnerFields);
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.redrawWarning', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
           await interaction.editReply({ embeds: [embed], components });
         }
@@ -72,7 +74,8 @@ export default <GiveawayEndCommand> {
         try {
           const winners = await interaction.client.services.discordserver.drawWinners(guild.id, giveaway.id) as WinnerList;
           const detailFields = giveawayutil.getGiveawayDetails(locale, giveaway);
-          detailFields.push(await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild));
+          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild);
+          detailFields.push(...winnerFields);
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.successRedraw', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
           const components = [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(this.createRedrawButton(giveaway, locale)),
@@ -90,8 +93,8 @@ export default <GiveawayEndCommand> {
         const tokenMetadata = await giveawayutil.getTokenMetadataFromRegistry(guild.id, giveaway, interaction.client);
         const { detailFields } = giveawayutil.getGiveawayAnnouncementParts(discordServer, giveaway, participation, tokenMetadata);
         const winners = await interaction.client.services.discordserver.getWinnerList(guild.id, giveaway.id) as WinnerList;
-        const winnerField = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild);
-        detailFields.push(winnerField);
+        const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild);
+        detailFields.push(...winnerFields);
         const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields);
         const announceChannel = await guild.channels.fetch(giveaway.channelId) as GuildTextBasedChannel;
         try {
@@ -105,7 +108,7 @@ export default <GiveawayEndCommand> {
           }
         }
         const detailFieldsAdmin = giveawayutil.getGiveawayDetails(locale, giveaway);
-        detailFieldsAdmin.push(winnerField);
+        detailFieldsAdmin.push(...winnerFields);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.successPublish', locale }, giveaway as any), 'configure-giveaway-end', detailFieldsAdmin);
         const components = [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(this.createRedrawButton(giveaway, locale)),
