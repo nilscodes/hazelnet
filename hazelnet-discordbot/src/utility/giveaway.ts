@@ -268,10 +268,9 @@ export default {
     }
     return null;
   },
-  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild) {
-    let winnerText = '';
+  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild): Promise<APIEmbedField[]> {
+    const winnerTextList = [];
     if (giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
-      const winnerTextList = [];
       for (let i = 0, len = winnerList.winners.length; i < len; i += 1) {
         try {
           const member = await guild.members.fetch(winnerList.winners[i]);
@@ -282,13 +281,23 @@ export default {
           }
         }
       }
-      winnerText = winnerTextList.join('\n');
     } else if(giveaway.drawType === GiveawayDrawType.CARDANO_ADDRESS) {
-      winnerText = winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale}, { place: `${idx + 1}`, winnerAddress })).join('\n');
+      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale}, { place: `${idx + 1}`, winnerAddress })));
     }
-    return {
+
+    const CHUNK_SIZE = 25;
+    const firstTexts = winnerTextList.splice(0, CHUNK_SIZE);
+    const winnerFields = [{
       name: i18n.__({ phrase: 'configure.giveaway.end.winnerList', locale }, giveaway as any),
-      value: winnerText,
+      value: firstTexts.join('\n'),
+    }];
+    while (winnerTextList.length) {
+      const additionalWinners = winnerTextList.splice(0, CHUNK_SIZE);
+      winnerFields.push({
+        name: i18n.__({ phrase: 'configure.giveaway.end.winnerListContinued', locale }, giveaway as any),
+        value: additionalWinners.join('\n'),
+      });
     }
+    return winnerFields;
   }
 }

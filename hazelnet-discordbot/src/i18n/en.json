@@ -1668,6 +1668,7 @@
 				"redrawWarning": "⚠ The winners for the giveaway **{{{displayName}}}** have already been drawn. Would you like to redraw them?",
 				"redrawButton": "Redraw winners",
 				"winnerList": "{{winnerCount}} winners drawn",
+				"winnerListContinued": "Winners (continued)",
 				"chooseGiveawayDetails": "Choose the giveaway you want to draw winners for",
 				"publishButton": "Publish winners",
 				"winnerDrawDiscordId": "{{place}}. <@{{userId}}>",
