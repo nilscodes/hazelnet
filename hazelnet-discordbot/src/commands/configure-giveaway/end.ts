@@ -41,22 +41,36 @@ export default <GiveawayEndCommand> {
         if (giveaway.channelId && giveaway.messageId && giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
           components[0].addComponents(this.createPublishButton(giveaway, locale));
         }
+        const firstChunkSize = detailFields.length + 1;
+        const chunkSize = giveaway.drawType == GiveawayDrawType.CARDANO_ADDRESS ? 4 : 10;
         if (existingWinners === null) {
           try {
             const winners = await interaction.client.services.discordserver.drawWinners(interaction.guild!.id, giveaway.id);
             const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, interaction.guild!);
             detailFields.push(...winnerFields);
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.success', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
+            const firstWinnerFields = detailFields.splice(0, firstChunkSize);
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.success', locale }, giveaway as any), 'configure-giveaway-end', firstWinnerFields);
             await interaction.editReply({ embeds: [embed], components });
+            while (detailFields.length) {
+              const additionalWinnerFields = detailFields.splice(0, chunkSize);
+              const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.success', locale }, giveaway as any), 'configure-giveaway-end', additionalWinnerFields);
+              await interaction.followUp({ embeds: [embed], ephemeral: true });
+            }
           } catch (e) {
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.errorDraw', locale }, giveaway as any), 'configure-giveaway-end');
             await interaction.editReply({ embeds: [embed], components: [] });
           }
         } else {
-          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, existingWinners, interaction.guild!);
+          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, existingWinners, interaction.guild!, false);
           detailFields.push(...winnerFields);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.redrawWarning', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
+          const firstWinnerFields = detailFields.splice(0, firstChunkSize);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.redrawWarning', locale }, giveaway as any), 'configure-giveaway-end', firstWinnerFields);
           await interaction.editReply({ embeds: [embed], components });
+          while (detailFields.length) {
+            const additionalWinnerFields = detailFields.splice(0, chunkSize);
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.redrawWarning', locale }, giveaway as any), 'configure-giveaway-end', additionalWinnerFields);
+            await interaction.followUp({ embeds: [embed], ephemeral: true });
+          }
         }
       }
     }
@@ -74,9 +88,12 @@ export default <GiveawayEndCommand> {
         try {
           const winners = await interaction.client.services.discordserver.drawWinners(guild.id, giveaway.id) as WinnerList;
           const detailFields = giveawayutil.getGiveawayDetails(locale, giveaway);
-          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild);
+          const firstChunkSize = detailFields.length + 1;
+          const chunkSize = giveaway.drawType == GiveawayDrawType.CARDANO_ADDRESS ? 4 : 10;
+          const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild, false);
           detailFields.push(...winnerFields);
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.successRedraw', locale }, giveaway as any), 'configure-giveaway-end', detailFields);
+          const firstWinnerFields = detailFields.splice(0, firstChunkSize);
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.successRedraw', locale }, giveaway as any), 'configure-giveaway-end', firstWinnerFields);
           const components = [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(this.createRedrawButton(giveaway, locale)),
           ];
@@ -84,6 +101,11 @@ export default <GiveawayEndCommand> {
             components[0].addComponents(this.createPublishButton(giveaway, locale));
           }
           await interaction.editReply({ embeds: [embed], components });
+          while (detailFields.length) {
+            const additionalWinnerFields = detailFields.splice(0, chunkSize);
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.successRedraw', locale }, giveaway as any), 'configure-giveaway-end', additionalWinnerFields);
+            await interaction.followUp({ embeds: [embed], ephemeral: true });
+          }
         } catch (e) {
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.errorDraw', locale }, giveaway as any), 'configure-giveaway-end');
           await interaction.editReply({ embeds: [embed], components: [] });

@@ -7,7 +7,7 @@ import embedBuilder from '../../utility/embedbuilder';
 
 
 interface ConfigureTokenrolesListCommand extends BotSubcommand {
-  createDetailsDropdown(tokenRoles: TokenOwnershipRole[], locale: string, maxForDropdown: number): ActionRowBuilder<MessageActionRowComponentBuilder>[]
+  createDetailsDropdown(tokenRoles: TokenOwnershipRole[], locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
 }
 
 export default <ConfigureTokenrolesListCommand> {
@@ -19,42 +19,45 @@ export default <ConfigureTokenrolesListCommand> {
       const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const maxDetailedRolesOnOnePage = 5;
-      const maxForDropdown = 25;
       let customTokenRoleMessage: string | false = false;
 
-      if (tokenRoles.length > maxForDropdown) {
-        customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortCommand';
-      } else if (tokenRoles.length > maxDetailedRolesOnOnePage) {
+      if (tokenRoles.length > maxDetailedRolesOnOnePage) {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortSelect';
       }
 
-      const tokenRoleFieldsNested = tokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, false, customTokenRoleMessage));
-      const tokenRoleFields = tokenRoleFieldsNested.flat();
-      if (!tokenRoleFields.length) {
-        tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
-      } else if (tokenRoleFields.length > 25) {
-        const moreCount = tokenRoleFields.length - 24;
-        tokenRoleFields.splice(24);
-        tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.moreRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.moreRoles', locale }, { moreCount } as any) });
+      const CHUNK_SIZE = 20;
+      let page = 0;
+      while (tokenRoles.length) {
+        const currentTokenRoles = tokenRoles.splice(0, CHUNK_SIZE);
+        const tokenRoleFieldsNested = currentTokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, false, customTokenRoleMessage));
+        const tokenRoleFields = tokenRoleFieldsNested.flat();
+        if (!tokenRoleFields.length) {
+          tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
+        }
+        if (!discordServer.premium && tokenRoles.length > 1 && page === 0) {
+          const lowestTokenRoleId = Math.min(...tokenRoles.map((tokenRole) => +tokenRole.id));
+          const lowestIdTokenRole = tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
+          tokenRoleFields.unshift({
+            name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
+            value: i18n.__({ phrase: 'configure.tokenroles.list.noPremium', locale }, { tokenRole: lowestIdTokenRole } as any),
+          });
+        }
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
+        const components = this.createDetailsDropdown(currentTokenRoles, discordServer.getBotLanguage());
+        if (page === 0) {
+          await interaction.editReply({ embeds: [embed], components });
+        } else {
+          await interaction.followUp({ embeds: [embed], components, ephemeral: true });
+        }
+        page += 1;
       }
-      if (!discordServer.premium && tokenRoles.length > 1) {
-        const lowestTokenRoleId = Math.min(...tokenRoles.map((tokenRole) => +tokenRole.id));
-        const lowestIdTokenRole = tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
-        tokenRoleFields.unshift({
-          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
-          value: i18n.__({ phrase: 'configure.tokenroles.list.noPremium', locale }, { tokenRole: lowestIdTokenRole } as any),
-        });
-      }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
-      const components = this.createDetailsDropdown(tokenRoles, discordServer.getBotLanguage(), maxForDropdown);
-      await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting auto-role-assignment for token owners. Please contact your bot admin via https://www.hazelnet.io.' });
     }
   },
-  createDetailsDropdown(tokenRoles, locale, maxForDropdown) {
-    if (tokenRoles.length > 0 && tokenRoles.length <= maxForDropdown) {
+  createDetailsDropdown(tokenRoles, locale) {
+    if (tokenRoles.length > 0) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
           new SelectMenuBuilder()
