@@ -1,9 +1,9 @@
 package io.hazelnet.community.services
 
 import com.bloxbean.cardano.client.util.AssetUtil
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.token.*
+import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
@@ -13,6 +13,7 @@ import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
 import io.hazelnet.community.services.external.NftCdnService
+import io.hazelnet.shared.decodeHex
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
@@ -33,6 +34,7 @@ class RoleAssignmentService(
     private val quizRepository: DiscordQuizRepository,
     private val discordBanRepository: DiscordBanRepository,
     private val nftCdnService: NftCdnService,
+    private val config: CommunityApplicationConfiguration,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -96,6 +98,9 @@ class RoleAssignmentService(
                     externalAccountLookup,
                     memberIdsToTokenPolicyOwnershipAssets
                 )
+                if (logger.isDebugEnabled && config.logging?.tokenroles?.externalAccountIds?.contains(verification.externalAccount.id) == true) {
+                    logger.debug("Processing verification ${verification.id} for Discord ID ${verification.externalAccount.referenceId} with the following data:\n$verification")
+                }
                 relevantPolicyIds.forEach { policy ->
                     val tokenListForStakeAddressAndPolicy =
                         tokenOwnershipData.find { it.stakeAddress == verification.cardanoStakeAddress && it.policyIdWithOptionalAssetFingerprint == policy }
@@ -110,6 +115,9 @@ class RoleAssignmentService(
                             bannedAssetFingerprints,
                             existingMetadata
                         )
+                        if (logger.isDebugEnabled && config.logging?.tokenroles?.externalAccountIds?.contains(verification.externalAccount.id) == true) {
+                            logger.debug { "Found the following CIP-0025 assets under policy $policy for Discord user ${verification.externalAccount.referenceId}: ${nonCip68Tokens.map { it.decodeHex() }}" }
+                        }
                         val cip68Tokens = tokenListForStakeAddressAndPolicy.assetList.map { Cip68Token(it) }.filter { it.isValidCip68Token() }
                         collectCip68TokenMetadata(
                             cip68Tokens,
@@ -117,6 +125,9 @@ class RoleAssignmentService(
                             bannedAssetFingerprints,
                             existingMetadata
                         )
+                        if (logger.isDebugEnabled && config.logging?.tokenroles?.externalAccountIds?.contains(verification.externalAccount.id) == true) {
+                            logger.debug { "Found the following CIP-0068 assets under policy $policy for Discord user ${verification.externalAccount.referenceId}: ${cip68Tokens.map { it.assetName }}" }
+                        }
                     }
                 }
             }
@@ -125,6 +136,12 @@ class RoleAssignmentService(
                     externalAccountLookup[tokenOwnershipInfo.key]?.let {
                         val tokenCount = calculateMatchedTokenCountForFiltered(role, tokenOwnershipInfo)
                         val (minimum, maximum) = getMinimumAndMaximumTokenCounts(role)
+
+                        if (logger.isDebugEnabled
+                            && config.logging?.tokenroles?.externalAccountIds?.contains(it.id) == true
+                            && config.logging.tokenroles.tokenRoleIds?.contains(role.id) == true) {
+                            logger.debug { "Found $tokenCount valid items for role ${role.id} (Discord role ID ${role.roleId}) for Discord user ${it.referenceId}. Minimum required: $minimum, Maximum required: $maximum" }
+                        }
 
                         if (
                             tokenCount >= minimum
@@ -214,6 +231,10 @@ class RoleAssignmentService(
             }.flatten().toMutableList()
         }
 
+        fun shouldLog() = logger.isDebugEnabled
+                    && config.logging?.tokenroles?.externalAccountIds?.contains(tokenOwnershipInfo.key) == true
+                    && config.logging.tokenroles.tokenRoleIds?.contains(role.id) == true
+
         return when (role.aggregationType) {
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_OR,
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_AND -> {
@@ -222,16 +243,26 @@ class RoleAssignmentService(
                     val ownedAssets = tokenOwnershipInfo.value[policyIdWithOptionalAssetFingerprint]
                     ownedAssets?.sumOf { assetInfo ->
                         val filterMatchInfo = role.meetsFilterCriteria(assetInfo.metadata)
-                        if (filterMatchInfo.first) filterMatchInfo.second else 0
+                        val weight = if (filterMatchInfo.first) filterMatchInfo.second else 0
+                        if (shouldLog()) {
+                            logger.debug { "Item ${assetInfo.assetName} for user ${tokenOwnershipInfo.key} and role ${role.id} had a ${filterMatchInfo.first} match for aggregation type ${role.aggregationType} and will be weighted with $weight"}
+                        }
+                        weight
                     } ?: 0
                 }.toLong()
             }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ONE_EACH -> {
                 val matchingAssets = getMatchingAssets()
+                if (shouldLog()) {
+                    logger.debug { "The following matching assets are included in the calculation for ANY_POLICY_FILTERED_ONE_EACH for user ${tokenOwnershipInfo.key} and role ${role.id}: ${matchingAssets.map { it.assetName }} and will be attempted to be matched to all ${role.filters.size} metadata filters" }
+                }
                 role.filters.count { filter -> matchingAssets.removeIf { filter.apply(it.metadata) } }.toLong()
             }
             TokenOwnershipAggregationType.ANY_POLICY_FILTERED_ALL_MATCHED -> {
                 val matchingAssets = getMatchingAssets()
+                if (shouldLog()) {
+                    logger.debug { "The following matching assets are included in the calculation for ANY_POLICY_FILTERED_ALL_MATCHED for user ${tokenOwnershipInfo.key} and role ${role.id}: ${matchingAssets.map { it.assetName }}" }
+                }
                 role.filters.count { filter -> matchingAssets.any { filter.apply(it.metadata) } }.toLong()
             }
             TokenOwnershipAggregationType.EVERY_POLICY_FILTERED_OR -> {

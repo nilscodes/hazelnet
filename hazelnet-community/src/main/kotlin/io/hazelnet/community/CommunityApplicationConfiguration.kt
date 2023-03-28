@@ -17,6 +17,7 @@ data class CommunityApplicationConfiguration(
     val mintIpfslink: String?,
     val marketplace: MarketplaceConfiguration,
     val nftcdn: NftCdnConfiguration,
+    val logging: LoggingConfiguration?,
 )
 
 data class ConnectConfiguration(
@@ -46,4 +47,13 @@ data class MarketplaceConfiguration(
 data class NftCdnConfiguration(
     val domain: String,
     val key: String,
+)
+
+data class LoggingConfiguration(
+    val tokenroles: TokenRoleLoggingConfiguration?,
+)
+
+data class TokenRoleLoggingConfiguration(
+    val externalAccountIds: List<Long>?,
+    val tokenRoleIds: List<Long>?,
 )

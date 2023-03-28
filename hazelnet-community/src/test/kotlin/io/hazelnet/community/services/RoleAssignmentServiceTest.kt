@@ -199,6 +199,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
+            mockk(relaxed = true),
         )
         val testServer = makeTestDiscordServer()
         val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
@@ -266,6 +267,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
+            mockk(relaxed = true),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -567,6 +569,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
+            mockk(relaxed = true),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -642,6 +645,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
+            mockk(relaxed = true),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -788,6 +792,7 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
+            mockk(relaxed = true),
         )
 
         return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(

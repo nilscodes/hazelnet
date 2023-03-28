@@ -29,7 +29,8 @@ class ConnectivityConfigurationTest {
                 null,
                 null,
                 mockk(),
-                NftCdnConfiguration("hazel", "ghTahnr2pfjjGn100vBPfF0BA8lXmH8rMQWklCtw0yA=")
+                NftCdnConfiguration("hazel", "ghTahnr2pfjjGn100vBPfF0BA8lXmH8rMQWklCtw0yA="),
+                null,
             )
         )
 

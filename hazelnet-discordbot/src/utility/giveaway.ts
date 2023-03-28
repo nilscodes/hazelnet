@@ -3,6 +3,7 @@ import { DiscordRequiredRole } from "./polltypes"
 import i18n from 'i18n';
 import HazelnetClient from "./hazelnetclient";
 import { DiscordServer, TokenMetadata } from "./sharedtypes";
+import cardanoaddress from "./cardanoaddress";
 
 export type Giveaway = {
   name: string
@@ -268,7 +269,7 @@ export default {
     }
     return null;
   },
-  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild): Promise<APIEmbedField[]> {
+  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild, shortenAddresses: boolean = true): Promise<APIEmbedField[]> {
     const winnerTextList = [];
     if (giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
       for (let i = 0, len = winnerList.winners.length; i < len; i += 1) {
@@ -282,10 +283,10 @@ export default {
         }
       }
     } else if(giveaway.drawType === GiveawayDrawType.CARDANO_ADDRESS) {
-      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale}, { place: `${idx + 1}`, winnerAddress })));
+      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale}, { place: `${idx + 1}`, winnerAddress: (shortenAddresses ? cardanoaddress.shorten(winnerAddress) : winnerAddress) })));
     }
 
-    const CHUNK_SIZE = 25;
+    const CHUNK_SIZE = 8;
     const firstTexts = winnerTextList.splice(0, CHUNK_SIZE);
     const winnerFields = [{
       name: i18n.__({ phrase: 'configure.giveaway.end.winnerList', locale }, giveaway as any),
