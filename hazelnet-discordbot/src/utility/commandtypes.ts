@@ -1,11 +1,11 @@
 // To be merged with commandbase.js
 import HazelnetClient, { AugmentedCommandInteraction, AugmentedButtonInteraction, AugmentedSelectMenuInteraction, AugmentedUserContextMenuInteraction } from "./hazelnetclient";
-import { ContextMenuCommandBuilder, Guild, RESTPostAPIApplicationCommandsJSONBody, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import { ContextMenuCommandBuilder, Guild, RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
 
 export interface BotCommand {
   getCommandData(locale: string, commandsToEnable?: string[]): SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder
   getContextMenuData?(locale: string): ContextMenuCommandBuilder
-  augmentPermissions(json: RESTPostAPIApplicationCommandsJSONBody): RESTPostAPIApplicationCommandsJSONBody
+  augmentPermissions(json: RESTPostAPIChatInputApplicationCommandsJSONBody): RESTPostAPIChatInputApplicationCommandsJSONBody
   commandTags?: string[],
   execute(interaction: AugmentedCommandInteraction): void
   executeSelectMenu?(interaction: AugmentedSelectMenuInteraction): void
