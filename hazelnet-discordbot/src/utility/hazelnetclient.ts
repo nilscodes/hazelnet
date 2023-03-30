@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, ClientOptions, Collection, SelectMenuInteraction, ButtonInteraction, UserContextMenuCommandInteraction, Message, Guild } from 'discord.js';
+import { ChatInputCommandInteraction, Client, ClientOptions, Collection, SelectMenuInteraction, ButtonInteraction, UserContextMenuCommandInteraction, Message, Guild, ClientApplication } from 'discord.js';
 import { CommandMetrics } from './metrics';
 import { Logger } from 'pino'
 import type Services from '../services';
@@ -23,7 +23,7 @@ export interface AugmentedMessage extends Message {
   client: HazelnetClient
 }
 
-export default class HazelnetClient extends Client {
+export default class HazelnetClient extends Client<true> {
   services: typeof Services;
   logger: Logger;
   commands: Collection<unknown, unknown>;
