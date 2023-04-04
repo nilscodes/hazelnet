@@ -50,7 +50,7 @@ export default <InteractionCreateDiscordEvent> {
             guild: interaction.guild?.id,
           })
           .observe(durationInMs);
-      } else if (interaction.isSelectMenu()) {
+      } else if (interaction.isStringSelectMenu()) {
         const commandForSelect = interaction.customId.split('/')[0];
         const command: any = client.commands.get(commandForSelect);
         if (!command) return;
