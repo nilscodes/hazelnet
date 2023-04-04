@@ -95,11 +95,21 @@ export default {
   },
   getCurrentResults(discordServer: DiscordServer, poll: Poll, result: VoteData, tokenMetadata: TokenMetadata | null) {
     const decimals = (poll.weighted && tokenMetadata?.decimals?.value) || 0;
-    return poll.options
+    let totalVotes = 0;
+    const resultList = poll.options
       .map((option, idx) => {
-        const formattedVotes = discordServer.formatNumber(this.calculateVotingNumber(result.votes[option.id], decimals));
+        const votes = this.calculateVotingNumber(result.votes[option.id], decimals);
+        totalVotes += votes;
+        const formattedVotes = discordServer.formatNumber(votes);
         return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
-      }).join('\n');
+      });
+    const formattedVoteCount = discordServer.formatNumber(totalVotes)
+    resultList.push(i18n.__({ phrase: 'vote.currentResultsTotalVotes', locale: discordServer.getBotLanguage() }, { formattedVoteCount }));
+    if (poll.weighted || poll.voteaireUUID) {
+      const formattedVoterCount = discordServer.formatNumber(result.voterCount);
+      resultList.push(i18n.__({ phrase: 'vote.currentResultsTotalVoters', locale: discordServer.getBotLanguage() }, { formattedVoterCount }));
+    }
+    return resultList.join('\n');
   },
   getCurrentOptions(poll: Poll) {
     return poll.options
