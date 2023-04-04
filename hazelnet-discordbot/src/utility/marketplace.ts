@@ -111,7 +111,7 @@ export default {
       case MarketplaceLinkType.CNFTJUNGLE:
         return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnCnftJungle', locale }))
-          .setURL(`https://www.cnftjungle.io/collections/${linkData.policyId}?assetId=${linkData.policyId}.${encodeURIComponent(linkData.assetName)}`)
+          .setURL(`https://www.jngl.io/asset/${linkData.policyId}${linkData.assetNameHex}`)
           .setStyle(ButtonStyle.Link);
       case MarketplaceLinkType.POOLPMHANDLE:
         return new ButtonBuilder()
