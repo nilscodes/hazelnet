@@ -438,6 +438,8 @@
 		"pollInfoTitle": "Information about this poll",
 		"optionList": "Multiple options allowed: {{multipleVotes}}\nToken-based vote: {{tokenBased}}\nWeighted vote: {{weighted}}",
 		"currentResults": "Current results",
+		"currentResultsTotalVotes": "Total votes: **{{formattedVoteCount}}**",
+		"currentResultsTotalVoters": "Number of voters: **{{formattedVoterCount}}**",
 		"resultsNotVisible": "The results of this poll are hidden until the team publishes them.",
 		"yourVotingPower": "Your voting power",
 		"votingPowerMultiple": "Based on token ownership for this poll you have a total voting power of **{{totalVotingPower}}{{unit}}** in your verified wallets.",

@@ -86,30 +86,33 @@ class DiscordPollService(
     }
 
     private fun getExistingVotesFromPoll(poll: DiscordPoll): VoteData {
-        val existingVotes = if (poll.voteaireUUID != null) {
+        return if (poll.voteaireUUID != null) {
             getExistingVotesFromVoteaireBallot(poll)
         } else {
             getExistingVotesFromDiscordPoll(poll)
         }
-        return VoteData(existingVotes)
     }
 
-    private fun getExistingVotesFromDiscordPoll(poll: DiscordPoll) = poll.options
-        .associate { option ->
-            Pair(
-                option.id!!,
-                option.votes.sumOf { it.weight }
-            )
-        }
+    private fun getExistingVotesFromDiscordPoll(poll: DiscordPoll): VoteData {
+        return VoteData(poll.options
+            .associate { option ->
+                Pair(
+                    option.id!!,
+                    option.votes.sumOf { it.weight }
+                )
+            }, poll.options.sumOf { it.votes.size })
+    }
 
-    private fun getExistingVotesFromVoteaireBallot(poll: DiscordPoll) =
-        voteaireService.getProposalResults(poll.voteaireUUID!!)
+    private fun getExistingVotesFromVoteaireBallot(poll: DiscordPoll): VoteData {
+        val results = voteaireService.getProposalResults(poll.voteaireUUID!!)
+        return VoteData(results
             .questions[0].responses.associate { choice ->
             Pair(
                 poll.options.find { it.text == choice.choice }?.id ?: 0,
                 choice.choiceWeight!!
             )
-        }
+        }, results.questions[0].responses.sumOf { it.choiceVotes ?: 0 })
+    }
 
     fun getVoteOfUser(guildId: Long, pollId: Int, externalAccountId: Long): VoteData {
         val discordServer = discordServerService.getDiscordServer(guildId)
@@ -134,7 +137,7 @@ class DiscordPollService(
             .filter { it.value > 0 }
             .toMutableMap()
         existingVotes[0] = totalVotingPower
-        return VoteData(existingVotes)
+        return VoteData(existingVotes, 1)
     }
 
     fun getVotingPower(poll: DiscordPoll, externalAccountId: Long): Long {

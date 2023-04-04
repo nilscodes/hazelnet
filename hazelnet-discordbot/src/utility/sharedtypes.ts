@@ -511,6 +511,7 @@ type DecimalsTokenMetadata = {
 
 export type VoteData = {
     votes: VoteMap
+    voterCount: number
 }
 
 type VoteMap = {
