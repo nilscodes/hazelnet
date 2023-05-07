@@ -1,6 +1,6 @@
 import { APIEmbedField, EmbedAuthorOptions, EmbedBuilder, EmbedFooterOptions, HexColorString } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, ExternalAccount } from './sharedtypes';
+import { DiscordServer, ExternalAccount } from '@vibrantnet/core';
 
 export default {
   buildForUserWithAd(externalAccount: ExternalAccount, discordServer: DiscordServer, title: string, message: string, commandId: string, fields?: APIEmbedField[], image?: string) {

@@ -1,7 +1,6 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Poll } from '../../utility/polltypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
@@ -33,7 +32,7 @@ export default <PollUpdateRemoveRoleCommand> {
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-poll/update-removerole/chooserole') {
       const pollId = +interaction.values[0].substring('configure-poll-'.length);
-      const polls = await interaction.client.services.discordserver.getPolls(guild.id) as Poll[];
+      const polls = await interaction.client.services.discordserver.getPolls(guild.id);
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
         if (poll.requiredRoles && poll.requiredRoles.length) {
@@ -65,7 +64,7 @@ export default <PollUpdateRemoveRoleCommand> {
       }
     } else if (interaction.customId === 'configure-poll/update-removerole/complete') {
       const [pollId, roleToRemove] = interaction.values[0].split('-');
-      const polls = await interaction.client.services.discordserver.getPolls(guild.id) as Poll[];
+      const polls = await interaction.client.services.discordserver.getPolls(guild.id);
       const poll = polls.find((pollForDetails) => pollForDetails.id === +pollId);
       if (poll && poll.requiredRoles) {
         const requiredRoles = poll.requiredRoles.filter((role) => role.roleId !== roleToRemove);

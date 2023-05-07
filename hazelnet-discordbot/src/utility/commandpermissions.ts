@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { ApplicationCommandPermissionType, Guild } from "discord.js";
 import HazelnetClient from "./hazelnetclient";
-import { DiscordServer } from "./sharedtypes";
+import { DiscordServer } from '@vibrantnet/core';
 
 export default {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],

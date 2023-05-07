@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import discordstring from './discordstring';
-import { DiscordMintCounterUpdate, MetadataFilter, PolicyInfo, TokenOwnershipAggregationType } from './sharedtypes';
+import { DiscordMintCounterUpdate, MetadataFilter, PolicyInfo, TokenOwnershipAggregationType } from '@vibrantnet/core';
 
 export default {
   isValidAssetFingerprint(assetFingerprint: string) {

@@ -1,7 +1,7 @@
-import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-import { BaseGuildVoiceChannel, ChannelType } from "discord.js";
-import cardanoaddress from '../../utility/cardanoaddress';
+import { BaseGuildVoiceChannel, ChannelType } from 'discord.js';
+import { BotSubcommand } from '../../utility/commandtypes';
+import epochClockUtil from '../../utility/epochclockutil';
 import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
@@ -17,7 +17,7 @@ export default <BotSubcommand> {
           if (newStatus !== false) {
             const epochDetails = await interaction.client.services.cardanoinfo.epochDetails();
             if (epochDetails.estimatedSecondsLeft > 0) {
-              const epochClock = cardanoaddress.buildEpochClockText(epochDetails);
+              const epochClock = epochClockUtil.buildEpochClockText(epochDetails);
               await (clockChannel as BaseGuildVoiceChannel).setName(epochClock);
             }
           }

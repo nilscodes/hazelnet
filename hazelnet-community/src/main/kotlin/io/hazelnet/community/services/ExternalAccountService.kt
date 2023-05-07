@@ -1,10 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.CommunityApplicationConfiguration
-import io.hazelnet.community.data.Account
-import io.hazelnet.community.data.ExternalAccount
-import io.hazelnet.community.data.ExternalAccountPremiumInfo
-import io.hazelnet.community.data.Verification
+import io.hazelnet.community.data.*
 import io.hazelnet.community.data.premium.PremiumStakedInfo
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
@@ -65,6 +62,29 @@ class ExternalAccountService(
     fun getExternalAccountVerifications(externalAccountId: Long): List<Verification> {
         val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
         return verificationRepository.findAllByExternalAccount(externalAccount)
+    }
+
+    @Transactional
+    fun addExternalAccountVerification(externalAccountId: Long, verification: VerificationDto): Verification {
+        val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
+        val newVerification = Verification(
+            id = null,
+            externalAccount = externalAccount,
+            address = verification.address,
+            blockchain = verification.blockchain,
+            cardanoStakeAddress = verification.cardanoStakeAddress,
+            transactionHash = verification.transactionHash,
+            amount = verification.amount,
+            validAfter = verification.validAfter,
+            validBefore = verification.validBefore,
+            confirmed = verification.confirmed,
+            confirmedAt = verification.confirmedAt,
+            obsolete = verification.obsolete,
+            succeededBy = verification.succeededBy,
+        )
+        val createdVerification = verificationRepository.save(newVerification);
+        verificationRepository.invalidateOutdatedVerifications(createdVerification.cardanoStakeAddress!!, createdVerification.id!!)
+        return createdVerification
     }
 
     fun getVerifiedStakeAddressesForExternalAccount(externalAccountId: Long): Set<String> {

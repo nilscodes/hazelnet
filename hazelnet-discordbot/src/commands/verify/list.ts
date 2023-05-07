@@ -1,8 +1,10 @@
 import i18n from 'i18n';
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder,
+} from 'discord.js';
+import { cardanoaddress } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
-import cardanoaddress from '../../utility/cardanoaddress';
 
 export default <BotSubcommand> {
   async execute(interaction) {
@@ -28,9 +30,12 @@ export default <BotSubcommand> {
         if (confirmedVerifications.length) {
           verificationInfoFields.push(...confirmedVerifications.map((verification) => {
             const stakeShort = verification.cardanoStakeAddress!.substring(0, 10);
-            let confirmationText = i18n.__({ phrase: 'verify.list.confirmedData', locale }, { verification } as any);
-            if (!verification.transactionHash || !cardanoaddress.isTransactionHash(verification.transactionHash)) {
-              confirmationText = i18n.__({ phrase: 'verify.list.confirmedDataImport', locale }, { verification } as any);
+            const verificationConfirmedTimestamp = Math.floor(new Date(verification.confirmedAt!).getTime() / 1000);
+            let confirmationText = i18n.__({ phrase: 'verify.list.confirmedData', locale }, { verification, verificationConfirmedTimestamp } as any);
+            if (verification.transactionHash === 'CIP-0030') {
+              confirmationText = i18n.__({ phrase: 'verify.list.confirmedDataCip30', locale }, { verification, verificationConfirmedTimestamp } as any);
+            } else if (!verification.transactionHash || !cardanoaddress.isTransactionHash(verification.transactionHash)) {
+              confirmationText = i18n.__({ phrase: 'verify.list.confirmedDataImport', locale }, { verification, verificationConfirmedTimestamp } as any);
             }
             return {
               name: i18n.__({ phrase: 'verify.list.confirmedVerificationFor', locale }, { stakeShort }),

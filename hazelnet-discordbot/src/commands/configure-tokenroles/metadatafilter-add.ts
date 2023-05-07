@@ -1,5 +1,5 @@
 import i18n from 'i18n';
-import { AttributeOperatorType } from '../../utility/sharedtypes';
+import { AttributeOperatorType } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import tokenroles from '../../utility/tokenroles';
 import embedBuilder from '../../utility/embedbuilder';

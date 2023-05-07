@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import cardanotoken from './cardanotoken';
 import discordstring from './discordstring';
-import { TokenOwnershipAggregationType, TokenOwnershipRole, TokenPolicy, TokenStakingType } from "./sharedtypes";
+import { TokenOwnershipAggregationType, TokenOwnershipRole, TokenPolicy, TokenStakingType } from '@vibrantnet/core';
 
 export default {
   getTokenRoleDetailsFields(tokenRole: TokenOwnershipRole, tokenPolicies: TokenPolicy[], locale: string, includeAllDetails: boolean = false, customTokenRoleMessage: string | false = false) {

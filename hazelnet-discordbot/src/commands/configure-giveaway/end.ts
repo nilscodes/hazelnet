@@ -1,8 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder, ButtonStyle, GuildTextBasedChannel } from "discord.js"
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import giveawayutil, { Giveaway, GiveawayDrawType, WinnerList } from '../../utility/giveaway';
+import giveawayutil from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
+import { Giveaway, GiveawayDrawType } from '@vibrantnet/core';
 
 interface GiveawayEndCommand extends BotSubcommand {
   createRedrawButton(giveaway: Giveaway, locale: string): ButtonBuilder
@@ -86,7 +87,7 @@ export default <GiveawayEndCommand> {
     if (giveaway) {
       if (interaction.customId.indexOf('configure-giveaway/end/redraw') === 0) {
         try {
-          const winners = await interaction.client.services.discordserver.drawWinners(guild.id, giveaway.id) as WinnerList;
+          const winners = await interaction.client.services.discordserver.drawWinners(guild.id, giveaway.id);
           const detailFields = giveawayutil.getGiveawayDetails(locale, giveaway);
           const firstChunkSize = detailFields.length + 1;
           const chunkSize = giveaway.drawType == GiveawayDrawType.CARDANO_ADDRESS ? 4 : 10;
@@ -114,8 +115,8 @@ export default <GiveawayEndCommand> {
         const participation = await interaction.client.services.discordserver.getParticipationForGiveaway(guild.id, giveaway.id);
         const tokenMetadata = await giveawayutil.getTokenMetadataFromRegistry(guild.id, giveaway, interaction.client);
         const { detailFields } = giveawayutil.getGiveawayAnnouncementParts(discordServer, giveaway, participation, tokenMetadata);
-        const winners = await interaction.client.services.discordserver.getWinnerList(guild.id, giveaway.id) as WinnerList;
-        const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners, guild);
+        const winners = await interaction.client.services.discordserver.getWinnerList(guild.id, giveaway.id);
+        const winnerFields = await giveawayutil.getWinnerInfo(giveaway, locale, winners!, guild);
         detailFields.push(...winnerFields);
         const embedPublic = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'configure.giveaway.announce.publicSuccess', locale }), 'vote', detailFields);
         const announceChannel = await guild.channels.fetch(giveaway.channelId) as GuildTextBasedChannel;

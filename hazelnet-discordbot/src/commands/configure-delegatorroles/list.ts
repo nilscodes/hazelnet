@@ -1,6 +1,6 @@
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-import { DelegatorRole, Stakepool } from '../../utility/sharedtypes';
+import { DelegatorRole, Stakepool } from '@vibrantnet/core';
 import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {

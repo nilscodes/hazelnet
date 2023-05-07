@@ -1,6 +1,6 @@
 import i18n from 'i18n';
-import bans, { BanResponseType, BanType } from '../../utility/bans';
-import cardanoaddress from '../../utility/cardanoaddress';
+import { BanResponseType, BanType, cardanoaddress } from '@vibrantnet/core';
+import bans from '../../utility/bans';
 import cardanotoken from '../../utility/cardanotoken';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
@@ -19,10 +19,10 @@ export default <BotSubcommand> {
         value: reason.length ? reason : i18n.__({ phrase: 'configure.bans.list.banReasonNoneGiven', locale }),
       }];
       if (type === BanType.ASSET_FINGERPRINT_BAN && !cardanotoken.isValidAssetFingerprint(pattern)) {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.banFailAssetFingerprint', locale: locale }, { pattern }), 'configure-bans-add', proposedBanFields);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.banFailAssetFingerprint', locale }, { pattern }), 'configure-bans-add', proposedBanFields);
         await interaction.editReply({ embeds: [embed] });
       } else if (type === BanType.STAKE_ADDRESS_BAN && !cardanoaddress.isStakeAddress(pattern)) {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.banFailStakeAddress', locale: locale }, { pattern }), 'configure-bans-add', proposedBanFields);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.banFailStakeAddress', locale }, { pattern }), 'configure-bans-add', proposedBanFields);
         await interaction.editReply({ embeds: [embed] });
       } else {
         const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
@@ -36,7 +36,7 @@ export default <BotSubcommand> {
         };
         const newBan = await interaction.client.services.discordbans.addBan(interaction.guild!.id, newBanData);
         const banFields = bans.getBanDetailsFields(newBan, externalAccount, locale);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.success', locale: locale }), 'configure-bans-add', banFields);
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans add', i18n.__({ phrase: 'configure.bans.add.success', locale }), 'configure-bans-add', banFields);
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {

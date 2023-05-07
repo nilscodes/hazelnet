@@ -2,7 +2,7 @@
 import i18n from 'i18n';
 import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
 import HazelnetClient from "../utility/hazelnetclient";
-import { MintAnnouncement } from "../utility/sharedtypes";
+import { MintAnnouncement } from '@vibrantnet/core';
 import embedBuilder from '../utility/embedbuilder';
 import marketplace from '../utility/marketplace';
 import discordpermissions from '../utility/discordpermissions';

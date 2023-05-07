@@ -4,7 +4,7 @@ import HazelnetClient from "../utility/hazelnetclient";
 import {  GuildTextBasedChannel } from 'discord.js';
 import pollutil from '../utility/poll';
 import embedBuilder from '../utility/embedbuilder';
-import { VoteData } from "../utility/sharedtypes";
+import { VoteData } from '@vibrantnet/core';
 import discordpermissions from '../utility/discordpermissions';
 
 export default {

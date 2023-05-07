@@ -1,6 +1,6 @@
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from './sharedtypes';
+import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from '@vibrantnet/core';
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 import nftcdn, { NftCdnAttachment } from './nftcdn';

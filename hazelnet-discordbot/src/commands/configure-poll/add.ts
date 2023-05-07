@@ -1,15 +1,18 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Poll, PollOption, PollPartial } from '../../utility/polltypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageCollector, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import cardanotoken from '../../utility/cardanotoken';
 import poll from '../../utility/poll';
 import datetime from '../../utility/datetime';
 import discordemoji from '../../utility/discordemoji';
-import { DiscordServer } from '../../utility/sharedtypes';
+import { DiscordServer, Poll, PollOption, PollPartial } from '@vibrantnet/core';
+
+interface PollPartialWithCollector extends PollPartial {
+  optionCollector?: MessageCollector
+}
 
 interface PollAddCommand extends BotSubcommand {
   cache: NodeCache
@@ -433,7 +436,7 @@ export default <PollAddCommand> {
         await interaction.update({ embeds: [embed], components: [] });
         this.startPhase3(interaction, discordServer, pollObjectPhase3);
       } else if (interaction.customId === 'configure-poll/add/startphase4') {
-        const { optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartial;
+        const { optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartialWithCollector;
         optionCollector!.stop('cancelled');
         this.startPhase4(interaction, discordServer, pollObject);
       } else if (interaction.customId === 'configure-poll/add/startphase5' || interaction.customId === 'configure-poll/add/redophase5') {
@@ -446,7 +449,7 @@ export default <PollAddCommand> {
         await interaction.update({ embeds: [embed], components: [] });
         this.startPhase2(interaction, discordServer, pollObject);
       } else if (interaction.customId === 'configure-poll/add/redophase3') {
-        const { options, optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartial;
+        const { options, optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartialWithCollector;
         optionCollector!.stop('cancelled');
         const content = this.buildContent(locale, interaction.channel!.id, pollObject, 3);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');

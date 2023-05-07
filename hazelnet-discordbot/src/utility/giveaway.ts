@@ -1,61 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SelectMenuBuilder, ButtonStyle, APIEmbedField, Guild, DiscordAPIError } from "discord.js"
-import { DiscordRequiredRole } from "./polltypes"
+import {
+  ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SelectMenuBuilder, ButtonStyle, APIEmbedField, Guild, DiscordAPIError,
+} from 'discord.js';
 import i18n from 'i18n';
-import HazelnetClient from "./hazelnetclient";
-import { DiscordServer, TokenMetadata } from "./sharedtypes";
-import cardanoaddress from "./cardanoaddress";
-
-export type Giveaway = {
-  name: string
-  displayName: string,
-  id: number
-  description: string,
-  requiredRoles: DiscordRequiredRole[]
-  createTime?: string
-  openAfter?: string
-  openUntil?: string
-  snapshotTime?: string
-  weighted?: boolean
-  uniqueWinners?: boolean
-  channelId?: string
-  messageId?: string
-  snapshotIds: number[]
-  creator: number
-  winnerCount: number
-  drawType: GiveawayDrawType
-  archived: boolean
-  logoUrl?: string
-}
-
-export type ParticipationData = {
-  participants: number
-  totalEntries: number
-}
-
-export type WinnerList = {
-  winners: string[]
-  winnerCount: number
-  winnerType: GiveawayDrawType
-}
-
-export enum GiveawayDrawType {
-  DISCORD_ID = 'DISCORD_ID',
-  CARDANO_ADDRESS = 'CARDANO_ADDRESS',
-}
-
-export interface GiveawayPartial extends Omit<Giveaway, 'description' | 'id' | 'createTime' | 'snapshotIds' | 'archived' | 'name' | 'winnerCount' | 'displayName' | 'creator' | 'drawType' | 'requiredRoles'> {
-  name?: string
-  displayName?: string,
-  description?: string
-  tokenType?: string
-  assetFingerprint?: string
-  policyId?: string
-  snapshotIds?: number[]
-  requiredRoles?: DiscordRequiredRole[]
-  drawType?: GiveawayDrawType
-  winnerCount?: number
-  archived?: boolean
-}
+import {
+  DiscordServer, Giveaway, GiveawayDrawType, ParticipationData, TokenMetadata, WinnerList, cardanoaddress,
+} from '@vibrantnet/core';
+import HazelnetClient from './hazelnetclient';
 
 export default {
   isValidName(giveawayName: string) {
@@ -168,10 +118,9 @@ export default {
     this.augmentGiveawayDates(giveaway, detailFields, locale);
     this.augmentGiveawayOptions(giveaway, detailFields, locale);
     detailFields.push({
-        name: i18n.__({ phrase: 'configure.giveaway.list.detailsChannel', locale }),
-        value: giveaway.channelId ? i18n.__({ phrase: 'configure.giveaway.list.announcementChannel', locale }, { giveaway } as any) : i18n.__({ phrase: 'configure.giveaway.list.announcementNone', locale }),
-      },
-    );
+      name: i18n.__({ phrase: 'configure.giveaway.list.detailsChannel', locale }),
+      value: giveaway.channelId ? i18n.__({ phrase: 'configure.giveaway.list.announcementChannel', locale }, { giveaway } as any) : i18n.__({ phrase: 'configure.giveaway.list.announcementNone', locale }),
+    });
     this.augmentRequiredRoles(giveaway, detailFields, locale);
     return detailFields;
   },
@@ -195,7 +144,8 @@ export default {
           tokenBased: giveaway.snapshotIds.length ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
           weighted: giveaway.weighted ? i18n.__({ phrase: 'generic.yes', locale }) : i18n.__({ phrase: 'generic.no', locale }),
         }),
-      });
+      },
+    );
   },
   augmentRequiredRoles(giveaway: Giveaway, detailFields: APIEmbedField[], locale: string) {
     if (giveaway.requiredRoles?.length) {
@@ -217,9 +167,8 @@ export default {
     const formattedEntries = discordServer.formatNumber(this.calculateParticipationCountNumber(participation.totalEntries, decimals));
     if (giveaway.weighted) {
       return i18n.__({ phrase: 'configure.giveaway.list.participationWeighted', locale }, { entrants: `${participation.participants}`, entries: formattedEntries });
-    } else {
-      return i18n.__({ phrase: 'configure.giveaway.list.participation', locale }, { entries: formattedEntries });
     }
+    return i18n.__({ phrase: 'configure.giveaway.list.participation', locale }, { entries: formattedEntries });
   },
   calculateParticipationCountNumber(votingPower: number, decimals: number) {
     return Math.floor(votingPower / (10 ** decimals));
@@ -250,7 +199,7 @@ export default {
       const buttons = [new ButtonBuilder()
         .setCustomId(`join/widgetjoin/giveaway/${giveaway.id}`)
         .setLabel(i18n.__({ phrase: 'join.joinGiveawayButton', locale }))
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Primary),
       ];
 
       if (giveaway.snapshotIds.length) {
@@ -269,21 +218,22 @@ export default {
     }
     return null;
   },
-  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild, shortenAddresses: boolean = true): Promise<APIEmbedField[]> {
+  async getWinnerInfo(giveaway: Giveaway, locale: string, winnerList: WinnerList, guild: Guild, shortenAddresses = true): Promise<APIEmbedField[]> {
     const winnerTextList = [];
     if (giveaway.drawType === GiveawayDrawType.DISCORD_ID) {
       for (let i = 0, len = winnerList.winners.length; i < len; i += 1) {
         try {
+          // eslint-disable-next-line no-await-in-loop
           const member = await guild.members.fetch(winnerList.winners[i]);
-          winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawDiscordId', locale}, { place: `${i + 1}`, userId: member.user.id }));
+          winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawDiscordId', locale }, { place: `${i + 1}`, userId: member.user.id }));
         } catch (e) {
           if ((e as DiscordAPIError).code === 10013) {
-            winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawError', locale}, { place: `${i + 1}` }));
+            winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawError', locale }, { place: `${i + 1}` }));
           }
         }
       }
-    } else if(giveaway.drawType === GiveawayDrawType.CARDANO_ADDRESS) {
-      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale}, { place: `${idx + 1}`, winnerAddress: (shortenAddresses ? cardanoaddress.shorten(winnerAddress) : winnerAddress) })));
+    } else if (giveaway.drawType === GiveawayDrawType.CARDANO_ADDRESS) {
+      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale }, { place: `${idx + 1}`, winnerAddress: (shortenAddresses ? cardanoaddress.shorten(winnerAddress) : winnerAddress) })));
     }
 
     const CHUNK_SIZE = 8;
@@ -300,5 +250,5 @@ export default {
       });
     }
     return winnerFields;
-  }
-}
+  },
+};

@@ -1,25 +1,15 @@
-import discordserver from "./services/discordserver";
-import discordquiz from "./services/discord/quiz";
-import discordbans from "./services/discord/bans";
-import globalsettings from "./services/globalsettings";
-import accounts from "./services/accounts";
-import externalaccounts from "./services/externalaccounts";
-import pings from "./services/pings";
-import verifications from "./services/verifications";
-import cardanoinfo from "./services/cardanoinfo";
-import claimlists from "./services/claimlists";
-import snapshots from "./services/snapshots";
+import { AccountsApi, ClaimListsApi, DiscordBanApi, DiscordServerApi, DiscordQuizApi, ExternalAccountsApi, GlobalSettingsApi, CardanoInfoApi, PingsApi, SnapshotsApi, VerificationsApi } from '@vibrantnet/core';
 
 export default {
-  discordserver,
-  discordquiz,
-  discordbans,
-  globalsettings,
-  accounts,
-  externalaccounts,
-  pings,
-  verifications,
-  cardanoinfo,
-  claimlists,
-  snapshots,
+  discordserver: new DiscordServerApi(process.env.HAZELNET_COMMUNITY_URL!),
+  discordquiz: new DiscordQuizApi(process.env.HAZELNET_COMMUNITY_URL!),
+  discordbans: new DiscordBanApi(process.env.HAZELNET_COMMUNITY_URL!),
+  globalsettings: new GlobalSettingsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  accounts: new AccountsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  externalaccounts: new ExternalAccountsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  pings: new PingsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  verifications: new VerificationsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  cardanoinfo: new CardanoInfoApi(process.env.HAZELNET_CONNECT_URL!),
+  claimlists: new ClaimListsApi(process.env.HAZELNET_COMMUNITY_URL!),
+  snapshots: new SnapshotsApi(process.env.HAZELNET_COMMUNITY_URL!),
 };

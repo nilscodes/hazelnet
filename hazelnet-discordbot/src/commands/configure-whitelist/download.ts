@@ -7,7 +7,7 @@ import {
   SelectMenuBuilder,
 } from 'discord.js';
 import { stringify } from 'csv-stringify/sync';
-import { Whitelist, SharedWhitelistSignup, SharedWhitelist } from '../../utility/sharedtypes';
+import { Whitelist, SharedWhitelistSignup, SharedWhitelist } from '@vibrantnet/core';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 

@@ -5,7 +5,7 @@ import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../util
 import embedBuilder from '../utility/embedbuilder';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
-import { DiscordServer, DiscordServerMember } from '../utility/sharedtypes';
+import { DiscordServer, DiscordServerMember } from '@vibrantnet/core';
 
 type InterfaceInfo = {
   image: string

@@ -1,80 +1,8 @@
 import i18n from 'i18n';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder } from "discord.js"
 import giveaway from "./giveaway"
-import { DiscordRequiredRole } from "./polltypes"
-import { DiscordServer } from "./sharedtypes"
+import { DiscordQuizApi, DiscordServer, Quiz } from '@vibrantnet/core'
 import HazelnetClient from './hazelnetclient';
-import discordquiz from '../services/discord/quiz';
-
-export type Quiz = {
-  name: string
-  displayName: string,
-  id: number
-  description: string,
-  requiredRoles: DiscordRequiredRole[]
-  createTime?: string
-  openAfter?: string
-  openUntil?: string
-  channelId?: string
-  messageId?: string
-  creator: number
-  winnerCount: number
-  archived: boolean
-  logoUrl?: string
-  awardedRole?: string
-  attemptsPerQuestion: number
-  correctAnswersRequired: number
-}
-
-export interface QuizPartial extends Omit<Quiz, 'description' | 'id' | 'createTime' | 'archived' | 'name' | 'winnerCount' | 'displayName' | 'creator' | 'requiredRoles' | 'attemptsPerQuestion' | 'correctAnswersRequired'> {
-  name?: string
-  displayName?: string,
-  description?: string
-  requiredRoles?: DiscordRequiredRole[]
-  winnerCount?: number
-  archived?: boolean
-  attemptsPerQuestion?: number
-  correctAnswersRequired?: number
-}
-
-export type QuizQuestion = {
-  id: number
-  text: string
-  order: number
-  answer0: string
-  answer1: string
-  answer2?: string
-  answer3?: string
-  correctAnswer: number
-  correctAnswerDetails?: string
-  shuffleAnswers: boolean
-}
-
-export type QuizCompletion = {
-  externalAccountId: string
-  time: string
-  correctAnswers: number
-  qualifies: boolean
-  address?: string
-}
-
-export type DiscordQuizUpdate = {
-  guildId: string
-  quizId: number
-  channelId: string
-  messageId: string
-}
-
-export type QuizParticipation = {
-  answers: QuizAnswer[]
-}
-
-export type QuizAnswer = {
-  questionId: number
-  correct: boolean
-  attempts: number
-  wrongAnswers: number[]
-}
 
 export default {
   fisherYatesShuffle(toShuffle: any[]) {
@@ -161,7 +89,7 @@ export default {
     return (await client.services.discordquiz.listQuizQuestions(guildId, quizId))
         .sort((questionA, questionB) => questionA.order - questionB.order);
   },
-  async saveQuizCompletion(service: typeof discordquiz, guildId: string, quizId: number, correct: number, qualifies: boolean, externalAccountId: string, address?: string) {
+  async saveQuizCompletion(service: DiscordQuizApi, guildId: string, quizId: number, correct: number, qualifies: boolean, externalAccountId: string, address?: string) {
     service.addQuizCompletion(guildId, quizId, {
       correctAnswers: correct,
       externalAccountId,
@@ -170,8 +98,8 @@ export default {
       address,
     });
   },
-  async getQuizById(service: typeof discordquiz, guildId: string, quizId: number): Promise<Quiz | undefined> {
-    const quizzes = await discordquiz.getQuizzes(guildId);
+  async getQuizById(service: DiscordQuizApi, guildId: string, quizId: number): Promise<Quiz | undefined> {
+    const quizzes = await service.getQuizzes(guildId);
     const quiz = quizzes.find((quizForDetails) => quizForDetails.id === quizId);
     return quiz;
   }

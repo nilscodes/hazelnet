@@ -1,8 +1,8 @@
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
+import { cardanoaddress } from '@vibrantnet/core';
+import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
-import cardanoaddress from '../../utility/cardanoaddress';
 
 export default <BotSubcommand> {
   async execute(interaction) {

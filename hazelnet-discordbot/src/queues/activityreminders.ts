@@ -2,7 +2,7 @@ import { GuildTextBasedChannel } from "discord.js";
 import i18n from 'i18n';
 import HazelnetClient from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
-import { DiscordServer } from "../utility/sharedtypes";
+import { DiscordServer } from '@vibrantnet/core';
 import discordpermissions from "../utility/discordpermissions";
 
 export type DiscordActivityReminder = {

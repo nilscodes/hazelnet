@@ -5,5 +5,5 @@ import com.fasterxml.jackson.annotation.JsonCreator
 data class VerificationRequest @JsonCreator constructor(
     val blockchain: BlockchainType,
     val address: String,
-    val externalAccountId: Long
+    val externalAccountId: Long,
 )

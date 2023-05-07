@@ -29,7 +29,7 @@ discordbot-docker:
         - "hazelnet-discordbot/**/*"
 
 gradle-build:
-  image: gradle:alpine
+  image: gradle:7-jdk17-alpine
 
   variables:
     GRADLE_OPTS: "-Dorg.gradle.daemon=false"

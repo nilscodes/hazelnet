@@ -212,12 +212,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Verification"
-        default:
-          description: Unexpected error
+    post:
+      summary: Add a specific verification to an external account (only for CIP-0030 verification)
+      description: Use root /verifications endpoint for dust-based verification requests without CIP-0030
+      operationId: addExternalAccountVerification
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "201":
+          description: Confirmed creation of a new verification
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/Verification"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /externalaccounts/{externalAccountId}/pings:
     get:
       summary: "Get pings for this specific account (sent and received)"
@@ -2336,49 +2349,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  ? /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}
-    : get:
-        summary: Get the whitelist signup for a specific external account for this Discord server
-        operationId: getWhitelistSignup
-        tags:
-          - discord
-          - whitelist
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/WhitelistIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-        responses:
-          "200":
-            description: "Whitelist signup information"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/WhitelistSignup"
-          "404":
-            description: "No whitelist signup for this external account present"
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ErrorResponse"
-          default:
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ErrorResponse"
-      delete:
-        summary: Remove a whitelist signup from this discord server
-        operationId: deleteWhitelistSignup
-        tags:
-          - discord
-          - whitelist
-        parameters:
-          - $ref: "#/components/parameters/GuildIdPathParameter"
-          - $ref: "#/components/parameters/WhitelistIdPathParameter"
-          - $ref: "#/components/parameters/ExternalAccountPathParameter"
-        responses:
-          "204":
-            description: Successful deletion
+  /discord/servers/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}:
+    get:
+      summary: Get the whitelist signup for a specific external account for this Discord server
+      operationId: getWhitelistSignup
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "Whitelist signup information"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhitelistSignup"
+        "404":
+          description: "No whitelist signup for this external account present"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Remove a whitelist signup from this discord server
+      operationId: deleteWhitelistSignup
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
   /discord/servers/{guildId}/settings/{settingName}:
     put:
       summary: Create or update a guild setting with the provided value

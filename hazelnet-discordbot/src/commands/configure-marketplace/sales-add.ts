@@ -2,7 +2,7 @@ import i18n from 'i18n';
 import NodeCache from 'node-cache';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ChannelType, GuildTextBasedChannel, MessageActionRowComponentBuilder, PermissionsBitField, SelectMenuBuilder } from 'discord.js';
-import { DiscordMarketplaceChannelType, DiscordServer, ExternalAccount, Marketplace, MarketplaceChannel, MarketplaceChannelPartial } from '../../utility/sharedtypes';
+import { DiscordMarketplaceChannelType, DiscordServer, ExternalAccount, Marketplace, MarketplaceChannel, MarketplaceChannelPartial } from '@vibrantnet/core';
 import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import marketplaceUtil from '../../utility/marketplace';

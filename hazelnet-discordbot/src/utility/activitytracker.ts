@@ -1,4 +1,4 @@
-import { DiscordServer } from "./sharedtypes";
+import { DiscordServer } from '@vibrantnet/core';
 
 interface EngagementInteractionHandler {
   activity: Map<String, Number>

@@ -1,6 +1,6 @@
 import { APIEmbedField } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, DiscordServerPremiumInfo } from '../../utility/sharedtypes';
+import { DiscordServer, DiscordServerPremiumInfo } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 

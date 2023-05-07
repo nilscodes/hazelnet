@@ -1,8 +1,10 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import {
+  ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder,
+} from 'discord.js';
+import { DiscordServer, TokenOwnershipRole } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, APIEmbed, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
-import { DiscordServer, TokenOwnershipRole } from '../../utility/sharedtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
 import tokenroles from '../../utility/tokenroles';
 import embedBuilder from '../../utility/embedbuilder';
@@ -10,7 +12,15 @@ import cardanotoken from '../../utility/cardanotoken';
 
 interface ConfigureTokenRoleAddCommand extends BotSubcommand {
   cache: NodeCache
-  createTokenRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, policyId: string, minimumTokenQuantity: string, maximumTokenQuantity: string | null, roleId: string, assetFingerprint: string | null): APIEmbed
+  createTokenRole(
+    interaction: AugmentedCommandInteraction | AugmentedButtonInteraction,
+    discordServer: DiscordServer,
+    policyId: string,
+    minimumTokenQuantity: string,
+    maximumTokenQuantity: string | null,
+    roleId: string,
+    assetFingerprint: string | null,
+  ): APIEmbed
   confirm(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToUpdate: TokenOwnershipRole): void
   cancel(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToUpdate: TokenOwnershipRole): void
 }
@@ -102,7 +112,7 @@ export default <ConfigureTokenRoleAddCommand> {
     const addNextStepsField = {
       name: i18n.__({ phrase: 'configure.tokenroles.add.nextStepsTitle', locale }),
       value: i18n.__({ phrase: 'configure.tokenroles.add.nextStepsDetails', locale }),
-    }
+    };
 
     const embed = embedBuilder.buildForAdmin(
       discordServer,

@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
-import { DiscordServer, SummarizedWhitelistSignup, Whitelist, WhitelistSignupContainer } from '../../utility/sharedtypes';
+import { DiscordServer, SummarizedWhitelistSignup, Whitelist, WhitelistSignupContainer } from '@vibrantnet/core';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../../utility/hazelnetclient';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';

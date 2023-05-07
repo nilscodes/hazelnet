@@ -2,8 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActio
 import i18n from 'i18n';
 import discordemoji from './discordemoji';
 import HazelnetClient from './hazelnetclient';
-import { Poll } from './polltypes';
-import { DiscordServer, TokenMetadata, VoteData } from './sharedtypes';
+import { DiscordServer, Poll, TokenMetadata, VoteData } from '@vibrantnet/core';
 
 export default {
   isValidName(pollName: string) {

@@ -118,7 +118,9 @@ class TokenService(
     fun findBestHandleForStakeAddress(stakeAddress: String): Handle {
         val shortestHandle = getMultiAssetListForStakeAddress(stakeAddress, listOf(handlePolicy))
             .find { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
-            ?.assetList?.minByOrNull { it.length }
+            ?.assetList
+                ?.map { it.decodeHex() }
+                ?.minByOrNull { it.length }
         return if (shortestHandle != null) {
             handleService.resolveHandle(shortestHandle)
         } else {

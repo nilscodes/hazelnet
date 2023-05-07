@@ -1,9 +1,9 @@
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import i18n, { Replacements } from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Poll } from '../../utility/polltypes';
 import embedBuilder from '../../utility/embedbuilder';
 import discordemoji from '../../utility/discordemoji';
+import { Poll } from '@vibrantnet/core';
 
 interface PollRemoveCommand extends BotSubcommand {
   getPollChoices(locale: string, polls: Poll[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
