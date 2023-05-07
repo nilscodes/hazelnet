@@ -3,6 +3,7 @@ package io.hazelnet.community.data
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIdentityReference
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.PropertyGenerator
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
@@ -52,6 +53,7 @@ class ExternalAccount @JsonCreator constructor(
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "premium_staked", joinColumns = [JoinColumn(name = "external_account_id")])
+    @JsonIgnore
     var stakeInfo: MutableSet<PremiumStakedInfo> = mutableSetOf(),
 ) {
     override fun equals(other: Any?): Boolean {

@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { AttributeOperatorType, MarketplaceChannel } from '../../utility/sharedtypes';
+import { AttributeOperatorType, MarketplaceChannel } from '@vibrantnet/core';
 import embedBuilder from '../../utility/embedbuilder';
 import marketplace from '../../utility/marketplace';
 

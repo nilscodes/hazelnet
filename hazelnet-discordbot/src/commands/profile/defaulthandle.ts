@@ -1,10 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from "discord.js";
-import { BotSubcommand } from "../../utility/commandtypes";
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder,
+} from 'discord.js';
 import i18n from 'i18n';
-import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from "../../utility/hazelnetclient";
-import adahandle  from '../../utility/adahandle';
+import { Account, DiscordServer, adahandle } from '@vibrantnet/core';
+import { BotSubcommand } from '../../utility/commandtypes';
+import { AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
-import { Account, DiscordServer } from "../../utility/sharedtypes";
 
 interface DefaultHandleCommand extends BotSubcommand {
   getInteractionComponents(availableHandles: string[], currentDefaultHandle: string, locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -23,7 +24,7 @@ export default <DefaultHandleCommand> {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const mainAccount = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccount.id);
       const allAvailableHandles: string[] = (await interaction.client.services.accounts.getHandlesForAccount(mainAccount.id))
-        .map((handleData) => `\$${handleData.handle}`)
+        .map((handleData) => `$${handleData.handle}`)
         .sort((handleA: string, handleB: string) => handleA.length - handleB.length);
       const availableHandles = allAvailableHandles.slice(0, 25);
       const handleFields = [];
@@ -34,7 +35,7 @@ export default <DefaultHandleCommand> {
       if (newDefaultHandle) {
         if (adahandle.isHandle(newDefaultHandle)) {
           if (allAvailableHandles.includes(newDefaultHandle)) {
-            const embed = await this.setNewDefaultHandle(interaction, mainAccount, newDefaultHandle, discordServer)
+            const embed = await this.setNewDefaultHandle(interaction, mainAccount, newDefaultHandle, discordServer);
             await interaction.editReply({ embeds: [embed] });
           } else {
             const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'profile.defaulthandle.messageTitle', locale }), i18n.__({ phrase: 'profile.defaulthandle.errorNotOwned', locale }, { handle: newDefaultHandle }), 'profile-defaulthandle');
@@ -65,26 +66,24 @@ export default <DefaultHandleCommand> {
     const actions = [];
     if (availableHandles.length) {
       actions.push(new ActionRowBuilder()
-      .addComponents(
-        new SelectMenuBuilder()
-          .setCustomId('profile/defaulthandle/complete')
-          .setPlaceholder(i18n.__({ phrase: 'profile.defaulthandle.chooseHandle', locale }))
-          .addOptions(availableHandles.map((handle) => {
-            return {
+        .addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId('profile/defaulthandle/complete')
+            .setPlaceholder(i18n.__({ phrase: 'profile.defaulthandle.chooseHandle', locale }))
+            .addOptions(availableHandles.map((handle) => ({
               label: handle,
               value: handle,
-            };
-          })),
-      ));
+            }))),
+        ));
     }
     if (currentDefaultHandle) {
       actions.push(new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId('profile/defaulthandle/reset')
-          .setLabel(i18n.__({ phrase: 'profile.defaulthandle.removeDefaultHandle', locale }))
-          .setStyle(ButtonStyle.Danger)
-      ));
+        .addComponents(
+          new ButtonBuilder()
+            .setCustomId('profile/defaulthandle/reset')
+            .setLabel(i18n.__({ phrase: 'profile.defaulthandle.removeDefaultHandle', locale }))
+            .setStyle(ButtonStyle.Danger),
+        ));
     }
     return actions;
   },
@@ -119,5 +118,3 @@ export default <DefaultHandleCommand> {
     return embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'profile.defaulthandle.messageTitle', locale }), i18n.__({ phrase: 'profile.defaulthandle.success', locale }, { handle: newDefaultHandle }), 'profile-defaulthandle');
   },
 };
-
-

@@ -3,7 +3,7 @@ import i18n from 'i18n';
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData, SlashCommandBuilder } from 'discord.js';
 import { BotCommand } from '../utility/commandtypes';
 import { AugmentedButtonInteraction, AugmentedMessage, AugmentedSelectMenuInteraction } from '../utility/hazelnetclient';
-import { ClaimList, ClaimListsWithProducts, DiscordServer, PartialPhysicalOrder, PhysicalOrder, PhysicalOrderItem, PhysicalProduct } from '../utility/sharedtypes';
+import { ClaimList, ClaimListsWithProducts, DiscordServer, PartialPhysicalOrder, PhysicalOrder, PhysicalOrderItem, PhysicalProduct } from '@vibrantnet/core';
 import embedBuilder from '../utility/embedbuilder';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';

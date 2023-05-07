@@ -1,6 +1,6 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { WhitelistType } from '../../utility/sharedtypes';
+import { WhitelistType } from '@vibrantnet/core';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 

@@ -1,16 +1,17 @@
 import NodeCache from 'node-cache';
-import { ActionRowBuilder, APIEmbedField, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SlashCommandBuilder, ButtonStyle, EmbedBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, APIEmbedField, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SlashCommandBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } from 'discord.js';
 import i18n from 'i18n';
+import {
+  DiscordServer, Giveaway, ParticipationData, Quiz, QuizAnswer, QuizParticipation, QuizQuestion, TokenMetadata, cardanoaddress,
+} from '@vibrantnet/core';
 import { AugmentedButtonInteraction } from '../utility/hazelnetclient';
-import { BotCommand } from "../utility/commandtypes";
-import giveawayutil, { Giveaway, ParticipationData } from '../utility/giveaway';
-import quizutil, { Quiz, QuizAnswer, QuizParticipation, QuizQuestion } from '../utility/quiz';
-import { DiscordServer, ExternalAccount, TokenMetadata } from '../utility/sharedtypes';
+import { BotCommand } from '../utility/commandtypes';
+import giveawayutil from '../utility/giveaway';
+import quizutil from '../utility/quiz';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 import embedBuilder from '../utility/embedbuilder';
 import discordstring from '../utility/discordstring';
-import cardanoaddress from '../utility/cardanoaddress';
 import wallet from '../utility/wallet';
 
 type FieldsAndComponents = {
@@ -70,7 +71,7 @@ export default <JoinCommand> {
         if (giveawayutil.userCanSeeGiveaway(member, giveaway)) {
           const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
           if (interaction.customId.indexOf('join/widgetjoin') === 0) {
-            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id) as ParticipationData;
+            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id);
             let phrase = 'join.giveawayInfoTitle';
             if (participationOfUser.participants === 0 && participationOfUser.totalEntries > 0) {
               await interaction.client.services.discordserver.participateAsUser(interaction.guild!.id, giveaway.id, externalAccount.id);
@@ -82,13 +83,13 @@ export default <JoinCommand> {
             await interaction.reply({ embeds: [embed], components, ephemeral: true });
           } else if (interaction.customId.indexOf('join/removeentry') === 0) {
             await interaction.client.services.discordserver.removeParticipationAsUser(interaction.guild!.id, giveaway.id, externalAccount.id);
-            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id) as ParticipationData;
+            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id);
             const { detailFields, components } = await this.getGiveawayDetails(giveaway, interaction, discordServer, member, participationOfUser);
             const embed = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'join.successRemoval', locale }), 'join', detailFields);
             await interaction.update({ embeds: [embed], components });
           } else if (interaction.customId.indexOf('join/addentry') === 0) {
             await interaction.client.services.discordserver.participateAsUser(interaction.guild!.id, giveaway.id, externalAccount.id);
-            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id) as ParticipationData;
+            const participationOfUser = await interaction.client.services.discordserver.getParticipationOfUser(interaction.guild!.id, giveaway.id, externalAccount.id);
             const { detailFields, components } = await this.getGiveawayDetails(giveaway, interaction, discordServer, member, participationOfUser);
             const embed = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase: 'join.success', locale }), 'join', detailFields);
             await interaction.update({ embeds: [embed], components });
@@ -176,7 +177,7 @@ export default <JoinCommand> {
       name: i18n.__({ phrase: 'join.yourEntryWeight', locale }),
       value: this.getUserParticipationText(discordServer, giveaway, totalEntriesForUser, tokenMetadata),
     });
-    let components = [];
+    const components = [];
     if (giveawayutil.userCanParticipateInGiveaway(member, giveaway, totalEntriesForUser)) {
       const hasEntered = participationOfUser.participants > 0;
       if (hasEntered) {
@@ -190,7 +191,7 @@ export default <JoinCommand> {
           new ButtonBuilder()
             .setCustomId(`join/removeentry/${giveaway.id}`)
             .setLabel(i18n.__({ phrase: 'join.removeEntry', locale }))
-            .setStyle(ButtonStyle.Danger)
+            .setStyle(ButtonStyle.Danger),
         ));
       } else {
         detailFields.push({
@@ -201,7 +202,7 @@ export default <JoinCommand> {
           new ButtonBuilder()
             .setCustomId(`join/addentry/${giveaway.id}`)
             .setLabel(i18n.__({ phrase: 'join.addEntry', locale }))
-            .setStyle(ButtonStyle.Primary)
+            .setStyle(ButtonStyle.Primary),
         ));
       }
     }
@@ -364,7 +365,7 @@ export default <JoinCommand> {
   },
   async finalizeQuiz(interaction, discordServer, quiz, allAnsweredQuestions, questions, lastAnsweredQuestion) {
     const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-    const correct = allAnsweredQuestions.filter(answer => answer.correct).length;
+    const correct = allAnsweredQuestions.filter((answer) => answer.correct).length;
     const minimumCorrect = quiz.correctAnswersRequired > 0 ? quiz.correctAnswersRequired : questions.length;
     const locale = discordServer.getBotLanguage();
     const { titlePhrase, mainText } = this.determineMainContentBasedOnLastAnsweredQuestion(locale, allAnsweredQuestions, lastAnsweredQuestion);
@@ -376,7 +377,7 @@ export default <JoinCommand> {
   
         const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
-            new SelectMenuBuilder()
+            new StringSelectMenuBuilder()
               .setCustomId(`join/completequiz/${quiz.id}`)
               .setPlaceholder(i18n.__({ phrase: 'join.chooseAddressForQuizPrize', locale }))
               .addOptions(registerOptions)

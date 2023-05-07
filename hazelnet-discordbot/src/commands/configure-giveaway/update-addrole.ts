@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import giveawayutil, { Giveaway } from '../../utility/giveaway';
+import giveawayutil from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayUpdateAddRoleCommand extends BotSubcommand {

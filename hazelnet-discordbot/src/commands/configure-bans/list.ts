@@ -1,9 +1,9 @@
 import i18n from 'i18n';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import cardanoaddress from '../../utility/cardanoaddress';
+import { Ban, cardanoaddress } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
-import banutils, { Ban } from '../../utility/bans';
+import banutils from '../../utility/bans';
 
 interface ConfigureBansListCommand extends BotSubcommand {
   createDetailsDropdown(tokenRoles: Ban[], locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -13,8 +13,8 @@ export default <ConfigureBansListCommand> {
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id) ;
-      const bans = await interaction.client.services.discordbans.listBans(interaction.guild!.id);;
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const bans = await interaction.client.services.discordbans.listBans(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const banFields = bans.map((ban) => ({
         name: i18n.__({ phrase: `configure.bans.list.banEntryTitle_${ban.type}`, locale }, { banId: `${ban.id}` }),
@@ -25,13 +25,14 @@ export default <ConfigureBansListCommand> {
         banFields.push({ name: i18n.__({ phrase: 'configure.bans.list.noBansName', locale }), value: i18n.__({ phrase: 'configure.bans.list.noBans', locale }) });
       }
       const firstFields = banFields.splice(0, CHUNK_SIZE);
-      let components = this.createDetailsDropdown(bans.splice(0, CHUNK_SIZE), discordServer.getBotLanguage());
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans list', i18n.__({ phrase: 'configure.bans.list.purpose', locale }), 'configure-bans-list', firstFields);
+      const components = this.createDetailsDropdown(bans.splice(0, CHUNK_SIZE), discordServer.getBotLanguage());
+      let embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans list', i18n.__({ phrase: 'configure.bans.list.purpose', locale }), 'configure-bans-list', firstFields);
       await interaction.editReply({ embeds: [embed], components });
       while (banFields.length) {
         const additionalBans = banFields.splice(0, CHUNK_SIZE);
         this.createDetailsDropdown(bans.splice(0, CHUNK_SIZE), discordServer.getBotLanguage());
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans list', i18n.__({ phrase: 'configure.bans.list.purposeContinued', locale }), 'configure-bans-list', additionalBans);
+        embed = embedBuilder.buildForAdmin(discordServer, '/configure-bans list', i18n.__({ phrase: 'configure.bans.list.purposeContinued', locale }), 'configure-bans-list', additionalBans);
+        // eslint-disable-next-line no-await-in-loop
         await interaction.followUp({ embeds: [embed], components, ephemeral: true });
       }
     } catch (error) {

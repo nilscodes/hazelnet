@@ -1,7 +1,7 @@
 import { APIRole, Guild, GuildMember, Role } from 'discord.js';
 import i18n from 'i18n';
 import HazelnetClient from './hazelnetclient';
-import { DiscordRoleAssignment, DiscordServer, WithRoleId } from './sharedtypes';
+import { DiscordRoleAssignment, DiscordServer, WithRoleId } from '@vibrantnet/core';
 
 type RoleToUserMap = {
   [index: string]: string[]

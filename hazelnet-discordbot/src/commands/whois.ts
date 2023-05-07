@@ -1,13 +1,14 @@
 import i18n from 'i18n';
-import { ApplicationCommandType, AttachmentBuilder, ContextMenuCommandBuilder, SlashCommandBuilder } from 'discord.js';
-import { BotCommand } from "../utility/commandtypes";
+import {
+  ApplicationCommandType, AttachmentBuilder, ContextMenuCommandBuilder, SlashCommandBuilder,
+} from 'discord.js';
+import { cardanoaddress, adahandle } from '@vibrantnet/core';
+import { BotCommand } from '../utility/commandtypes';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
 import cardanotoken from '../utility/cardanotoken';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 import embedBuilder from '../utility/embedbuilder';
-import adahandle from '../utility/adahandle';
-import cardanoaddress from '../utility/cardanoaddress';
 import nftcdn from '../utility/nftcdn';
 
 interface WhoisCommand extends BotCommand {
@@ -31,7 +32,7 @@ export default <WhoisCommand> {
       .addStringOption((option) => option.setName('address-or-handle').setDescription(ci18n.option('address-or-handle')).setRequired(true));
     return builder;
   },
-  getContextMenuData(locale) {
+  getContextMenuData(_) {
     return new ContextMenuCommandBuilder()
       .setName('Show ADA Handle')
       .setType(ApplicationCommandType.User);

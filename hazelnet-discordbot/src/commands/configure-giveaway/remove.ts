@@ -1,8 +1,8 @@
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import i18n, { Replacements } from 'i18n';
-import { Giveaway } from '../../utility/giveaway';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
+import { Giveaway } from '@vibrantnet/core';
 
 interface GiveawayRemoveCommand extends BotSubcommand {
   getGiveawayChoices(locale: string, giveaways: Giveaway[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]

@@ -1,10 +1,9 @@
-import cardanoinfo from '../services/cardanoinfo';
-import adahandle from './adahandle';
-import cardanoaddress from './cardanoaddress';
-import { Verification } from './sharedtypes';
+import {
+  CardanoInfoApi, Verification, cardanoaddress, adahandle,
+} from '@vibrantnet/core';
 
 export default {
-  async getWalletRegisterOptions(service: typeof cardanoinfo, existingConfirmedVerifications: Verification[], optionPrefix: string) {
+  async getWalletRegisterOptions(service: CardanoInfoApi, existingConfirmedVerifications: Verification[], optionPrefix: string) {
     const stakeAddressesToHandles = await adahandle.getHandleMapFromStakeAddresses(service, existingConfirmedVerifications.map((verification) => verification.cardanoStakeAddress!));
     const registerOptions = existingConfirmedVerifications.map((verification) => {
       const handleForStakeAddress = stakeAddressesToHandles.find((handleForStake) => handleForStake && (handleForStake.handle.resolved && handleForStake.stakeAddress === verification.cardanoStakeAddress));
@@ -14,5 +13,5 @@ export default {
       };
     });
     return registerOptions;
-  }
-}
+  },
+};

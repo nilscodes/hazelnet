@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { Whitelist } from '../../utility/sharedtypes';
+import { Whitelist } from '@vibrantnet/core';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 

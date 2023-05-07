@@ -1,12 +1,12 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
+import {
+  Whitelist, WhitelistSignupContainer, WhitelistType, cardanoaddress, adahandle,
+} from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { Whitelist, WhitelistSignupContainer, WhitelistType } from '../../utility/sharedtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
-import adahandle  from '../../utility/adahandle';
-import cardanoaddress from '../../utility/cardanoaddress';
 import wallet from '../../utility/wallet';
 
 interface WhitelistRegisterCommand extends BotSubcommand {
@@ -54,7 +54,7 @@ export default <WhitelistRegisterCommand> {
 
             const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
               .addComponents(
-                new SelectMenuBuilder()
+                new StringSelectMenuBuilder()
                   .setCustomId('whitelist/register/complete')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseWhitelist', locale }))
                   .addOptions(whitelistOptions),
@@ -185,7 +185,7 @@ export default <WhitelistRegisterCommand> {
 
             const components = !userQualifiesForWhitelist ? [] : [new ActionRowBuilder<MessageActionRowComponentBuilder>()
               .addComponents(
-                new SelectMenuBuilder()
+                new StringSelectMenuBuilder()
                   .setCustomId('whitelist/register/widget')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.register.chooseAddressToWhitelist', locale }))
                   .addOptions(registerOptions),
@@ -220,5 +220,3 @@ export default <WhitelistRegisterCommand> {
     }
   },
 };
-
-

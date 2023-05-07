@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-      "target": "ESNext",
+      "target": "es2017",
       "module": "commonjs",
       "rootDir": "./src/",
       "outDir": "./dist/",
-      "allowJs": true,
       "strict": true,
       "moduleResolution": "node",
       "importHelpers": true,
@@ -22,7 +21,8 @@
       "baseUrl": "./"
   },
   "include": [
-      "./src"
+      "./src",
+      ".eslintrc.cjs",
   ],
   "exclude": [
       "node_modules",

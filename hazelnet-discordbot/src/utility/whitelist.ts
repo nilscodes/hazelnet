@@ -2,14 +2,15 @@ import i18n from 'i18n';
 import {
   ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder,
 } from 'discord.js';
-import { DiscordServer, ExternalAccount, Whitelist, WhitelistSignup, WhitelistSignupContainer } from './sharedtypes';
+import {
+  DiscordServer, ExternalAccount, Whitelist, WhitelistSignup, WhitelistSignupContainer, cardanoaddress,
+} from '@vibrantnet/core';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from './hazelnetclient';
-import cardanoaddress from './cardanoaddress';
 import embedBuilder from './embedbuilder';
 import datetime from './datetime';
 
 export default {
-  getDetailsText(discordServer: DiscordServer, whitelist: Whitelist, noCurrentNumbers: boolean = false): string {
+  getDetailsText(discordServer: DiscordServer, whitelist: Whitelist, noCurrentNumbers = false): string {
     const locale = discordServer.getBotLanguage();
     const started = this.hasSignupStarted(whitelist);
     const ended = this.hasSignupEnded(whitelist);

@@ -1,32 +1,6 @@
 import i18n from 'i18n';
 import { APIEmbedField } from "discord.js"
-import { ExternalAccount } from "./sharedtypes"
-
-export type Ban = {
-  id: number
-  creator: string
-  createTime?: string
-  type: BanType
-  responseType: BanResponseType
-  pattern: string
-  reason: string
-  alertChannel?: string
-}
-
-export enum BanType {
-  STAKE_ADDRESS_BAN = 'STAKE_ADDRESS_BAN',
-  ASSET_FINGERPRINT_BAN = 'ASSET_FINGERPRINT_BAN',
-  DISCORD_ID_BAN = 'DISCORD_ID_BAN',
-  EXACT_NAME_BAN = 'EXACT_NAME_BAN',
-  PARTIAL_NAME_BAN = 'PARTIAL_NAME_BAN',
-  FUZZY_NAME_BAN = 'FUZZY_NAME_BAN',
-}
-
-export enum BanResponseType {
-  PREVENT_ROLES = 'PREVENT_ROLES',
-  SERVER_BAN = 'SERVER_BAN',
-}
-
+import { Ban, ExternalAccount } from '@vibrantnet/core'
 
 export default {
   getBanDetailsFields(ban: Ban, bannedBy: ExternalAccount | null, locale: string): APIEmbedField[] {

@@ -1,17 +1,15 @@
 import i18n from 'i18n';
+import { Message, TextBasedChannel } from 'discord.js';
+import { DiscordServer, cardanoaddress, adahandle } from '@vibrantnet/core';
 import HazelnetClient from '../../utility/hazelnetclient';
-import { Message, TextBasedChannel } from "discord.js";
-import adahandle  from '../../utility/adahandle';
-import cardanoaddress from '../../utility/cardanoaddress';
 import embedBuilder from '../../utility/embedbuilder';
 import ethereumaddress from '../../utility/ethereumaddress';
-import { DiscordServer } from '../../utility/sharedtypes';
 
 interface ProtectionInteractionHandler {
   applyProtection(client: HazelnetClient, message: Message, discordServer: DiscordServer): void
 }
 
-export default<ProtectionInteractionHandler> {
+export default <ProtectionInteractionHandler> {
   async applyProtection(client, message, discordServer) {
     const containsCardanoAddress = cardanoaddress.containsWalletOrEnterpriseAddress(message.content);
     const containsEthereumAddress = ethereumaddress.containsWalletAddress(message.content);
@@ -33,7 +31,7 @@ export default<ProtectionInteractionHandler> {
                     discordServer,
                     i18n.__({ phrase: 'configure.protection.auditchannel.auditEventTitle', locale }),
                     i18n.__({ phrase: 'configure.protection.auditchannel.auditEventDetail', locale }, { author: message.author.id, channel: message.channel.id, message: message.content }),
-                    'configure-protection-auditchannel'
+                    'configure-protection-auditchannel',
                   );
                   channel.send({ embeds: [embed] });
                 } else {
@@ -52,4 +50,3 @@ export default<ProtectionInteractionHandler> {
     }
   },
 };
-

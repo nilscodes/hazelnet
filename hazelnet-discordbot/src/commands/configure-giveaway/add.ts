@@ -3,11 +3,11 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
-import giveaway, { Giveaway, GiveawayDrawType, GiveawayPartial } from '../../utility/giveaway';
+import giveaway from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
 import cardanotoken from '../../utility/cardanotoken';
 import datetime from '../../utility/datetime';
-import { DiscordServer } from '../../utility/sharedtypes';
+import { DiscordServer, Giveaway, GiveawayDrawType, GiveawayPartial } from '@vibrantnet/core';
 
 interface GiveawayAddCommand extends BotSubcommand {
   cache: NodeCache

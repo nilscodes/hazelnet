@@ -1,6 +1,8 @@
 package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.ExternalAccount
+import io.hazelnet.community.data.Verification
+import io.hazelnet.community.data.VerificationDto
 import io.hazelnet.community.data.ping.ExternalAccountPingPartial
 import io.hazelnet.community.services.*
 import org.springframework.http.HttpStatus
@@ -45,6 +47,19 @@ class ExternalAccountController(
 
     @GetMapping("/{externalAccountId}/verifications")
     fun getExternalAccountVerifications(@PathVariable externalAccountId: Long) = externalAccountService.getExternalAccountVerifications(externalAccountId)
+
+    @PostMapping("/{externalAccountId}/verifications")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun addExternalAccountVerification(@PathVariable externalAccountId: Long, @RequestBody @Valid verification: VerificationDto): ResponseEntity<Verification> {
+        val newVerification = externalAccountService.addExternalAccountVerification(externalAccountId, verification)
+        return ResponseEntity
+            .created(
+                ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{externalAccountId}/verifications/{verificationId}")
+                    .buildAndExpand(newVerification.id, newVerification.id)
+                    .toUri())
+            .body(newVerification)
+    }
 
     @GetMapping("/{externalAccountId}/pings")
     fun getExternalAccountPings(@PathVariable externalAccountId: Long) = pingService.getExternalAccountPings(externalAccountId)

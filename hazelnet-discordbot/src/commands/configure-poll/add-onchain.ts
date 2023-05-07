@@ -1,8 +1,8 @@
 import i18n from 'i18n';
-import { Poll } from '../../utility/polltypes';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
+import { Poll } from '@vibrantnet/core';
 
 export default <BotSubcommand> {
   async execute(interaction) {

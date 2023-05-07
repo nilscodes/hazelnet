@@ -1,5 +1,5 @@
 import i18n from 'i18n';
-import { TokenOwnershipRole, TokenPolicy } from '../../utility/sharedtypes';
+import { TokenOwnershipRole, TokenPolicy } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import tokenroles from '../../utility/tokenroles';

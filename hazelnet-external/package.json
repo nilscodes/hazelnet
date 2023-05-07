@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.6.0"
+  },
+  "scripts": {
+    "generate-typescript": "openapi-generator-cli generate -g typescript-axios -i .\\src\\main\\resources\\hazelnet-external-api.yml -o ../hazelnet-js-sdk --additional-properties=npmName=hazelnet-js-sdk",
+    "generate-dotnet": "openapi-generator-cli generate -g csharp-dotnet -i .\\src\\main\\resources\\hazelnet-external-api.yml -o ../hazelnet-dotnet-sdk --additional-properties=targetFramework=net7.0,packageName=Io.VibrantNet"
+  }
+}

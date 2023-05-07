@@ -1,10 +1,10 @@
+/* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
-import { TokenOwnershipRole } from '../../utility/sharedtypes';
+import { TokenOwnershipRole } from '@vibrantnet/core';
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import tokenroles from '../../utility/tokenroles';
 import embedBuilder from '../../utility/embedbuilder';
-
 
 interface ConfigureTokenrolesListCommand extends BotSubcommand {
   createDetailsDropdown(tokenRoles: TokenOwnershipRole[], locale: string): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -60,7 +60,7 @@ export default <ConfigureTokenrolesListCommand> {
     if (tokenRoles.length > 0) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-tokenroles/list/details')
             .setPlaceholder(i18n.__({ phrase: 'configure.tokenroles.list.chooseDetails', locale }))
             .addOptions(tokenRoles.map((tokenRole) => ({

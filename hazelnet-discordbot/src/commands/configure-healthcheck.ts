@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { SlashCommandBuilder, GuildMember, GuildTextBasedChannel, APIEmbedField } from 'discord.js';
 import { AugmentedCommandInteraction } from '../utility/hazelnetclient';
-import { DelegatorRole, DiscordServer, MarketplaceChannel, TokenOwnershipRole } from '../utility/sharedtypes';
+import { DelegatorRole, DiscordServer, MarketplaceChannel, TokenOwnershipRole } from '@vibrantnet/core';
 import { BotCommand } from '../utility/commandtypes';
 import i18n from 'i18n';
 import commandbase from '../utility/commandbase';

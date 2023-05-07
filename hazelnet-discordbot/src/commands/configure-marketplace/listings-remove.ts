@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { DiscordMarketplaceChannelType, MarketplaceChannel } from '../../utility/sharedtypes';
+import { DiscordMarketplaceChannelType, MarketplaceChannel } from '@vibrantnet/core';
 import embedBuilder from '../../utility/embedbuilder';
 import marketplaceUtil from '../../utility/marketplace';
 

@@ -1,5 +1,5 @@
 import i18n from 'i18n';
-import { DiscordMarketplaceChannelType, DiscordServer, MarketplaceChannel, TokenPolicy } from '../../utility/sharedtypes';
+import { DiscordMarketplaceChannelType } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import marketplaceUtil from '../../utility/marketplace';

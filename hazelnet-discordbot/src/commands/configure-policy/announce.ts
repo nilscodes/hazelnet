@@ -3,7 +3,7 @@ import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ChannelType, GuildChannel, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextBasedChannel, MessageActionRowComponentBuilder, APIEmbedField } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
-import { TokenPolicy } from '../../utility/sharedtypes';
+import type { TokenPolicy } from '@vibrantnet/core';
 import discordpermissions from '../../utility/discordpermissions';
 
 interface PolicyAnnounceCommand extends BotSubcommand {

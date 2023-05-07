@@ -1,5 +1,5 @@
 import i18n from 'i18n';
-import { DiscordServer } from './sharedtypes';
+import { DiscordServer } from '@vibrantnet/core';
 
 export default {
   getFeatureOptions(discordServer: DiscordServer) {

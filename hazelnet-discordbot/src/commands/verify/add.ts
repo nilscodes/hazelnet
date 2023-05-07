@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
-import { Account, ExternalAccount, Verification } from '../../utility/sharedtypes';
+import { Account, cardanoaddress, adahandle } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-const wait = require('util').promisify(setTimeout);
 import embedBuilder from '../../utility/embedbuilder';
-import adahandle  from '../../utility/adahandle';
-import cardanoaddress from '../../utility/cardanoaddress';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const wait = require('util').promisify(setTimeout);
 
 export default <BotSubcommand> {
   async execute(interaction) {

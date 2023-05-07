@@ -1,8 +1,7 @@
 import { ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, SlashCommandBuilder, MessageActionRowComponentBuilder, ButtonStyle, GuildMember } from 'discord.js';
 import { BotCommand } from "../utility/commandtypes";
 import i18n from 'i18n';
-import { DiscordServer, EmbedFieldsAndComponents, ExternalAccount } from '../utility/sharedtypes';
-import { Poll } from '../utility/polltypes';
+import { DiscordServer, Poll } from '@vibrantnet/core';
 import { AugmentedButtonInteraction, AugmentedSelectMenuInteraction } from '../utility/hazelnetclient';
 import CommandTranslations from '../utility/commandtranslations';
 import embedBuilder from '../utility/embedbuilder';
@@ -10,6 +9,7 @@ import commandbase from '../utility/commandbase';
 import pollutil from '../utility/poll';
 import discordemoji from '../utility/discordemoji';
 import discordstring from '../utility/discordstring';
+import { EmbedFieldsAndComponents } from '../utility/sharedtypes';
 
 interface VoteCommand extends BotCommand {
   getPollVoteOptions(locale: string, poll: Poll, totalVotingPower: number, hasVoted: boolean): Promise<ActionRowBuilder<MessageActionRowComponentBuilder>[]>

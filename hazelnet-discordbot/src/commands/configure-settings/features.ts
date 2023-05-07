@@ -2,11 +2,12 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import { DiscordServer, EmbedAndComponents } from '../../utility/sharedtypes';
+import { DiscordServer } from '@vibrantnet/core';
 import { AugmentedButtonInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import botfeatures from '../../utility/botfeatures';
 import commandregistration from '../../utility/commandregistration';
+import { EmbedAndComponents } from '../../utility/sharedtypes';
 
 interface ConfigureSettingsFeaturesCommand extends BotSubcommand {
   cache: NodeCache

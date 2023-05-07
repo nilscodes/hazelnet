@@ -1,5 +1,5 @@
 import i18n from 'i18n';
-import { DiscordServer, MarketplaceChannel, TokenPolicy } from '../../utility/sharedtypes';
+import { DiscordServer, MarketplaceChannel, TokenPolicy } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';

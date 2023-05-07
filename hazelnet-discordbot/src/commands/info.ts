@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, APIEmbedField, ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder, ButtonStyle, } from 'discord.js';
 import i18n from 'i18n';
-import { Stakepool } from '../utility/sharedtypes';
+import { Stakepool } from '@vibrantnet/core';
 import { BotCommand } from '../utility/commandtypes';
 import embedBuilder from '../utility/embedbuilder';
 import commandbase from '../utility/commandbase';

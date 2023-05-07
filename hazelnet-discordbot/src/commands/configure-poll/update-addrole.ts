@@ -1,7 +1,6 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { Poll } from '../../utility/polltypes';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
 
@@ -34,7 +33,7 @@ export default <PollUpdateAddRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
       const pollId = +interaction.values[0].substring('configure-poll-'.length);
-      const polls = await interaction.client.services.discordserver.getPolls(guildId) as Poll[];
+      const polls = await interaction.client.services.discordserver.getPolls(guildId);
       const poll = polls.find((pollForDetails) => pollForDetails.id === pollId);
       if (poll) {
         if (poll.requiredRoles && poll.requiredRoles.length < 20) {

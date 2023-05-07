@@ -2,11 +2,12 @@ import { PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder
 import { BotCommand } from "../utility/commandtypes";
 import i18n from 'i18n';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../utility/hazelnetclient';
-import { DiscordServer, EmbedAndComponents } from '../utility/sharedtypes';
+import { DiscordServer } from '@vibrantnet/core';
 import commandbase from '../utility/commandbase';
 import embedbuilder from '../utility/embedbuilder';
 import botfeatures from '../utility/botfeatures';
 import commandregistration from '../utility/commandregistration';
+import { EmbedAndComponents } from '../utility/sharedtypes';
 
 interface StartCommand extends BotCommand {
   completeSetup(interaction: AugmentedButtonInteraction, discordServer: DiscordServer): void

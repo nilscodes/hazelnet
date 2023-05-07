@@ -2,7 +2,7 @@ import { ActionRowBuilder, APIEmbedField, MessageActionRowComponentBuilder, Sele
 import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
 import embedBuilder from '../../utility/embedbuilder';
-import { Settings } from "../../utility/sharedtypes";
+import { Settings } from '@vibrantnet/core';
 
 type ToggleSetting = {
   name: string
