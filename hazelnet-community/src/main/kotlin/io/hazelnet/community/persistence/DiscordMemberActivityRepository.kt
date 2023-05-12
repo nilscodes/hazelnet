@@ -21,4 +21,7 @@ interface DiscordMemberActivityRepository: CrudRepository<DiscordMemberActivity,
 
     @Query(value = "SELECT dma FROM DiscordMemberActivity dma WHERE dma.discordServerId=:discordServerId AND dma.lastActivityTime<:activityThreshold AND dma.lastReminderTime IS NULL")
     fun findUsersThatNeedActivityReminder(@Param("discordServerId") discordServerId: Int, @Param("activityThreshold") activityThreshold: Date): List<DiscordMemberActivity>
+
+    @Query(value = "SELECT dma FROM DiscordMemberActivity dma WHERE dma.discordServerId=:discordServerId AND dma.lastReminderTime<:activityThreshold")
+    fun findUsersThatNeedActivityReminderResend(@Param("discordServerId") discordServerId: Int, @Param("activityThreshold") activityThreshold: Date): List<DiscordMemberActivity>
 }

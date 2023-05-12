@@ -517,21 +517,36 @@ class DiscordServerService(
             if (discordServer.getPremium()
                 || (discordServer.settings.find { it.name == "FREE_FEATURES" }?.value?.contains("configure-engagement-activityreminder", ignoreCase = true) == true)) {
                 val (channelIdString, activityThresholdString) = discordServer.settings.find { it.name == "ACTIVITY_REMINDER" }?.value?.split(",") ?: listOf("", "")
-                if (activityThresholdString.isNotBlank()) {
-                    val activityThreshold = Date(System.currentTimeMillis() - activityThresholdString.toLong() * 1000)
-                    val channelId = channelIdString.toLong()
-                    val userIdsOfInactiveUsers = discordMemberActivityRepository.findUsersThatNeedActivityReminder(discordServer.id!!, activityThreshold)
-                    userIdsOfInactiveUsers.forEach {
-                        rabbitTemplate.convertAndSend(
-                            "activityreminders", DiscordActivityReminder(
-                                guildId = discordServer.guildId,
-                                userId = it.discordUserId!!,
-                                channelId = channelId,
-                            )
-                        )
-                        discordMemberActivityRepository.updateLastReminderTime(it.discordServerId!!, it.discordUserId!!, Date())
-                    }
-                }
+                sendActivityReminders(activityThresholdString, channelIdString, discordServer, true)
+                val (resendChannelIdString, reminderResendThresholdString) = discordServer.settings.find { it.name == "ACTIVITY_REMINDER_RESEND" }?.value?.split(",") ?: listOf("", "")
+                sendActivityReminders(reminderResendThresholdString, resendChannelIdString, discordServer, false)
+            }
+        }
+    }
+
+    private fun sendActivityReminders(
+        activityThresholdString: String,
+        channelIdString: String,
+        discordServer: DiscordServer,
+        initialReminder: Boolean,
+    ) {
+        if (activityThresholdString.isNotBlank()) {
+            val activityThreshold = Date(System.currentTimeMillis() - activityThresholdString.toLong() * 1000)
+            val channelId = channelIdString.toLong()
+            val userIdsOfInactiveUsers = if (initialReminder) {
+                discordMemberActivityRepository.findUsersThatNeedActivityReminder(discordServer.id!!, activityThreshold)
+            } else {
+                discordMemberActivityRepository.findUsersThatNeedActivityReminderResend(discordServer.id!!, activityThreshold)
+            }
+            userIdsOfInactiveUsers.forEach {
+                rabbitTemplate.convertAndSend(
+                    "activityreminders", DiscordActivityReminder(
+                        guildId = discordServer.guildId,
+                        userId = it.discordUserId!!,
+                        channelId = channelId,
+                    )
+                )
+                discordMemberActivityRepository.updateLastReminderTime(it.discordServerId!!, it.discordUserId!!, Date())
             }
         }
     }
