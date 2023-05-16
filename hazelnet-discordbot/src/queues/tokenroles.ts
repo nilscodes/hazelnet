@@ -1,5 +1,5 @@
-import HazelnetClient from "../utility/hazelnetclient";
 import { DiscordRoleAssignmentListForGuildMember } from '@vibrantnet/core';
+import HazelnetClient from '../utility/hazelnetclient';
 import roleassignments from '../utility/roleassignments';
 
 export default {

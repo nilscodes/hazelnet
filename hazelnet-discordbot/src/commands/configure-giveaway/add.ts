@@ -1,13 +1,18 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, StringSelectMenuBuilder, SelectMenuComponentOptionData,
+} from 'discord.js';
+import {
+  DiscordServer, Giveaway, GiveawayDrawType, GiveawayPartial,
+} from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, SelectMenuComponentOptionData } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import giveaway from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
 import cardanotoken from '../../utility/cardanotoken';
 import datetime from '../../utility/datetime';
-import { DiscordServer, Giveaway, GiveawayDrawType, GiveawayPartial } from '@vibrantnet/core';
+import discordstring from '../../utility/discordstring';
 
 interface GiveawayAddCommand extends BotSubcommand {
   cache: NodeCache
@@ -117,7 +122,7 @@ export default <GiveawayAddCommand> {
       content.push(i18n.__({ phrase: 'configure.giveaway.add.previewPhase2Description', locale }, { description: giveawayObject.description } as any));
     }
     if (step >= 3) {
-      const drawType = giveawayObject.drawType;
+      const { drawType } = giveawayObject;
       content.push(i18n.__({ phrase: `configure.giveaway.list.drawType${drawType}`, locale }));
     }
     if (step >= 4) {
@@ -161,7 +166,13 @@ export default <GiveawayAddCommand> {
 
     collector.on('end', async (collected) => {
       if (collected.size > 0) {
-        const phase2GiveawayObject = { description: collected.at(0)!.content, ...giveawayObject };
+        const maxLength = 1000;
+        const description = collected.at(0)!.content;
+        const phase2GiveawayObject = { description: discordstring.ensureLength(description, maxLength), ...giveawayObject };
+        if (description.length > maxLength) {
+          const warningEmbed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', i18n.__({ phrase: 'configure.giveaway.add.descriptionLengthWarning', locale }, { maxLength } as any), 'configure-giveaway-add');
+          await interaction.followUp({ embeds: [warningEmbed], ephemeral: true });
+        }
         const content = this.buildContent(locale, interaction.channel!.id, phase2GiveawayObject, 2);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', content.join('\n\n'), 'configure-giveaway-add');
         this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, phase2GiveawayObject);
@@ -192,21 +203,21 @@ export default <GiveawayAddCommand> {
     const components = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-giveaway/add/uniquewinners')
             .setPlaceholder(i18n.__({ phrase: 'configure.giveaway.add.isUniqueWinners', locale }).substring(0, 100))
             .addOptions(this.getYesNoOptions(locale, giveawayObject.uniqueWinners ?? true, 'uniqueWinnersYes', 'uniqueWinnersYesDescription', '1️⃣', 'uniqueWinnersNo', 'uniqueWinnersNoDescription', '🔢')),
         ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-giveaway/add/drawtype')
             .setPlaceholder(i18n.__({ phrase: 'configure.giveaway.add.selectDrawType', locale }).substring(0, 100))
             .addOptions(this.getDrawTypeOptions(locale, giveawayObject.drawType!)),
         ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-giveaway/add/tokentype')
             .setPlaceholder(i18n.__({ phrase: 'configure.giveaway.add.isTokenOwnershipRequired', locale }).substring(0, 100))
             .addOptions(this.getTokenOwnershipOptions(locale, giveawayObject.tokenType!)),
@@ -282,7 +293,7 @@ export default <GiveawayAddCommand> {
       filter: onlyGiveawayCreatorMessageFilter,
       time: 5 * 60000,
       dispose: true,
-      max: 1
+      max: 1,
     });
     const phase4GivewayObject = {
       ...giveawayObject,
@@ -364,7 +375,7 @@ export default <GiveawayAddCommand> {
         const giveawayObjectPhase4 = this.cache.take(`${guildId}-${interaction.user.id}`) as GiveawayPartial;
         this.startPhase4(interaction, discordServer, giveawayObjectPhase4);
       } else if (interaction.customId === 'configure-giveaway/add/redophase2') {
-        const { description, ...giveawayObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as GiveawayPartial;
+        const { description: _, ...giveawayObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as GiveawayPartial;
         const content = this.buildContent(locale, interaction.channel!.id, giveawayObject, 1);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway add', content.join('\n\n'), 'configure-giveaway-add');
         await interaction.update({ embeds: [embed], components: [] });

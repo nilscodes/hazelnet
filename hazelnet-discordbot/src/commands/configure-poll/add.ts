@@ -1,14 +1,19 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageCollector, MessageReaction, StringSelectMenuBuilder, SelectMenuComponentOptionData, User,
+} from 'discord.js';
+import {
+  DiscordServer, Poll, PollOption, PollPartial,
+} from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessageActionRowComponentBuilder, MessageCollector, MessageReaction, SelectMenuBuilder, SelectMenuComponentOptionData, User } from 'discord.js';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import cardanotoken from '../../utility/cardanotoken';
 import poll from '../../utility/poll';
 import datetime from '../../utility/datetime';
 import discordemoji from '../../utility/discordemoji';
-import { DiscordServer, Poll, PollOption, PollPartial } from '@vibrantnet/core';
+import discordstring from '../../utility/discordstring';
 
 interface PollPartialWithCollector extends PollPartial {
   optionCollector?: MessageCollector
@@ -175,7 +180,13 @@ export default <PollAddCommand> {
 
     collector.on('end', async (collected) => {
       if (collected.size > 0) {
-        const phase2PollObject = { description: collected.at(0)!.content, ...pollObject };
+        const maxLength = 1000;
+        const description = collected.at(0)!.content;
+        const phase2PollObject = { description: discordstring.ensureLength(description, maxLength), ...pollObject };
+        if (description.length > maxLength) {
+          const warningEmbed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', i18n.__({ phrase: 'configure.poll.add.descriptionLengthWarning', locale }, { maxLength } as any), 'configure-poll-add');
+          await interaction.followUp({ embeds: [warningEmbed], ephemeral: true });
+        }
         const content = this.buildContent(locale, interaction.channel!.id, phase2PollObject, 2);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
         this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, phase2PollObject);
@@ -226,7 +237,7 @@ export default <PollAddCommand> {
         filter: onlyAuthorReactionsFilter,
         time: 5 * 60000,
         dispose: true,
-        max: 1
+        max: 1,
       });
 
       reactionCollector.on('end', async (collectedReactions) => {
@@ -279,21 +290,21 @@ export default <PollAddCommand> {
     const components = [
       new ActionRowBuilder()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-poll/add/resultsvisible')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isPublicVote', locale }).substring(0, 100))
             .addOptions(this.getYesNoOptions(locale, pollObject.resultsVisible ?? true, 'publicVoteYes', 'publicVoteYesDescription', '👁', 'publicVoteNo', 'publicVoteNoDescription', '🔐')),
         ),
       new ActionRowBuilder()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-poll/add/multiplevotes')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isMultipleVotes', locale }).substring(0, 100))
             .addOptions(this.getYesNoOptions(locale, pollObject.multipleVotes ?? false, 'multipleVoteYes', 'multipleVoteYesDescription', '🖐', 'multipleVoteNo', 'multipleVoteNoDescription', '1️⃣')),
         ),
       new ActionRowBuilder()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-poll/add/tokentype')
             .setPlaceholder(i18n.__({ phrase: 'configure.poll.add.isTokenOwnershipRequired', locale }).substring(0, 100))
             .addOptions(this.getTokenOwnershipOptions(locale, pollObject.tokenType!)),
@@ -354,7 +365,7 @@ export default <PollAddCommand> {
       filter: onlyPollCreatorMessageFilter,
       time: 5 * 60000,
       dispose: true,
-      max: 1
+      max: 1,
     });
     const phase5PollObject = {
       ...pollObject,
@@ -443,13 +454,13 @@ export default <PollAddCommand> {
         const pollObjectPhase5 = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartial;
         this.startPhase5(interaction, discordServer, pollObjectPhase5);
       } else if (interaction.customId === 'configure-poll/add/redophase2') {
-        const { description, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartial;
+        const { description: _, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartial;
         const content = this.buildContent(locale, interaction.channel!.id, pollObject, 1);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
         await interaction.update({ embeds: [embed], components: [] });
         this.startPhase2(interaction, discordServer, pollObject);
       } else if (interaction.customId === 'configure-poll/add/redophase3') {
-        const { options, optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartialWithCollector;
+        const { options: _, optionCollector, ...pollObject } = this.cache.take(`${guildId}-${interaction.user.id}`) as PollPartialWithCollector;
         optionCollector!.stop('cancelled');
         const content = this.buildContent(locale, interaction.channel!.id, pollObject, 3);
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll add', content.join('\n\n'), 'configure-poll-add');
