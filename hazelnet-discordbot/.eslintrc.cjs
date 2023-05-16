@@ -19,8 +19,8 @@ module.exports = {
       ignoreTemplateLiterals: true,
     }],
     'no-underscore-dangle': ['off'],
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'no-unused-vars': ['off'],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
   },
   root: true,
 };
