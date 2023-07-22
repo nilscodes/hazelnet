@@ -229,8 +229,8 @@
 				"giveaway-closetime": "The UTC time until which signup is possible (Format: 2022-01-31T15:00:00Z)",
 				"channel": "The channel to send the giveaway announcement and participation widget to.",
 				"winner-count": "The number of winners drawn at the end of the giveaway.",
-				"snapshot-time": "The time to take the token snapshot, if this is a token-based giveaway",
-				"image-url": "URL to an image to showcase the giveaway"
+				"snapshot-time": "The time to take the token snapshot, if this is a token-based giveaway.",
+				"image-url": "URL to an image to showcase the giveaway."
 			},
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
@@ -1657,7 +1657,7 @@
 				"purpose": "👇 Pick a giveaway from the list of available giveaways to announce. If the giveaway is still open, a vote button will also be added to the widget.\n\n{{{participationPublishingInfo}}}\n\n💡 You can only have one announcement for each giveaway at a time. The announcement will automatically be updated with the current participation counts every 5 minutes.",
 				"participationPublishYes": "📢 The (current) entry counts will be published along with the giveaway announcement.",
 				"success": "✅ Results successfully published in <#{{channel}}>.",
-				"publicSuccess": "🎁 The team shared the following giveaway with you.",
+				"publicSuccess": "🎁",
 				"chooseGiveaway": "Pick the giveaway you'd like to announce",
 				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages** and **Embed Links** permissions for the bot to allow announcing in it.",
 				"errorWrongChannelType": "This channel cannot be used for giveaway announcements."
