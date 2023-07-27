@@ -117,6 +117,7 @@ export default {
 
     this.augmentGiveawayDates(giveaway, detailFields, locale);
     this.augmentGiveawayOptions(giveaway, detailFields, locale);
+    this.augmentGiveawayGroup(giveaway, detailFields, locale);
     detailFields.push({
       name: i18n.__({ phrase: 'configure.giveaway.list.detailsChannel', locale }),
       value: giveaway.channelId ? i18n.__({ phrase: 'configure.giveaway.list.announcementChannel', locale }, { giveaway } as any) : i18n.__({ phrase: 'configure.giveaway.list.announcementNone', locale }),
@@ -146,6 +147,18 @@ export default {
         }),
       },
     );
+  },
+  augmentGiveawayGroup(giveaway: Giveaway, detailFields: APIEmbedField[], locale: string) {
+    if (giveaway.group) {
+      detailFields.push(
+        {
+          name: i18n.__({ phrase: 'configure.giveaway.list.group', locale }),
+          value: i18n.__({ phrase: 'configure.giveaway.list.groupDetails', locale }, {
+            groupName: giveaway.group,
+          }),
+        },
+      );
+    }
   },
   augmentRequiredRoles(giveaway: Giveaway, detailFields: APIEmbedField[], locale: string) {
     if (giveaway.requiredRoles?.length) {

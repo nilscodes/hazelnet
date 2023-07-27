@@ -169,6 +169,7 @@ export default <JoinCommand> {
 
     giveawayutil.augmentGiveawayDates(giveaway, detailFields, locale);
     giveawayutil.augmentGiveawayOptions(giveaway, detailFields, locale);
+    giveawayutil.augmentGiveawayGroup(giveaway, detailFields, locale);
     giveawayutil.augmentRequiredRoles(giveaway, detailFields, locale);
     giveawayutil.augmentCurrentParticipation(giveaway, detailFields, discordServer, participation, tokenMetadata);
 

@@ -38,6 +38,7 @@ export default <GiveawayAddCommand> {
     const winnerCount = interaction.options.getInteger('winner-count', false) ?? 1;
     const requiredRole = interaction.options.getRole('required-role');
     const publishChannel = interaction.options.getChannel('channel');
+    const group = interaction.options.getString('group-name');
 
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -70,6 +71,7 @@ export default <GiveawayAddCommand> {
             winnerCount,
             drawType: 'DISCORD_ID',
             logoUrl,
+            group,
           } as GiveawayPartial;
           if (requiredRole) {
             giveawayObject.requiredRoles = [{ roleId: requiredRole.id }];

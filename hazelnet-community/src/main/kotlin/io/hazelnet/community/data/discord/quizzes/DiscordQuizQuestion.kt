@@ -75,8 +75,8 @@ class DiscordQuizQuestion @JsonCreator constructor(
         var result = id ?: 0
         result = 31 * result + text.hashCode()
         result = 31 * result + order
-        result = 31 * result + (answer0?.hashCode() ?: 0)
-        result = 31 * result + (answer1?.hashCode() ?: 0)
+        result = 31 * result + answer0.hashCode()
+        result = 31 * result + answer1.hashCode()
         result = 31 * result + (answer2?.hashCode() ?: 0)
         result = 31 * result + (answer3?.hashCode() ?: 0)
         result = 31 * result + correctAnswer

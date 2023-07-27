@@ -48,4 +48,10 @@ class DiscordGiveawayEntry @JsonCreator constructor(
     override fun hashCode(): Int {
         return externalAccountId.hashCode()
     }
+
+    override fun toString(): String {
+        return "DiscordGiveawayEntry(externalAccountId=$externalAccountId, time=$time, weight=$weight, winningCount=$winningCount)"
+    }
+
+
 }
