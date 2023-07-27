@@ -143,7 +143,13 @@ class DiscordGiveawayService(
     fun drawWinners(guildId: Long, giveawayId: Int): WinnerList {
         val giveaway = getGiveaway(guildId, giveawayId)
 
-        drawWinnersWithRandom(giveaway, guildId, Random.Default)
+        val sameGroupWinners = if (giveaway.group != null) {
+            discordGiveawayRepository.findWinnersOfGroupExcept(giveaway.id!!, giveaway.discordServer?.id!!, giveaway.group!!).toSet()
+        } else {
+            emptySet()
+        }
+
+        drawWinnersWithRandom(giveaway, guildId, sameGroupWinners, Random.Default)
 
         giveaway.archived = true
         discordGiveawayRepository.save(giveaway)
@@ -218,6 +224,7 @@ class DiscordGiveawayService(
         fun drawWinnersWithRandom(
             giveaway: DiscordGiveaway,
             guildId: Long,
+            excludedWinners: Set<Long>,
             drawingRandom: Random,
         ) {
             // Reset current winners
@@ -229,7 +236,11 @@ class DiscordGiveawayService(
                 } else {
                     giveaway.entries
                 }
-                return candidates
+                return if (excludedWinners.isNotEmpty()) {
+                    candidates.filter { !excludedWinners.contains(it.externalAccountId) }
+                } else {
+                    candidates
+                }
             }
 
             // Draw actual winners

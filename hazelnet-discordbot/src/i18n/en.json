@@ -230,7 +230,8 @@
 				"channel": "The channel to send the giveaway announcement and participation widget to.",
 				"winner-count": "The number of winners drawn at the end of the giveaway.",
 				"snapshot-time": "The time to take the token snapshot, if this is a token-based giveaway.",
-				"image-url": "URL to an image to showcase the giveaway."
+				"image-url": "URL to an image to showcase the giveaway.",
+				"group-name": "Add to a group of giveaways where winners are unique across all giveaways of that group."
 			},
 			"configure-whitelist": {
 				"whitelist-name": "The internal name for this whitelist (can only be up to 30 alphanumeric characters)",
@@ -1587,6 +1588,8 @@
 				"creationDate": "<t:{{createTime}}>",
 				"detailsDates": "Starts/Ends",
 				"detailsConfiguration": "Giveaway configuration",
+				"group": "Giveaway Group",
+				"groupDetails": "Group name: **{{{groupName}}}**. A user can only be drawn as a winner in at most one giveaway included in this group (regardless of unique winners being required or not).\n",
 				"optionList": "Winners must be unique: {{uniqueWinners}}\nToken-based giveaway: {{tokenBased}}\nWeighted giveaway: {{weighted}}",
 				"detailsRoles": "User has to have one of the following roles",
 				"requiredRoleEntry": "• <@&{{role.roleId}}>",

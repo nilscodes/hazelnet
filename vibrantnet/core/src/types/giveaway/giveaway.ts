@@ -21,4 +21,5 @@ export type Giveaway = {
   drawType: GiveawayDrawType
   archived: boolean
   logoUrl?: string
+  group?: string
 };

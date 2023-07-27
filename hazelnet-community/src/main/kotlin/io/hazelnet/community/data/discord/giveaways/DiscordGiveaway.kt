@@ -103,6 +103,10 @@ class DiscordGiveaway @JsonCreator constructor(
     @Column(name = "giveaway_logo_url")
     @field:Size(min = 1, max = 1000)
     var logoUrl: String? = null,
+
+    @Column(name = "giveaway_group")
+    @field:Size(min = 1, max = 30)
+    var group: String? = null,
     ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -123,11 +127,14 @@ class DiscordGiveaway @JsonCreator constructor(
         if (openUntil != other.openUntil) return false
         if (weighted != other.weighted) return false
         if (uniqueWinners != other.uniqueWinners) return false
-        if (winnerCount != other.winnerCount) return false
         if (archived != other.archived) return false
+        if (winnerCount != other.winnerCount) return false
+        if (drawType != other.drawType) return false
         if (snapshotIds != other.snapshotIds) return false
         if (requiredRoles != other.requiredRoles) return false
+        if (entries != other.entries) return false
         if (logoUrl != other.logoUrl) return false
+        if (group != other.group) return false
 
         return true
     }
@@ -142,20 +149,23 @@ class DiscordGiveaway @JsonCreator constructor(
         result = 31 * result + displayName.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + (createTime?.hashCode() ?: 0)
-        result = 31 * result + openAfter.hashCode()
-        result = 31 * result + openUntil.hashCode()
+        result = 31 * result + (openAfter?.hashCode() ?: 0)
+        result = 31 * result + (openUntil?.hashCode() ?: 0)
         result = 31 * result + weighted.hashCode()
         result = 31 * result + uniqueWinners.hashCode()
-        result = 31 * result + winnerCount.hashCode()
         result = 31 * result + archived.hashCode()
+        result = 31 * result + winnerCount
+        result = 31 * result + drawType.hashCode()
         result = 31 * result + snapshotIds.hashCode()
         result = 31 * result + requiredRoles.hashCode()
-        result = 31 * result + logoUrl.hashCode()
+        result = 31 * result + entries.hashCode()
+        result = 31 * result + (logoUrl?.hashCode() ?: 0)
+        result = 31 * result + (group?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, winnerCount=$winnerCount, archived=$archived, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles, logoUrl=$logoUrl)"
+        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, archived=$archived, winnerCount=$winnerCount, drawType=$drawType, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles, entries=$entries, logoUrl=$logoUrl, group=$group)"
     }
 
 }

@@ -1,9 +1,17 @@
 package io.hazelnet.community.services
 
+import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.discord.DiscordServer
 import io.hazelnet.community.data.discord.giveaways.DiscordGiveaway
 import io.hazelnet.community.data.discord.giveaways.DiscordGiveawayEntry
 import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersCannotBeDrawnException
+import io.hazelnet.community.persistence.DiscordGiveawayRepository
+import io.hazelnet.community.persistence.ExternalAccountRepository
+import io.hazelnet.shared.data.ExternalAccountType
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -63,7 +71,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), true, 4, false)
         assertThrows(GiveawayWinnersCannotBeDrawnException::class.java) {
-            DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random.Default)
+            DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random.Default)
         }
     }
 
@@ -75,7 +83,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), true, 4, true)
         assertThrows(GiveawayWinnersCannotBeDrawnException::class.java) {
-            DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random.Default)
+            DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random.Default)
         }
     }
 
@@ -87,8 +95,38 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1, 1),
         ), true, 1, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51209L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51209L))
         assertEquals(1, giveaway.entries.sumOf { it.winningCount }, "One winner and all others reset")
+    }
+
+    @Test
+    fun `draw winners fails if only one entry exists and it is excluded`() {
+        val giveaway = makeGiveaway(setOf(
+            DiscordGiveawayEntry(1, Date(), 1, 0),
+        ), true, 1, false)
+        assertThrows(GiveawayWinnersCannotBeDrawnException::class.java) {
+            DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, setOf(1), Random.Default)
+        }
+    }
+
+    @Test
+    fun `draw winners with a random that would draw an excluded winner reverts to alternative winner with unique winners on`() {
+        val giveaway = makeGiveaway(setOf(
+            DiscordGiveawayEntry(1, Date(), 1, 0),
+            DiscordGiveawayEntry(2, Date(), 1, 0),
+        ), true, 1, false)
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, setOf(1), Random(51209L))
+        assertEquals(1, giveaway.entries.find { it.externalAccountId == 2L }?.winningCount ?: 0, "External account 2 is the winner despite the Random picking external account 1 first")
+    }
+
+    @Test
+    fun `draw winners with a random that would draw an excluded winner reverts to alternative winner with unique winners off`() {
+        val giveaway = makeGiveaway(setOf(
+            DiscordGiveawayEntry(1, Date(), 1, 0),
+            DiscordGiveawayEntry(2, Date(), 1, 0),
+        ), false, 1, false)
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, setOf(1), Random(51209L))
+        assertEquals(1, giveaway.entries.find { it.externalAccountId == 2L }?.winningCount ?: 0, "External account 2 is the winner despite the Random picking external account 1 first")
     }
 
     @Test
@@ -99,7 +137,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 10, true)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51209L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51209L))
         assertEquals(10, giveaway.entries.find { it.externalAccountId == 2L }?.winningCount ?: 0, "One winner takes all with a 1000x weight")
     }
 
@@ -111,7 +149,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1000),
         ), false, 9, true)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51209L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51209L))
         assertEquals(
             mapOf(Pair(1L, 3), Pair(2L, 3), Pair(3L, 3)),
             giveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -126,7 +164,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 9, true)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51210L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51210L))
         assertEquals(
             mapOf(Pair(1L, 3), Pair(2L, 3), Pair(3L, 3)),
             giveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -141,7 +179,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 9, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51215L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51215L))
         assertEquals(
             mapOf(Pair(1L, 3), Pair(2L, 3), Pair(3L, 3)),
             giveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -156,7 +194,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 1, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51215L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51215L))
         assertEquals(
             mapOf(Pair(1L, 1), Pair(2L, 0), Pair(3L, 0)),
             giveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -171,7 +209,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 1, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, Random(51215L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveaway, testServer.guildId, emptySet(), Random(51215L))
         assertEquals(
             mapOf(Pair(1L, 1), Pair(2L, 0), Pair(3L, 0)),
             giveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -186,7 +224,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 3, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveawayNonUnique, testServer.guildId, Random(51213L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveawayNonUnique, testServer.guildId, emptySet(), Random(51213L))
         assertEquals(
             mapOf(Pair(1L, 3), Pair(2L, 0), Pair(3L, 0)),
             giveawayNonUnique.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -194,7 +232,7 @@ internal class DiscordGiveawayServiceTest {
 
         val giveawayUnique = makeGiveaway(giveawayNonUnique.entries, true, 3, false)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveawayUnique, testServer.guildId, Random(51213L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveawayUnique, testServer.guildId, emptySet(), Random(51213L))
         assertEquals(
             mapOf(Pair(1L, 1), Pair(2L, 1), Pair(3L, 1)),
             giveawayUnique.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -209,7 +247,7 @@ internal class DiscordGiveawayServiceTest {
             DiscordGiveawayEntry(3, Date(), 1),
         ), false, 3, true)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveawayNonUnique, testServer.guildId, Random(51213L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveawayNonUnique, testServer.guildId, emptySet(), Random(51213L))
         assertEquals(
             mapOf(Pair(1L, 3), Pair(2L, 0), Pair(3L, 0)),
             giveawayNonUnique.entries.associate { Pair(it.externalAccountId, it.winningCount) },
@@ -217,10 +255,43 @@ internal class DiscordGiveawayServiceTest {
 
         val giveawayUnique = makeGiveaway(giveawayNonUnique.entries, true, 3, true)
 
-        DiscordGiveawayService.drawWinnersWithRandom(giveawayUnique, testServer.guildId, Random(51213L))
+        DiscordGiveawayService.drawWinnersWithRandom(giveawayUnique, testServer.guildId, emptySet(), Random(51213L))
         assertEquals(
             mapOf(Pair(1L, 1), Pair(2L, 1), Pair(3L, 1)),
             giveawayUnique.entries.associate { Pair(it.externalAccountId, it.winningCount) },
             "All accounts wins one three with same random seed if unique winners are on and weighted is on")
+    }
+
+    @Test
+    fun `draw winners queries by group for excluded users when group name is set`() {
+        val basicGiveaway = makeGiveaway(setOf(
+            DiscordGiveawayEntry(1, Date(), 1),
+            DiscordGiveawayEntry(2, Date(), 1),
+        ), false, 1, false)
+        basicGiveaway.group = "potatoes"
+
+        val discordServerService = mockk<DiscordServerService>()
+        every { discordServerService.getDiscordServer(testServer.guildId!!) } returns testServer
+
+        val externalAccountRepository = mockk<ExternalAccountRepository>()
+        every { externalAccountRepository.findById(any()) } returns Optional.of(ExternalAccount(1, "12", "shared", Date(), ExternalAccountType.DISCORD, null, false, mutableSetOf()))
+        val externalAccountService = ExternalAccountService(externalAccountRepository, mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
+
+        val giveawayRepository = mockk<DiscordGiveawayRepository>()
+        every { giveawayRepository.findByDiscordServerId(12) } returns listOf(basicGiveaway)
+        every { giveawayRepository.findWinnersOfGroupExcept(2, 12, "potatoes") } returns listOf(1, 3)
+        every { giveawayRepository.save(any()) } returnsArgument 0
+
+        val giveawayService = DiscordGiveawayService(giveawayRepository, discordServerService, externalAccountService, mockk(), mockk())
+
+        for (i in 1..100) {
+            giveawayService.drawWinners(testServer.guildId!!, basicGiveaway.id!!)
+            assertEquals(
+                mapOf(Pair(1L, 0), Pair(2L, 1)),
+                basicGiveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },
+                "Account 2 wins always because account 1 is excluded from winning another giveaway in the group"
+            )
+        }
+        verify { giveawayRepository.findWinnersOfGroupExcept(2, 12, "potatoes") }
     }
 }
