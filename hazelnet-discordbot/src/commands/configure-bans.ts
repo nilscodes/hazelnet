@@ -1,5 +1,5 @@
-import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from '../utility/commandtypes';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 
@@ -13,11 +13,11 @@ export default <BotCommand> {
         .setName('add')
         .setDescription(ci18n.subDescription('add'))
         .addStringOption((option) => option.setName('ban-type').setDescription(ci18n.option('ban-type'))
-            .addChoices(
-              { name: ci18n.choice('STAKE_ADDRESS_BAN'), value: 'STAKE_ADDRESS_BAN' },
-              { name: ci18n.choice('ASSET_FINGERPRINT_BAN'), value: 'ASSET_FINGERPRINT_BAN' },
-            )
-            .setRequired(true))
+          .addChoices(
+            { name: ci18n.choice('STAKE_ADDRESS_BAN'), value: 'STAKE_ADDRESS_BAN' },
+            { name: ci18n.choice('ASSET_FINGERPRINT_BAN'), value: 'ASSET_FINGERPRINT_BAN' },
+          )
+          .setRequired(true))
         .addStringOption((option) => option.setName('ban-pattern').setDescription(ci18n.option('ban-pattern')).setRequired(true))
         .addStringOption((option) => option.setName('ban-reason').setDescription(ci18n.option('ban-reason')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand

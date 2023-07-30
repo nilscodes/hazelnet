@@ -271,7 +271,7 @@ internal class DiscordGiveawayServiceTest {
         basicGiveaway.group = "potatoes"
 
         val discordServerService = mockk<DiscordServerService>()
-        every { discordServerService.getDiscordServer(testServer.guildId!!) } returns testServer
+        every { discordServerService.getDiscordServer(testServer.guildId) } returns testServer
 
         val externalAccountRepository = mockk<ExternalAccountRepository>()
         every { externalAccountRepository.findById(any()) } returns Optional.of(ExternalAccount(1, "12", "shared", Date(), ExternalAccountType.DISCORD, null, false, mutableSetOf()))
@@ -285,7 +285,7 @@ internal class DiscordGiveawayServiceTest {
         val giveawayService = DiscordGiveawayService(giveawayRepository, discordServerService, externalAccountService, mockk(), mockk())
 
         for (i in 1..100) {
-            giveawayService.drawWinners(testServer.guildId!!, basicGiveaway.id!!)
+            giveawayService.drawWinners(testServer.guildId, basicGiveaway.id!!)
             assertEquals(
                 mapOf(Pair(1L, 0), Pair(2L, 1)),
                 basicGiveaway.entries.associate { Pair(it.externalAccountId, it.winningCount) },

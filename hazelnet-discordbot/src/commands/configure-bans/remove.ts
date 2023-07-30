@@ -8,8 +8,8 @@ export default <BotSubcommand> {
     const banId = interaction.options.getInteger('ban-id', true);
     try {
       await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id) ;
-      const bans = await interaction.client.services.discordbans.listBans(interaction.guild!.id);;
+      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+      const bans = await interaction.client.services.discordbans.listBans(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const banToRemove = bans.find((ban) => ban.id === banId);
       if (banToRemove) {
