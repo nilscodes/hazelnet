@@ -25,7 +25,6 @@ export default <SocialAnnounceCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const tokenPolicies = await interaction.client.services.discordserver.listTokenPolicies(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       if (announceChannel
         && (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement)) {
@@ -33,7 +32,6 @@ export default <SocialAnnounceCommand> {
         const announceChannelPermissions = guildChannel.permissionsFor(interaction.client.application!.id);
         if (announceChannelPermissions) {
           if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
-
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-social announce', i18n.__({ phrase: 'configure.social.announce.purpose', locale }, { channel: announceChannel.id }), 'configure-social-announce');
             await interaction.editReply({ embeds: [embed] });
 
@@ -47,7 +45,7 @@ export default <SocialAnnounceCommand> {
             collector.on('end', async (collected) => {
               if (collected.size > 0) {
                 const announcementText = collected.at(0)!.content;
-                this.cache!.set(`${interaction.guild!.id}-${interaction.user.id}`, {
+                this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
                   announceChannelId: announceChannel.id,
                   title,
                   announcementText,
@@ -63,11 +61,10 @@ export default <SocialAnnounceCommand> {
                     ),
                 ] as ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
-                const embed = embedBuilder.buildForUser(discordServer, title, announcementText);
-                await interaction.followUp({ components, embeds: [embed], ephemeral: true });
+                const userEmbed = embedBuilder.buildForUser(discordServer, title, announcementText);
+                await interaction.followUp({ components, embeds: [userEmbed], ephemeral: true });
               }
             });
-
           } else {
             const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-social announce', i18n.__({ phrase: 'configure.social.announce.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-social-announce');
             await interaction.editReply({ embeds: [embedAdmin], components: [] });
@@ -88,7 +85,7 @@ export default <SocialAnnounceCommand> {
       const guild = interaction.guild!;
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guild.id);
       const locale = discordServer.getBotLanguage();
-      const { announceChannelId, title, announcementText } = this.cache!.take(`${guild.id}-${interaction.user.id}`) as any;
+      const { announceChannelId, title, announcementText } = this.cache.take(`${guild.id}-${interaction.user.id}`) as any;
       const announceChannel = await guild.channels.fetch(announceChannelId) as GuildTextBasedChannel;
       const embedPublic = embedBuilder.buildForUser(discordServer, title, announcementText, 'info');
       await announceChannel.send({ embeds: [embedPublic] });

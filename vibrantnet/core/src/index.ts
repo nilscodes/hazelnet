@@ -7,6 +7,7 @@ export * from './api/discordQuiz';
 export * from './api/externalAccounts';
 export * from './api/globalSettings';
 export * from './api/pings';
+export * from './api/reminders';
 export * from './api/snapshots';
 export * from './api/verifications';
 
@@ -77,6 +78,9 @@ export * from './types/quiz/quizCompletion';
 export * from './types/quiz/quizPartial';
 export * from './types/quiz/quizParticipation';
 export * from './types/quiz/quizQuestion';
+export * from './types/reminder/reminderType';
+export * from './types/reminder/reminder';
+export * from './types/reminder/reminderPartial';
 export * from './types/roles/delegatorRole';
 export * from './types/roles/discordRoleAssignment';
 export * from './types/roles/discordRoleAssignmentListForGuildMember';

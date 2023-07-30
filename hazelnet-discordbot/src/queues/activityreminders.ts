@@ -1,15 +1,15 @@
-import { GuildTextBasedChannel } from "discord.js";
+import { GuildTextBasedChannel } from 'discord.js';
+import { DiscordServer } from '@vibrantnet/core';
 import i18n from 'i18n';
 import HazelnetClient from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
-import { DiscordServer } from '@vibrantnet/core';
-import discordpermissions from "../utility/discordpermissions";
+import discordpermissions from '../utility/discordpermissions';
 
 export type DiscordActivityReminder = {
   guildId: string
   channelId: string
   userId: string
-}
+};
 
 export default {
   name: 'activityreminders',
@@ -29,7 +29,7 @@ export default {
               const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.engagement.activityreminder.announceTitle', locale }, { userName: user.nickname ?? user.user.tag }), reminderText, 'help');
               await announceChannel.send({ embeds: [embedPublic] });
             }
-          }  else {
+          } else {
             client.logger.error({ guildId: activityReminder.guildId, msg: `Channel permissions for ${activityReminder.channelId} did not allow publishing activity reminders for user ${activityReminder.userId}` });
           }
         } else {
@@ -56,5 +56,3 @@ export default {
     return reminderText;
   },
 };
-
-

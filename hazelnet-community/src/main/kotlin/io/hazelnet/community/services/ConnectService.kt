@@ -2,6 +2,7 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.address.Handle
+import io.hazelnet.cardano.connect.data.other.EpochDetails
 import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
@@ -86,6 +87,14 @@ class ConnectService(
             .uri("/info/syncstatus")
             .retrieve()
             .bodyToMono(SyncInfo::class.java)
+            .block()!!
+    }
+
+    fun getEpochDetails(): EpochDetails {
+        return connectClient.get()
+            .uri("/info/epochdetails")
+            .retrieve()
+            .bodyToMono(EpochDetails::class.java)
             .block()!!
     }
 

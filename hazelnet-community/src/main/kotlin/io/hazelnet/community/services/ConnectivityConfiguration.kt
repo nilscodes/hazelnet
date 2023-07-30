@@ -127,6 +127,9 @@ class ConnectivityConfiguration(
     fun activityRemindersQueue() = Queue("activityreminders")
 
     @Bean
+    fun scheduledRemindersQueue() = Queue("scheduledreminders")
+
+    @Bean
     fun exchange() = DirectExchange("hazelnet")
 
     @Bean
@@ -180,6 +183,10 @@ class ConnectivityConfiguration(
     @Bean
     fun activityRemindersQueueBinding(@Qualifier("activityRemindersQueue") activityRemindersQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
             = BindingBuilder.bind(activityRemindersQueue).to(exchange)
+
+    @Bean
+    fun scheduledRemindersQueueBinding(@Qualifier("scheduledRemindersQueue") scheduledRemindersQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(scheduledRemindersQueue).to(exchange)
 
     @Bean
     fun messageConverter() = Jackson2JsonMessageConverter()

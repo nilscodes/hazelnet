@@ -584,6 +584,21 @@ CREATE TABLE "discord_bans"
     "alert_channel"       bigint
 );
 
+CREATE TABLE "discord_reminders"
+(
+    "reminder_id"             SERIAL PRIMARY KEY,
+    "discord_server_id"       int,
+    "external_account_id"     bigint,
+    "reminder_creation"       timestamp    NOT NULL,
+    "reminder_type"           smallint     NOT NULL,
+    "reminder_seconds_offset" int          NOT NULL,
+    "reminder_channel"        bigint       NOT NULL,
+    "reminder_title"          varchar(128) NOT NULL,
+    "reminder_text"           varchar(512) NOT NULL,
+    "last_epoch_sent"         smallint,
+    "last_time_sent"          timestamp
+);
+
 ALTER TABLE "account_settings" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id") ON DELETE CASCADE;
 
 ALTER TABLE "external_accounts" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("account_id");
@@ -729,3 +744,10 @@ ALTER TABLE "discord_quiz_completion" ADD FOREIGN KEY ("discord_quiz_id") REFERE
 ALTER TABLE "discord_bans" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_bans" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE SET NULL;
+
+ALTER TABLE "discord_reminders" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_reminders" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE SET NULL;
+
+CREATE INDEX "discord_reminders_last_epoch_sent_index" ON "discord_reminders" ("last_epoch_sent");
+

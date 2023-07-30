@@ -1,6 +1,6 @@
 import i18n from 'i18n';
-import { APIEmbedField } from "discord.js"
-import { Ban, ExternalAccount } from '@vibrantnet/core'
+import { APIEmbedField } from 'discord.js';
+import { Ban, ExternalAccount } from '@vibrantnet/core';
 
 export default {
   getBanDetailsFields(ban: Ban, bannedBy: ExternalAccount | null, locale: string): APIEmbedField[] {
@@ -18,5 +18,5 @@ export default {
       name: i18n.__({ phrase: 'configure.bans.list.banTimeTitle', locale }),
       value: `<t:${banTime}>`,
     }];
-  }
-}
+  },
+};

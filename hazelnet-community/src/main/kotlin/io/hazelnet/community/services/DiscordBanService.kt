@@ -2,9 +2,7 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.data.discord.DiscordBan
 import io.hazelnet.community.data.discord.DiscordServer
-import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
 import io.hazelnet.community.persistence.DiscordBanRepository
-import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
@@ -13,7 +11,6 @@ import java.util.*
 class DiscordBanService(
     private val discordServerService: DiscordServerService,
     private val discordBanRepository: DiscordBanRepository,
-    private val rabbitTemplate: RabbitTemplate,
 ) {
     fun listBans(guildId: Long): List<DiscordBan> {
         val discordServer = discordServerService.getDiscordServer(guildId)

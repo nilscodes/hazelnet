@@ -143,6 +143,10 @@
 			"configure-adminaccess-remove": "Remove a role that is currently allowed to administer the bot.",
 			"configure-social": "Commands to manage various Discord and social media features and integrations.",
 			"configure-social-announce": "Create custom branded announcements.",
+			"configure-social-epochreminder": "Manage epoch-scheduled announcements.",
+			"configure-social-epochreminder-add": "Create epoch-scheduled announcements.",
+			"configure-social-epochreminder-list": "Show current epoch-scheduled announcements.",
+			"configure-social-epochreminder-remove": "Remove an epoch-scheduled announcement.",
 			"join": "Join an existing giveaway or raffle.",
 			"configure-engagement": "Features to track and increase community engagement",
 			"configure-engagement-activityreminder": "Set up a channel for activity reminders",
@@ -282,7 +286,9 @@
 			},
 			"configure-social": {
 				"channel": "Channel to post the announcement to.",
-				"title": "The title/headline of your announcement."
+				"title": "The title/headline of your announcement.",
+				"type": "The type of schedule to use",
+				"time-offset": "The offset (in minutes) for when to post your announcement."
 			},
 			"configure-engagement": {
 				"status": "Set to False to turn this feature off.",
@@ -348,6 +354,10 @@
 				"STARTSWITH": "starts with",
 				"ENDSWITH": "ends with",
 				"REGEX": "matches the Regular Expression"
+			},
+			"configure-social": {
+				"BEFORE_EPOCH_BOUNDARY": "Before epoch boundary",
+				"AFTER_EPOCH_BOUNDARY": "After epoch boundary"
 			}
 		}
 	},
@@ -846,6 +856,37 @@
 				"purpose": "You are about to create a announcement in the channel <#{{channel}}>. The announcement will contain the text you send as the next message in this channel in the next five minutes. You can use any Discord markdown you want and will receive a preview of your announcement before submitting it.",
 				"success": "✅ Announcement successfully published in <#{{channel}}>.",
 				"publish": "Create announcement"
+			},
+			"epochreminder": {
+				"add": {
+					"purpose": "You are about to create a regular reminder with the following configuration.",
+					"purposeFollow": "The reminder will contain the text you send as the next message in this channel in the next five minutes. You can use any Discord markdown you want and will receive a preview of your reminder before submitting it.",
+					"success": "✅ Reminder successfully created.",
+					"publish": "Create reminder",
+					"reminderType": "Reminder Type",
+					"reminderType_BEFORE_EPOCH_BOUNDARY": "Reminder is sent **{{offset}}** before each epoch boundary to channel <#{{channel}}>.",
+					"reminderType_AFTER_EPOCH_BOUNDARY": "Reminder is sent **{{offset}}** after each epoch boundary to channel <#{{channel}}>.",
+					"reminderTitle": "Title",
+					"lastTimeSent": "Last Time/Epoch sent",
+					"lastTimeSentDetails": "The last reminder was sent at <t:{{lastTimeSentTimestamp}}> during epoch {{lastEpochSent}}.",
+					"createTimeTitle": "Time created"
+				},
+				"list": {
+					"purpose": "Reminder list",
+					"purposeContinued": "Reminder list (continued)",
+					"reminderSelection": "{{reminderTitle}} (ID: {{reminderId}})",
+					"noRemindersName": "No active reminders",
+					"noReminders": "Currently, this server has no reminders configured.",
+					"chooseDetails": "Choose the reminder you want to get details for",
+					"detailsPurpose": "Information about the reminder you selected:"
+				},
+				"remove": {
+					"purpose": "🗑️ Select a reminder to remove.\n⚠ This will not remove existing messages and cannot be undone.",
+					"purposeContinued": "Selected a reminder to remove (continued)",
+					"success": "🗑️ Removed the following reminder from this server:",
+					"errorNotFound": "⚠ No reminder with the ID **{{reminderId}}** was found for this server. Nothing was removed.",
+					"chooseDetails": "Choose the reminder you want to remove"
+				}
 			}
 		},
 		"stakepool": {
