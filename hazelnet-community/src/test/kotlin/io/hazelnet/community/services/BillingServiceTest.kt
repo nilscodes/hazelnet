@@ -94,6 +94,39 @@ internal class BillingServiceTest {
 
     }
 
+    @Test
+    fun `calculate bot funding with weighted pledge amount`() {
+        val discordServerRepository = getMockDiscordServerRepository()
+        every { discordServerRepository.getDiscordMembersWithStakeAndPremiumPledge(testServer.id!!) } returns listOf(
+            DiscordServerMemberStakeImpl(12, 1, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff", 80),
+            DiscordServerMemberStakeImpl(2, 1, "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff", 20),
+        )
+        val stakepoolService = getMockStakepoolService()
+        every { stakepoolService.getDelegation("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4") } returns listOf(
+            DelegationInfo(
+                "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4",
+                167765168318,
+                "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"
+            ),
+        )
+        val discordServerService = mockk<DiscordServerService>()
+        every { discordServerService.getDiscordServer(testServer.guildId) } returns(testServer)
+        val mockConfig = mockk<CommunityApplicationConfiguration>()
+        every { mockConfig.fundedpool } returns "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4"
+        val billingService = BillingService(
+            mockConfig,
+            stakepoolService,
+            discordServerService,
+            discordServerRepository,
+            mockk(),
+            mockk(),
+            mockk(),
+        )
+
+        assertEquals(134212134654, billingService.getBotFunding(testServer.guildId))
+
+    }
+
     private fun getMockDiscordServerRepository(): DiscordServerRepository {
         val discordServerRepository = mockk<DiscordServerRepository>()
         every { discordServerRepository.findByGuildId(testServer.guildId) } returns Optional.of(testServer)

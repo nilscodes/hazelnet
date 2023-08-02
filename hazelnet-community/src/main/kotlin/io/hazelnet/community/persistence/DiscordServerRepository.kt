@@ -1,10 +1,12 @@
 package io.hazelnet.community.persistence
 
 import io.hazelnet.community.data.discord.DiscordServer
+import io.hazelnet.community.data.discord.DiscordServerMemberPledge
 import io.hazelnet.community.data.discord.DiscordServerMemberStake
 import io.hazelnet.community.data.discord.widgets.DiscordMintCounterUpdateProjection
 import io.hazelnet.community.data.discord.widgets.DiscordRoleCounterUpdateProjection
 import io.hazelnet.community.data.discord.widgets.DiscordWidgetUpdateProjection
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -21,11 +23,11 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
     @Query(value = "SELECT SUM(guildMemberCount) FROM DiscordServer WHERE active=true")
     fun sumGuildMemberCountForActiveServers(): Long
 
-    @Query(value = "SELECT DISTINCT discord_server_id AS discordServerId, m.external_account_id AS externalAccountId, cardano_stake_address as cardanoStakeAddress FROM external_accounts ea JOIN discord_server_members m ON ea.external_account_id = m.external_account_id JOIN verifications v on ea.external_account_id = v.external_account_id WHERE m.external_account_id IN (SELECT external_account_id FROM discord_server_members WHERE discord_server_id=:discordServerId AND premium_support=true) AND m.premium_support=true AND v.confirmed", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT discord_server_id AS discordServerId, m.external_account_id AS externalAccountId, cardano_stake_address as cardanoStakeAddress, premium_weight as stakePercentage FROM external_accounts ea JOIN discord_server_members m ON ea.external_account_id = m.external_account_id JOIN verifications v on ea.external_account_id = v.external_account_id WHERE m.external_account_id IN (SELECT external_account_id FROM discord_server_members WHERE discord_server_id=:discordServerId AND premium_support=true) AND m.premium_support=true AND v.confirmed", nativeQuery = true)
     fun getDiscordMembersWithStakeAndPremiumPledge(@Param("discordServerId") discordServerId: Int): List<DiscordServerMemberStake>
 
-    @Query(value = "SELECT DISTINCT guild_name FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId AND premium_support=true", nativeQuery = true)
-    fun getDiscordServersForPremiumMember(@Param("externalAccountId") externalAccountId: Long): List<String>
+    @Query(value = "SELECT DISTINCT guild_name as guildName, premium_weight as premiumWeight FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId AND premium_support=true", nativeQuery = true)
+    fun getDiscordServersForPremiumMember(@Param("externalAccountId") externalAccountId: Long): List<DiscordServerMemberPledge>
 
     @Query(value = "SELECT DISTINCT ds.* FROM discord_servers ds JOIN discord_server_members dsm on ds.discord_server_id = dsm.discord_server_id WHERE external_account_id=:externalAccountId", nativeQuery = true)
     fun getDiscordServersForMember(@Param("externalAccountId") externalAccountId: Long): List<DiscordServer>
@@ -44,4 +46,8 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
 
     @Query(value = "SELECT ds.guild_id AS guildId, dss.setting_value as updateInfo FROM discord_servers ds JOIN discord_settings dss on ds.discord_server_id = dss.discord_server_id WHERE dss.setting_name='WIDGET_MINTCOUNTER' AND dss.setting_value<>''", nativeQuery = true)
     fun findChannelsForMintCounterUpdate(): List<DiscordMintCounterUpdateProjection>
+
+    @Query(value = "UPDATE discord_server_members SET premium_weight=-1 WHERE external_account_id=:externalAccountId", nativeQuery = true)
+    @Modifying
+    fun resetPremiumWeightForExternalAccount(@Param("externalAccountId") externalAccountId: Long)
 }

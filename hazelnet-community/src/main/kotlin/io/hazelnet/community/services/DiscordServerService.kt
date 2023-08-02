@@ -258,11 +258,13 @@ class DiscordServerService(
     private fun getMember(discordServer: DiscordServer, externalAccountId: Long)
         = discordServer.members.find { it.externalAccountId == externalAccountId } ?: throw NoSuchElementException("No discord member with external account ID $externalAccountId found on guild ${discordServer.guildId}")
 
+    @Transactional
     fun updateMember(guildId: Long, externalAccountId: Long, discordMemberPartial: DiscordMemberPartial): DiscordMember {
         val discordServer = getDiscordServer(guildId)
         val member = getMember(discordServer, externalAccountId)
         member.premiumSupport = discordMemberPartial.premiumSupport
         discordServerRepository.save(discordServer)
+        discordServerRepository.resetPremiumWeightForExternalAccount(externalAccountId)
         return member
     }
 

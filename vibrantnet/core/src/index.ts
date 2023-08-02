@@ -68,6 +68,7 @@ export * from './types/poll/voteData';
 export * from './types/poll/poll';
 export * from './types/poll/pollOption';
 export * from './types/poll/pollPartial';
+export * from './types/premium/discordServerMemberPledge';
 export * from './types/premium/discordServerPremiumInfo';
 export * from './types/premium/externalAccountPremiumInfo';
 export * from './types/premium/incomingDiscordPayment';

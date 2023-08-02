@@ -1,5 +1,7 @@
+import { DiscordServerMemberPledge } from './discordServerMemberPledge';
+
 export type ExternalAccountPremiumInfo = {
-  discordServers: string[],
+  discordServers: DiscordServerMemberPledge[],
   stakeAmount: number,
   tokenBalance: number,
   premium: boolean

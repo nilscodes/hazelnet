@@ -1,24 +1,28 @@
-import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder, APIEmbed } from 'discord.js';
+import {
+  SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, AnyComponentBuilder, APIEmbed,
+} from 'discord.js';
 import i18n from 'i18n';
+import {
+  DiscordServer, DiscordServerMember, DiscordServerMemberPledge, ExternalAccountPremiumInfo,
+} from '@vibrantnet/core';
 import { BotCommand } from '../utility/commandtypes';
 import { AugmentedButtonInteraction, AugmentedCommandInteraction } from '../utility/hazelnetclient';
 import embedBuilder from '../utility/embedbuilder';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
-import { DiscordServer, DiscordServerMember } from '@vibrantnet/core';
 
 type InterfaceInfo = {
   image: string
   text: string
-}
+};
 type EmbedParts = {
   embed: APIEmbed
   components: ActionRowBuilder<MessageActionRowComponentBuilder>[]
-}
+};
 
 interface PremiumCommand extends BotCommand {
   getGiveawayInfo(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction): Promise<InterfaceInfo>
-  showPremiumEmbed(discordMemberInfo: DiscordServerMember, premiumInfo: any, locale: string, discordServer: DiscordServer, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
+  showPremiumEmbed(discordMemberInfo: DiscordServerMember, premiumInfo: ExternalAccountPremiumInfo, locale: string, discordServer: DiscordServer, stakeLink: string, giveawayInfo: InterfaceInfo): EmbedParts
 }
 
 export default <PremiumCommand> {
@@ -65,15 +69,21 @@ export default <PremiumCommand> {
     const stakedAda = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / 1000000));
     const premiumFields = [{
       name: i18n.__({ phrase: 'premium.premiumStatus', locale }),
-      value: i18n.__({ phrase: (premiumInfo.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink }),
+      value: i18n.__({ phrase: (premiumInfo.premium ? 'premium.premiumStatusYes' : 'premium.premiumStatusNo'), locale }, { ...premiumInfo, stakeAmount: stakedAda, stakeLink } as any),
     }];
     let components: ActionRowBuilder<AnyComponentBuilder>[] = [];
     if (premiumInfo.premium) {
       let serverSupport = i18n.__({ phrase: 'premium.serverSupportNo', locale });
       const pledgedServerCount = premiumInfo.discordServers.length;
       if (pledgedServerCount) {
-        const stakeAmountPerServer = discordServer.formatNumber(Math.floor(premiumInfo.stakeAmount / pledgedServerCount / 1000000));
-        serverSupport = i18n.__({ phrase: 'premium.serverSupportYes', locale }, { stakeAmountPerServer }) + premiumInfo.discordServers.map((serverName: string) => i18n.__({ phrase: 'premium.serverSupportEntry', locale }, { serverName })).join('\n');
+        serverSupport = i18n.__({ phrase: 'premium.serverSupportYes', locale }) + premiumInfo.discordServers.map((pledgeInfo: DiscordServerMemberPledge) => {
+          let premiumWeight = 1 / pledgedServerCount;
+          if (pledgeInfo.premiumWeight >= 0) {
+            premiumWeight = pledgeInfo.premiumWeight / 100;
+          }
+          const pledgedAda = discordServer.formatNumber(Math.floor((premiumInfo.stakeAmount * premiumWeight) / 1000000));
+          return i18n.__({ phrase: 'premium.serverSupportEntryWeighted', locale }, { serverName: pledgeInfo.guildName, premiumWeight: Math.round(premiumWeight * 100), pledgedAda } as any);
+        }).join('\n');
       }
       premiumFields.push({
         name: i18n.__({ phrase: 'premium.serverSupport', locale }),

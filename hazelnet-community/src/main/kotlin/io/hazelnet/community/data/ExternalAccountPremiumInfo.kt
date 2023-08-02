@@ -1,7 +1,9 @@
 package io.hazelnet.community.data
 
+import io.hazelnet.community.data.discord.DiscordServerMemberPledge
+
 data class ExternalAccountPremiumInfo(
-    val discordServers: List<String>,
+    val discordServers: List<DiscordServerMemberPledge>,
     val stakeAmount: Long,
     val tokenBalance: Long,
 ) {
