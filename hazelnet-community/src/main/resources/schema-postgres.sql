@@ -185,7 +185,8 @@ CREATE TABLE "discord_server_members"
     "discord_server_id"       int,
     "external_account_id"     bigint,
     "join_time"               timestamp,
-    "premium_support"         boolean NOT NULL DEFAULT false
+    "premium_support"         boolean NOT NULL DEFAULT false,
+    "premium_weight"          smallint NOT NULL DEFAULT -1
 );
 
 CREATE TABLE "discord_activity"

@@ -2908,7 +2908,16 @@ components:
         discordServers:
           type: array
           items:
-            type: string
+            type: object
+            properties:
+              guildName:
+                type: string
+                example: 'My cool Discord'
+              premiumWeight:
+                description: A percentage (between 0-100) of how much of the total delegation is counted towards this server
+                type: integer
+                format: int32
+                example: 80
           readOnly: true
         stakeAmount:
           type: integer

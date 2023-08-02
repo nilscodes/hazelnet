@@ -118,7 +118,9 @@ class BillingService(
             return allDelegationToFundedPool
                 .filter { stakeAddressesOnThisServer.contains(it.stakeAddress) }
                 .sumOf {
-                    it.amount / (stakeAddressesToServerMembershipCounts[it.stakeAddress] ?: 1)
+                    val declaredPercentage = discordMemberDelegations.find { delegation -> delegation.getCardanoStakeAddress() == it.stakeAddress }?.getStakePercentage() ?: -1
+                    val percentage = if (declaredPercentage >= 0) declaredPercentage / 100.0 else 1.0 / stakeAddressesToServerMembershipCounts[it.stakeAddress]!!
+                    (it.amount * percentage).toLong()
                 }
         }
         return 0

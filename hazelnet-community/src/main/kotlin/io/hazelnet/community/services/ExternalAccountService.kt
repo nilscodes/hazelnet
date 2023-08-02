@@ -110,8 +110,8 @@ class ExternalAccountService(
 
     fun getPremiumInfo(externalAccountId: Long): ExternalAccountPremiumInfo {
         val externalAccount = getExternalAccount(externalAccountId) // Ensure account exists
-        val verifiedStakeAddresses = getVerifiedStakeAddressesForExternalAccount(externalAccountId)
         if (config.fundedpool != null) {
+            val verifiedStakeAddresses = getVerifiedStakeAddressesForExternalAccount(externalAccountId)
             val premiumDelegationInfo = stakepoolService.getDelegation(config.fundedpool)
             val totalAmountStaked = premiumDelegationInfo
                 .filter { verifiedStakeAddresses.contains(it.stakeAddress) }
