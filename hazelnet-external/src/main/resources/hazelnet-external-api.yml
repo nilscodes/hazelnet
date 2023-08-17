@@ -85,6 +85,30 @@ paths:
                                     $ref: '#/components/schemas/PhysicalProduct'
                 default:
                     $ref: '#/components/responses/DefaultErrorResponse'
+    /community/assets/{discordUserId}/{policyId}:
+        get:
+            summary: 'Get all assets of a given policy ID from the wallets the respective Discord user has chosen to expose to the Discord server identified by the API token that is provided'
+            operationId: getAssetsOfPolicyForDiscordUser
+            tags:
+                - discord
+                - assets
+            parameters:
+                - $ref: '#/components/parameters/DiscordUserIdPathParameter'
+                - $ref: "#/components/parameters/PolicyIdPathParameter"
+            responses:
+                '200':
+                    description: 'A list of asset fingerprints in verified wallets of this user that the user has chosen to expose to the Discord server identified by the API token that is provided'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/AssetFingerprint"
+                '403':
+                    description: 'No wallets have been exposed by this user'
+                default:
+                    $ref: '#/components/responses/DefaultErrorResponse'
+
 components:
     parameters:
         WhitelistNamePathParameter:
@@ -105,6 +129,22 @@ components:
             example: HoodieOrder
             schema:
                 type: string
+        DiscordUserIdPathParameter:
+            name: discordUserId
+            in: path
+            description: The Discord Users's ID
+            required: true
+            style: simple
+            schema:
+                $ref: "#/components/schemas/DiscordUser"
+        PolicyIdPathParameter:
+            name: policyId
+            in: path
+            description: The Policy ID
+            required: true
+            style: simple
+            schema:
+                $ref: "#/components/schemas/TokenPolicyId"
 
     responses:
         DefaultErrorResponse:
@@ -232,6 +272,21 @@ components:
                             - L
                             - XL
                             - XXL
+        TokenPolicyId:
+            type: string
+            description: The Policy ID
+            example: ceb5dedd6cda3f0b4a98919b5d3827e15e324771642b57e0e6aabd57
+            pattern: "^[A-Za-z0-9]{56}$"
+        AssetFingerprint:
+            type: string
+            description: The fingerprint of an asset
+            example: asset1ls9tt8s03x2gcqjyppx346ct64jts7fnwsmequ
+            pattern: "^asset1[A-Za-z-0-9]{38}$"
+        DiscordUser:
+            description: Snowflake ID matching a Discord user
+            type: integer
+            format: int64
+            example: 717264144735590
         WalletAddress:
             type: string
         BlockchainType:
