@@ -2,17 +2,18 @@ package io.hazelnet.community.controllers
 
 import io.hazelnet.community.data.HandleNotResolvedException
 import io.hazelnet.community.data.IncomingPaymentAlreadyRequestedException
-import io.hazelnet.shared.data.ApiErrorMessage
-import io.hazelnet.shared.data.ApiErrorResponse
 import io.hazelnet.community.data.InvalidAddressException
 import io.hazelnet.community.data.StakeAddressInUseException
-import io.hazelnet.community.data.discord.whitelists.WhitelistRequirementNotMetException
 import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersCannotBeDrawnException
 import io.hazelnet.community.data.discord.giveaways.GiveawayWinnersNotDrawnException
+import io.hazelnet.community.data.discord.whitelists.WhitelistRequirementNotMetException
 import io.hazelnet.community.data.ping.LastPingTooRecentException
 import io.hazelnet.community.data.ping.PingTargetNotFoundException
+import io.hazelnet.shared.data.ApiErrorMessage
+import io.hazelnet.shared.data.ApiErrorResponse
 import mu.KotlinLogging
 import org.springframework.core.annotation.Order
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -101,6 +102,20 @@ class ApiExceptionHandler {
     @ResponseBody
     fun processHandleNotResolvedException(ex: HandleNotResolvedException): ApiErrorResponse {
         return ApiErrorResponse(ex.message ?: "", HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    fun processIllegalArgumentException(ex: IllegalArgumentException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun processDataIntegrityViolationException(ex: DataIntegrityViolationException): ApiErrorResponse {
+        return ApiErrorResponse(ex.message ?: "", HttpStatus.CONFLICT)
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

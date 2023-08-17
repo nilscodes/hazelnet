@@ -1,9 +1,11 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.community.data.*
+import io.hazelnet.community.persistence.ExposedWalletRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationImportRepository
 import io.hazelnet.community.persistence.VerificationRepository
+import io.hazelnet.shared.data.BlockchainType
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
@@ -14,6 +16,7 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.transaction.Transactional
+import kotlin.NoSuchElementException
 
 private val logger = KotlinLogging.logger {}
 
@@ -27,6 +30,7 @@ class VerificationService(
     private val accountService: AccountService,
     private val globalCommunityService: GlobalCommunityService,
     private val roleAssignmentService: RoleAssignmentService,
+    private val exposedWalletRepository: ExposedWalletRepository,
     meterRegistry: MeterRegistry,
 ) {
 
@@ -198,5 +202,31 @@ class VerificationService(
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId) // Ensure account exists
         return importExternalVerifications(externalAccount)
     }
+
+    fun getExposedWallets(verificationId: Long): List<ExposedWallet> {
+        val verification = getVerificationInfo(verificationId)
+        return verification.exposedWallets.toList()
+    }
+
+    fun addExposedWallet(verificationId: Long, exposedWallet: ExposedWallet): ExposedWallet {
+        getVerificationInfo(verificationId)
+        if (exposedWallet.verificationId != verificationId) {
+            throw IllegalArgumentException("Verification ID of exposed wallet does not match verification ID of verification.")
+        }
+        // TODO Consider verifying if verification owner is linked ot the server
+        exposedWallet.exposedAt = Date()
+        return exposedWalletRepository.save(exposedWallet)
+    }
+
+    fun deleteExposedWallet(verificationId: Long, exposedWalletId: Long) {
+        val verificationToDeleteFrom = getVerificationInfo(verificationId)
+        val exposedWalletRemoved = verificationToDeleteFrom.exposedWallets.firstOrNull() { it.id == exposedWalletId }
+        if (exposedWalletRemoved != null) {
+            exposedWalletRepository.delete(exposedWalletRemoved)
+        } else {
+            throw NoSuchElementException("No exposed wallet with ID $exposedWalletId found for verification with ID $verificationId.")
+        }
+    }
+
 
 }

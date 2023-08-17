@@ -6,6 +6,7 @@ import { SummarizedWhitelistSignup } from '../types/whitelist/summarizedWhitelis
 import { ExternalAccountPremiumInfo } from '../types/premium/externalAccountPremiumInfo';
 import { VerificationImport } from '../types/verification/verificationImport';
 import { BaseCacheApi } from './baseCache';
+import { ExposedWallet } from '../types/verification/exposedWallet';
 
 export class ExternalAccountsApi extends BaseCacheApi {
   async createOrUpdateExternalDiscordAccount(discordUserId: string, discordUserTag: string): Promise<ExternalAccount> {
@@ -83,5 +84,23 @@ export class ExternalAccountsApi extends BaseCacheApi {
   async importVerifications(externalAccountId: string): Promise<VerificationImport[]> {
     const importedVerifications = await axios.post(`${this.apiUrl}/externalaccounts/${externalAccountId}/import`);
     return importedVerifications.data;
+  }
+
+  async getExternalAccountExposedWallets(externalAccountId: string, guildId?: string): Promise<ExposedWallet[]> {
+    const exposedWallets = await axios.get(`${this.apiUrl}/externalaccounts/${externalAccountId}/exposedwallets`, {
+      params: {
+        guildId,
+      },
+    });
+    return exposedWallets.data;
+  }
+
+  async deleteExternalAccountExposedWallets(externalAccountId: string, guildId?: string): Promise<ExposedWallet[]> {
+    const exposedWallets = await axios.delete(`${this.apiUrl}/externalaccounts/${externalAccountId}/exposedwallets`, {
+      params: {
+        guildId,
+      },
+    });
+    return exposedWallets.data;
   }
 }

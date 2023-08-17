@@ -1,5 +1,6 @@
 package io.hazelnet.community.data
 
+import io.hazelnet.shared.data.BlockchainType
 import java.util.Date
 
 data class VerificationDto(

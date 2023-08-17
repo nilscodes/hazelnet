@@ -7,6 +7,7 @@ import io.hazelnet.community.data.*
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
+import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.data.ExternalAccountType
 import io.mockk.every
 import io.mockk.mockk

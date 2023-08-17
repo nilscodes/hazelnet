@@ -275,7 +275,7 @@ internal class DiscordGiveawayServiceTest {
 
         val externalAccountRepository = mockk<ExternalAccountRepository>()
         every { externalAccountRepository.findById(any()) } returns Optional.of(ExternalAccount(1, "12", "shared", Date(), ExternalAccountType.DISCORD, null, false, mutableSetOf()))
-        val externalAccountService = ExternalAccountService(externalAccountRepository, mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
+        val externalAccountService = ExternalAccountService(externalAccountRepository, mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
 
         val giveawayRepository = mockk<DiscordGiveawayRepository>()
         every { giveawayRepository.findByDiscordServerId(12) } returns listOf(basicGiveaway)

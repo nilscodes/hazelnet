@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS "exposed_wallets";
 DROP TABLE IF EXISTS "discord_activity";
 DROP TABLE IF EXISTS "discord_marketplace_markets";
 DROP TABLE IF EXISTS "discord_marketplace_filters";
@@ -385,6 +386,14 @@ CREATE TABLE "discord_giveaway_entries"
     "winning_count"       smallint NOT NULL DEFAULT 0
 );
 
+CREATE TABLE "exposed_wallets"
+(
+    "exposed_wallet_id"   BIGSERIAL PRIMARY KEY,
+    "exposed_at"          timestamp NOT NULL,
+    "discord_server_id"   int    NOT NULL,
+    "verification_id"     bigint NOT NULL
+);
+
 CREATE TABLE "stake_snapshot_cardano"
 (
     "snapshot_id"                SERIAL PRIMARY KEY,
@@ -752,3 +761,8 @@ ALTER TABLE "discord_reminders" ADD FOREIGN KEY ("external_account_id") REFERENC
 
 CREATE INDEX "discord_reminders_last_epoch_sent_index" ON "discord_reminders" ("last_epoch_sent");
 
+ALTER TABLE "exposed_wallets" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
+
+ALTER TABLE "exposed_wallets" ADD FOREIGN KEY ("verification_id") REFERENCES "verifications" ("verification_id") ON DELETE CASCADE;
+
+CREATE UNIQUE INDEX ON "exposed_wallets" ("discord_server_id", "verification_id");

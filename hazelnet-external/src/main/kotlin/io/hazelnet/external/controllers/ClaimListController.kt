@@ -2,6 +2,7 @@ package io.hazelnet.external.controllers
 
 import io.hazelnet.external.data.claim.AnonymousPhysicalOrder
 import io.hazelnet.external.data.claim.PhysicalProduct
+import io.hazelnet.external.security.getGuildId
 import io.hazelnet.external.services.ClaimListService
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication
@@ -15,18 +16,15 @@ class ClaimListController(
     @GetMapping("/{claimListName}/orders")
     @ResponseStatus(HttpStatus.OK)
     fun getClaimListOrders(@PathVariable claimListName: String, authentication: BearerTokenAuthentication): List<AnonymousPhysicalOrder> {
-        val guildId = getGuildIdFromToken(authentication)
+        val guildId = authentication.getGuildId()
         return claimListService.getClaimListOrders(guildId, claimListName)
     }
 
     @GetMapping("/{claimListName}/products")
     @ResponseStatus(HttpStatus.OK)
     fun getClaimListProducts(@PathVariable claimListName: String, authentication: BearerTokenAuthentication): List<PhysicalProduct> {
-        val guildId = getGuildIdFromToken(authentication)
+        val guildId = authentication.getGuildId()
         return claimListService.getClaimListProducts(guildId, claimListName)
     }
 
-    private fun getGuildIdFromToken(authentication: BearerTokenAuthentication): Long {
-        return authentication.token.tokenValue.substringAfter(".").toLong()
-    }
 }

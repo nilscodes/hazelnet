@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@discordjs/rest": "^0.4.0",
-    "@vibrantnet/core": "^0.0.5",
+    "@vibrantnet/core": "^0.0.6",
     "amqplib": "^0.10.2",
     "axios": "^0.24.0",
     "cids": "^1.1.9",

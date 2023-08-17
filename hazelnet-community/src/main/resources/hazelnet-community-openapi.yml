@@ -231,6 +231,53 @@ paths:
           headers:
             Location:
               $ref: "#/components/schemas/CreatedResponseHeader"
+  /externalaccounts/{externalAccountId}/exposedwallets:
+    get:
+      summary: "Get all exposed wallets for this external account based on optional filter criteria"
+      operationId: getExternalAccountExposedWallets
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - name: guildId
+          in: query
+          description: The guild ID of the discord server to retrieve the exposed wallets for
+          required: false
+          schema:
+            $ref: '#/components/schemas/DiscordGuild'
+      responses:
+        "200":
+          description: "List of all exposed wallets for this user"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExposedWallet"
+    delete:
+      summary: "Delete all exposed wallets for this external account based on optional filter criteria"
+      operationId: deleteExternalAccountExposedWallets
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+        - name: guildId
+          in: query
+          description: The guild ID of the discord server to remove the exposed wallets for
+          required: false
+          schema:
+            $ref: '#/components/schemas/DiscordGuild'
+      responses:
+        "200":
+          description: "List of all matched and deleted exposed wallets for this user"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExposedWallet"
   /externalaccounts/{externalAccountId}/pings:
     get:
       summary: "Get pings for this specific account (sent and received)"
@@ -307,12 +354,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ExternalAccountPremiumInfo"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/{externalAccountId}/import:
     post:
       summary: "Import any outstanding verifications from other systems for this user"
@@ -348,12 +389,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Account"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /externalaccounts/discord/{discordUserId}:
     get:
       summary: Get external account matching a Discord user ID
@@ -425,12 +460,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Verification"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /snapshots/stake:
     post:
       summary: "Schedule a token snapshot"
@@ -450,12 +479,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiAssetSnapshot"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
   /verifications/{verificationId}:
     get:
       summary: "Get Verification Info"
@@ -471,12 +494,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Verification"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
     delete:
       summary: "Delete Verification Info by ID"
       operationId: deleteVerification
@@ -487,12 +504,61 @@ paths:
       responses:
         "204":
           description: "Successful deletion"
-        default:
-          description: Unexpected error
+  /verifications/{verificationId}/exposedwallets:
+    get:
+      summary: "Get all exposed locations for this specific wallet/verification"
+      operationId: getExposedWallets
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/VerificationPathParameter"
+      responses:
+        "200":
+          description: "List of all exposed locations for this specific wallet/verification"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExposedWallet"
+    post:
+      summary: Expose a specific wallet to a dedicated service
+      description: Use to expose an existing, valid verification to a dedicated external service (like a Discord server)
+      operationId: addExposedWallet
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/VerificationPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExposedWallet"
+      responses:
+        "201":
+          description: Confirmed creation of new exposed wallet location
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExposedWallet"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /verifications/{verificationId}/exposedwallets/{exposedWalletId}:
+    delete:
+      summary: Remove a specific wallet exposure from this verification
+      operationId: deleteExposedWallet
+      tags:
+        - account
+        - verification
+      parameters:
+        - $ref: "#/components/parameters/VerificationPathParameter"
+        - $ref: "#/components/parameters/ExposedWalletPathParameter"
+      responses:
+        "204":
+          description: "Successful deletion"
   /pings:
     post:
       summary: Ping another user
@@ -746,7 +812,7 @@ paths:
               $ref: "#/components/schemas/DiscordBan"
       responses:
         "201":
-          description: "Added discord member"
+          description: "Added discord ban configuration"
           content:
             application/json:
               schema:
@@ -780,6 +846,76 @@ paths:
       parameters:
         - $ref: "#/components/parameters/GuildIdPathParameter"
         - $ref: "#/components/parameters/BanIdPathParameter"
+      responses:
+        "204":
+          description: "Successful deletion"
+  /discord/servers/{guildId}/reminders:
+    get:
+      summary: Get the current set of reminders on this Discord
+      operationId: listReminders
+      tags:
+        - discord
+        - reminders
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Reminder list for this Discord"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordReminder"
+    post:
+      summary: Add a new reminder to this Discord
+      operationId: addReminder
+      tags:
+        - discord
+        - reminders
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordReminder"
+      responses:
+        "201":
+          description: "Added discord reminder"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordReminder"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/reminders/{reminderId}:
+    get:
+      summary: Get details of a specific reminder
+      operationId: getReminder
+      tags:
+        - discord
+        - reminders
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ReminderIdPathParameter"
+      responses:
+        "200":
+          description: Reminder details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordReminder"
+    delete:
+      summary: Delete a reminder from this Discord server
+      operationId: deleteReminder
+      tags:
+        - discord
+        - reminders
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ReminderIdPathParameter"
       responses:
         "204":
           description: "Successful deletion"
@@ -2646,6 +2782,16 @@ components:
       schema:
         type: integer
         format: int64
+    ReminderIdPathParameter:
+      name: reminderId
+      in: path
+      description: The reminder ID
+      required: true
+      style: simple
+      example: 52
+      schema:
+        type: integer
+        format: int64
     PolicyIdPathParameter:
       name: policyId
       in: path
@@ -2848,6 +2994,15 @@ components:
       schema:
         type: integer
         format: int64
+    ExposedWalletPathParameter:
+      name: exposedWalletId
+      in: path
+      description: The ID of the exposed wallet location
+      required: true
+      style: simple
+      schema:
+        type: integer
+        format: int64
   schemas:
     GlobalSetting:
       type: object
@@ -3016,6 +3171,28 @@ components:
         obsolete:
           readOnly: true
           type: boolean
+    ExposedWallet:
+      type: object
+      required:
+        - discordServerId
+        - verificationId
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          example: 12351
+          format: int64
+        discordServerId:
+          $ref: "#/components/schemas/DiscordServerId"
+        exposedAt:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T13:20:57Z
+        verificationId:
+          type: integer
+          example: 1249010
+          format: int64
     IncomingDiscordPaymentRequest:
       type: object
       required:
@@ -4296,6 +4473,59 @@ components:
           maxLength: 256
         alertChannel:
           $ref: "#/components/schemas/DiscordChannel"
+    DiscordReminder:
+      type: object
+      required:
+        - creator
+        - type
+        - title
+        - reminderText
+        - reminderChannel
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        creator:
+          type: integer
+          format: int64
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        type:
+          type: string
+          enum:
+            - BEFORE_EPOCH_BOUNDARY
+            - AFTER_EPOCH_BOUNDARY
+        secondsOffset:
+          description: Number of seconds before or after the event in type (if applicable)
+          type: integer
+          format: int64
+          example: 3600
+        title:
+          type: string
+          description: Title of the reminder message
+          example: Claim your HOSKY before it is too late
+          minLength: 1
+          maxLength: 128
+        reminderText:
+          type: string
+          description: The text of the reminder message
+          example: Hey, go to https://www.hosky.io and claim now!
+        reminderChannel:
+          $ref: "#/components/schemas/DiscordChannel"
+        lastEpochSent:
+          readOnly: true
+          type: integer
+          format: int64
+          example: 420
+        lastTimeSent:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
     Whitelist:
       type: object
       required:

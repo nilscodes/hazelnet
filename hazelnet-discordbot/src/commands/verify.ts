@@ -1,12 +1,12 @@
-import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from '../utility/commandtypes';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 
 export default <BotCommand> {
-  getCommandData(locale) {
+  getCommandData(locale, commandsToEnable) {
     const ci18n = new CommandTranslations('verify', locale);
-    return new SlashCommandBuilder()
+    const commandBuilder = new SlashCommandBuilder()
       .setName('verify')
       .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
@@ -29,9 +29,16 @@ export default <BotCommand> {
       .addSubcommand((subcommand) => subcommand
         .setName('unlink')
         .setDescription(ci18n.subDescription('unlink')));
+    if (commandsToEnable?.includes('verify-expose')) {
+      commandBuilder.addSubcommand((subcommand) => subcommand
+        .setName('expose')
+        .setDescription(ci18n.subDescription('expose')));
+    }
+    return commandBuilder;
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
   commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
   execute: commandbase.executeSubcommand,
   executeButton: commandbase.executeButtonIfUser,
+  executeSelectMenu: commandbase.executeSubcommandSelectMenu,
 };

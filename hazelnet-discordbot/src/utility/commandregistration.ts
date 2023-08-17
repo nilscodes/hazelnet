@@ -1,18 +1,14 @@
 /* eslint-disable global-require */
-import startCommand from '../commands/start';
-import { BotCommand } from './commandtypes';
-import HazelnetClient from './hazelnetclient';
-import fs from 'fs'
-import { REST } from '@discordjs/rest'
+import fs from 'fs';
+import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import path from 'path';
+import { BotCommand } from './commandtypes';
+import HazelnetClient from './hazelnetclient';
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN!);
 
 export default {
-  async registerStartCommand(client: HazelnetClient, guildId: string) {
-    await this.registerCommands(client, guildId, [startCommand.getCommandData('en').toJSON()]);
-  },
   async registerMainCommands(enabledCommandTags: string[], client: HazelnetClient, guildId: string) {
     const commandsToEnable = [...enabledCommandTags];
     const discordServer = await client.services.discordserver.getDiscordServer(guildId);
@@ -24,6 +20,9 @@ export default {
 
     if (!discordServer.settings?.SPONSORED_BY) {
       commandsToEnable.push('premium');
+    }
+    if (discordServer.settings?.EXPOSE_WALLETS_RECOMMENDED === 'true') {
+      commandsToEnable.push('verify-expose');
     }
 
     for (let i = 0; i < commandFiles.length; i += 1) {

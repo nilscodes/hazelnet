@@ -6,7 +6,12 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties(prefix = "io.hazelnet")
 data class ExternalApplicationConfiguration(
-        val community: ConnectConfiguration
+        val community: CommunityConfiguration,
+        val connect: ConnectConfiguration,
+)
+
+data class CommunityConfiguration(
+        val url: String
 )
 
 data class ConnectConfiguration(

@@ -1,6 +1,6 @@
 package io.hazelnet.community.persistence.data
 
-import io.hazelnet.community.data.BlockchainType
+import io.hazelnet.shared.data.BlockchainType
 import org.hibernate.HibernateException
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.type.EnumType

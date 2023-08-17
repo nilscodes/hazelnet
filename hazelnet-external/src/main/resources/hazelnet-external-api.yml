@@ -25,11 +25,7 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/WhitelistSignup'
                 default:
-                    description: Unexpected error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ErrorResponse'
+                    $ref: '#/components/responses/DefaultErrorResponse'
     /community/whitelists/shared:
         get:
             summary: 'Get signups for all shared whitelists'
@@ -47,11 +43,7 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/SharedWhitelist'
                 default:
-                    description: Unexpected error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ErrorResponse'
+                    $ref: '#/components/responses/DefaultErrorResponse'
 
     /community/claimlists/{claimListName}/orders:
         get:
@@ -72,11 +64,7 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/AnonymousPhysicalOrder'
                 default:
-                    description: Unexpected error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ErrorResponse'
+                    $ref: '#/components/responses/DefaultErrorResponse'
     /community/claimlists/{claimListName}/products:
         get:
             summary: 'Get products for a claim list'
@@ -96,11 +84,7 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/PhysicalProduct'
                 default:
-                    description: Unexpected error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ErrorResponse'
+                    $ref: '#/components/responses/DefaultErrorResponse'
 components:
     parameters:
         WhitelistNamePathParameter:
@@ -121,6 +105,14 @@ components:
             example: HoodieOrder
             schema:
                 type: string
+
+    responses:
+        DefaultErrorResponse:
+            description: Unexpected error
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/ErrorResponse'
 
     schemas:
         SharedWhitelist:

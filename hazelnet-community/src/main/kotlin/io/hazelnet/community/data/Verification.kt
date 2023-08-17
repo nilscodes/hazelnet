@@ -2,7 +2,9 @@ package io.hazelnet.community.data
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.JsonIdentityReference
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
+import io.hazelnet.shared.data.BlockchainType
 import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
@@ -64,6 +66,11 @@ class Verification(
 
         @Column(name = "succeeded_by")
         var succeededBy: Long? = null,
+
+        @OneToMany(fetch = FetchType.LAZY)
+        @JoinColumn(name = "verification_id")
+        @JsonIgnore
+        var exposedWallets: MutableSet<ExposedWallet> = mutableSetOf(),
 ) {
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -84,6 +91,7 @@ class Verification(
                 if (confirmedAt != other.confirmedAt) return false
                 if (obsolete != other.obsolete) return false
                 if (succeededBy != other.succeededBy) return false
+                if (exposedWallets != other.exposedWallets) return false
 
                 return true
         }
@@ -102,11 +110,12 @@ class Verification(
                 result = 31 * result + (confirmedAt?.hashCode() ?: 0)
                 result = 31 * result + obsolete.hashCode()
                 result = 31 * result + (succeededBy?.hashCode() ?: 0)
+                result = 31 * result + exposedWallets.hashCode()
                 return result
         }
 
         override fun toString(): String {
-                return "Verification(id=$id, amount=$amount, blockchain=$blockchain, address='$address', cardanoStakeAddress=$cardanoStakeAddress, transactionHash=$transactionHash, externalAccount=$externalAccount, validAfter=$validAfter, validBefore=$validBefore, confirmed=$confirmed, confirmedAt=$confirmedAt, obsolete=$obsolete, succeededBy=$succeededBy)"
+                return "Verification(id=$id, amount=$amount, blockchain=$blockchain, address='$address', cardanoStakeAddress=$cardanoStakeAddress, transactionHash=$transactionHash, externalAccount=$externalAccount, validAfter=$validAfter, validBefore=$validBefore, confirmed=$confirmed, confirmedAt=$confirmedAt, obsolete=$obsolete, succeededBy=$succeededBy, exposedWallets=$exposedWallets)"
         }
 
 }

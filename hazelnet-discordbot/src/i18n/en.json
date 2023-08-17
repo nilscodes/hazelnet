@@ -6,6 +6,7 @@
 			"verify-help": "Get help about the verification features",
 			"verify-link": "Link your verified addresses to this Discord server to enable additional features",
 			"verify-list": "List all staking addresses and link status associated with this Discord user and server",
+			"verify-expose": "Expose/Conceal your verified addresses on this Discord server",
 			"verify-remove": "Removes a verified wallet address",
 			"verify-unlink": "Unlink your verified addresses from this server (verifications will remain)",
 			"whois": "Find out info about an ADA Handle or address.",
@@ -616,7 +617,28 @@
 			"widgetInstructionsAlreadyVerified": "🚨 You have {{verifiedWallets}} verified wallets. If you would like to see which ones, use **/verify list** in a channel where commands are enabled.",
 			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n❔ For more information, use **/verify help** and **/help**.",
 			"blacklistedTitle": "Blocked",
-			"blacklisted": "🛑 Your account is currently blocked from using HAZELnet."
+			"blacklisted": "🛑 Your account is currently blocked from using HAZELnet.",
+			"walletExposureRecommended": "⚠ This server is asking for your permission to expose your wallet addresses. If you do not want to expose your wallet addresses, you can deny this request and still have automatic role assignments and all other standard bot features, but you will not be able to use any custom features the server owner is offering.",
+			"walletExposureRecommendedTitle": "Message from {{{guildName}}}",
+			"walletExposureRecommendedNoDetails": "No specific details have been provided by the server owner - we recommend NOT exposing your wallet addresses.",
+			"walletExposureSelect": "Select the wallets you want to expose to this Discord. Only select the wallets that contain tokens you need to use for the above mentioned features. You can change this at any time via **/verify expose**.",
+			"chooseExpose": "Choose the wallets you want to expose to this Discord",
+			"exposeAction": "Expose selected wallets",
+			"doNotExposeAction": "Do not expose any wallets",
+			"successConfirmExpose": "👁 You have successfully confirmed the request to expose the following wallet addresses to this Discord. You can change this at any time via **/verify expose**.",
+			"exposedEntry": "• {{exposedEntry}}",
+			"successDenyExpose": "✅ You have denied the request to expose your wallet addresses to this Discord. You can change this at any time via **/verify expose**."
+		},
+		"expose": {
+			"messageTitle": "Expose/Conceal your wallets on this server",
+			"purpose": "Certain Discord servers need information about your wallets to provide additional services. With this command, you can see your currently exposed wallets on this server, expose new wallets and conceal already exposed wallets if you do no longer wish to provide the project with any information regarding your wallet addresses.\n\n⚠ It is not required to expose your wallets to receive automatic role-assignments or participate in whitelists etc. via HAZELnet.",
+			"status": "Wallet exposure status",
+			"exposedWallets": "👁 The following wallets are currently exposed to this Discord server:",
+			"exposedWalletsNone": "✅ No wallets are currently exposed to this Discord server.",
+			"changeExposedWalletsButton": "Change your exposed/concealed wallets",
+			"noWalletExposureSupported": "✅ Wallet exposure is not requested on this server. Any existing exposed wallets have been concealed.",
+			"noVerifications": "⚠ You have no verified addresses, but will need to provide at least one to expose any wallets. Please verify first by using **/verify add**.",
+			"notLinked": "🔌 Your verified wallets and addresses are not linked to this server and thus not exposed. If you want to link your wallets, use **/verify link**."
 		},
 		"remove": {
 			"messageTitle": "Remove a verified address",

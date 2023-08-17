@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient
 class ConnectivityConfiguration {
 
     @Bean
-    fun connectClient(config: ExternalApplicationConfiguration) =
+    fun communityClient(config: ExternalApplicationConfiguration) =
             WebClient.builder()
                     .baseUrl(config.community.url)
                     .exchangeStrategies(
@@ -18,4 +18,14 @@ class ConnectivityConfiguration {
                                 it.defaultCodecs().maxInMemorySize(10000000)
                             }.build())
                     .build()
+
+    @Bean
+    fun connectClient(config: ExternalApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.connect.url)
+            .exchangeStrategies(
+                ExchangeStrategies.builder().codecs {
+                    it.defaultCodecs().maxInMemorySize(10000000)
+                }.build())
+            .build()
 }
