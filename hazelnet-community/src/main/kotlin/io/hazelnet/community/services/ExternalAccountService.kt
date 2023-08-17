@@ -4,6 +4,7 @@ import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.*
 import io.hazelnet.community.data.premium.PremiumStakedInfo
 import io.hazelnet.community.persistence.DiscordServerRepository
+import io.hazelnet.community.persistence.ExposedWalletRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationRepository
 import io.hazelnet.shared.data.ExternalAccountType
@@ -19,6 +20,7 @@ import javax.transaction.Transactional
 class ExternalAccountService(
     private val externalAccountRepository: ExternalAccountRepository,
     private val verificationRepository: VerificationRepository,
+    private val exposedWalletRepository: ExposedWalletRepository,
     private val discordServerRepository: DiscordServerRepository,
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
@@ -180,5 +182,27 @@ class ExternalAccountService(
     }
 
     fun updateExternalAccount(externalAccount: ExternalAccount) = externalAccountRepository.save(externalAccount)
+
+    fun getExternalAccountExposedWallets(externalAccountId: Long, guildId: Long): List<ExposedWallet> {
+        val verifications = getExternalAccountVerifications(externalAccountId)
+        return filterExposedWallets(verifications, guildId)
+    }
+
+    fun deleteExternalAccountExposedWallets(externalAccountId: Long, guildId: Long): List<ExposedWallet> {
+        val verifications = getExternalAccountVerifications(externalAccountId)
+        val exposedWalletsToDelete = filterExposedWallets(verifications, guildId)
+        exposedWalletsToDelete.forEach { exposedWalletRepository.delete(it) }
+        return exposedWalletsToDelete
+    }
+
+    private fun filterExposedWallets(verifications: List<Verification>, guildId: Long): List<ExposedWallet> {
+        return if (guildId > 0) {
+            val discordServer = discordServerRepository.findByGuildId(guildId)
+            verifications.flatMap { it.exposedWallets }
+                .filter { it.discordServerId == discordServer.get().id!! }
+        } else {
+            verifications.flatMap { it.exposedWallets }
+        }
+    }
 
 }

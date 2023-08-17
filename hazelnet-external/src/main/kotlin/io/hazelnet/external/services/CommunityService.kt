@@ -1,16 +1,23 @@
 package io.hazelnet.external.services
 
+import io.hazelnet.external.data.DiscordMemberDto
+import io.hazelnet.external.data.ExposedWalletDto
+import io.hazelnet.external.data.ExternalAccountDto
+import io.hazelnet.external.data.VerificationDto
 import io.hazelnet.shared.data.SharedWhitelist
 import io.hazelnet.shared.data.WhitelistSignup
 import io.hazelnet.external.data.claim.AnonymousPhysicalOrder
 import io.hazelnet.external.data.claim.PhysicalProduct
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @Service
 class CommunityService(
-        private val communityClient: WebClient,
+    @Qualifier("communityClient")
+    private val communityClient: WebClient,
 ) {
     fun getWhitelistSignups(guildId: Long, whitelistName: String): List<WhitelistSignup> {
         return communityClient.get()
@@ -54,6 +61,54 @@ class CommunityService(
                     .build()
             }.retrieve()
             .bodyToMono(object : ParameterizedTypeReference<List<PhysicalProduct>>() {})
+            .block()!!
+    }
+
+    fun getExternalAccountByDiscordId(discordUserId: Long): ExternalAccountDto {
+        return communityClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/externalaccounts/discord/$discordUserId")
+                    .build()
+            }.retrieve()
+            .bodyToMono(ExternalAccountDto::class.java)
+            .doOnError(WebClientResponseException.NotFound::class.java) {
+                throw NoSuchElementException("No external account found for discord user $discordUserId")
+            }
+            .block()!!
+    }
+
+    fun getLinkedDiscordUsers(guildId: Long): List<DiscordMemberDto> {
+        return communityClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/discord/servers/$guildId/members")
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<DiscordMemberDto>>() {})
+            .block()!!
+    }
+
+    fun getExposedWallets(externalAccountId: Long, guildId: Long): List<ExposedWalletDto> {
+        return communityClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/externalaccounts/${externalAccountId}/exposedwallets")
+                    .queryParam("guildId", guildId)
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<ExposedWalletDto>>() {})
+            .block()!!
+    }
+
+    fun getExternalAccountVerifications(externalAccountId: Long): List<VerificationDto> {
+        return communityClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/externalaccounts/${externalAccountId}/verifications")
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<VerificationDto>>() {})
             .block()!!
     }
 }

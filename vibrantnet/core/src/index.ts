@@ -90,6 +90,8 @@ export * from './types/roles/tokenOwnershipRole';
 export * from './types/roles/tokenOwnershipRolePartial';
 export * from './types/roles/withRoleId';
 export * from './types/settings';
+export * from './types/verification/exposedWallet';
+export * from './types/verification/exposedWalletPartial';
 export * from './types/verification/verification';
 export * from './types/verification/verificationImport';
 export * from './types/whitelist/sharedWhitelist';

@@ -1,6 +1,5 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
 import {
   ChannelType,
   GuildChannel,
@@ -10,6 +9,7 @@ import {
   ButtonStyle,
   MessageActionRowComponentBuilder,
 } from 'discord.js';
+import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import discordpermissions from '../../utility/discordpermissions';
 
@@ -28,8 +28,8 @@ export default <VerifyAnnounceCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      if (announceChannel &&
-          (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement)) {
+      if (announceChannel
+        && (announceChannel.type === ChannelType.GuildText || announceChannel.type === ChannelType.GuildAnnouncement)) {
         const guildChannel = announceChannel as GuildChannel;
         const announceChannelPermissions = guildChannel.permissionsFor(interaction.client.application!.id);
         if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {

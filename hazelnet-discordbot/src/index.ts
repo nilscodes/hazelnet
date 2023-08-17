@@ -110,14 +110,14 @@ if (queueFiles.length) {
         }
       });
       conn.on('close', () => {
-        client.logger.error({ msg: `Connection to AMQP server was closed. Reconnecting in 10 seconds...` });
+        client.logger.error({ msg: 'Connection to AMQP server was closed. Reconnecting in 10 seconds...' });
         setTimeout(connectToAmqp, 10000);
       });
       conn.on('error', (e) => {
-        client.logger.error({ msg: `Error during AMQP connection`, error: e });
+        client.logger.error({ msg: 'Error during AMQP connection', error: e });
       });
     } catch (e) {
-      client.logger.error({ msg: `Connection to AMQP server could not be established. Reconnecting in 10 seconds...` });
+      client.logger.error({ msg: 'Connection to AMQP server could not be established. Reconnecting in 10 seconds...' });
       setTimeout(connectToAmqp, 10000);
     }
   };

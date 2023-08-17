@@ -1,13 +1,25 @@
 /* eslint-disable no-await-in-loop */
 import i18n from 'i18n';
-import { Account, cardanoaddress, adahandle } from '@vibrantnet/core';
+import NodeCache from 'node-cache';
+import {
+  Account, cardanoaddress, adahandle, DiscordServer, ExternalAccount, Verification,
+} from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
+import { AugmentedButtonInteraction } from '../../utility/hazelnetclient';
+import verifyutil from '../../utility/verify';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const wait = require('util').promisify(setTimeout);
 
-export default <BotSubcommand> {
+interface VerifyAddCommand extends BotSubcommand {
+  cache: NodeCache
+  confirmExposeWalletsDenied(interaction: AugmentedButtonInteraction, externalAccount: ExternalAccount, discordServer: DiscordServer): Promise<void>
+  confirmExposeWalletsSuccess(interaction: AugmentedButtonInteraction, walletsToExpose: string[], existingConfirmedVerifications: Verification[], externalAccount: ExternalAccount, discordServer: DiscordServer): Promise<void>
+}
+
+export default <VerifyAddCommand> {
+  cache: new NodeCache({ stdTTL: 900 }),
   async execute(interaction) {
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -45,7 +57,7 @@ export default <BotSubcommand> {
 
           try {
             const verification = await interaction.client.services.verifications.createVerificationRequest(externalAccount.id, addressToVerify);
-            const maxVerificationWaitTimeInMinutes = await interaction.client.services.globalsettings.getGlobalSetting('VERIFICATION_TIMEOUT_MINUTES') || 15;
+            const maxVerificationWaitTimeInMinutes = +(await interaction.client.services.globalsettings.getGlobalSetting('VERIFICATION_TIMEOUT_MINUTES')) || 15;
             const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationRequest', locale }, { verification, amount: verification.amount / 1000000, maxTime: maxVerificationWaitTimeInMinutes } as any), 'verify-add');
             await interaction.editReply({ embeds: [embed] });
             for (let i = 0; i < 14; i += 1) {
@@ -53,8 +65,18 @@ export default <BotSubcommand> {
               const verificationStatus = await interaction.client.services.verifications.getVerification(verification.id!);
               if (verificationStatus.confirmed) {
                 await interaction.client.services.discordserver.connectExternalAccount(interaction.guild!.id, externalAccount.id);
-                const successEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationSuccess', locale }, { verification: verificationStatus } as any), 'verify-add');
-                await interaction.followUp({ embeds: [successEmbed], ephemeral: true });
+                const walletExposureRecommended = discordServer.settings?.EXPOSE_WALLETS_RECOMMENDED === 'true';
+                if (walletExposureRecommended) {
+                  const existingConfirmedVerifications = existingVerifications.filter((v) => v.confirmed && !v.obsolete);
+                  existingConfirmedVerifications.push(verificationStatus);
+                  const instructions = `${i18n.__({ phrase: 'verify.add.messageTitle', locale })}\n\n${i18n.__({ phrase: 'verify.add.verificationSuccess', locale }, { verification: verificationStatus } as any)}\n\n${i18n.__({ phrase: 'verify.add.walletExposureRecommended', locale })}`;
+                  const { serverMessageField, components } = await verifyutil.getWalletExposeInteractionComponents(interaction.client.services.cardanoinfo, interaction.guild!.name, existingConfirmedVerifications, externalAccount, discordServer);
+                  const successEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add', [serverMessageField]);
+                  await interaction.followUp({ ephemeral: true, embeds: [successEmbed], components });
+                } else {
+                  const successEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.verificationSuccess', locale }, { verification: verificationStatus } as any), 'verify-add');
+                  await interaction.followUp({ embeds: [successEmbed], ephemeral: true });
+                }
                 return;
               }
               if (verification.obsolete) {
@@ -111,27 +133,63 @@ export default <BotSubcommand> {
     }
   },
   async executeButton(interaction) {
+    await interaction.deferUpdate();
+    const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
+    const locale = discordServer.getBotLanguage();
+    const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+    const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
+    const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
+    const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id);
+    const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);
+
     if (interaction.customId === 'verify/add/widgetverify') {
-      await interaction.deferReply({ ephemeral: true });
-      const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const locale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-      const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
-      const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
-      const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id);
-      const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccount.id);
       if (existingConfirmedVerifications.length) {
         if (!currentMemberData) {
           await interaction.client.services.discordserver.connectExternalAccount(interaction.guild!.id, externalAccount.id);
         }
-        const instructions = `${i18n.__({ phrase: 'verify.link.success', locale })}\n\n${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length } as any)}`;
-        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), instructions, 'verify-link');
-        await interaction.editReply({ embeds: [embed] });
+        const walletExposureRecommended = discordServer.settings?.EXPOSE_WALLETS_RECOMMENDED === 'true';
+        if (walletExposureRecommended) {
+          const instructions = `${i18n.__({ phrase: 'verify.link.success', locale })}\n\n${i18n.__({ phrase: 'verify.add.walletExposureRecommended', locale })}`;
+          const { serverMessageField, components } = await verifyutil.getWalletExposeInteractionComponents(interaction.client.services.cardanoinfo, interaction.guild!.name, existingConfirmedVerifications, externalAccount, discordServer);
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), instructions, 'verify-link', [serverMessageField]);
+          await interaction.followUp({ ephemeral: true, embeds: [embed], components });
+        } else {
+          const instructions = `${i18n.__({ phrase: 'verify.link.success', locale })}\n\n${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length } as any)}`;
+          const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), instructions, 'verify-link');
+          await interaction.followUp({ ephemeral: true, embeds: [embed] });
+        }
       } else {
         const instructions = i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.followUp({ ephemeral: true, embeds: [embed] });
       }
+    } else if (interaction.customId === 'verify/add/exposewalletsconfirm' && currentMemberData /* Only expose linked users */) {
+      const walletsToExpose = this.cache.take(`${interaction.guild!.id}-${interaction.user.id}`) as string[];
+      if (walletsToExpose?.length) {
+        await this.confirmExposeWalletsSuccess(interaction, walletsToExpose, existingConfirmedVerifications, externalAccount, discordServer);
+      } else {
+        await this.confirmExposeWalletsDenied(interaction, externalAccount, discordServer);
+      }
+    } else if (interaction.customId === 'verify/add/exposewalletsdeny') {
+      await this.confirmExposeWalletsDenied(interaction, externalAccount, discordServer);
     }
+  },
+  async executeSelectMenu(interaction) {
+    if (interaction.customId === 'verify/add/exposewallets') {
+      this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, interaction.values);
+      await interaction.deferUpdate();
+    }
+  },
+  async confirmExposeWalletsDenied(interaction, externalAccount, discordServer) {
+    const locale = discordServer.getBotLanguage();
+    await interaction.client.services.externalaccounts.deleteExternalAccountExposedWallets(externalAccount.id, discordServer.guildId);
+    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), i18n.__({ phrase: 'verify.add.successDenyExpose', locale }), 'verify-link');
+    await interaction.editReply({ embeds: [embed], components: [] });
+  },
+  async confirmExposeWalletsSuccess(interaction, walletsToExpose, existingConfirmedVerifications, externalAccount, discordServer) {
+    const locale = discordServer.getBotLanguage();
+    const exposeText = await verifyutil.completeExposeWalletsAction(interaction.client.services, discordServer, walletsToExpose, existingConfirmedVerifications, externalAccount);
+    const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), exposeText, 'verify-link');
+    await interaction.editReply({ embeds: [embed], components: [] });
   },
 };

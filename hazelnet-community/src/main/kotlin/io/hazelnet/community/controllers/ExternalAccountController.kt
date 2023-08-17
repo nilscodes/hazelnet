@@ -79,5 +79,9 @@ class ExternalAccountController(
     @PutMapping("/{externalAccountId}/account")
     fun setAccountForExternalAccount(@PathVariable externalAccountId: Long) = accountService.setAccountForExternalAccount(externalAccountId)
 
+    @GetMapping("/{externalAccountId}/exposedwallets")
+    fun getExternalAccountExposedWallets(@PathVariable externalAccountId: Long, @RequestParam("guildId", required = false, defaultValue = "0") guildId: Long) = externalAccountService.getExternalAccountExposedWallets(externalAccountId, guildId)
 
+    @DeleteMapping("/{externalAccountId}/exposedwallets")
+    fun deleteExternalAccountExposedWallets(@PathVariable externalAccountId: Long, @RequestParam("guildId", required = false, defaultValue = "0") guildId: Long) = externalAccountService.deleteExternalAccountExposedWallets(externalAccountId, guildId)
 }

@@ -1,6 +1,6 @@
 package io.hazelnet.community.services
 
-import io.hazelnet.community.data.BlockchainType
+import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.VerificationDto
@@ -29,7 +29,7 @@ class ExternalAccountServiceTest {
             slot.captured.id = 3
             slot.captured
         }
-        val externalAccountService = ExternalAccountService(externalAccountRepository, verificationRepository, mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
+        val externalAccountService = ExternalAccountService(externalAccountRepository, verificationRepository, mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
         externalAccountService.addExternalAccountVerification(2, VerificationDto(
             externalAccountId = 2,
             address = "addr1",
