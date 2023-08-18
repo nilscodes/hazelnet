@@ -147,7 +147,8 @@ CREATE TABLE "discord_servers"
     "owner_account_id"    bigint,
     "premium_until"       timestamp,
     "premium_reminder"    timestamp,
-    "active"              boolean       NOT NULL DEFAULT true
+    "active"              boolean       NOT NULL DEFAULT true,
+    "referral"            varchar(50)
 );
 
 CREATE TABLE "discord_billing"
