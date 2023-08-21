@@ -148,7 +148,8 @@ CREATE TABLE "discord_servers"
     "premium_until"       timestamp,
     "premium_reminder"    timestamp,
     "active"              boolean       NOT NULL DEFAULT true,
-    "referral"            varchar(50)
+    "referral"            varchar(50),
+    "referral_paid_out"   boolean       NOT NULL DEFAULT false
 );
 
 CREATE TABLE "discord_billing"

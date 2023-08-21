@@ -112,6 +112,9 @@ class DiscordServer @JsonCreator constructor(
 
     @Column(name = "referral")
     var referral: String? = null,
+
+    @Column(name = "referral_paid_out")
+    var referralPaidOut: Boolean = false,
 ) {
     fun getPremium(): Boolean = premiumUntil != null && Date().before(premiumUntil)
 
@@ -140,6 +143,7 @@ class DiscordServer @JsonCreator constructor(
         if (members != other.members) return false
         if (active != other.active) return false
         if (referral != other.referral) return false
+        if (referralPaidOut != other.referralPaidOut) return false
 
         return true
     }
@@ -164,11 +168,12 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + members.hashCode()
         result = 31 * result + active.hashCode()
         result = 31 * result + (referral?.hashCode() ?: 0)
+        result = 31 * result + referralPaidOut.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, premiumReminder=$premiumReminder, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active, referral=$referral"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, premiumReminder=$premiumReminder, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active, referral=$referral, referralPaidOut=$referralPaidOut"
     }
 
 }

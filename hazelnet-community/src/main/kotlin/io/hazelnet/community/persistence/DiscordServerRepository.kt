@@ -19,6 +19,7 @@ interface DiscordServerRepository: CrudRepository<DiscordServer, Int> {
 
     fun countByActive(active: Boolean): Long
     fun countByPremiumUntilAfter(current: Date): Long
+    fun findByReferralAndReferralPaidOut(referral: String, referralPaidOut: Boolean): List<DiscordServer>
 
     @Query(value = "SELECT SUM(guildMemberCount) FROM DiscordServer WHERE active=true")
     fun sumGuildMemberCountForActiveServers(): Long

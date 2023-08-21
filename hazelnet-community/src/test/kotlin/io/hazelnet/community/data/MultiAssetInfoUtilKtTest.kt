@@ -35,7 +35,6 @@ class MultiAssetInfoUtilKtTest {
         )
         val actual = getImageUrlFromAssetInfo("https://image-optimizer.jpgstoreapis.com/%ipfs?width=1200", assetInfo)
         assertNotNull(actual)
-        println(actual)
         assertTrue(actual!!.startsWith("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA"))
     }
 }

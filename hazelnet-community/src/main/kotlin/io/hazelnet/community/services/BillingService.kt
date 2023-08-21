@@ -24,6 +24,8 @@ import javax.transaction.Transactional
 import kotlin.math.min
 import kotlin.math.round
 
+val REFERRAL_BONUS_MONTHS = mapOf(Pair("re23", 30))
+
 @Service
 class BillingService(
     private val config: CommunityApplicationConfiguration,
@@ -47,6 +49,33 @@ class BillingService(
             .with(TemporalAdjusters.lastDayOfMonth())
             .withHour(23).withMinute(59).withSecond(59)
         billPremiumStatusWithTimes(currentTime, endOfMonth)
+    }
+
+    @Transactional
+    @Scheduled(fixedDelay = 60000, initialDelay = 5000)
+    fun applyReferralBonuses() {
+        val currentTime = ZonedDateTime.now(ZoneId.of("UTC"))
+        REFERRAL_BONUS_MONTHS.entries.forEach {
+            val unpaidReferrals = discordServerRepository.findByReferralAndReferralPaidOut(it.key, false)
+            unpaidReferrals.forEach { discordServer ->
+                var startDate = currentTime
+                if (discordServer.premiumUntil != null) {
+                    val premiumUntil = discordServer.premiumUntil!!.toInstant().atZone(ZoneId.of("UTC"))
+                    if (premiumUntil.isAfter(startDate)) {
+                        startDate = premiumUntil
+                    }
+                }
+                discordServer.premiumUntil = Date.from(startDate.plusDays(it.value.toLong()).toInstant())
+                discordServer.referralPaidOut = true
+                discordServerRepository.save(discordServer)
+                val bill = billingRepository.save(
+                    DiscordBilling(null, discordServer, Date.from(currentTime.toInstant()), 0, discordServer.guildMemberCount, 0, 0 )
+                )
+                paymentRepository.save(
+                    DiscordPayment(null, discordServer, it.key, Date.from(currentTime.toInstant()), 0, bill)
+                )
+            }
+        }
     }
 
     fun billPremiumStatusWithTimes(currentTime: ZonedDateTime, endOfMonth: ZonedDateTime) {
