@@ -7,4 +7,5 @@ data class DiscordServerPartial @JsonCreator constructor(
     val guildOwner: Long?,
     val guildMemberCount: Int?,
     val active: Boolean?,
+    val referral: String?,
 )

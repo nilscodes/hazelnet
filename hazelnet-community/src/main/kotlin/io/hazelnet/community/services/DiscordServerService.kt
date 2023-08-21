@@ -136,6 +136,9 @@ class DiscordServerService(
         if (discordServerPartial.active != null) {
             discordServer.active = discordServerPartial.active
         }
+        if (discordServerPartial.referral != null && discordServer.referral == null) { // Can only set referral once
+            discordServer.referral = discordServerPartial.referral
+        }
         return discordServerRepository.save(discordServer)
     }
 

@@ -3,4 +3,5 @@ export type DiscordServerPartial = {
   guildOwner?: string
   guildMemberCount?: number
   active?: boolean
+  referral?: string
 };
