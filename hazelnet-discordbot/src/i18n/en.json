@@ -877,7 +877,8 @@
 			"announce": {
 				"purpose": "You are about to create a announcement in the channel <#{{channel}}>. The announcement will contain the text you send as the next message in this channel in the next five minutes. You can use any Discord markdown you want and will receive a preview of your announcement before submitting it.",
 				"success": "✅ Announcement successfully published in <#{{channel}}>.",
-				"publish": "Create announcement"
+				"publish": "Create announcement",
+				"errorNoSendPermissions": "The bot has no permissions to send messages to or view the channel <#{{channel}}>. Please allow the **View Channel**, **Send Messages**, **Embed Links** and **Attach Files** permissions for the bot to allow announcing in it."
 			},
 			"epochreminder": {
 				"add": {
