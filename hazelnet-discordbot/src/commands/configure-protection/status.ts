@@ -15,7 +15,7 @@ export default <BotSubcommand> {
         value: i18n.__({ phrase: (addressRemoval ? 'configure.protection.addressremove.protectionOn' : 'configure.protection.addressremove.protectionOff'), locale }),
       }, {
         name: i18n.__({ phrase: 'configure.protection.status.auditChannelTitle', locale }),
-        value: i18n.__({ phrase: (auditChannel?.length ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'),    }, { auditChannel }),
+        value: i18n.__({ phrase: (auditChannel?.length ? 'configure.protection.auditchannel.auditChannelOn' : 'configure.protection.auditchannel.auditChannelOff'), locale }, { auditChannel }),
       }];
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-protection status', i18n.__({ phrase: 'configure.protection.status.purpose', locale }), 'configure-protection-status', settingFields);
       await interaction.editReply({ embeds: [embed] });
