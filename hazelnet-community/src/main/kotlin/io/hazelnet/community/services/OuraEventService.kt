@@ -3,6 +3,7 @@ package io.hazelnet.community.services
 import com.bloxbean.cardano.client.util.AssetUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.hazelnet.cardano.connect.data.token.AssetFingerprint
+import io.hazelnet.cardano.connect.data.token.Cip68Token
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.cardano.connect.data.token.PolicyId
 import io.hazelnet.community.CommunityApplicationConfiguration
@@ -88,8 +89,13 @@ class OuraEventService(
             if (metadataMap.containsKey(mintToProcess.transactionHash)) {
                 val metadataOfPolicy = metadataMap[mintToProcess.transactionHash]?.metadata?.get(mintToProcess.policyId) as Map<String, Any>?
                 if (metadataOfPolicy is Map<String, Any>) {
-                    val assetName = mintToProcess.assetNameHex.decodeHex()
-                    val metadataOfAsset = metadataOfPolicy[assetName] as Map<String, Any>?
+                    val cip68Token = Cip68Token(mintToProcess.assetNameHex)
+                    val (metadataOfAsset, assetName) = if (cip68Token.isValidCip68Token()) {
+                        Pair(metadataOfPolicy[mintToProcess.assetNameHex] as Map<String, Any>?, cip68Token.assetName)
+                    } else {
+                        val assetName = mintToProcess.assetNameHex.decodeHex()
+                        Pair(metadataOfPolicy[assetName] as Map<String, Any>?, assetName)
+                    }
                     if (metadataOfAsset is Map<String, Any>) {
 
                         val combinedAssetInfo = MultiAssetInfo(
