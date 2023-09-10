@@ -19,13 +19,13 @@ class HandleDaoBlockfrost(
             try {
                 val details = api.getAssetAddresses("$handlePolicy$handleNameHex")
                 if (details.isNotEmpty()) {
-                    Handle(handle = handleName, address = details[0].address)
+                    Handle(handle = handleName, nftTokenNameHex = handleNameHex, address = details[0].address)
                 } else {
-                    Handle(handle = handleName, resolved = false)
+                    Handle(handle = handleName, nftTokenNameHex = "", resolved = false)
                 }
             } catch(nfe: NotFoundException) {
                 // Ignore this exception - we'll consider the handle unresolved
-                Handle(handle = handleName, resolved = false)
+                Handle(handle = handleName, nftTokenNameHex = "", resolved = false)
             }
         }
     }

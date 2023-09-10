@@ -43,7 +43,6 @@ export default <WhoisCommand> {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
-      const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const knownMarketplaces = JSON.parse(await interaction.client.services.globalsettings.getGlobalSetting('KNOWN_MARKETPLACE_ADDRESSES')) ?? {};
       const addressOrHandle = interaction.options.getString('address-or-handle', true);
       let resolvedAddress = null;
@@ -111,7 +110,7 @@ export default <WhoisCommand> {
     const externalAccountOfTarget = await interaction.client.services.externalaccounts.getExternalDiscordAccount(interaction.targetUser.id);
     if (externalAccountOfTarget) {
       const mainAccountOfTarget = await interaction.client.services.externalaccounts.getAccountForExternalAccount(externalAccountOfTarget.id);
-      const handle = mainAccountOfTarget.settings['DEFAULT_HANDLE'];
+      const handle = mainAccountOfTarget.settings.DEFAULT_HANDLE;
       if (handle) {
         const resolvedHandle = await interaction.client.services.cardanoinfo.resolveHandle(handle);
         const resolvedAddress = resolvedHandle.address;
@@ -120,7 +119,7 @@ export default <WhoisCommand> {
           value: i18n.__({ phrase: 'whois.handleFoundText', locale }, { handleWithoutPrefix: handle.substring(1) }),
         }]);
         this.applyHandleBranding(embed);
-        const { files, name } = await nftcdn.nftcdnBlob(resolvedHandle.assetFingerprint!!, { size: 1024 })
+        const { files, name } = await nftcdn.nftcdnBlob(resolvedHandle.assetFingerprint!!, { size: 1024 });
         embed.setImage(name);
         await interaction.editReply({ embeds: [embed], files });
         return;
@@ -143,8 +142,7 @@ export default <WhoisCommand> {
       handlesAtAddress.sort((handleA: HandleInfo, handleB: HandleInfo) => handleA.handle.length - handleB.handle.length);
       const handleList = handlesAtAddress.map((handleInfo: HandleInfo) => i18n.__({ phrase: 'whois.handlesEntry', locale }, { handle: handleInfo.handle }));
       content = i18n.__({ phrase: successMessage, locale }, { address }) + handleList.join('\n');
-      const multiAssetInfoForFirstHandle = await interaction.client.services.cardanoinfo.multiAssetInfo(process.env.HANDLE_POLICY!, cardanotoken.toHex(handlesAtAddress[0].handle));
-      const { files, name } = await nftcdn.nftcdnBlob(multiAssetInfoForFirstHandle.assetFingerprint, { size: 1024 })
+      const { files, name } = await nftcdn.nftcdnBlob(handlesAtAddress[0].assetFingerprint, { size: 1024 });
       useImage = name;
       useFiles = files;
     }

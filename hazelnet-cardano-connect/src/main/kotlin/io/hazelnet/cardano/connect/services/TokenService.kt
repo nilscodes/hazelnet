@@ -1,5 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
+import io.hazelnet.cardano.connect.data.HandleUtil
 import io.hazelnet.cardano.connect.data.PolicyIdsAndExcludedAssets
 import io.hazelnet.cardano.connect.data.address.Handle
 import io.hazelnet.cardano.connect.data.token.*
@@ -119,12 +120,19 @@ class TokenService(
         val shortestHandle = getMultiAssetListForStakeAddress(stakeAddress, listOf(handlePolicy))
             .find { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
             ?.assetList
-                ?.map { it.decodeHex() }
+                ?.map {
+                    val cip68Token = Cip68Token(it)
+                    if (cip68Token.isValidCip68Token()) {
+                        cip68Token.assetName
+                    } else {
+                        it.decodeHex()
+                    }
+                }
                 ?.minByOrNull { it.length }
         return if (shortestHandle != null) {
             handleService.resolveHandle(shortestHandle)
         } else {
-            Handle(handle = "", resolved = false)
+            Handle(handle = "", nftTokenNameHex = "", resolved = false)
         }
     }
 
@@ -133,7 +141,7 @@ class TokenService(
             .filter { it.policyIdWithOptionalAssetFingerprint == handlePolicy }
             .map { it.assetList }
             .flatten()
-            .map { Handle(handle = it, resolved = false) }
+            .map { HandleUtil.getHandle(handlePolicy, it) }
     }
 
     private fun extractTokenConstraints(policyIdsWithOptionalAssetFingerprint: List<String>): Pair<List<PolicyId>, List<Pair<PolicyId, AssetFingerprint>>> {
