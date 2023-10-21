@@ -30,7 +30,6 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-	implementation("javax.validation:validation-api")
 	implementation("org.hibernate.validator:hibernate-validator")
 	implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
 	implementation("com.jayway.jsonpath:json-path:2.7.0")

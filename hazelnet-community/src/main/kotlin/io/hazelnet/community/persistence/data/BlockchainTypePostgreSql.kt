@@ -8,6 +8,7 @@ import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.sql.Types
 
+
 @Suppress("unused")
 class BlockchainTypePostgreSql : EnumType<BlockchainType>() {
     @Throws(HibernateException::class, SQLException::class)

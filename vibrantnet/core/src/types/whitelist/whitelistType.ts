@@ -1,4 +1,4 @@
 export enum WhitelistType {
-  CARDANO_ADDRESS = 'CARDANO_ADDRESS',
+  WALLET_ADDRESS = 'WALLET_ADDRESS',
   DISCORD_ID = 'DISCORD_ID',
 }

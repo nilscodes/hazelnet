@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: "0.0.1"
-  title: "HazelNet Community"
+  title: "Vibrant Community"
 servers:
   - url: "localhost:8085"
 
@@ -3892,7 +3892,7 @@ components:
           default: DISCORD_ID
           enum:
             - DISCORD_ID
-            - CARDANO_ADDRESS
+            - WALLET_ADDRESS
         archived:
           type: boolean
           default: false
@@ -3982,7 +3982,7 @@ components:
           default: DISCORD_ID
           enum:
             - DISCORD_ID
-            - CARDANO_ADDRESS
+            - WALLET_ADDRESS
     DiscordQuiz:
       type: object
       required:
@@ -4574,6 +4574,10 @@ components:
           maxItems: 20
           items:
             $ref: "#/components/schemas/DiscordRequiredRole"
+        blockchains:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockchainType"
         awardedRole:
           $ref: "#/components/schemas/DiscordRole"
         sharedWithServer:
@@ -4586,9 +4590,9 @@ components:
           maxLength: 1000
     WhitelistType:
       type: string
-      default: CARDANO_ADDRESS
+      default: WALLET_ADDRESS
       enum:
-        - CARDANO_ADDRESS
+        - WALLET_ADDRESS
         - DISCORD_ID
     WhitelistPartial:
       type: object
@@ -4624,6 +4628,10 @@ components:
           maxLength: 1000
         awardedRole:
           $ref: "#/components/schemas/DiscordRole"
+        blockchains:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockchainType"
     WhitelistSignup:
       type: object
       required:
@@ -4857,11 +4865,20 @@ components:
       type: string
       example: $hazelnet
       pattern: '^\$[-._a-zA-Z0-9]{1,15}$'
-    WalletAddress:
+    CardanoWalletAddress:
       type: string
-      description: The wallet address (non-enterprise)
+      description: The wallet address (non-enterprise, Cardano)
       example: addr1qxpc4jfv5qvcr3plf046u365urrmlcthqrpp34p3445lfu3wejzsmqmaqlupfs6v2cmnh868t6vrjljtj6u43wg6w6zs6v20aa
       pattern: "^addr1[A-Za-z-0-9]{98}$"
+    EthereumWalletAddress:
+      type: string
+      description: The wallet address (Ethereum)
+      example: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+      pattern: "^(0x)?[0-9a-fA-F]{40}$"
+    WalletAddress:
+      oneOf:
+        - $ref: "#/components/schemas/CardanoWalletAddress"
+        - $ref: "#/components/schemas/EthereumWalletAddress"
     TransactionHash:
       type: string
       description: A cardano transaction hash
@@ -4891,6 +4908,7 @@ components:
       enum:
         - CARDANO
         - ETHEREUM
+        - POLYGON
     OuraEvent:
       type: object
       required:

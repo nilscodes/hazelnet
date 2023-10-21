@@ -2,15 +2,17 @@ import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import {
-  Whitelist, WhitelistSignupContainer, WhitelistType, cardanoaddress, adahandle,
+  Whitelist, WhitelistSignupContainer, WhitelistType, cardanoaddress, adahandle, BlockchainType,
 } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 import wallet from '../../utility/wallet';
+import ethereumaddress from '../../utility/ethereumaddress';
 
 interface WhitelistRegisterCommand extends BotSubcommand {
   cache: NodeCache
+  walletAddressFitsAllowedBlockchainTypes(address: string, allowedBlockchainTypes: BlockchainType[]): boolean
   getSuccessText(locale: string, whitelist: Whitelist, addressToWhitelist: string | undefined | null): string
   getSignupsText(signups: (WhitelistSignupContainer | undefined)[], whitelists: Whitelist[], locale: string): string
 }
@@ -33,7 +35,7 @@ export default <WhitelistRegisterCommand> {
       }
 
       const cardanoAddress = /^addr1[a-zA-Z0-9]{10,100}$/;
-      if (addressToWhitelist === null || cardanoAddress.test(addressToWhitelist)) {
+      if (addressToWhitelist === null || cardanoAddress.test(addressToWhitelist) || ethereumaddress.isWalletAddress(addressToWhitelist)) {
         const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
         const whitelists = await interaction.client.services.discordserver.listWhitelists(interaction.guild!.id);
         const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
@@ -96,13 +98,19 @@ export default <WhitelistRegisterCommand> {
         if (whitelistToRegisterFor) {
           const addressToWhitelist = this.cache.take(`${interaction.guild!.id}-${interaction.user.id}`) as string;
           if (addressToWhitelist || whitelistToRegisterFor.type === WhitelistType.DISCORD_ID) {
-            const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
-            const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
-            const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
-            if (await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, existingSignup)) {
-              await interaction.client.services.discordserver.registerForWhitelist(interaction.guild!.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
-              const successText = this.getSuccessText(locale, whitelistToRegisterFor, addressToWhitelist);
-              const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), successText, 'whitelist-register', [], whitelistToRegisterFor.logoUrl);
+            if (whitelistToRegisterFor.type !== WhitelistType.WALLET_ADDRESS || this.walletAddressFitsAllowedBlockchainTypes(addressToWhitelist, whitelistToRegisterFor.blockchains)) {
+              const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
+              const signups = await whitelistUtil.getExistingSignups(externalAccount, whitelists, interaction);
+              const existingSignup = signups.find((signup) => signup?.whitelistId === whitelistToRegisterFor.id);
+              if (await whitelistUtil.userQualifies(interaction, whitelistToRegisterFor, existingSignup)) {
+                await interaction.client.services.discordserver.registerForWhitelist(interaction.guild!.id, whitelistToRegisterFor.id, externalAccount.id, addressToWhitelist);
+                const successText = this.getSuccessText(locale, whitelistToRegisterFor, addressToWhitelist);
+                const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), successText, 'whitelist-register', [], whitelistToRegisterFor.logoUrl);
+                await interaction.editReply({ components: [], embeds: [embed] });
+              }
+            } else {
+              const blockchains = whitelistToRegisterFor.blockchains.join(', ');
+              const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'whitelist.register.messageTitle', locale }), i18n.__({ phrase: 'whitelist.register.errorInvalidBlockchain', locale }, { blockchains }), 'whitelist-register');
               await interaction.editReply({ components: [], embeds: [embed] });
             }
           } else {
@@ -132,6 +140,17 @@ export default <WhitelistRegisterCommand> {
         await interaction.editReply({ components: [], embeds: [embed] });
       }
     }
+  },
+  walletAddressFitsAllowedBlockchainTypes(address, blockchains) {
+    return blockchains.some((blockchain) => {
+      if (blockchain === BlockchainType.CARDANO) {
+        return /^addr1[a-zA-Z0-9]{10,100}$/.test(address);
+      }
+      if (blockchain === BlockchainType.POLYGON) {
+        return ethereumaddress.isWalletAddress(address);
+      }
+      return false;
+    });
   },
   getSuccessText(locale, whitelist, addressToWhitelist) {
     return i18n.__({ phrase: 'whitelist.register.success', locale }, { whitelist } as any)
@@ -177,7 +196,7 @@ export default <WhitelistRegisterCommand> {
           await interaction.editReply({ embeds: [embed] });
           return;
         }
-        if (whitelistToRegisterFor.type === WhitelistType.CARDANO_ADDRESS) {
+        if (whitelistToRegisterFor.type === WhitelistType.WALLET_ADDRESS) {
           const existingVerifications = await interaction.client.services.externalaccounts.getActiveVerificationsForExternalAccount(externalAccount.id);
           const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
           if (existingConfirmedVerifications.length) {

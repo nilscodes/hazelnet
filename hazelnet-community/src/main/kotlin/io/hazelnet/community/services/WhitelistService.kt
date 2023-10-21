@@ -174,7 +174,7 @@ class WhitelistService(
                 throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} already closed its registration.")
             }
         }
-        if (whitelist.type == WhitelistType.CARDANO_ADDRESS && whitelistSignup.address == null) {
+        if (whitelist.type == WhitelistType.WALLET_ADDRESS && whitelistSignup.address == null) {
             throw WhitelistRequirementNotMetException("Signup failed as whitelist $whitelistId on server ${discordServer.guildId} cannot be signed up to without a valid address.")
         } else if (whitelist.type == WhitelistType.DISCORD_ID) {
             whitelistSignup.address = null

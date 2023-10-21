@@ -1,13 +1,13 @@
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
 import {
   ActionRowBuilder,
   AttachmentBuilder,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
 } from 'discord.js';
 import { stringify } from 'csv-stringify/sync';
 import { Whitelist, SharedWhitelistSignup, SharedWhitelist } from '@vibrantnet/core';
+import { BotSubcommand } from '../../utility/commandtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 
@@ -35,7 +35,7 @@ export default <WhitelistDownloadCommand> {
       if (whitelistOptions.length) {
         const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
-            new SelectMenuBuilder()
+            new StringSelectMenuBuilder()
               .setCustomId('configure-whitelist/download/complete')
               .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale }))
               .addOptions(whitelistOptions),
@@ -121,7 +121,7 @@ export default <WhitelistDownloadCommand> {
     return fileToDownload;
   },
   getCsvContent(whitelist, signups) {
-    if (whitelist.type !== 'CARDANO_ADDRESS') {
+    if (whitelist.type !== 'WALLET_ADDRESS') {
       return [['referenceId', 'referenceName', 'referenceType', 'signupTime'], ...signups.map((signup) => ([signup.referenceId, signup.referenceName, signup.referenceType, signup.signupTime]))];
     }
     return [['address', 'signupTime'], ...signups.map((signup) => ([signup.address, signup.signupTime]))];

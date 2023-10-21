@@ -169,7 +169,7 @@ internal class WhitelistServiceTest {
             whitelistName = "white",
             whitelistDisplayName = "Black",
             signups = emptySet(),
-            type = WhitelistType.CARDANO_ADDRESS
+            type = WhitelistType.WALLET_ADDRESS
         )), whitelistService.getSharedWhitelists(testServer.guildId, false))
     }
 

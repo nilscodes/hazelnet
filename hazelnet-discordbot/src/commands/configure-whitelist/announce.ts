@@ -1,12 +1,12 @@
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
 import {
   ChannelType,
   ActionRowBuilder,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
 } from 'discord.js';
+import { BotSubcommand } from '../../utility/commandtypes';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 import discordpermissions from '../../utility/discordpermissions';
@@ -28,7 +28,7 @@ export default <BotSubcommand> {
           if (whitelistOptions.length) {
             const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
               .addComponents(
-                new SelectMenuBuilder()
+                new StringSelectMenuBuilder()
                   .setCustomId('configure-whitelist/announce/publish')
                   .setPlaceholder(i18n.__({ phrase: 'whitelist.unregister.chooseWhitelist', locale }))
                   .addOptions(whitelistOptions),
@@ -72,7 +72,7 @@ export default <BotSubcommand> {
         const components = whitelistUtil.getSignupComponents(discordServer, whitelistToAnnounce);
         try {
           const announceChannel = await interaction.guild!.channels.fetch(announceChannelId) as GuildTextBasedChannel;
-          const successText = i18n.__({ phrase: `configure.whitelist.announce.${whitelistToAnnounce.type === 'CARDANO_ADDRESS' ? 'publicSuccess' : 'publicSuccessNoAddress'}`, locale });
+          const successText = i18n.__({ phrase: `configure.whitelist.announce.${whitelistToAnnounce.type === 'WALLET_ADDRESS' ? 'publicSuccess' : 'publicSuccessNoAddress'}`, locale });
           const embedPublic = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'configure.whitelist.announce.publicSuccessTitle', locale }), successText, 'whitelist-register', detailFields, whitelistToAnnounce.logoUrl);
           await announceChannel.send({ embeds: [embedPublic], components });
           const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist announce', i18n.__({ phrase: 'configure.whitelist.announce.success', locale }, { channel: announceChannelId }), 'configure-whitelist-announce');

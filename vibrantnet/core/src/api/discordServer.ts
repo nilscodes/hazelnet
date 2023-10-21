@@ -42,6 +42,7 @@ import { DiscordRoleCounterUpdate } from '../types/discordRoleCounterUpdate';
 import { DiscordMintCounterUpdate } from '../types/cardano/discordMintCounterUpdate';
 import { GlobalSettingsApi } from './globalSettings';
 import { PollPartial } from '../types/poll/pollPartial';
+import { BlockchainType } from '../types/blockchainType';
 
 export class DiscordServerApi extends BaseCacheApi {
   globalsettings: GlobalSettingsApi;
@@ -272,11 +273,12 @@ export class DiscordServerApi extends BaseCacheApi {
     signupUntil: string | null,
     maxUsers: number | null,
     requiredRoles: DiscordRequiredRole[],
+    blockchains: BlockchainType[],
     awardedRole: string | undefined,
     launchDate: string | null,
     logoUrl: string | null,
-  ): Promise<any> {
-    return axios.post(`${this.apiUrl}/discord/servers/${guildId}/whitelists`, {
+  ): Promise<Whitelist> {
+    return (await axios.post(`${this.apiUrl}/discord/servers/${guildId}/whitelists`, {
       creator,
       displayName,
       name,
@@ -288,7 +290,8 @@ export class DiscordServerApi extends BaseCacheApi {
       awardedRole,
       launchDate,
       logoUrl,
-    });
+      blockchains,
+    })).data;
   }
 
   async updateWhitelist(guildId: string, whitelistId: number, whitelistPartial: WhitelistPartial): Promise<Whitelist> {

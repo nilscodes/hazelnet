@@ -1,3 +1,4 @@
+import { BlockchainType } from '../blockchainType';
 import { DiscordRequiredRole } from '../discordRequiredRole';
 import { WhitelistType } from './whitelistType';
 
@@ -7,6 +8,7 @@ export type Whitelist = {
   displayName: string
   creator: string
   requiredRoles: DiscordRequiredRole[]
+  blockchains: BlockchainType[]
   awardedRole?: string
   createTime: string
   type: WhitelistType

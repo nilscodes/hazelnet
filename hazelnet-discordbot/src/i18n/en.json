@@ -172,7 +172,7 @@
 			},
 			"whitelist": {
 				"name": "Name of the whitelist",
-				"address-or-handle": "The Cardano wallet address or $handle to add register for the whitelist."
+				"address-or-handle": "The wallet address or $handle to add register for the whitelist."
 			},
 			"configure-verify": {
 				"channel": "Channel to post the verification widget to.",
@@ -188,7 +188,7 @@
 				"ban-id": "The ID of the ban to remove/update",
 				"ban-type": "The type of ban",
 				"ban-pattern": "The name/asset/address you want to ban",
-				"ban-reason": "commands.options.configure-bans.ban-reason"
+				"ban-reason": "Reason for the ban"
 			},
 			"configure-protection": {
 				"status": "Set to False to turn this feature off.",
@@ -250,7 +250,8 @@
 				"guild-id": "The Discord guild/server ID (Snowflake Format: 717264144759390238)",
 				"channel": "The channel to send the whitelist announcement and signup widget to.",
 				"logo-url": "A https URL to the image you want to represent your whitelist with",
-				"launch-date": "The date on which users can claim their whitelist spot (Format: 2022-01-31T15:00:00Z)"
+				"launch-date": "The date on which users can claim their whitelist spot (Format: 2022-01-31T15:00:00Z)",
+				"blockchain": "Blockchain to allow for wallet-based whitelist (Default is Cardano)"
 			},
 			"configure-tokenroles": {
 				"policy-id": "Policy ID (Does not need to be an official policy of this server)",
@@ -296,9 +297,6 @@
 				"reminderchannel": "The channel to send public activity reminder messages to.",
 				"inactivity-days": "The number of days after which to send an activity reminder.",
 				"remindermessage": "A custom reminder message in which you can use the %USER% placeholder.",
-				"target-role": "commands.options.configure-engagement.target-role"
-			},
-			"configure-downloadusers": {
 				"target-role": "The role which users need to be in to be included in the list."
 			}
 		},
@@ -341,8 +339,11 @@
 				"RESET": "Reset all (value must be \"YES\" to confirm)"
 			},
 			"configure-whitelist": {
-				"CARDANO_ADDRESS": "Cardano wallet address (addr1...)",
-				"DISCORD_ID": "Discord ID and tag"
+				"WALLET_ADDRESS": "Wallet address (addr1... or 0x...)",
+				"DISCORD_ID": "Discord ID and tag",
+				"CARDANO": "Cardano",
+				"ETHEREUM": "Ethereum",
+				"POLYGON": "Polygon"
 			},
 			"configure-marketplace": {
 				"JPGSTORE": "jpg.store",
@@ -708,6 +709,7 @@
 			"errorNotFound": "⚠ Your registration was not successful. No whitelist with the name/ID **{{whitelistName}}** was found for this server.",
 			"otherError": "⚠ Error while registering for this whitelist.",
 			"errorNoAddress": "⚠ You have to provide an ADA Handle or wallet address as an option for the **/whitelist register** command, for this whitelist type. If you did provide one, ensure to complete the whitelist registration process in under 10 minutes.",
+			"errorInvalidBlockchain": "The address you provided does not look like a valid address for any of the following supported blockchains for this whitelist: {{blockchains}}.",
 			"noPremium": "🙀 Users currently can not register for any whitelists as this server is not running **Black Edition**. Please contact your Discord admin to resolve this issue.",
 			"widgetNotVerified": "⚠ You currently have no verified wallets. You can use the command **/whitelist register** in a channel that allows bot commands to register any address (*addr1…*) or *$handle* for this whitelist.\n\n💡 **Better**: We recommend verifying a wallet via **/verify add** and then registering it with the whitelist by clicking the same button again.",
 			"widgetNotVerifiedAlreadyRegistered": "✅ You have already registered for the whitelist **{{whitelist.displayName}}** at <t:{{signupTime}}> with the address *{{addressShort}}*.\n\nYou can use the command **/whitelist register** in a channel that allows bot commands to register a different address (*addr1…*) or *$handle* for this whitelist.",
@@ -1666,9 +1668,9 @@
 				"winnerCount": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
 				"drawTypeDescription": "Draw type",
 				"drawTypeDISCORD_ID": "When the winners are drawn, you will be provided with the Discord ID and tags of the winners.",
-				"drawTypeCARDANO_ADDRESS": "When the winners are drawn, you will be provided with the Cardano wallet address of the winners.",
+				"drawTypeWALLET_ADDRESS": "When the winners are drawn, you will be provided with the wallet address of the winners.",
 				"winnerCountDISCORD_ID": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
-				"winnerCountCARDANO_ADDRESS": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
+				"winnerCountWALLET_ADDRESS": "When the giveaway is closed, **{{winnerCount}} winners** will be drawn.",
 				"participationWeighted": "Users: **{{entrants}}**\nTotal giveaway entries: **{{entries}}**",
 				"participation": "Total giveaway entries: **{{entries}}**"
 			},
@@ -1742,7 +1744,7 @@
 				"publishButton": "Publish winners",
 				"winnerDrawDiscordId": "{{place}}. <@{{userId}}>",
 				"winnerDrawError": "{{place}}. ⚠ UNKNOWN DISCORD USER",
-				"winnerDrawCardanoAddress": "{{place}}. **{{winnerAddress}}**",
+				"winnerDrawWalletAddress": "{{place}}. **{{winnerAddress}}**",
 				"errorDraw": "⚠ Error drawing your winners for giveaway **{{{displayName}}}**. Likely there are not enough entrants to match your winner count and uniqueness conditions for this giveaway."
 			},
 			"remove": {
@@ -1818,7 +1820,7 @@
 				"publishButton": "Publish winners",
 				"winnerDrawDiscordId": "{{place}}. <@{{userId}}>",
 				"winnerDrawError": "{{place}}. ⚠ UNKNOWN DISCORD USER",
-				"winnerDrawCardanoAddress": "{{place}}. **{{winnerAddress}}**",
+				"winnerDrawWalletAddress": "{{place}}. **{{winnerAddress}}**",
 				"errorDraw": "⚠ Error drawing your winners for quiz **{{{displayName}}}**. Likely there are not enough entrants to match your winner count and uniqueness conditions for this quiz."
 			},
 			"remove": {
@@ -1906,6 +1908,11 @@
 	"stakingProviders": {
 		"MUTANT_STAKING": "Mutant Staking"
 	},
+	"blockchains": {
+		"CARDANO": "Cardano",
+		"ETHEREUM": "Ethereum",
+		"POLYGON": "Polygon"
+	},
 	"generic": {
 		"cancel": "Cancel",
 		"yes": "Yes",
@@ -1934,8 +1941,5 @@
 			"author": "@NilsCodes on Twitter",
 			"bot": "@HAZELnet_io on Twitter"
 		}
-	},
-	"": "",
-	"banEntry_ASSET_FINGERPRINT_BAN_PREVENT_ROLES": "banEntry_ASSET_FINGERPRINT_BAN_PREVENT_ROLES",
-	"banEntry_STAKE_ADDRESS_BAN_PREVENT_ROLES": "banEntry_STAKE_ADDRESS_BAN_PREVENT_ROLES"
+	}
 }

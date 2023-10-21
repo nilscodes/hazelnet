@@ -31,6 +31,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
 
     implementation("com.github.snksoft:crc:1.1.0")
+    implementation("jakarta.validation:jakarta.validation-api:2.0.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
