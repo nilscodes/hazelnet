@@ -171,7 +171,7 @@ class DiscordGiveawayService(
                         winnerList.addAll(List(it.winningCount) { externalAccount.referenceId })
                     }
                 }
-                GiveawayDrawType.CARDANO_ADDRESS -> {
+                GiveawayDrawType.WALLET_ADDRESS -> {
                     winners.forEach {
                         val verificationList =
                             externalAccountService.getConfirmedExternalAccountVerifications(it.externalAccountId)

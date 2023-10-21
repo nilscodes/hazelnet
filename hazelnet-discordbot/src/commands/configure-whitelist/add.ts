@@ -1,6 +1,6 @@
 import i18n from 'i18n';
+import { BlockchainType, WhitelistType } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { WhitelistType } from '@vibrantnet/core';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 
@@ -16,6 +16,7 @@ export default <BotSubcommand> {
     const signupUntil = interaction.options.getString('signup-end');
     const launchDate = interaction.options.getString('launch-date');
     const logoUrl = interaction.options.getString('logo-url');
+    const blockchain = (interaction.options.getString('blockchain') as BlockchainType) ?? BlockchainType.CARDANO;
 
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -38,7 +39,7 @@ export default <BotSubcommand> {
               requiredRoles.push({ roleId: requiredRole.id });
             }
 
-            const newWhitelistPromise = await interaction.client.services.discordserver.createWhitelist(
+            const whitelist = await interaction.client.services.discordserver.createWhitelist(
               interaction.guild!.id,
               externalAccount.id,
               whitelistName,
@@ -48,16 +49,16 @@ export default <BotSubcommand> {
               signupUntil,
               maxUsers,
               requiredRoles,
+              [blockchain],
               awardedRole?.id,
               launchDate,
               logoUrl,
             );
-            const whitelist = newWhitelistPromise.data;
 
             const detailsPhrase = whitelistUtil.getDetailsText(discordServer, whitelist);
             const embed = embedBuilder.buildForAdmin(discordServer, '/configure-whitelist add', i18n.__({ phrase: 'configure.whitelist.add.success', locale }), 'configure-whitelist-add', [
               {
-                name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist }),
+                name: i18n.__({ phrase: 'configure.whitelist.list.adminName', locale }, { whitelist } as any),
                 value: detailsPhrase,
               },
             ], whitelist.logoUrl);

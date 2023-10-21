@@ -1,3 +1,4 @@
+import { BlockchainType } from '../blockchainType';
 import { DiscordRequiredRole } from '../discordRequiredRole';
 
 export type WhitelistPartial = {
@@ -11,4 +12,5 @@ export type WhitelistPartial = {
   logoUrl?: string | null
   awardedRole?: string | null
   requiredRoles?: DiscordRequiredRole[] | null
+  blockchain?: BlockchainType[] | null
 };

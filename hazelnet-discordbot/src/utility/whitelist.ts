@@ -115,7 +115,7 @@ export default {
     return true;
   },
   async getQualifyText(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, whitelist: Whitelist, existingSignup: WhitelistSignup | undefined, includeFullAddress: boolean): Promise<string> {
-    const isAddressBasedWhitelist = whitelist.type === 'CARDANO_ADDRESS';
+    const isAddressBasedWhitelist = whitelist.type === 'WALLET_ADDRESS';
     if (existingSignup) {
       const phrase = `whitelist.list.${isAddressBasedWhitelist ? 'youAreRegisteredWithAddress' : 'youAreRegistered'}`;
       return `\n${i18n.__({ phrase, locale: discordServer.getBotLanguage() }, {
@@ -166,7 +166,7 @@ export default {
         .setLabel(i18n.__({ phrase: 'whitelist.register.registerButton', locale }))
         .setStyle(ButtonStyle.Primary),
     ];
-    if (whitelist.type === 'CARDANO_ADDRESS') {
+    if (whitelist.type === 'WALLET_ADDRESS') {
       buttons.push(new ButtonBuilder()
         .setCustomId('verify/add/widgetverify')
         .setLabel(i18n.__({ phrase: 'verify.add.verifyButton', locale }))

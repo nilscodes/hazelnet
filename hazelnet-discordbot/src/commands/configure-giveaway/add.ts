@@ -262,9 +262,9 @@ export default <GiveawayAddCommand> {
     }, {
       label: i18n.__({ phrase: 'configure.giveaway.add.drawTypeWalletAddress', locale }).substring(0, 100),
       description: i18n.__({ phrase: 'configure.giveaway.add.drawTypeWalletAddressDescription', locale }).substring(0, 100),
-      value: 'CARDANO_ADDRESS',
+      value: 'WALLET_ADDRESS',
       emoji: { name: '🏠' },
-      default: drawType === 'CARDANO_ADDRESS',
+      default: drawType === 'WALLET_ADDRESS',
     }];
   },
   getTokenOwnershipOptions(locale, tokenType) {

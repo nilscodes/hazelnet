@@ -1,6 +1,6 @@
 package io.hazelnet.shared.data
 
 enum class WhitelistType {
-    CARDANO_ADDRESS,
+    WALLET_ADDRESS,
     DISCORD_ID
 }

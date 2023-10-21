@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import io.hazelnet.community.data.discord.DiscordRequiredRole
+import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.data.WhitelistType
+import org.hibernate.annotations.Type
 import org.springframework.lang.NonNull
 import java.util.*
 import javax.persistence.*
@@ -27,7 +29,7 @@ class Whitelist @JsonCreator constructor(
 
     @Column(name = "whitelist_type")
     @Enumerated(EnumType.ORDINAL)
-    var type: WhitelistType = WhitelistType.CARDANO_ADDRESS,
+    var type: WhitelistType = WhitelistType.WALLET_ADDRESS,
 
     @Column(name = "external_account_id")
     @field:NonNull
@@ -65,6 +67,13 @@ class Whitelist @JsonCreator constructor(
     @field:Valid
     var requiredRoles: MutableSet<DiscordRequiredRole> = mutableSetOf(),
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "discord_whitelists_blockchains", joinColumns = [JoinColumn(name = "discord_whitelist_id")])
+    @Column(name = "blockchain")
+    @Enumerated(EnumType.STRING)
+    @Type(type = "io.hazelnet.community.persistence.data.BlockchainTypePostgreSql")
+    var blockchains: MutableSet<BlockchainType> = mutableSetOf(),
+
     @Column(name = "awarded_discord_role_id")
     @field:Min(1)
     @field:JsonSerialize(using = ToStringSerializer::class)
@@ -91,9 +100,7 @@ class Whitelist @JsonCreator constructor(
     fun getCurrentUsers(): Int = signups.size
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Whitelist
+        if (other !is Whitelist) return false
 
         if (id != other.id) return false
         if (discordServerId != other.discordServerId) return false
@@ -106,6 +113,7 @@ class Whitelist @JsonCreator constructor(
         if (signupUntil != other.signupUntil) return false
         if (launchDate != other.launchDate) return false
         if (requiredRoles != other.requiredRoles) return false
+        if (blockchains != other.blockchains) return false
         if (awardedRole != other.awardedRole) return false
         if (maxUsers != other.maxUsers) return false
         if (closed != other.closed) return false
@@ -128,6 +136,7 @@ class Whitelist @JsonCreator constructor(
         result = 31 * result + (signupUntil?.hashCode() ?: 0)
         result = 31 * result + (launchDate?.hashCode() ?: 0)
         result = 31 * result + requiredRoles.hashCode()
+        result = 31 * result + blockchains.hashCode()
         result = 31 * result + (awardedRole?.hashCode() ?: 0)
         result = 31 * result + (maxUsers ?: 0)
         result = 31 * result + closed.hashCode()
@@ -138,7 +147,7 @@ class Whitelist @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "Whitelist(id=$id, discordServerId=$discordServerId, type=$type, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoles=$requiredRoles, awardedRole=$awardedRole, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
+        return "Whitelist(id=$id, discordServerId=$discordServerId, type=$type, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoles=$requiredRoles, blockchains=$blockchains, awardedRole=$awardedRole, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
     }
 
 }

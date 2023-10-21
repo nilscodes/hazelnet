@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS "discord_poll_required_roles";
 DROP TABLE IF EXISTS "discord_polls";
 DROP TABLE IF EXISTS "stake_snapshot_cardano";
 DROP TABLE IF EXISTS "discord_whitelists_required_roles";
+DROP TABLE IF EXISTS "discord_whitelists_blockchains";
 DROP TABLE IF EXISTS "discord_whitelists_signup";
 DROP TABLE IF EXISTS "discord_whitelists";
 DROP TABLE IF EXISTS "discord_server_members";
@@ -53,7 +54,8 @@ CREATE TYPE "accounts_external_type" AS ENUM (
 
 CREATE TYPE "blockchain_type" AS ENUM (
     'CARDANO',
-    'ETHEREUM'
+    'ETHEREUM',
+    'POLYGON'
 );
 
 CREATE TABLE "accounts"
@@ -297,6 +299,12 @@ CREATE TABLE "discord_whitelists_required_roles"
 (
     "discord_whitelist_id" bigint,
     "discord_role_id"     bigint NOT NULL
+);
+
+CREATE TABLE "discord_whitelists_blockchains"
+(
+    "discord_whitelist_id" bigint,
+    "blockchain"           blockchain_type NOT NULL
 );
 
 CREATE TABLE "discord_polls"
@@ -674,6 +682,8 @@ ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") 
 CREATE INDEX "discord_whitelists_signup_external_account_id_index" ON "discord_whitelists_signup" ("external_account_id");
 
 ALTER TABLE "discord_whitelists_required_roles" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
+
+ALTER TABLE "discord_whitelists_blockchains" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
 
 ALTER TABLE "discord_polls" ADD FOREIGN KEY ("discord_server_id") REFERENCES "discord_servers" ("discord_server_id") ON DELETE CASCADE;
 

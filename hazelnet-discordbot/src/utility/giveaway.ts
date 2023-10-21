@@ -245,8 +245,8 @@ export default {
           }
         }
       }
-    } else if (giveaway.drawType === GiveawayDrawType.CARDANO_ADDRESS) {
-      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawCardanoAddress', locale }, { place: `${idx + 1}`, winnerAddress: (shortenAddresses ? cardanoaddress.shorten(winnerAddress) : winnerAddress) })));
+    } else if (giveaway.drawType === GiveawayDrawType.WALLET_ADDRESS) {
+      winnerTextList.push(...winnerList.winners.map((winnerAddress, idx) => i18n.__({ phrase: 'configure.giveaway.end.winnerDrawWalletAddress', locale }, { place: `${idx + 1}`, winnerAddress: (shortenAddresses ? cardanoaddress.shorten(winnerAddress) : winnerAddress) })));
     }
 
     const CHUNK_SIZE = 8;

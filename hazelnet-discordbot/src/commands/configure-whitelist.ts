@@ -1,5 +1,5 @@
-import { BotCommand } from '../utility/commandtypes';
 import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from '../utility/commandtypes';
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 
@@ -16,7 +16,7 @@ export default <BotCommand> {
         .addStringOption((option) => option.setName('whitelist-name').setDescription(ci18n.option('whitelist-name')).setRequired(true))
         .addStringOption((option) => option.setName('type').setDescription(ci18n.option('type'))
           .addChoices(
-            { name: ci18n.choice('CARDANO_ADDRESS'), value: 'CARDANO_ADDRESS' },
+            { name: ci18n.choice('WALLET_ADDRESS'), value: 'WALLET_ADDRESS' },
             { name: ci18n.choice('DISCORD_ID'), value: 'DISCORD_ID' },
           )
           .setRequired(true))
@@ -26,7 +26,13 @@ export default <BotCommand> {
         .addStringOption((option) => option.setName('signup-start').setDescription(ci18n.option('signup-start')).setRequired(false))
         .addStringOption((option) => option.setName('signup-end').setDescription(ci18n.option('signup-end')).setRequired(false))
         .addStringOption((option) => option.setName('launch-date').setDescription(ci18n.option('launch-date')).setRequired(false))
-        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)))
+        .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false))
+        .addStringOption((option) => option.setName('blockchain').setDescription(ci18n.option('blockchain'))
+          .addChoices(
+            { name: ci18n.choice('CARDANO'), value: 'CARDANO' },
+            { name: ci18n.choice('POLYGON'), value: 'POLYGON' },
+          )
+          .setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list')))

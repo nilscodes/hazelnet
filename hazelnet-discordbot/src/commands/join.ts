@@ -1,5 +1,7 @@
 import NodeCache from 'node-cache';
-import { ActionRowBuilder, APIEmbedField, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SlashCommandBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder } from 'discord.js';
+import {
+  ActionRowBuilder, APIEmbedField, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SlashCommandBuilder, ButtonStyle, EmbedBuilder, StringSelectMenuBuilder,
+} from 'discord.js';
 import i18n from 'i18n';
 import {
   DiscordServer, Giveaway, ParticipationData, Quiz, QuizAnswer, QuizParticipation, QuizQuestion, TokenMetadata, cardanoaddress,
@@ -17,17 +19,17 @@ import wallet from '../utility/wallet';
 type FieldsAndComponents = {
   detailFields: APIEmbedField[]
   components: ActionRowBuilder<MessageActionRowComponentBuilder>[]
-}
+};
 
 type QuestionEmbedParts = {
   questionEmbed: EmbedBuilder
   questionComponents: ActionRowBuilder<MessageActionRowComponentBuilder>[]
-}
+};
 
 type QuizFinalizeContent = {
   titlePhrase: string
   mainText: string
-}
+};
 
 interface JoinCommand extends BotCommand {
   cache: NodeCache
@@ -375,7 +377,7 @@ export default <JoinCommand> {
       const existingConfirmedVerifications = existingVerifications.filter((verification) => verification.confirmed && !verification.obsolete);
       if (existingConfirmedVerifications.length) {
         const registerOptions = await wallet.getWalletRegisterOptions(interaction.client.services.cardanoinfo, existingConfirmedVerifications, `${externalAccount.id}`);
-  
+
         const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()
           .addComponents(
             new StringSelectMenuBuilder()
