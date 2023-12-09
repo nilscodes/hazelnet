@@ -4,4 +4,5 @@ export enum MarketplaceLinkType {
   CNFTJUNGLE = 'CNFTJUNGLE',
   POOLPMHANDLE = 'POOLPMHANDLE',
   POOLPM = 'POOLPM',
+  TAPTOOLS = 'TAPTOOLS',
 }

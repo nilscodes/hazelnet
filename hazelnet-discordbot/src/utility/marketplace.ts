@@ -52,7 +52,7 @@ export default {
     return displayName;
   },
   getSaleAnnouncementComponents(discordServer: DiscordServer, saleAnnouncement: SaleAnnouncement) {
-    const componentsToAdd = (discordServer.settings.SALES_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[];
+    const componentsToAdd = (discordServer.settings.SALES_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.TAPTOOLS]) as MarketplaceLinkType[];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, saleAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(components)];
@@ -86,7 +86,7 @@ export default {
     return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, { displayName });
   },
   getListingAnnouncementComponents(discordServer: DiscordServer, listingAnnouncement: ListingAnnouncement) {
-    const componentsToAdd = (discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[]
+    const componentsToAdd = (discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.TAPTOOLS]) as MarketplaceLinkType[]
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, listingAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(components)];
@@ -112,6 +112,11 @@ export default {
         return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnCnftJungle', locale }))
           .setURL(`https://www.jngl.io/asset/${linkData.policyId}${linkData.assetNameHex}`)
+          .setStyle(ButtonStyle.Link);
+      case MarketplaceLinkType.TAPTOOLS:
+        return new ButtonBuilder()
+          .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnTapTools', locale }))
+          .setURL(`https://www.taptools.io/charts/nft?policyID=${linkData.policyId}`)
           .setStyle(ButtonStyle.Link);
       case MarketplaceLinkType.POOLPMHANDLE:
         return new ButtonBuilder()
@@ -145,7 +150,7 @@ export default {
     return i18n.__({ phrase: 'configure.marketplace.mint.announce.itemContentMint', locale }, { displayName });
   },
   getMintAnnouncementComponents(discordServer: DiscordServer, mintAnnouncement: MintAnnouncement) {
-    const componentsToAdd = (discordServer.settings.MINT_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.POOLPM, MarketplaceLinkType.CNFTJUNGLE]) as MarketplaceLinkType[];
+    const componentsToAdd = (discordServer.settings.MINT_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.POOLPM, MarketplaceLinkType.TAPTOOLS]) as MarketplaceLinkType[];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, mintAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(components)];
