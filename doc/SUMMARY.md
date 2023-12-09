@@ -8,20 +8,34 @@
 * [✨ Our Features](overview/our-features.md)
 * [🙌 Free Version](overview/free-version.md)
 
-## Basics
+## Discord Basics
 
-* [🛠 Getting set up](fundamentals/getting-set-up/README.md)
-  * [📝 Setting permissions](fundamentals/getting-set-up/setting-permissions.md)
-  * [🧑 Inviting Members](fundamentals/getting-set-up/inviting-members.md)
+* [🛠 Getting set up](discord-basics/getting-set-up/README.md)
+  * [🤖 Inviting the bot](discord-basics/getting-set-up/inviting-bot.md)
+  * [📝 Setting permissions](discord-basics/getting-set-up/setting-permissions.md)
 
 ## Guides
 
-* [📪 Making a post](guides/making-a-post.md)
-* [📎 Understanding Projects](guides/understanding-projects.md)
+* [🎨 For NFT projects](guides/nft-projects/README.md)
+  * [🧪 Pre-Mint](guides/nft-projects/mint.md)
+  * [🧱 Mint](guides/nft-projects/mint.md)
+  * [🚀 Post launch](guides/nft-projects/post-launch.md)
+  * [🏙 Community Building](guides/nft-projects/community-building.md)
+* [🌊 For Stakepools](guides/stakepools/README.md)
+  * [🧑 Delegation Roles](guides/stakepools/delegation-roles.md)
+  * [❕ Stakepool Updates](guides/stakepools/stakepool-updates.md)
+  * [🏙 Community Building](guides/stakepools/community-building.md)
+* [📈 For DeFi Projects](guides/defi-projects/README.md)
+  * [🧑 Token Roles](guides/defi-projects/token-roles.md)
+  * [🏙 Community Building](guides/defi-projects/community-building.md)
+* [🤝 For DAOs](guides/daos/README.md)
+  * [🧑 Token Roles](guides/daos/token-roles.md)
+  * [🗳 Voting and Decisions](guides/daos/voting-decisions.md)
+  * [🏙 Community Building](guides/daos/community-building.md)
 
 ## Discord Commands
 * User Commands
-  * General
+  * [General](user-commands/README.md)
     * [❔ /help](user-commands/help.md)
     * [ℹ /info](user-commands/info.md)
     * [🛡 /policyid](user-commands/policyid.md)
@@ -29,22 +43,22 @@
     * [🧑 /whois](user-commands/whois.md)
     * [🐈 /premium](user-commands/premium.md)
     * [🛒 /claim](user-commands/claim.md)
-  * Verification
-    * [❔ /verify help](user-commands/verification/help.md)
-    * [📃 /verify list](user-commands/verification/list.md)
-    * [➕ /verify add](user-commands/verification/add.md)
-    * [🔗 /verify link](user-commands/verification/link.md)
-    * [✖ /verify unlink](user-commands/verification/unlink.md)
-    * [🛑 /verify cancel](user-commands/verification/cancel.md)
-    * [🗑 /verify remove](user-commands/verification/remove.md)
-  * Whitelist Signup
+  * [Verification](user-commands/README.md)
+    * [❔ /verify help](user-commands/verify/help.md)
+    * [📃 /verify list](user-commands/verify/list.md)
+    * [➕ /verify add](user-commands/verify/add.md)
+    * [🔗 /verify link](user-commands/verify/link.md)
+    * [✖ /verify unlink](user-commands/verify/unlink.md)
+    * [🛑 /verify cancel](user-commands/verify/cancel.md)
+    * [🗑 /verify remove](user-commands/verify/remove.md)
+  * [Whitelist Signup](user-commands/README.md)
     * [📃 /whitelist list](user-commands/whitelist/list.md)
     * [✅ /whitelist register](user-commands/whitelist/register.md)
     * [🚪 /whitelist unregister](user-commands/whitelist/unregister.md)
-  * Messaging
+  * [Messaging](user-commands/ping/README.md)
     * [📩 /ping send](user-commands/ping/send.md)
     * [📃 /ping list](user-commands/ping/list.md)
-  * Profile
+  * [Profile](user-commands/profile/README.md)
     * [🔲 /profile toggle](user-commands/profile/toggle.md)
     * [📛 /profile defaulthandle](user-commands/profile/defaulthandle.md)
 * Admin Commands
