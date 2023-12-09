@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -28,6 +29,7 @@ class JpgStoreService(
 
     private val lastSalesSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
     private val lastListingsSyncTimeForPolicy: MutableMap<String, Date> = mutableMapOf()
+    private val dupeSalesPreventionMap: MutableMap<String, Date> = mutableMapOf() // A map to prevent duplicate sales from being sent to the queue because the JPG store API includes multiple entries for sales that resolve collection offers
     private val jpgStoreSalesRequestCounter = Counter
         .builder("jpgstore_requestcount_sales")
         .description("Count of requests for aggregating sales from jpg.store")
@@ -60,35 +62,14 @@ class JpgStoreService(
                     .increment()
             }
             .filter {
-                val sold = it.saleDate != null && it.saleDate.after(lastSyncTimeBeforeCall)
+                val sold = it.saleDate != null && it.saleDate.after(lastSyncTimeBeforeCall) && !dupeSalesPreventionMap.containsKey(it.transactionHash + it.displayName)
                 if (track) {
                     logger.info { "Found sale with listing ID ${it.listingId} for item ${it.displayName} and sale date ${it.saleDate}. With last sync at $lastSyncTimeBeforeCall this is considered sold: $sold" }
                 }
+                if (sold) {
+                    dupeSalesPreventionMap[it.transactionHash + it.displayName] = Date()
+                }
                 sold
-            }
-            .doFinally {
-                if (it == SignalType.ON_COMPLETE) {
-                    lastSalesSyncTimeForPolicy[policyId] = now
-                }
-            }
-            .subscribe { rabbitTemplate.convertAndSend("sales", it.toSalesInfo()) }
-        this.getTransactionsForCollection(listOf(policyId), 1)
-            .onErrorContinue(WebClientResponseException::class.java) { e, _ ->
-                logger.info(e) { "Failed getting jpg.store transactions for policy $policyId" }
-                jpgStoreSalesStatusCounter
-                    .tag("code", (e as WebClientResponseException).rawStatusCode.toString())
-                    .register(meterRegistry)
-                    .increment()
-            }
-            .flatMap { Flux.fromIterable(it.transactions) }
-            .filter {
-                val offerSold = it.transactionConfirmationDate != null
-                        && it.transactionConfirmationDate.after(lastSyncTimeBeforeCall)
-                        && it.action == JpgStoreTransactionAction.ACCEPT_OFFER
-                if (track) {
-                    logger.info { "Found ${it.action} for asset ${it.displayName} with confirmation date ${it.transactionConfirmationDate}. With last sync at $lastSyncTimeBeforeCall this offer is considered sold: $offerSold" }
-                }
-                offerSold
             }
             .doFinally {
                 if (it == SignalType.ON_COMPLETE) {
@@ -128,6 +109,12 @@ class JpgStoreService(
                 }
             }
             .subscribe { rabbitTemplate.convertAndSend("listings", it.toListingsInfo()) }
+    }
+
+    @Scheduled(fixedRate = 300000)
+    fun removeOutdatedDupeSalesPreventionMapEntries() {
+        val now = Date(System.currentTimeMillis() - 300000)
+        dupeSalesPreventionMap.entries.removeIf { it.value.before(now) }
     }
 
     private fun getListings(policyIds: List<String>): Flux<JpgStoreListingPage> {
