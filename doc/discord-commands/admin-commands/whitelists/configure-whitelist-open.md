@@ -1,0 +1,2 @@
+# 🚪 /configure-whitelist open
+

@@ -1,0 +1,2 @@
+# 🚪 /configure-api generatetoken
+

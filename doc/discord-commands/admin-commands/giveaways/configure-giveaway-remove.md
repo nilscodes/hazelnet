@@ -1,0 +1,2 @@
+# 🗑 /configure-giveaway remove
+

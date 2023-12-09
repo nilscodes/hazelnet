@@ -1,0 +1,2 @@
+# 🗑 /configure-marketplace mint remove
+
