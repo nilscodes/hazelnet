@@ -249,8 +249,12 @@ class TokenDaoCardanoDbSync(
         if (includeMetadata) {
             val mintMetadata =
                 objectMapper.readValue(rs.getString("json"), object : TypeReference<Map<String, Any>>() {})
-            val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
-            metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
+            if (mintMetadata.containsKey(policyId)) {
+                val metadataOfPolicyId = mintMetadata[policyId] as Map<String, Any>
+                if (metadataOfPolicyId.containsKey(assetName)) {
+                    metadataOfAsset = (metadataOfPolicyId[assetName] as Map<String, Any>?) ?: mapOf()
+                }
+            }
         }
         return MultiAssetInfo(
             PolicyId(policyId),
