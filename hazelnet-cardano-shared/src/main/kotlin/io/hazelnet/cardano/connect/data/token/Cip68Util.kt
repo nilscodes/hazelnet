@@ -15,7 +15,7 @@ data class Cip68Token(val assetClass: Cip67Label, val assetName: String) {
     }
 
     fun toHexString(): String {
-        return "$assetClass${assetName.toByteArray(Charsets.UTF_8).toHex()}"
+        return if (isValidCip68Token()) "$assetClass${assetName.toByteArray(Charsets.UTF_8).toHex()}" else assetName
     }
 
     override fun toString(): String {

@@ -44,6 +44,12 @@ class Cip68TokenTest {
     }
 
     @Test
+    fun `can recover original hex name for non CIP-0068 token name`() {
+        val nonCip68Token = Cip68Token("436c61794e6174696f6e39323031")
+        assertEquals("436c61794e6174696f6e39323031", nonCip68Token.toHexString())
+    }
+
+    @Test
     fun `cip67 test vectors work`() {
         assertEquals(0, Cip67Label("00000000").label)
         assertEquals(1, Cip67Label("00001070").label)
