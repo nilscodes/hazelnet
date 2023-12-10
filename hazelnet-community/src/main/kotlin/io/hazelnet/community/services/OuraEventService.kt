@@ -106,6 +106,7 @@ class OuraEventService(
                             mintTransaction = mintToProcess.transactionHash,
                             quantity = mintToProcess.quantity,
                         )
+                        val cip68Token = Cip68Token(mintToProcess.assetNameHex)
 
                         currentMintChannels
                             .filter { it.policyId == mintToProcess.policyId
@@ -115,7 +116,8 @@ class OuraEventService(
                                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                                     channelId = it.channelId,
                                     policyId = mintToProcess.policyId,
-                                    assetFingerprint = combinedAssetInfo.assetFingerprint.assetFingerprint,
+                                    assetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(mintToProcess.policyId, cip68Token.getNft().toHexString()) else combinedAssetInfo.assetFingerprint.assetFingerprint,
+                                    referenceTokenAssetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(mintToProcess.policyId, cip68Token.getReferenceToken().toHexString()) else null,
                                     assetNameHex = mintToProcess.assetNameHex,
                                     assetName = combinedAssetInfo.assetName,
                                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),

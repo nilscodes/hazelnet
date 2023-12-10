@@ -1,9 +1,10 @@
 import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy } from '@vibrantnet/core';
+import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy, } from '@vibrantnet/core';
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 import nftcdn, { NftCdnAttachment } from './nftcdn';
+
 const punycode = require('punycode/');
 
 export default {
@@ -86,7 +87,7 @@ export default {
     return i18n.__({ phrase: 'configure.marketplace.listings.announce.itemContentListed', locale }, { displayName });
   },
   getListingAnnouncementComponents(discordServer: DiscordServer, listingAnnouncement: ListingAnnouncement) {
-    const componentsToAdd = (discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.TAPTOOLS]) as MarketplaceLinkType[]
+    const componentsToAdd = (discordServer.settings.LISTINGS_TRACKER_BUTTONS?.split(',').filter((button) => button.trim() !== '') ?? [MarketplaceLinkType.MARKETPLACE, MarketplaceLinkType.POOLPM, MarketplaceLinkType.TAPTOOLS]) as MarketplaceLinkType[];
     const components = componentsToAdd.map((linkType) => this.generateLink(linkType, listingAnnouncement, discordServer.getBotLanguage()));
     if (components.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(components)];
@@ -123,6 +124,16 @@ export default {
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnPoolPm', locale }))
           .setURL(`https://pool.pm/$${linkData.assetName}`)
           .setStyle(ButtonStyle.Link);
+      case MarketplaceLinkType.SPACEBUDZ:
+      {
+        const regex = /[0-9]+/g;
+        const match = linkData.assetName.match(regex);
+        const budnumber = match ? match[0] : null;
+        return new ButtonBuilder()
+          .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnSpacebudz', locale }))
+          .setURL(`https://spacebudz.io/spacebud/${budnumber}`)
+          .setStyle(ButtonStyle.Link);
+      }
       case MarketplaceLinkType.POOLPM:
       default:
         return new ButtonBuilder()
@@ -213,7 +224,7 @@ export default {
       });
     }
   },
-  getMarketplaceNames(marketplaces: Marketplace[], locale: string, showAllMarketplaceNamesInsteadOfCatchAll: boolean = true): string {
+  getMarketplaceNames(marketplaces: Marketplace[], locale: string, showAllMarketplaceNamesInsteadOfCatchAll = true): string {
     let useMarketplaces = marketplaces;
     if (showAllMarketplaceNamesInsteadOfCatchAll && marketplaces.find((marketplace) => marketplace === Marketplace.ALL_MARKETPLACES)) {
       useMarketplaces = [];

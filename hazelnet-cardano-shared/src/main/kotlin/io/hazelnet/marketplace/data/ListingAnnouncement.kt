@@ -15,6 +15,7 @@ data class ListingAnnouncement @JsonCreator constructor(
 
     val policyId: String,
     val assetFingerprint: String,
+    val referenceTokenAssetFingerprint: String?,
     val assetNameHex: String,
     val assetName: String,
     val displayName: String,

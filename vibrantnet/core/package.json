@@ -1,6 +1,6 @@
 {
   "name": "@vibrantnet/core",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "The main library to use within JS/TS based applications trying to interact with the Vibrant Community Integration System.",
   "main": "dist/index.js",
   "scripts": {

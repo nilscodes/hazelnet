@@ -1,14 +1,12 @@
 package io.hazelnet.community.services
 
-import io.hazelnet.cardano.connect.data.token.GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER
 import com.bloxbean.cardano.client.util.AssetUtil
 import io.hazelnet.cardano.connect.data.token.Cip68Token
+import io.hazelnet.cardano.connect.data.token.GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
-import io.hazelnet.community.data.external.cnftjungle.AssetInfo
 import io.hazelnet.community.data.getImageUrlFromAssetInfo
 import io.hazelnet.community.data.getItemNameFromAssetInfo
-import io.hazelnet.community.services.external.CnftJungleService
 import io.hazelnet.community.services.external.NftCdnService
 import io.hazelnet.marketplace.data.ListingAnnouncement
 import io.hazelnet.marketplace.data.ListingsInfo
@@ -19,8 +17,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
-import reactor.util.function.Tuple2
 
 private val logger = KotlinLogging.logger {}
 
@@ -28,7 +24,6 @@ private val logger = KotlinLogging.logger {}
 class DiscordMarketplaceChannelPublisher(
     private val discordMarketplaceService: DiscordMarketplaceService,
     private val discordServerService: DiscordServerService,
-    private val cnftJungleService: CnftJungleService,
     private val connectService: ConnectService,
     private val rabbitTemplate: RabbitTemplate,
     private val config: CommunityApplicationConfiguration,
@@ -39,29 +34,31 @@ class DiscordMarketplaceChannelPublisher(
     fun processSales(sale: SalesInfo) {
         val policyIdToUse = if (sale.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else sale.policyId
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(policyIdToUse)
-        val combinedAssetInfo = retrieveAssetInfo(sale.policyId, sale.assetNameHex)
+        val cip68Token = Cip68Token(sale.assetNameHex)
+        val combinedAssetInfo = retrieveAssetInfo(sale.policyId, cip68Token)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || sale.price >= it.minimumValue!!)
                 && (it.maximumValue == null || sale.price <= it.maximumValue!!)
-                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)
+                && it.meetsFilterCriteria(combinedAssetInfo.metadata)
                 && it.canShowForMarketplace(sale.source)) {
                 SaleAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,
                     policyId = sale.policyId,
-                    assetFingerprint = combinedAssetInfo.t1.assetFingerprint.assetFingerprint,
+                    assetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(sale.policyId, cip68Token.getNft().toHexString()) else combinedAssetInfo.assetFingerprint.assetFingerprint,
+                    referenceTokenAssetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(sale.policyId, cip68Token.getReferenceToken().toHexString()) else null,
                     assetNameHex = sale.assetNameHex,
-                    assetName = combinedAssetInfo.t1.assetName,
-                    displayName = getItemNameFromAssetInfo(combinedAssetInfo.t1),
+                    assetName = combinedAssetInfo.assetName,
+                    displayName = getItemNameFromAssetInfo(combinedAssetInfo),
                     source = sale.source,
                     marketplaceAssetUrl = sale.marketplaceAssetUrl,
-                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo.t1),
+                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo),
                     price = sale.price,
                     saleDate = sale.saleDate,
-                    rarityRank = combinedAssetInfo.t2.rarityRank,
+                    rarityRank = 0,
                     type = sale.type,
                     highlightAttributeDisplayName = it.highlightAttributeDisplayName,
-                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.t1.metadata)
+                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.metadata)
                 )
             } else {
                 null
@@ -74,28 +71,30 @@ class DiscordMarketplaceChannelPublisher(
     fun processListings(listing: ListingsInfo) {
         val policyIdToUse = if (listing.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else listing.policyId
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(policyIdToUse)
-        val combinedAssetInfo = retrieveAssetInfo(listing.policyId, listing.assetNameHex)
+        val cip68Token = Cip68Token(listing.assetNameHex)
+        val combinedAssetInfo = retrieveAssetInfo(listing.policyId, cip68Token)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || listing.price >= it.minimumValue!!)
                 && (it.maximumValue == null || listing.price <= it.maximumValue!!)
-                && it.meetsFilterCriteria(combinedAssetInfo.t1.metadata)
+                && it.meetsFilterCriteria(combinedAssetInfo.metadata)
                 && it.canShowForMarketplace(listing.source)) {
                 ListingAnnouncement(
                     guildId = discordServerService.getGuildIdFromServerId(it.discordServerId!!),
                     channelId = it.channelId,
                     policyId = listing.policyId,
-                    assetFingerprint = combinedAssetInfo.t1.assetFingerprint.assetFingerprint,
+                    assetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(listing.policyId, cip68Token.getNft().toHexString()) else combinedAssetInfo.assetFingerprint.assetFingerprint,
+                    referenceTokenAssetFingerprint = if (cip68Token.isValidCip68Token()) AssetUtil.calculateFingerPrint(listing.policyId, cip68Token.getReferenceToken().toHexString()) else null,
                     assetNameHex = listing.assetNameHex,
-                    assetName = combinedAssetInfo.t1.assetName,
-                    displayName = getItemNameFromAssetInfo(combinedAssetInfo.t1),
+                    assetName = combinedAssetInfo.assetName,
+                    displayName = getItemNameFromAssetInfo(combinedAssetInfo),
                     source = listing.source,
                     marketplaceAssetUrl = listing.marketplaceAssetUrl,
-                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo.t1),
+                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo),
                     price = listing.price,
                     listingDate = listing.listingDate,
-                    rarityRank = combinedAssetInfo.t2.rarityRank,
+                    rarityRank = 0,
                     highlightAttributeDisplayName = it.highlightAttributeDisplayName,
-                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.t1.metadata)
+                    highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.metadata)
                 )
             } else {
                 null
@@ -104,23 +103,14 @@ class DiscordMarketplaceChannelPublisher(
             .forEach { rabbitTemplate.convertAndSend("listingannouncements", it) }
     }
 
-    private fun retrieveAssetInfo(policyId: String, assetNameHex: String): Tuple2<MultiAssetInfo, AssetInfo> {
-        val cip68Token = Cip68Token(assetNameHex)
-        logger.debug { "Getting asset info for asset $assetNameHex on policy $policyId. CIP-0068 token: ${cip68Token.isValidCip68Token()}"}
+    private fun retrieveAssetInfo(policyId: String, cip68Token: Cip68Token): MultiAssetInfo {
+        logger.debug { "Getting asset info for asset ${cip68Token.toHexString()} on policy $policyId. CIP-0068 token: ${cip68Token.isValidCip68Token()}"}
         val blockchainAssetInfo = if (cip68Token.isValidCip68Token()) {
             Mono.just(nftCdnService.getAssetMetadata(listOf(AssetUtil.calculateFingerPrint(policyId, cip68Token.getReferenceToken().toHexString())))
                 .map { it.toMultiAssetInfo() }.first())
         } else {
-            connectService.getMultiAssetInfoSingle(policyId, assetNameHex)
+            connectService.getMultiAssetInfoSingle(policyId, cip68Token.toHexString())
         }
-        val cnftJungleAssetInfo = cnftJungleService.getAssetInfo(policyId, assetNameHex)
-            .onErrorReturn(
-                AssetInfo(
-                    assetId = "${policyId}${assetNameHex}",
-                    policyId = policyId
-                )
-            )
-        return Mono.zip(blockchainAssetInfo, cnftJungleAssetInfo)
-            .block()!!
+        return blockchainAssetInfo.block()!!
     }
 }

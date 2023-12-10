@@ -23,6 +23,7 @@ data class Cip68Token(val assetClass: Cip67Label, val assetName: String) {
     }
 
     fun getReferenceToken() = Cip68Token(Cip67Label(100), assetName)
+    fun getNft() = Cip68Token(Cip67Label(222), assetName)
 }
 
 data class Cip67Label(val label: Int) {

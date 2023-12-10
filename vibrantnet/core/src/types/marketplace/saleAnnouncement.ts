@@ -6,6 +6,7 @@ export type SaleAnnouncement = {
   channelId: string
   policyId: string
   assetFingerprint: string
+  referenceTokenAssetFingerprint?: string
   assetNameHex: string
   assetName: string
   displayName: string
