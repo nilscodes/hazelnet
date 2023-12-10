@@ -39,7 +39,7 @@ data class Cip67Label(val label: Int) {
             val checksum = crc8ChecksumFromHexString(paddedHex).toInt().toString(16).padStart(2, '0')
             return "0${paddedHex}${checksum}0"
         }
-        throw IllegalArgumentException("Invalid CIP-0067 label name \"$this\"")
+        throw IllegalArgumentException("Invalid CIP-0067 label name \"$label\"")
     }
 }
 
