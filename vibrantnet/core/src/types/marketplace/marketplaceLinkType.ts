@@ -5,4 +5,5 @@ export enum MarketplaceLinkType {
   POOLPMHANDLE = 'POOLPMHANDLE',
   POOLPM = 'POOLPM',
   TAPTOOLS = 'TAPTOOLS',
+  SPACEBUDZ = 'SPACEBUDZ',
 }

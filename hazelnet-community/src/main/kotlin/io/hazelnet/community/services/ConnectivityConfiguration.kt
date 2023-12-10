@@ -36,12 +36,6 @@ class ConnectivityConfiguration(
             .build()
 
     @Bean
-    fun cnftJungleClient(config: CommunityApplicationConfiguration) =
-        WebClient.builder()
-            .baseUrl(config.cnftjungle.url)
-            .build()
-
-    @Bean
     fun tokenRegistryClient(config: CommunityApplicationConfiguration) =
         WebClient.builder()
             .baseUrl(config.tokenregistry.url)
