@@ -10,4 +10,4 @@ If you want to add additional roles to your Vibrant administrators, you can simp
 
 <table><thead><tr><th width="215">Parameter</th><th>Details</th></tr></thead><tbody><tr><td><strong><code>admin-role</code></strong></td><td>The Discord role you want to give administrator privileges to.</td></tr></tbody></table>
 
-<figure><picture><source srcset="../../../.gitbook/assets/configure-adminaccess-add.webp" media="(prefers-color-scheme: dark)"><img src="../../../.gitbook/assets/image.png" alt=""></picture><figcaption></figcaption></figure>
+<figure><picture><source srcset="../../../.gitbook/assets/configure-adminaccess-add.webp" media="(prefers-color-scheme: dark)"><img src="../../../.gitbook/assets/image (151).png" alt=""></picture><figcaption></figcaption></figure>
