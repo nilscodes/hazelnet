@@ -1,0 +1,48 @@
+---
+description: Add a new giveaway and its details
+---
+
+# ➕ /configure-giveaway add
+
+<mark style="background-color:red;">Black Edition</mark>
+
+With the <mark style="background-color:orange;">/CONFIGURE-GIVEAWAY ADD</mark> command you can create powerful giveaways for your community, right within Discord. The giveaways range from simple raffles for everyone on your server to weighted giveaways based on token ownership for verified wallets with dedicated snapshot dates and drawing multiple winners.
+
+There are multiple steps to create a giveaway after running the actual command, and these steps have to be done in a specific order, as described below. Ensure that you run these commands in a channel the bot has rights to Read Messages, because certain inputs are typed into the channel. We highly recommend to use a private channel or channel only your moderators have access to.
+
+*   ### 1. Description
+
+    Provide a description to explain what your are giving away
+
+    The description has to be typed into the channel and can contain Discord markup to make it more interesting or readable. There is a 4000 character limit in place for your giveaway description. The whole description has to be sent in one message and should include what the prizes are. After sending the message, the giveaway widget will show you a preview of your text and you can click a button to either to start over with another description or to use the one you typed and move on to step 2.
+*   ### 2. Configuration
+
+    Choose the settings for your giveaway
+
+    You can now choose your settings, like what data about the winners you want to receive (Discord info or wallet address). You can also determine if in a multi-winner scenario the same person can be drawn multiple times. Lastly, you can determine if only verified token-owners can participate in your giveaway or if anyone can join. If you choose _Everyone_, you can immediately create the giveaway with the _Create giveaway_ button.
+
+    If you choose to that only token holders can join (either one entry per holder or weighted based on number of tokens owned), the giveaway system will let you click _Provide token details_ in an optional 3rd step.
+*   ### 3. Optional: Token details
+
+    Provide token policy ID and optional asset fingerprint for a participation snapshot
+
+    As the last step, if doing a token-based giveaway, you can now send a message to the channel with the policy ID that determines who can join and who cannot. In addition, you can also provide an asset fingerprint, if you are using a policy that has multiple different fungible tokens minted on it and you would just like to allow one of them to be used in the ownership/weighting calculation. If using asset fingerprints, your message should look as follows: policyid+assetfingerprint.
+
+    Once the details have been sent to the channel and the format of the policy ID and asset fingerprint have been verified, you can click _Create Giveaway_. This will kick off a blockchain snapshot (at snapshot-time or immediately, if not set) to collect the current owners of tokens for the given policy ID. Only the users that have the respective verified wallet can participate in the giveaway.
+
+Below are the initial options you can provide to the command, which will further allow you to customize your giveaway, set up automatic announcements etc.
+
+| Parameter             | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| giveaway-displayname  | The display name for your giveaway. It is the official name shown in all announcements.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| giveaway-name         | The internal name for the giveaway. It is used for API access and can only contain lower and upper case letters from A-Z, as well as numbers. Your users will never see this name.                                                                                                                                                                                                                                                                                                                                                                            |
+| \[giveaway-opentime]  | <p>Optional: The exact time at which the giveaway opens, in the specific format </p><pre><code>2022-01-01T19:00:00Z
+</code></pre><p> in UTC time zone (note the T between date and time and the Z at the end). After the giveaway opens, anyone who fulfills the conditions can participate. If you have designated a publish-channel, this is also the time at which the giveaway widget will be posted there. If no opening time is provided, users will immediately be able to participate.</p>                                                            |
+| \[giveaway-closetime] | <p>Optional: The exact time at which the giveaway closes, in the specific format </p><pre><code>2022-02-05T23:00:00Z
+</code></pre><p> in UTC time zone. After this time, no one can participate in the giveaway any more, even if they fulfill all the conditions. No automatic announcement will be made at giveaway close time. If you do not provide a closing time, people can participate until <mark style="background-color:orange;">/CONFIGURE-GIVEAWAY-END</mark> is used or the giveaway is deleted.</p>                                            |
+| \[snapshot-time]      | <p>Optional: The exact time at which the token snapshot is made, if you are setting up a token-based giveaway. It has to be provided in the specific format </p><pre><code>2022-01-01T19:00:00Z
+</code></pre><p> in UTC time zone (note the T between date and time and the Z at the end). If you do not provide a snapshot time but still enter token details, the snapshot will be taken in the 30 minutes after the giveaway is created.</p>                                                                                                               |
+| \[image-url]          | Optional: A URL to an image that will be displayed underneath your giveaway, to showcase your prizes or a logo.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| \[winner-count]       | Optional: The number of winners you would like to draw from all entries at the end of the giveaway. If you do not provide this number, one single winner will be drawn when using <mark style="background-color:orange;">/CONFIGURE-GIVEAWAY-END</mark>.                                                                                                                                                                                                                                                                                                      |
+| \[required-role]      | Optional: If you want to limit the people that can participate in a giveaway, you can add one or more roles that are required to join the giveaway. This role can be manually assigned or can be a token- or delegation- based role managed by Vibrant. Keep in mind, that this is not an replacement for snapshot-based join conditions, but an additional mechanism. This is because roles can change when people trade tokens or redelegate. When using a token-based giveaway, only the data from the snapshot (at giveaway creation time) is considered. |
+| \[channel]            | Optional: The channel in which you would like to automatically post the announcement and join widget at the time the giveaway opens. The bot will need Send Messages permission on the selected channel. If you do not provide a channel, you can always manually publish the giveaway info via <mark style="background-color:orange;">/CONFIGURE-GIVEAWAY ANNOUNCE</mark>                                                                                                                                                                                    |
