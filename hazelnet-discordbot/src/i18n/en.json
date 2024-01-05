@@ -446,6 +446,7 @@
 	"vote": {
 		"messageTitle": "Current polls and decisions on this Discord",
 		"purpose": "Find ongoing and completed polls on this server and view the results or vote, if you fulfill the required voting conditions.",
+		"purposeContinued": "Choose a poll to participate in (continued).",
 		"pollInfo": "{{{description}}}",
 		"yourVote": "Your current vote",
 		"pollInfoTitle": "Information about this poll",
@@ -1148,6 +1149,7 @@
 		"poll": {
 			"list": {
 				"purpose": "This is the list of all existing polls for this Discord server.",
+				"purposeContinued": "Poll list (continued)",
 				"noPollsDetail": "*There are no configured polls on this server.*",
 				"pollInfo": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n{{{resultsVisible}}}",
 				"pollInfoVoteaire": "Opens on: <t:{{openAfterTimestamp}}>\nCloses on: <t:{{openUntilTimestamp}}>\n[Voteaire ID {{voteaireUUID}}]({{{voteaireLink}}})",
@@ -1225,6 +1227,7 @@
 			},
 			"announce": {
 				"purpose": "👇 Pick a poll from the list of available polls to announce. If the poll is still open, a vote button will also be added to the widget.\n\n{{{resultsPublishingInfo}}}\n\n💡 You can only have one announcement for each poll at a time. The announcement will automatically be updated with the current results every 5 minutes if your poll has public results.",
+				"purposeContinued": "Pick a poll to announce (continued)",
 				"resultsPublishYes": "📢 The (current) results will be published along with the poll announcement.",
 				"resultsPublishMaybe": "🔐 The results will remain hidden for non-public polls until you explicit publish them via **/configure-poll announce** with the *publishresults* parameter set to *True*.",
 				"success": "✅ Results successfully published in <#{{channel}}>.",
@@ -1236,6 +1239,7 @@
 			"remove": {
 				"success": "🗑️ Removed the following poll from this server:",
 				"purpose": "Select the poll to remove from your Discord server.\n\n⚠ **ALL REGISTERED VOTES WILL BE REMOVED AND BECOME INACCESSIBLE FOR YOU, IF YOU REMOVE THE POLL**.\n\nOnly do this after you have processed this poll.",
+				"purposeContinued": "Select the poll to remove (continued)",
 				"errorNotFound": "⚠ No poll with the ID **{{pollId}}** was found for this server. Nothing was removed.",
 				"choosePollDetails": "Choose the poll you want to irrevocably delete"
 			},
@@ -1243,6 +1247,7 @@
 				"addrole": {
 					"success": "✅ The role <@&{{roleId}}> was successfully added as an eligible role to vote in the poll **{{poll.displayName}}**.",
 					"purpose": "Select the poll you would like the role <@&{{roleId}}> to be able to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"purposeContinued": "Select the poll you would like the role <@&{{roleId}}> to be able to vote in (continued).",
 					"choosePoll": "Choose the poll you want to allow this role to vote in",
 					"tooManyRoles": "⚠ Cannot add more than 20 roles to a poll.",
 					"roleExists": "⚠ The role <@&{{roleId}}> is already allowed to vote in this poll and was not added again."
@@ -1250,6 +1255,7 @@
 				"removerole": {
 					"success": "🗑️ The role <@&{{roleId}}> was successfully removed from being eligible to vote on the poll **{{poll.displayName}}**.",
 					"purpose": "Select the poll you would like to remove a role from being allowed to vote in.\n\n💡 All other requirements, like poll times and holding any tokens from related snapshot, remain in place in addition to the existing role requirements.",
+					"purposeContinued": "Select the poll you would like to remove a role from being allowed to vote in (continued).",
 					"choosePoll": "Choose the poll you want to remove this role from",
 					"chooseRolePurpose": "Choose which role you would like to remove from the poll {{displayName}}:",
 					"chooseRole": "Choose role to remove",

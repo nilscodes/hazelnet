@@ -1,9 +1,9 @@
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
-import i18n, { Replacements } from 'i18n';
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { Poll } from '@vibrantnet/core';
+import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import discordemoji from '../../utility/discordemoji';
-import { Poll } from '@vibrantnet/core';
 
 interface PollRemoveCommand extends BotSubcommand {
   getPollChoices(locale: string, polls: Poll[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -14,15 +14,24 @@ export default <PollRemoveCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const polls = (await interaction.client.services.discordserver.getPolls(interaction.guild!.id))
         .sort((pollA: Poll, pollB: Poll) => pollA.displayName.localeCompare(pollB.displayName));
       if (polls.length) {
-        const components = this.getPollChoices(useLocale, polls);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.purpose', locale: useLocale }), 'configure-poll-remove');
+        const CHUNK_SIZE = 20;
+        const firstPolls = polls.splice(0, CHUNK_SIZE);
+        const components = this.getPollChoices(locale, firstPolls);
+        let embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.purpose', locale }), 'configure-poll-remove');
         await interaction.editReply({ embeds: [embed], components });
+        while (polls.length) {
+          const additionalPolls = polls.splice(0, CHUNK_SIZE);
+          const moreComponents = this.getPollChoices(locale, additionalPolls);
+          embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.purposeContinued', locale }), 'configure-poll-remove');
+          // eslint-disable-next-line no-await-in-loop
+          await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+        }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.list.noPollsDetail', locale: useLocale }), 'configure-poll-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.list.noPollsDetail', locale }), 'configure-poll-remove');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
@@ -58,7 +67,7 @@ export default <PollRemoveCommand> {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.success', locale }), 'configure-poll-remove', removedFields);
         await interaction.editReply({ embeds: [embed], components: [] });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.errorNotFound', locale }, { pollId: `pollId` }), 'configure-poll-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll remove', i18n.__({ phrase: 'configure.poll.remove.errorNotFound', locale }, { pollId: `${pollId}` }), 'configure-poll-remove');
         await interaction.editReply({ embeds: [embed], components: [] });
       }
     }
@@ -66,11 +75,11 @@ export default <PollRemoveCommand> {
   getPollChoices(locale, polls) {
     return [new ActionRowBuilder()
       .addComponents(
-        new SelectMenuBuilder()
+        new StringSelectMenuBuilder()
           .setCustomId('configure-poll/remove/complete')
-          .setPlaceholder(i18n.__({ phrase: 'configure.poll.remove.choosePollDetails', locale: locale }))
+          .setPlaceholder(i18n.__({ phrase: 'configure.poll.remove.choosePollDetails', locale }))
           .addOptions(polls.map((poll) => ({
-            label: i18n.__({ phrase: 'configure.poll.list.adminName', locale: locale }, { poll } as any),
+            label: i18n.__({ phrase: 'configure.poll.list.adminName', locale }, { poll } as any),
             description: (poll.description ? (poll.description.substring(0, 90) + (poll.description.length > 90 ? '...' : '')) : ''),
             value: `configure-poll-${poll.id}`,
           }))),
