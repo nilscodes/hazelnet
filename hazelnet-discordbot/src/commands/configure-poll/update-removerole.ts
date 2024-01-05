@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
 
@@ -17,9 +17,18 @@ export default <PollUpdateRemoveRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const polls = await interaction.client.services.discordserver.getPolls(interaction.guild!.id);
-      const { components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/update-removerole/chooserole', 'configure.poll.update.removerole.choosePoll');
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll update removerole', i18n.__({ phrase: 'configure.poll.update.removerole.purpose', locale }), 'configure-poll-update-removerole');
+      const CHUNK_SIZE = 20;
+      const firstPolls = polls.splice(0, CHUNK_SIZE);
+      const { components } = pollutil.getDiscordPollListParts(discordServer, firstPolls, 'configure-poll/update-removerole/chooserole', 'configure.poll.update.removerole.choosePoll');
+      let embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll update removerole', i18n.__({ phrase: 'configure.poll.update.removerole.purpose', locale }), 'configure-poll-update-removerole');
       await interaction.editReply({ embeds: [embed], components });
+      while (polls.length) {
+        const additionalPolls = polls.splice(0, CHUNK_SIZE);
+        const { components: moreComponents } = pollutil.getDiscordPollListParts(discordServer, additionalPolls, 'configure-poll/update-removerole/chooserole', 'configure.poll.update.removerole.choosePoll');
+        embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll update removerole', i18n.__({ phrase: 'configure.poll.update.removerole.purposeContinued', locale }), 'configure-poll-update-removerole');
+        // eslint-disable-next-line no-await-in-loop
+        await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+      }
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting poll list to remove role from. Please contact your bot admin via https://www.hazelnet.io.' });
@@ -46,7 +55,7 @@ export default <PollUpdateRemoveRoleCommand> {
           }
           const components = [new ActionRowBuilder()
             .addComponents(
-              new SelectMenuBuilder()
+              new StringSelectMenuBuilder()
                 .setCustomId('configure-poll/update-removerole/complete')
                 .setPlaceholder(i18n.__({ phrase: '', locale }))
                 .addOptions(roles.map((role) => ({

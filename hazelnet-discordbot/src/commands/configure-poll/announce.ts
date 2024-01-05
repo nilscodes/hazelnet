@@ -1,7 +1,7 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
 import { ChannelType, GuildChannel, TextBasedChannel } from 'discord.js';
+import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import pollutil from '../../utility/poll';
 import discordpermissions from '../../utility/discordpermissions';
@@ -25,11 +25,20 @@ export default <PollAnnounceCommand> {
         const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
         if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const polls = await interaction.client.services.discordserver.getPolls(guildId);
-          const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, polls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
+          const CHUNK_SIZE = 20;
+          const firstPolls = polls.splice(0, CHUNK_SIZE);
+          const { pollFields, components } = pollutil.getDiscordPollListParts(discordServer, firstPolls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
           this.cache.set(`${guildId}-${interaction.user.id}`, `${announceChannel.id}-${publishResults ? 1 : 0}`);
           const resultsPublishingInfo = i18n.__({ phrase: (publishResults ? 'configure.poll.announce.resultsPublishYes' : 'configure.poll.announce.resultsPublishMaybe'), locale });
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll announce', i18n.__({ phrase: 'configure.poll.announce.purpose', locale }, { resultsPublishingInfo }), 'configure-poll-announce', pollFields);
+          let embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll announce', i18n.__({ phrase: 'configure.poll.announce.purpose', locale }, { resultsPublishingInfo }), 'configure-poll-announce', pollFields);
           await interaction.editReply({ embeds: [embed], components });
+          while (polls.length) {
+            const additionalPolls = polls.splice(0, CHUNK_SIZE);
+            const { pollFields: morePollFields, components: moreComponents } = pollutil.getDiscordPollListParts(discordServer, additionalPolls, 'configure-poll/announce/publish', 'configure.poll.announce.choosePoll');
+            embed = embedBuilder.buildForAdmin(discordServer, '/configure-poll announce', i18n.__({ phrase: 'configure.poll.announce.purposeContinued', locale }), 'configure-poll-announce', morePollFields);
+            // eslint-disable-next-line no-await-in-loop
+            await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+          }
         } else {
           const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-poll announce', i18n.__({ phrase: 'configure.poll.announce.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-poll-announce');
           await interaction.editReply({ embeds: [embedAdmin], components: [] });

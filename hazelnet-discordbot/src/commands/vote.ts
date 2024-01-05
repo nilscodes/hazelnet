@@ -51,9 +51,18 @@ export default <VoteCommand> {
         if (!pollFields.length) {
           pollFields.push({ name: i18n.__({ phrase: 'vote.noPollsTitle', locale }), value: i18n.__({ phrase: 'vote.noPolls', locale }) });
         }
-        const components = this.getPollChoices(locale, visiblePolls);
-        const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.purpose', locale }), 'vote', pollFields);
+        const CHUNK_SIZE = 20;
+        const firstPolls = pollFields.splice(0, CHUNK_SIZE);
+        const components = this.getPollChoices(locale, visiblePolls.splice(0, CHUNK_SIZE));
+        let embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.purpose', locale }), 'vote', firstPolls);
         await interaction.editReply({ embeds: [embed], components });
+        while (pollFields.length) {
+          const additionalPolls = pollFields.splice(0, CHUNK_SIZE);
+          const moreComponents = this.getPollChoices(locale, visiblePolls.splice(0, CHUNK_SIZE));
+          embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.purposeContinued', locale }), 'vote', additionalPolls);
+          // eslint-disable-next-line no-await-in-loop
+          await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+        }
       } else {
         const embed = embedBuilder.buildForUserWithAd(externalAccount, discordServer, i18n.__({ phrase: 'vote.messageTitle', locale }), i18n.__({ phrase: 'vote.noPremium', locale }), 'vote');
         await interaction.editReply({ embeds: [embed] });
