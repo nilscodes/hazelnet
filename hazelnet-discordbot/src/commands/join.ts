@@ -195,7 +195,7 @@ export default <JoinCommand> {
       if (userCanParticipate) {
         components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId(`join/removeentry/${giveaway.id}`)
+            .setCustomId(`join/removeentry/giveaway/${giveaway.id}`)
             .setLabel(i18n.__({ phrase: 'join.removeEntry', locale }))
             .setStyle(ButtonStyle.Danger),
         ));
@@ -208,7 +208,7 @@ export default <JoinCommand> {
       if (userCanParticipate) {
         components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId(`join/addentry/${giveaway.id}`)
+            .setCustomId(`join/addentry/giveaway/${giveaway.id}`)
             .setLabel(i18n.__({ phrase: 'join.addEntry', locale }))
             .setStyle(ButtonStyle.Primary),
         ));
