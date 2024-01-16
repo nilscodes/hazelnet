@@ -1,5 +1,5 @@
 import {
-  ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, SelectMenuBuilder, ButtonStyle, APIEmbedField, Guild, DiscordAPIError,
+  ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, StringSelectMenuBuilder, ButtonStyle, APIEmbedField, Guild, DiscordAPIError,
 } from 'discord.js';
 import i18n from 'i18n';
 import {
@@ -78,7 +78,7 @@ export default {
     if (giveaways.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId(customId)
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(giveaways.map((giveaway) => ({

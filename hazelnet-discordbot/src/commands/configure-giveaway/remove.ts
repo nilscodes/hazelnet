@@ -1,8 +1,8 @@
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import i18n, { Replacements } from 'i18n';
+import { Giveaway } from '@vibrantnet/core';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
-import { Giveaway } from '@vibrantnet/core';
 
 interface GiveawayRemoveCommand extends BotSubcommand {
   getGiveawayChoices(locale: string, giveaways: Giveaway[]): ActionRowBuilder<MessageActionRowComponentBuilder>[]
@@ -17,9 +17,18 @@ export default <GiveawayRemoveCommand> {
       const giveaways = (await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id))
         .sort((giveawayA, giveawayB) => giveawayA.displayName.localeCompare(giveawayB.displayName));
       if (giveaways.length) {
-        const components = this.getGiveawayChoices(locale, giveaways);
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.purpose', locale }), 'configure-giveaway-remove');
+        const CHUNK_SIZE = 20;
+        const firstGiveaways = giveaways.splice(0, CHUNK_SIZE);
+        const components = this.getGiveawayChoices(locale, firstGiveaways);
+        let embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.purpose', locale }), 'configure-giveaway-remove');
         await interaction.editReply({ embeds: [embed], components });
+        while (giveaways.length) {
+          const additionalGiveaways = giveaways.splice(0, CHUNK_SIZE);
+          const moreComponents = this.getGiveawayChoices(locale, additionalGiveaways);
+          embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.purpose', locale }), 'configure-giveaway-remove');
+          // eslint-disable-next-line no-await-in-loop
+          await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+        }
       } else {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.list.noGiveaways', locale }), 'configure-giveaway-remove');
         await interaction.editReply({ embeds: [embed] });
@@ -36,7 +45,7 @@ export default <GiveawayRemoveCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
       const giveawayId = +interaction.values[0].substring(19);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId) ;
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId);
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         await interaction.client.services.discordserver.deleteGiveaway(guildId, giveaway.id);
@@ -53,7 +62,7 @@ export default <GiveawayRemoveCommand> {
         const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.success', locale }), 'configure-giveaway-remove', removedFields);
         await interaction.editReply({ embeds: [embed], components: [] });
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.errorNotFound', locale }, { giveawayId: `giveawayId` }), 'configure-giveaway-remove');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway remove', i18n.__({ phrase: 'configure.giveaway.remove.errorNotFound', locale }, { giveawayId: `${giveawayId}` }), 'configure-giveaway-remove');
         await interaction.editReply({ embeds: [embed], components: [] });
       }
     }
@@ -61,7 +70,7 @@ export default <GiveawayRemoveCommand> {
   getGiveawayChoices(locale, giveaways) {
     return [new ActionRowBuilder()
       .addComponents(
-        new SelectMenuBuilder()
+        new StringSelectMenuBuilder()
           .setCustomId('configure-giveaway/remove/complete')
           .setPlaceholder(i18n.__({ phrase: 'configure.giveaway.remove.chooseGiveawayDetails', locale }))
           .addOptions(giveaways.map((giveaway) => ({

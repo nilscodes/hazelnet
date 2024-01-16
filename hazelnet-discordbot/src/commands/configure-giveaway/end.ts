@@ -20,9 +20,18 @@ export default <GiveawayEndCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id);
-      const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/end/draw', 'configure.giveaway.end.chooseGiveawayDetails');
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.purpose', locale }), 'configure-giveaway-end', giveawayFields);
+      const CHUNK_SIZE = 20;
+      const firstGiveaways = giveaways.splice(0, CHUNK_SIZE);
+      const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, firstGiveaways, 'configure-giveaway/end/draw', 'configure.giveaway.end.chooseGiveawayDetails');
+      let embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.purpose', locale }), 'configure-giveaway-end', giveawayFields);
       await interaction.editReply({ embeds: [embed], components });
+      while (giveaways.length) {
+        const additionalGiveaways = giveaways.splice(0, CHUNK_SIZE);
+        const { giveawayFields: moreGiveawayFields, components: moreComponents } = giveawayutil.getDiscordGiveawayListParts(discordServer, additionalGiveaways, 'configure-giveaway/end/draw', 'configure.giveaway.end.chooseGiveawayDetails');
+        embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway end', i18n.__({ phrase: 'configure.giveaway.end.purposeContinued', locale }), 'configure-giveaway-end', moreGiveawayFields);
+        // eslint-disable-next-line no-await-in-loop
+        await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+      }
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while ending giveaway. Please contact your bot admin via https://www.hazelnet.io.' });
