@@ -1,8 +1,8 @@
+import { ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
 import giveawayutil from '../../utility/giveaway';
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import embedBuilder from '../../utility/embedbuilder';
 
 interface GiveawayUpdateRemoveRoleCommand extends BotSubcommand {
@@ -17,9 +17,18 @@ export default <GiveawayUpdateRemoveRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id);
-      const { components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/update-removerole/chooserole', 'configure.giveaway.update.removerole.chooseGiveaway');
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update removerole', i18n.__({ phrase: 'configure.giveaway.update.removerole.purpose', locale }), 'configure-giveaway-update-removerole');
+      const CHUNK_SIZE = 20;
+      const firstGiveaways = giveaways.splice(0, CHUNK_SIZE);
+      const { components } = giveawayutil.getDiscordGiveawayListParts(discordServer, firstGiveaways, 'configure-giveaway/update-removerole/chooserole', 'configure.giveaway.update.removerole.chooseGiveaway');
+      let embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update removerole', i18n.__({ phrase: 'configure.giveaway.update.removerole.purpose', locale }), 'configure-giveaway-update-removerole');
       await interaction.editReply({ embeds: [embed], components });
+      while (giveaways.length) {
+        const additionalGiveaways = giveaways.splice(0, CHUNK_SIZE);
+        const { components: moreComponents } = giveawayutil.getDiscordGiveawayListParts(discordServer, additionalGiveaways, 'configure-giveaway/update-removerole/chooserole', 'configure.giveaway.update.removerole.chooseGiveaway');
+        embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update removerole', i18n.__({ phrase: 'configure.giveaway.update.removerole.purposeContinued', locale }), 'configure-giveaway-update-removerole');
+        // eslint-disable-next-line no-await-in-loop
+        await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+      }
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting giveaway list to remove role from. Please contact your bot admin via https://www.hazelnet.io.' });
@@ -32,7 +41,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
     const locale = discordServer.getBotLanguage();
     if (interaction.customId === 'configure-giveaway/update-removerole/chooserole') {
       const giveawayId = +interaction.values[0].substring('configure-giveaway-'.length);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) ;
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id);
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         if (giveaway.requiredRoles.length) {
@@ -46,7 +55,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
           }
           const components = [new ActionRowBuilder()
             .addComponents(
-              new SelectMenuBuilder()
+              new StringSelectMenuBuilder()
                 .setCustomId('configure-giveaway/update-removerole/complete')
                 .setPlaceholder(i18n.__({ phrase: '', locale }))
                 .addOptions(roles.map((role) => ({
@@ -64,7 +73,7 @@ export default <GiveawayUpdateRemoveRoleCommand> {
       }
     } else if (interaction.customId === 'configure-giveaway/update-removerole/complete') {
       const [giveawayId, roleToRemove] = interaction.values[0].split('-');
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id) ;
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guild.id);
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === +giveawayId);
       if (giveaway) {
         const requiredRoles = giveaway.requiredRoles.filter((role) => role.roleId !== roleToRemove);

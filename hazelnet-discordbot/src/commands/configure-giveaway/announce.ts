@@ -1,7 +1,7 @@
+import { ChannelType, GuildChannel, TextBasedChannel } from 'discord.js';
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ChannelType, GuildChannel, TextBasedChannel } from 'discord.js';
 import giveawayutil from '../../utility/giveaway';
 import embedBuilder from '../../utility/embedbuilder';
 import discordpermissions from '../../utility/discordpermissions';
@@ -24,11 +24,20 @@ export default <GiveawayAnnounceCommand> {
         const announceChannelPermissions = announceGuildChannel.permissionsFor(interaction.client.application!.id);
         if (discordpermissions.hasBasicEmbedSendPermissions(announceChannelPermissions)) {
           const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId);
-          const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/announce/publish', 'configure.giveaway.announce.chooseGiveaway');
+          const CHUNK_SIZE = 20;
+          const firstGiveaways = giveaways.splice(0, CHUNK_SIZE);
+          const { giveawayFields, components } = giveawayutil.getDiscordGiveawayListParts(discordServer, firstGiveaways, 'configure-giveaway/announce/publish', 'configure.giveaway.announce.chooseGiveaway');
           this.cache.set(`${guildId}-${interaction.user.id}`, `${announceChannel.id}`);
           const participationPublishingInfo = i18n.__({ phrase: 'configure.giveaway.announce.participationPublishYes', locale });
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway announce', i18n.__({ phrase: 'configure.giveaway.announce.purpose', locale }, { participationPublishingInfo }), 'configure-giveaway-announce', giveawayFields);
+          let embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway announce', i18n.__({ phrase: 'configure.giveaway.announce.purpose', locale }, { participationPublishingInfo }), 'configure-giveaway-announce', giveawayFields);
           await interaction.editReply({ embeds: [embed], components });
+          while (giveaways.length) {
+            const additionalGiveaways = giveaways.splice(0, CHUNK_SIZE);
+            const { giveawayFields: moreGiveawayFields, components: moreComponents } = giveawayutil.getDiscordGiveawayListParts(discordServer, additionalGiveaways, 'configure-giveaway/announce/publish', 'configure.giveaway.announce.chooseGiveaway');
+            embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway announce', i18n.__({ phrase: 'configure.giveaway.announce.purposeContinued', locale }, { participationPublishingInfo }), 'configure-giveaway-announce', moreGiveawayFields);
+            // eslint-disable-next-line no-await-in-loop
+            await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+          }
         } else {
           const embedAdmin = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway announce', i18n.__({ phrase: 'configure.giveaway.announce.errorNoSendPermissions', locale }, { channel: announceChannel.id }), 'configure-giveaway-announce');
           await interaction.editReply({ embeds: [embedAdmin], components: [] });

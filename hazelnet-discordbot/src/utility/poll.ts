@@ -1,8 +1,12 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
+import {
+  ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder, StringSelectMenuBuilder,
+} from 'discord.js';
+import {
+  DiscordServer, Poll, TokenMetadata, VoteData,
+} from '@vibrantnet/core';
 import i18n from 'i18n';
 import discordemoji from './discordemoji';
 import HazelnetClient from './hazelnetclient';
-import { DiscordServer, Poll, TokenMetadata, VoteData } from '@vibrantnet/core';
 
 export default {
   isValidName(pollName: string) {
@@ -79,7 +83,7 @@ export default {
     if (polls.length) {
       return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId(customId)
             .setPlaceholder(i18n.__({ phrase: selectionPhrase, locale }))
             .addOptions(polls.map((poll) => ({
@@ -102,7 +106,7 @@ export default {
         const formattedVotes = discordServer.formatNumber(votes);
         return `${idx + 1}. ${discordemoji.makeOptionalEmojiMessageContent(option.reactionId, option.reactionName)} ${option.text}: **${formattedVotes} votes**`;
       });
-    const formattedVoteCount = discordServer.formatNumber(totalVotes)
+    const formattedVoteCount = discordServer.formatNumber(totalVotes);
     resultList.push(i18n.__({ phrase: 'vote.currentResultsTotalVotes', locale: discordServer.getBotLanguage() }, { formattedVoteCount }));
     if (poll.weighted || poll.voteaireUUID) {
       const formattedVoterCount = discordServer.formatNumber(result.voterCount);

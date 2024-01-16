@@ -17,10 +17,19 @@ export default <GiveawayUpdateAddRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const giveaways = await interaction.client.services.discordserver.getGiveaways(interaction.guild!.id);
-      const { components } = giveawayutil.getDiscordGiveawayListParts(discordServer, giveaways, 'configure-giveaway/update-addrole/complete', 'configure.giveaway.update.addrole.chooseGiveaway');
+      const CHUNK_SIZE = 20;
+      const firstGiveaways = giveaways.splice(0, CHUNK_SIZE);
+      const { components } = giveawayutil.getDiscordGiveawayListParts(discordServer, firstGiveaways, 'configure-giveaway/update-addrole/complete', 'configure.giveaway.update.addrole.chooseGiveaway');
       this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, `${requiredRole.id}`);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update addrole', i18n.__({ phrase: 'configure.giveaway.update.addrole.purpose', locale }, { roleId: requiredRole.id }), 'configure-giveaway-update-addrole');
+      let embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update addrole', i18n.__({ phrase: 'configure.giveaway.update.addrole.purpose', locale }, { roleId: requiredRole.id }), 'configure-giveaway-update-addrole');
       await interaction.editReply({ embeds: [embed], components });
+      while (giveaways.length) {
+        const additionalGiveaways = giveaways.splice(0, CHUNK_SIZE);
+        const { components: moreComponents } = giveawayutil.getDiscordGiveawayListParts(discordServer, additionalGiveaways, 'configure-giveaway/update-addrole/complete', 'configure.giveaway.update.addrole.chooseGiveaway');
+        embed = embedBuilder.buildForAdmin(discordServer, '/configure-giveaway update addrole', i18n.__({ phrase: 'configure.giveaway.update.addrole.purposeContinued', locale }, { roleId: requiredRole.id }), 'configure-giveaway-update-addrole');
+        // eslint-disable-next-line no-await-in-loop
+        await interaction.followUp({ embeds: [embed], components: moreComponents, ephemeral: true });
+      }
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ content: 'Error while getting giveaway list to add role to. Please contact your bot admin via https://www.hazelnet.io.' });
@@ -33,7 +42,7 @@ export default <GiveawayUpdateAddRoleCommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(guildId);
       const locale = discordServer.getBotLanguage();
       const giveawayId = +interaction.values[0].substring('configure-giveaway-'.length);
-      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId) ;
+      const giveaways = await interaction.client.services.discordserver.getGiveaways(guildId);
       const giveaway = giveaways.find((giveawayForDetails) => giveawayForDetails.id === giveawayId);
       if (giveaway) {
         if (giveaway.requiredRoles.length < 20) {
