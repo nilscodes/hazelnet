@@ -100,7 +100,7 @@ export default <WhoisCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.followUp({ content: 'Error while getting whois information. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while getting whois information. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
   async executeUserContextMenu(interaction) {

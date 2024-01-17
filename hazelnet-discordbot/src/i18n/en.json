@@ -83,7 +83,7 @@
 			"configure-whitelist-update-addrole": "Adds a new eligible role that can register for a whitelist.",
 			"configure-whitelist-update-removerole": "Removes a currently eligible role from a whitelist.",
 			"configure-whitelist-announce": "Announce your whitelist in a channel and create an interactive signup widget.",
-			"configure-whitelist-share": "Share your whitelist data with another HAZELnet Discord.",
+			"configure-whitelist-share": "Share your whitelist data with another Vibrant Discord.",
 			"configure-whitelist-unshare": "Turn off whitelist sharing for this whitelist.",
 			"configure-whitelist-download": "Download the signups for a specific whitelist.",
 			"configure-whitelist-remove": "Select and remove an existing whitelist. ⚠ This will also remove all registrations.",
@@ -135,9 +135,9 @@
 			"configure-marketplace-metadatafilter": "Manage metadata filters on your trackers.",
 			"configure-marketplace-metadatafilter-add": "Adds a metadata filter to your existing tracker.",
 			"configure-marketplace-metadatafilter-remove": "Remove a metadata filter from your existing tracker.",
-			"configure-api": "Manage your access token to connect to the public API of HAZELnet",
+			"configure-api": "Manage your access token to connect to the public API of Vibrant",
 			"configure-api-generatetoken": "Generates a new token to access the API. ⚠ This will overwrite any existing token, if present.",
-			"configure-api-removetoken": "Delete the current access token, revoking all access to the public API of HAZELnet",
+			"configure-api-removetoken": "Delete the current access token, revoking all access to the public API of Vibrant",
 			"configure-adminaccess": "Configure roles that can administer the bot",
 			"configure-adminaccess-add": "Adds a role that is allowed to administer the bot.",
 			"configure-adminaccess-list": "List all roles that are allowed to administer the bot.",
@@ -567,7 +567,7 @@
 		"purpose": "Here you can see your claimable **$HAZEL** balance and see if you have pledged your support to this project. You can also check if you're the winner of a recent premium giveaway.",
 		"premiumStatus": "Premium Status",
 		"premiumStatusNo": "You are currently not a premium user. Simply visit {{{stakeLink}}} and use the **Stake for Premium** button. Any staked ADA on any of your verified wallets will get you premium status - no minimum required.\n\nClaimable **$HAZEL** balance: {{tokenBalance}}",
-		"premiumStatusYes": "Thanks for supporting HAZELnet with your stake! 😻\n\nYour current amount staked with us: {{stakeAmount}} ADA\nClaimable **$HAZEL** balance: {{tokenBalance}}",
+		"premiumStatusYes": "Thanks for supporting Vibrant with your stake! 😻\n\nYour current amount staked with us: {{stakeAmount}} ADA\nClaimable **$HAZEL** balance: {{tokenBalance}}",
 		"serverSupport": "Server Support",
 		"serverSupportYes": "You have pledged your ADA to the following Discord servers:\n",
 		"serverSupportEntryWeighted": "   • {{{serverName}}} ({{premiumWeight}}%, {{pledgedAda}} ADA)",
@@ -605,7 +605,7 @@
 			"messageTitle": "Verify a new address",
 			"alreadyVerified": "✅ Found an existing verification for your user and the address *{{address}}*. Your stake address **{{verification.cardanoStakeAddress}}** is successfully registered on this server.",
 			"outstandingVerification": "⏳ Found an outstanding verification on this or another server. Please complete your other verification first. You can find your outstanding verification details with the */verify list* command.",
-			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by HAZELnet.io or the operator of this Discord server.\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
+			"verificationRequest": "⌛ Please send **₳{{amount}}** to your own address at *{{verification.address}}* within the next {{maxTime}} minutes.\n\n⚠ Do not include any other tokens and make sure to send from (and to) the wallet that owns this address. Transactions that include outputs to any other addresses will not be considered and your fees will not be reimbursed by vibrantnet.io or the operator of this Discord server.\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
 			"verificationSuccess": "✅ You are now verified with stake address **{{verification.cardanoStakeAddress}}** through transaction *{{verification.transactionHash}}*. Thank you!",
 			"verificationWaiting": "⏳ Still awaiting verification…\n\n💡 If you close Discord, you can use */verify list* to get your verification data later.",
 			"verificationFailure": "⚠ Verification failed as no transaction with the required data was found on the blockchain. Please try again using the '/verify add' command.",
@@ -619,7 +619,7 @@
 			"widgetInstructionsAlreadyVerified": "🚨 You have {{verifiedWallets}} verified wallets. If you would like to see which ones, use **/verify list** in a channel where commands are enabled.",
 			"widgetInstructions": "💡 You can verify your wallet by running the command **/verify add** in a channel that allows commands. You will need to provide a wallet address (*addr1…*) or *$handle* you would like to verify. The bot will then ask you to send a specific ADA amount from your own wallet to your own wallet to confirm ownership.\n\n❔ For more information, use **/verify help** and **/help**.",
 			"blacklistedTitle": "Blocked",
-			"blacklisted": "🛑 Your account is currently blocked from using HAZELnet.",
+			"blacklisted": "🛑 Your account is currently blocked from using Vibrant.",
 			"walletExposureRecommended": "⚠ This server is asking for your permission to expose your wallet addresses. If you do not want to expose your wallet addresses, you can deny this request and still have automatic role assignments and all other standard bot features, but you will not be able to use any custom features the server owner is offering.",
 			"walletExposureRecommendedTitle": "Message from {{{guildName}}}",
 			"walletExposureRecommendedNoDetails": "No specific details have been provided by the server owner - we recommend NOT exposing your wallet addresses.",
@@ -633,7 +633,7 @@
 		},
 		"expose": {
 			"messageTitle": "Expose/Conceal your wallets on this server",
-			"purpose": "Certain Discord servers need information about your wallets to provide additional services. With this command, you can see your currently exposed wallets on this server, expose new wallets and conceal already exposed wallets if you do no longer wish to provide the project with any information regarding your wallet addresses.\n\n⚠ It is not required to expose your wallets to receive automatic role-assignments or participate in whitelists etc. via HAZELnet.",
+			"purpose": "Certain Discord servers need information about your wallets to provide additional services. With this command, you can see your currently exposed wallets on this server, expose new wallets and conceal already exposed wallets if you do no longer wish to provide the project with any information regarding your wallet addresses.\n\n⚠ It is not required to expose your wallets to receive automatic role-assignments or participate in whitelists etc. via Vibrant.",
 			"status": "Wallet exposure status",
 			"exposedWallets": "👁 The following wallets are currently exposed to this Discord server:",
 			"exposedWalletsNone": "✅ No wallets are currently exposed to this Discord server.",
@@ -733,7 +733,7 @@
 	"ping": {
 		"send": {
 			"messageTitle": "Ping an unknown user",
-			"purpose": "You are about to send a message via HAZELnet to the user associated with your recipient **{{targetShort}}**.",
+			"purpose": "You are about to send a message via Vibrant to the user associated with your recipient **{{targetShort}}**.",
 			"success": "✅ You have successfully pinged the user associated with your recipient **{{targetShort}}**.\n\n💡 Please be aware that the recipient can choose to ignore your message - this does not mean it was not delivered. We take the privacy of our users extremely seriously and discourage the recipient to respond to suspicious messages or spam. If you are reported for abusing the system, your account may be suspended.",
 			"messageContentTitle": "Message Content",
 			"messageContentEmpty": "The ping message will just provide your Discord handle and server you are sending the message from.",
@@ -742,7 +742,7 @@
 			"recipientAcknowledgement": "\n\n💡 Please be aware that the recipient can choose to ignore your message - this does not mean it was not delivered. We take the privacy of our users extremely seriously and discourage the recipient to respond to suspicious messages or spam. If you are reported for abusing the system, your account may be suspended.",
 			"pingLimitTitle": "Ping limit",
 			"pingLimitStandard": "💡 You can currently ping once every 24 hours. If you would like to ping more frequently, considering staking with our partner pool by running the command **/premium**. Any staked amount will give you access to a Black Edition account tier and support the development of this project.",
-			"pingLimitPremium": "🐈 Thanks for supporting HAZELnet with your stake! Your Black Edition account allows you to ping a user once every 60 minutes.",
+			"pingLimitPremium": "🐈 Thanks for supporting Vibrant with your stake! Your Black Edition account allows you to ping a user once every 60 minutes.",
 			"pingButton": "Ping user",
 			"invalidHandle": "⚠ The handle (*{{target}}*) does not look like a valid handle. It has to start with $ and can have at most 15 characters. Please provide a valid handle to ping.",
 			"invalidAssetFingerprint": "⚠ The asset (*{{target}}*) does not look like a valid asset fingerprint (starts with asset1 and has 44 characters total). Please provide a valid asset fingerprint to ping.",
@@ -764,7 +764,7 @@
 			"pingTargetTypeAddress": "Cardano address",
 			"pingRecipientMessageTitle": "They have attached the following message",
 			"pingRecipientAdditionalTitle": "Additional information",
-			"pingRecipientAdditionalContent": "⚠ We highly recommend to not react to any messages that look suspicious to you. Never start an escrow based on Discord messages or send any funds. Use websites like jpg.store and tradingtent.io to safely trade assets.\n\n💡 If you would like to turn off message pings, simply run the command **/profile toggle** in any HAZELnet-enabled Discord to turn off the feature. You can always list recent pings via **/ping list** (even if message-pings are disabled).",
+			"pingRecipientAdditionalContent": "⚠ We highly recommend to not react to any messages that look suspicious to you. Never start an escrow based on Discord messages or send any funds. Use websites like jpg.store and tradingtent.io to safely trade assets.\n\n💡 If you would like to turn off message pings, simply run the command **/profile toggle** in any Vibrant-enabled Discord to turn off the feature. You can always list recent pings via **/ping list** (even if message-pings are disabled).",
 			"reportTitle": "The ping has been reported",
 			"reportContent": "Thank you for reporting this ping. We will continually investigate repeat-offenders and start blocking their access to the ping feature if abuse is confirmed."
 		},
@@ -817,7 +817,7 @@
 				"purpose": "Has it tho?"
 			},
 			"announce": {
-				"purpose": "You are about to create a verification widget and announcement in the channel <#{{channel}}>. The widget will contain your provided welcome text as shown below, and buttons to initiate verification via HAZELnet. Please confirm below if you want to continue.",
+				"purpose": "You are about to create a verification widget and announcement in the channel <#{{channel}}>. The widget will contain your provided welcome text as shown below, and buttons to initiate verification via Vibrant. Please confirm below if you want to continue.",
 				"success": "✅ Verification widget successfully published in <#{{channel}}>.",
 				"publicSuccessTitle": "✅ Verify here!",
 				"publicSuccess": "You can verify your wallet here, or quickly link your already verified wallets with this Discord by clicking the below button.",
@@ -843,7 +843,7 @@
 		},
 		"policy": {
 			"list": {
-				"purpose": "This is the list of official policies that this server will present when end users use the /policyid command.\n\n⚠ Do not add policy IDs for projects that are not your own or that you are not officially supporting. Reports of misused policy IDs will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage."
+				"purpose": "This is the list of official policies that this server will present when end users use the /policyid command.\n\n⚠ Do not add policy IDs for projects that are not your own or that you are not officially supporting. Reports of misused policy IDs will be taken seriously by the team and may result in your server being blacklisted for Vibrant usage."
 			},
 			"add": {
 				"success": "✅ New official token policy added for this Discord server!",
@@ -917,7 +917,7 @@
 		},
 		"stakepool": {
 			"list": {
-				"purpose": "This is the list of official stakepools that this server will present when end users use the /info command.\n\n⚠ Do not add stakepools that are not your own or that you are not officially supporting. Reports of misused stakepools will be taken seriously by the team and may result in your server being blacklisted for HAZELnet usage.",
+				"purpose": "This is the list of official stakepools that this server will present when end users use the /info command.\n\n⚠ Do not add stakepools that are not your own or that you are not officially supporting. Reports of misused stakepools will be taken seriously by the team and may result in your server being blacklisted for Vibrant usage.",
 				"noPoolName": "No official stakepools",
 				"noPools": "*Currently, this server has no stakepools listed.*"
 			},
@@ -1082,7 +1082,7 @@
 				"canceled": "ℹ Adding the following token role was cancelled:\n\nRole <@&{{roleId}}>\nPolicy ID: {{policyId}}\nMinimum token amount: {{minimumTokenQuantity}}",
 				"noPremium": "🙀 You currently can not add any additional token roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
 				"nextStepsTitle": "💡 Next steps",
-				"nextStepsDetails": "Are you looking to set rules based on your token metadata or advanced weighting and aggregation methods? Find examples on what is possible in the documentation at https://www.hazelnet.io/documentation/configure-tokenroles-update and https://www.hazelnet.io/documentation/configure-tokenroles-metadatafilter-add\n\nHave fun experimenting!"
+				"nextStepsDetails": "Are you looking to set rules based on your token metadata or advanced weighting and aggregation methods? Find examples on what is possible in the documentation at https://www.vibrantnet.io/documentation/configure-tokenroles-update and https://www.vibrantnet.io/documentation/configure-tokenroles-metadatafilter-add\n\nHave fun experimenting!"
 			},
 			"update": {
 				"success": "✅ Automatic token role-assignment was successfully updated:",
@@ -1324,15 +1324,15 @@
 				"errorWrongChannelType": "This channel cannot be used for whitelist announcements."
 			},
 			"share": {
-				"purpose": "You are about to share the registrations of a whitelist with another HAZELnet server named **{{{discordServerToShareWith.guildName}}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
+				"purpose": "You are about to share the registrations of a whitelist with another Vibrant server named **{{{discordServerToShareWith.guildName}}}**. The respective server will be able to collect whitelist registrations made on your server without needing access to your API key. You can unshare at any time with **/configure-whitelist unshare**.\n\nSelect the whitelist you would like to share.",
 				"success": "🤝 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully shared with **{{{discordServerToShareWith.guildName}}}**! If you want to unshare it again later, use */configure-whitelist unshare*.",
 				"noWhitelistsDetail": "⚠ There are currently no whitelists on this server that can be shared.",
 				"errorShareWithSelf": "⚠ You cannot share whitelists with your own Discord server.",
-				"errorGuildNotFound": "⚠ The guild with the ID {{guildToShareWith}} you are trying to share your whitelist with, does not exist or is not using the HAZELnet bot.",
+				"errorGuildNotFound": "⚠ The guild with the ID {{guildToShareWith}} you are trying to share your whitelist with, does not exist or is not using the Vibrant bot.",
 				"otherError": "⚠ Error while sharing this whitelist."
 			},
 			"unshare": {
-				"purpose": "You are about to disable sharing the registrations of a whitelist with another HAZELnet server. The respective server will no longer be able to collect whitelist registrations made on your server.",
+				"purpose": "You are about to disable sharing the registrations of a whitelist with another Vibrant server. The respective server will no longer be able to collect whitelist registrations made on your server.",
 				"success": "🔌 The whitelist {{whitelist.displayName}} ({{whitelist.name}}) was successfully unshared with **{{discordServerToUnshareWith.guildName}}**!",
 				"selectServer": "{{{whitelist.displayName}}} (shared with {{{guildName}}})",
 				"noWhitelistsDetail": "⚠ There are currently no shared whitelists on this server.",
@@ -1340,8 +1340,8 @@
 			},
 			"download": {
 				"purpose": "Select which whitelist you would like to download the address data for",
-				"success": "📂 Here is the download with address data for the whitelist **{{whitelist.displayName}}**. Thank you for using HAZELnet.",
-				"successExternal": "📂 Here is the download with address data for the whitelist **{{{whitelistDisplayName}}}** from Discord server *{{{guildName}}}*. Thank you for using HAZELnet.",
+				"success": "📂 Here is the download with address data for the whitelist **{{whitelist.displayName}}**. Thank you for using Vibrant.",
+				"successExternal": "📂 Here is the download with address data for the whitelist **{{{whitelistDisplayName}}}** from Discord server *{{{guildName}}}*. Thank you for using Vibrant.",
 				"errorSignupsEmpty": "⚠ No download is available for the whitelist **{{whitelist.displayName}}**. No one has signed up, yet.",
 				"otherError": "⚠ Error while downloading this whitelist.",
 				"externalWhitelist": "{{{whitelistDisplayName}}} ({{{guildName}}})",
@@ -1612,7 +1612,7 @@
 				"success": "✅ A new access token was generated. Please write down this token to provide to your development team.\n❗ You will not be able to access this token again. The only way to view an access token is by generating a new one.\n\n**Your token:**\n\n*{{accessToken}}*\n\nFind the REST API documentation by downloading the current OpenAPI Swagger Documentation at the following URL: {{{externalDocumentationUrl}}}"
 			},
 			"removetoken": {
-				"success": "🗑️ The API access token for this Discord server was successfully removed.\n❗ Any and all REST API integrations your project is using will currently not be able to retrieve data from HAZELnet."
+				"success": "🗑️ The API access token for this Discord server was successfully removed.\n❗ Any and all REST API integrations your project is using will currently not be able to retrieve data from Vibrant."
 			}
 		},
 		"premium": {
@@ -1632,16 +1632,16 @@
 				"balanceInfoNegative": "⚠ Based on your current balance, your Black Edition will not be renewed next month. Even a 100% delegation discount will require you to at least get to **0 ADA** before renewals resume.",
 				"balanceInfoTopOff": "You can refill your balance via the **/configure-premium refill** command.",
 				"benefits": "Black Edition Benefits",
-				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Marketplace integrations\n   ◦ Holder giveaways\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ … and much more @ https://www.hazelnet.io/pricing"
+				"benefitsDetails": "• No advertisements for your users\n• Priority Support\n• Access to more features\n   ◦ Custom bot branding\n   ◦ Whitelists\n   ◦ Marketplace integrations\n   ◦ Holder giveaways\n   ◦ Polls and token-based voting\n   ◦ More than two token/delegator role slots\n   ◦ … and much more @ https://www.vibrantnet.io/pricing"
 			},
 			"refill": {
-				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{incomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting HAZELnet!",
+				"success": "✅ You have successfully submitted a payment request to refill your balance! Please send **{{amount}} ADA** to the handle **$vibrant** or to the address *{{incomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can use **/configure-premium status** to check if your balance has been refilled and **/configure-premium refill** again if you want to cancel the payment request.\n\n😻 Thank you for supporting Vibrant!",
 				"cancelOutstanding": "Cancel open payment request",
-				"cancelSuccess": "❌ Your outstanding refill payment was successfully cancelled. You can now start a new refill process.\n\n😻 Thank you for supporting HAZELnet!",
-				"errorAmountToSmall": "⚠ The submitted amount of **{{refillAmount}} ADA** is too small. The minimum refill amount is **{{minimumAmount}} ADA**.\n\n😻 Thank you for supporting HAZELnet!",
-				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$hazelnet** or to the address *{{existingIncomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting HAZELnet!",
+				"cancelSuccess": "❌ Your outstanding refill payment was successfully cancelled. You can now start a new refill process.\n\n😻 Thank you for supporting Vibrant!",
+				"errorAmountToSmall": "⚠ The submitted amount of **{{refillAmount}} ADA** is too small. The minimum refill amount is **{{minimumAmount}} ADA**.\n\n😻 Thank you for supporting Vibrant!",
+				"errorAlreadyPending": "💡 A payment has been requested already. Please send **{{amount}} ADA** to the handle **$vibrant** or to the address *{{existingIncomingPayment.receivingAddress}}* by <t:{{expirationDateTimestamp}}> to refill your balance. You can also cancel the request below if it is not needed any more or if you want to refill a different amount. You can use **/configure-premium status** to check if your balance has been refilled.\n\n😻 Thank you for supporting Vibrant!",
 				"reminderTitle": "Black Edition Info",
-				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, marketplace integrations and giveaways, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour HAZELnet team"
+				"reminder": "Hello **{{{tag}}}**!\n\n💡 As bot administrator on the Discord server *{{{guildName}}}*, we're letting you know that your Black Edition is expiring at the end of this month and there are not enough funds for a renewal.\n\nWe appreciate your support and if you would like to like to continue to benefit from multiple tokenroles, off- and on-chain polls and whitelists, marketplace integrations and giveaways, custom branding and other features, head to your server and refill via **/configure-premium refill**.\n\nHave a great day!\nYour Vibrant team"
 			}
 		},
 		"giveaway": {
@@ -1862,9 +1862,9 @@
 		}
 	},
 	"start": {
-		"welcomeTitle": "Welcome to HAZELnet!",
+		"welcomeTitle": "Welcome to Vibrant!",
 		"completeTitle": "Great work! 😻",
-		"configureMessage": "The /start command will help you set up your HAZELnet bot. Select your options below:",
+		"configureMessage": "The /start command will help you set up your Vibrant bot. Select your options below:",
 		"configureLanguageTitle": "Language",
 		"configureAdminRoleTitle": "Admin Role",
 		"configureUserRoleTitle": "User Role",
@@ -1884,9 +1884,9 @@
 		"finishSetupButton": "Finish setup",
 		"resetSetupButton": "Reset settings",
 		"setupRoleWarningMessage": "**Your setup is complete with warnings**:\n\n❗ Please be aware the bot did not find all the necessary permissions through roles assigned to it. Make sure the bot has one or multiple roles that grant at least the following permissions: Send Messages, Read Messages, Manage Messages, Manage Roles\n\n💡 Make sure the bot role is high enough in the Discord role list, so it can assign any auto-assign roles it is configured to manage.",
-		"setupCompleteMessage": "**Your setup is complete!**\n\n👉 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage.\n\nℹ Make sure you also disable/enable the correct commands by going to \"Server Settings\" - \"Integrations\", selecting HAZELnet and setting the permissions for **/configure-** commands for your selected admin role, and enable the user-facing commands for your normal users.",
+		"setupCompleteMessage": "**Your setup is complete!**\n\n👉 Make sure the bot role is high enough so it can assign any auto-assign roles it is configured to manage.\n\nℹ Make sure you also disable/enable the correct commands by going to \"Server Settings\" - \"Integrations\", selecting HAZELnet/Vibrant and setting the permissions for **/configure-** commands for your selected admin role, and enable the user-facing commands for your normal users.",
 		"nextStepsTitle": "💡 Next steps",
-		"nextStepsDetails": "You are now ready to start adding token roles, verification widgets, and more…\n\nIf you are not sure where to start, some common first steps are adding a verification widget **/configure-verify announce** and adding your first token role via **/configure-tokenroles add**. You can click *Click for help* at the top of each command to get detailed info, run **/help** to see what is available, or just browse our documentation to learn more at https://www.hazelnet.io/documentation"
+		"nextStepsDetails": "You are now ready to start adding token roles, verification widgets, and more…\n\nIf you are not sure where to start, some common first steps are adding a verification widget **/configure-verify announce** and adding your first token role via **/configure-tokenroles add**. You can click *Click for help* at the top of each command to get detailed info, run **/help** to see what is available, or just browse our documentation to learn more at https://www.vibrantnet.io/documentation"
 	},
 	"features": {
 		"stakepoolTitle": "Stakepools",
@@ -1943,16 +1943,16 @@
 		"permissionDeniedTitle": "Permission Denied",
 		"permissionDeniedInformation": "⛔ You do not have permission to access this information.",
 		"permissionDeniedChanges": "⛔ You do not have permission to make these changes.",
-		"notWhitelisted": "Thank you for your interest in HAZELnet. Unfortunately, your server is not on the early access list. Contact @NilsCodes on Twitter to see if you can participate in the beta program.",
+		"notWhitelisted": "Thank you for your interest in Vibrant. Unfortunately, your server is not on the early access list. Contact @NilsCodes on Twitter to see if you can participate in the beta program.",
 		"invalidIsoDateFormat": "Invalid date format value \"{{value}}\" for parameter \"{{parameter}}\" - the format needs to be yyyy-MM-ddTHH:mm:ssZ (for example 2022-01-31T15:00:00Z)",
 		"invalidHttpsUrl": "Invalid URL provided with value \"{{value}}\" for parameter \"{{parameter}}\". Please provide a valid *https://* URL."
 	},
 	"about": {
-		"title": "About HAZELnet",
-		"info": "The HAZELnet Discord Community System was proudly built by the operators of HAZEL stakepool. We appreciate all our delegators and would love your support on our mission to improve feline lives.\n\nIf you would like this Discord bot in your server for free, visit https://www.hazelnet.io or https://twitter.com/HAZELnet_io",
+		"title": "About Vibrant",
+		"info": "The Vibrant Discord Community System was proudly built by the operators of HAZEL stakepool. We appreciate all our delegators and would love your support on our mission to improve feline lives.\n\nIf you would like this Discord bot in your server for free, visit https://www.vibrantnet.io or https://twitter.com/VibrantNet_io",
 		"twitter": {
 			"author": "@NilsCodes on Twitter",
-			"bot": "@HAZELnet_io on Twitter"
+			"bot": "@VibrantNet_io on Twitter"
 		}
 	}
 }

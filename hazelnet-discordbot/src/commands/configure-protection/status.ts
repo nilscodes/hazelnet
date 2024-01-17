@@ -21,7 +21,7 @@ export default <BotSubcommand> {
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting server settings. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting server settings. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
 };

@@ -39,7 +39,7 @@ export default <ConfigureMarketplaceMetadataFilterRemoveCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: `Error while removing metadata filter from tracker with ID ${trackerId} on your server. Please contact your bot admin via https://www.hazelnet.io.` });
+      await interaction.editReply({ content: `Error while removing metadata filter from tracker with ID ${trackerId} on your server. Please contact your bot admin via https://www.vibrantnet.io.` });
     }
   },
   createRemoveDropdown(marketplaceChannel, locale) {
@@ -87,7 +87,7 @@ export default <ConfigureMarketplaceMetadataFilterRemoveCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.editReply({ content: 'Error while removing metadata filter from tracker on your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while removing metadata filter from tracker on your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
 };

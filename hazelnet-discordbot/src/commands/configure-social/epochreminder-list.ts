@@ -40,7 +40,7 @@ export default <ConfigureRemindersListCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting reminder list. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting reminder list. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   createDetailsDropdown(reminders, locale) {
@@ -77,7 +77,7 @@ export default <ConfigureRemindersListCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while showing reminder details. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while showing reminder details. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
 };

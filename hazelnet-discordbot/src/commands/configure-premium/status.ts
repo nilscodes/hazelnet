@@ -31,7 +31,7 @@ export default <PremiumStatusCommand> {
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while viewing premium status. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while viewing premium status. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   addBillingInfo(premiumInfo, premiumFields, discordServer, locale) {

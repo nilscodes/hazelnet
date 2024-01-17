@@ -101,7 +101,7 @@ export default <ConfigureTokenRoleAddCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding automatic token-role assignment to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding automatic token-role assignment to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async createTokenRole(interaction, discordServer, policyId, minimumTokenQuantity, maximumTokenQuantity, roleId, assetFingerprint) {

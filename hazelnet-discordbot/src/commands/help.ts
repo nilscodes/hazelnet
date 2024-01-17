@@ -50,7 +50,7 @@ export default <BotCommand> {
       helpTexts.push('❔ **/help**');
       helpTexts.push(`${i18n.__({ phrase: 'help.generalCommands.help', locale })}`);
 
-      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitle', locale }, { botName: 'HAZELnet.io Bot' }), helpTexts.join('\n'), 'help');
+      const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitle', locale }, { botName: 'VibrantNet.io Bot' }), helpTexts.join('\n'), 'help');
       await interaction.editReply({ embeds: [embed] });
 
       if (isBotAdmin) {
@@ -93,7 +93,7 @@ export default <BotCommand> {
         adminHelpTexts.push('🔄 **/start**');
         adminHelpTexts.push(`${i18n.__({ phrase: 'help.adminCommands.start', locale })}`);
 
-        const adminembed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitleAdmin', locale }, { botName: 'HAZELnet.io Bot' }), adminHelpTexts.join('\n'), 'help');
+        const adminembed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'help.messageTitleAdmin', locale }, { botName: 'VibrantNet.io Bot' }), adminHelpTexts.join('\n'), 'help');
         await interaction.followUp({ embeds: [adminembed], ephemeral: true });
       }
     } catch (error) {

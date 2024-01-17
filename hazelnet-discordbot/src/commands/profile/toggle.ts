@@ -29,7 +29,7 @@ export default <ToggleCommand> {
       await interaction.editReply({ components, embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error({ guildId: interaction.guild?.id, error });
-      await interaction.editReply({ content: 'Error while pinging user. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while pinging user. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   getProfileFields(accountSettings, locale) {

@@ -36,7 +36,7 @@ export default <ConfigureTokenrolesMetadataFilterRemoveCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: `Error while removing metadata filter from auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.hazelnet.io.` });
+      await interaction.editReply({ content: `Error while removing metadata filter from auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.vibrantnet.io.` });
     }
   },
   createRemoveDropdown(tokenRole, locale) {
@@ -84,7 +84,7 @@ export default <ConfigureTokenrolesMetadataFilterRemoveCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while editing token role metadata. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while editing token role metadata. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
 };

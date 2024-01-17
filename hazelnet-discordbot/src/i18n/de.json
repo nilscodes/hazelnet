@@ -6,8 +6,8 @@
 		}
 	},
 	"start": {
-		"welcomeTitle": "Willkommen bei HAZELnet!",
-		"configureMessage": "Wähle Deine HAZELnet bot Einstellungen:",
+		"welcomeTitle": "Willkommen bei Vibrant!",
+		"configureMessage": "Wähle Deine Vibrant bot Einstellungen:",
 		"chooseLanguage": "Wähle Deine Bot-Sprache",
 		"chooseAdminRole": "Wähle Deine Admin-Rolle",
 		"chooseUserRole": "Wähle Deine Benutzer-Rolle",

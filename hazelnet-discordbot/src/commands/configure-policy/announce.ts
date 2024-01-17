@@ -63,7 +63,7 @@ export default <PolicyAnnounceCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting policy widget announcement ready. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting policy widget announcement ready. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeButton(interaction) {

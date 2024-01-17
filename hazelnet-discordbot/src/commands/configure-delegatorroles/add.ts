@@ -77,7 +77,7 @@ export default <DelegatorRoleAddCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding delegator role to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding delegator role to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async createDelegatorRole(interaction, discordServer, poolHash, minimumStake, roleId) {

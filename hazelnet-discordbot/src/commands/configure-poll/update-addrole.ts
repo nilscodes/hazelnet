@@ -32,7 +32,7 @@ export default <PollUpdateAddRoleCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting poll list to add role to. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting poll list to add role to. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeSelectMenu(interaction) {

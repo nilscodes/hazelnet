@@ -103,7 +103,7 @@ export default <PollAddCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   buildContent(locale, currentChannel, pollObject, step) {
@@ -432,7 +432,7 @@ export default <PollAddCommand> {
       await interaction.update({ embeds: [embed], components: [] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.update({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.update({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeButton(interaction) {
@@ -471,7 +471,7 @@ export default <PollAddCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeSelectMenu(interaction) {
@@ -491,7 +491,7 @@ export default <PollAddCommand> {
       this.startPhase4(interaction, discordServer, pollObject);
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding poll to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
 };

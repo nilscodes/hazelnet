@@ -96,7 +96,7 @@ export default <ClaimCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeButton(interaction) {
@@ -163,7 +163,7 @@ export default <ClaimCommand> {
               await interaction.followUp({ embeds: [embed], components: [], ephemeral: true });
             } else {
               interaction.client.logger.error(error);
-              await interaction.followUp({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+              await interaction.followUp({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
             }
           }
           break;

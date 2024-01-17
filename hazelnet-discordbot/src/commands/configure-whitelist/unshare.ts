@@ -42,7 +42,7 @@ export default <BotSubcommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while unsharing whitelists on your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while unsharing whitelists on your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeSelectMenu(interaction) {

@@ -49,7 +49,7 @@ export default <WhitelistDownloadCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while removing whitelists from your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while removing whitelists from your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeSelectMenu(interaction) {
@@ -117,7 +117,7 @@ export default <WhitelistDownloadCommand> {
     const csv = stringify(csvList);
     const csvBuffer = Buffer.from(csv, 'utf8');
     const fileToDownload = new AttachmentBuilder(csvBuffer, { name: `hazelnet-${guildId}-whitelist-${whitelistName}.csv` });
-    fileToDownload.setDescription('HAZELnet Whitelist Signups Download');
+    fileToDownload.setDescription('Vibrant Whitelist Signups Download');
     return fileToDownload;
   },
   getCsvContent(whitelist, signups) {

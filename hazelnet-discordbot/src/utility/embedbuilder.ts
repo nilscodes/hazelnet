@@ -13,14 +13,14 @@ export default {
     return this.build(discordServer, color, topLogo, title, message, commandId, useFields, useImage);
   },
   buildForAdmin(discordServer: DiscordServer, title: string, message: string, commandId?: string, fields?: APIEmbedField[], image?: string | null) {
-    return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields, image);
+    return this.build(discordServer, '#ee3323', 'https://info.hazelpool.com/vibrant-admin.png', title, message, commandId, fields, image);
   },
   buildForAudit(discordServer: DiscordServer, title: string, message: string, commandId?: string, fields?: APIEmbedField[]) {
-    return this.build(discordServer, '#ee3323', 'http://info.hazelpool.com/hazelnet-admin.png', title, message, commandId, fields);
+    return this.build(discordServer, '#ee3323', 'https://info.hazelpool.com/vibrant-admin.png', title, message, commandId, fields);
   },
   build(discordServer: DiscordServer, color: HexColorString, thumbnail: string, title: string, message: string, commandId?: string, fields?: APIEmbedField[], image?: string | null) {
-    const authorName = discordServer.settings?.THEME_AUTHOR_NAME ?? `HAZELnet.io | ${i18n.__({ phrase: 'generic.clickhelp', locale: discordServer.getBotLanguage() })}`;
-    const authorIcon = discordServer.settings?.THEME_AUTHOR_ICON ?? 'https://www.hazelnet.io/logo192.png';
+    const authorName = discordServer.settings?.THEME_AUTHOR_NAME ?? `VibrantNet.io | ${i18n.__({ phrase: 'generic.clickhelp', locale: discordServer.getBotLanguage() })}`;
+    const authorIcon = discordServer.settings?.THEME_AUTHOR_ICON ?? 'https://www.vibrantnet.io/logo192.png';
     let footer;
     if (discordServer.settings?.THEME_FOOTER_TEXT) {
       footer = {
@@ -32,7 +32,7 @@ export default {
     return this.buildFullyCustom(color, thumbnail, title, message, fields, {
       name: authorName,
       iconURL: authorIcon,
-      url: commandId ? `https://www.hazelnet.io/documentation/${commandId}` : undefined,
+      url: commandId ? `https://www.vibrantnet.io/documentation/${commandId}` : undefined,
     }, image, footer);
   },
   buildFullyCustom(color: HexColorString, thumbnail: string, title: string, message: string, fields: APIEmbedField[] | undefined, author: EmbedAuthorOptions, image?: string | null, footer?: EmbedFooterOptions) {

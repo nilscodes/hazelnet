@@ -1,8 +1,10 @@
-import { PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, SlashCommandBuilder, MessageActionRowComponentBuilder, SelectMenuComponentOptionData, Guild, ButtonStyle } from 'discord.js';
-import { BotCommand } from "../utility/commandtypes";
+import {
+  PermissionsBitField, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, SlashCommandBuilder, MessageActionRowComponentBuilder, SelectMenuComponentOptionData, Guild, ButtonStyle,
+} from 'discord.js';
 import i18n from 'i18n';
-import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../utility/hazelnetclient';
 import { DiscordServer } from '@vibrantnet/core';
+import { BotCommand } from '../utility/commandtypes';
+import { AugmentedButtonInteraction, AugmentedCommandInteraction, AugmentedSelectMenuInteraction } from '../utility/hazelnetclient';
 import commandbase from '../utility/commandbase';
 import embedbuilder from '../utility/embedbuilder';
 import botfeatures from '../utility/botfeatures';
@@ -24,7 +26,7 @@ export default <StartCommand> {
   getCommandData() {
     return new SlashCommandBuilder()
       .setName('start')
-      .setDescription('Start the setup of your HAZELnet.io bot.');
+      .setDescription('Start the setup of your VibrantNet.io bot.');
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   async execute(interaction) {
@@ -61,7 +63,7 @@ export default <StartCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
   async buildSetupMessage(discordServer, guild) {
@@ -174,7 +176,7 @@ export default <StartCommand> {
         const nextStepsFields = [{
           name: i18n.__({ phrase: 'start.nextStepsTitle', locale }),
           value: i18n.__({ phrase: 'start.nextStepsDetails', locale }),
-        }]
+        }];
         const embed = embedbuilder.buildForAdmin(discordServer, i18n.__({ phrase: 'start.completeTitle', locale }), successMessage, 'start', nextStepsFields);
         await interaction.followUp({ embeds: [embed], ephemeral: true });
       } else {
@@ -183,7 +185,7 @@ export default <StartCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while configuring bot via the /start command. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
   isSetupComplete(discordServer) {
@@ -213,7 +215,7 @@ export default <StartCommand> {
       .addComponents(
         new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'about.twitter.bot', locale: useLocale }))
-          .setURL('https://twitter.com/HAZELnet_io')
+          .setURL('https://twitter.com/VibrantNet_io')
           .setStyle(ButtonStyle.Link),
         new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'about.twitter.author', locale: useLocale }))
