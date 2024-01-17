@@ -42,7 +42,7 @@ export default <PremiumCommand> {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const discordMemberInfo = await interaction.client.services.discordserver.getExternalAccountOnDiscord(interaction.guild!.id, externalAccount.id);
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
-      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
+      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.vibrantnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
 
       // Running the /premium command can turn on premium mode for a user prior to the daily run. If that happens, we want to clear the local cache in the discord bot
@@ -54,7 +54,7 @@ export default <PremiumCommand> {
       await interaction.editReply({ embeds: [embed], components });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting information on claimable items. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async getGiveawayInfo(interaction) {
@@ -129,7 +129,7 @@ export default <PremiumCommand> {
       const externalAccount = await interaction.client.services.externalaccounts.createOrUpdateExternalDiscordAccount(interaction.user.id, interaction.user.tag);
       const discordMemberInfo = await interaction.client.services.discordserver.updateExternalAccountOnDiscord(interaction.guild!.id, externalAccount.id, { premiumSupport });
       const premiumInfo = await interaction.client.services.externalaccounts.getPremiumInfoForExternalAccount(externalAccount.id);
-      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.hazelnet.io/stakepool';
+      const stakeLink = await interaction.client.services.globalsettings.getGlobalSetting('STAKE_LINK') ?? 'https://www.vibrantnet.io/stakepool';
       const giveawayInfo = await this.getGiveawayInfo(interaction);
 
       const { embed, components } = this.showPremiumEmbed(discordMemberInfo, premiumInfo, useLocale, discordServer, stakeLink, giveawayInfo);

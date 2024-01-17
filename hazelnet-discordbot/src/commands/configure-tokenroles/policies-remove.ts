@@ -37,7 +37,7 @@ export default <ConfigureTokenrolesPoliciesRemoveCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: `Error while removing policies from auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.hazelnet.io.` });
+      await interaction.editReply({ content: `Error while removing policies from auto-role assignment for role with ID ${tokenRoleId} on your server. Please contact your bot admin via https://www.vibrantnet.io.` });
     }
   },
   createRemoveDropdown(tokenPolicies, locale, tokenRole) {
@@ -86,7 +86,7 @@ export default <ConfigureTokenrolesPoliciesRemoveCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while removing policies from auto-role assignment on your server. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while removing policies from auto-role assignment on your server. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
 };

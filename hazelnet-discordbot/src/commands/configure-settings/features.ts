@@ -28,7 +28,7 @@ export default <ConfigureSettingsFeaturesCommand> {
       await interaction.editReply({ components, embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting server features. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting server features. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   buildInterface(discordServer, commands) {

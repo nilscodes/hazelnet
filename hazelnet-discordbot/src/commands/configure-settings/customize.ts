@@ -87,7 +87,7 @@ export default <ConfigureSettingsCustomizeCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while customizing bot. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while customizing bot. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   isValidUrl(url) {

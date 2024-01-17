@@ -70,7 +70,7 @@ export default <VoteCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while getting poll list. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while getting poll list. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
   async executeSelectMenu(interaction) {
@@ -117,7 +117,7 @@ export default <VoteCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while showing poll details or voting. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while showing poll details or voting. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
   async executeButton(interaction) {
@@ -147,7 +147,7 @@ export default <VoteCommand> {
         }
       } catch (error) {
         interaction.client.logger.error(error);
-        await interaction.editReply({ content: 'Error while abstaining from vote. Please contact your bot admin via https://www.hazelnet.io.' });
+        await interaction.editReply({ content: 'Error while abstaining from vote. Please contact your bot admin via https://www.vibrantnet.io.' });
       }
     } else if (interaction.customId.indexOf('vote/widgetvote') === 0) {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);

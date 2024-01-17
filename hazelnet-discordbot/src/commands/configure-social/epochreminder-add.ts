@@ -82,7 +82,7 @@ export default <EpochreminderAddCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while adding reminder to your server. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while adding reminder to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   async executeButton(interaction) {

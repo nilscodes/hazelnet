@@ -59,7 +59,7 @@ export default <DefaultHandleCommand> {
       }
     } catch (error) {
       interaction.client.logger.error({ guildId: interaction.guild?.id, error });
-      await interaction.editReply({ content: 'Error while setting default handle for user. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while setting default handle for user. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   getInteractionComponents(availableHandles, currentDefaultHandle, locale) {

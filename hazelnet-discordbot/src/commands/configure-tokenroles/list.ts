@@ -53,7 +53,7 @@ export default <ConfigureTokenrolesListCommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: 'Error while getting auto-role-assignment for token owners. Please contact your bot admin via https://www.hazelnet.io.' });
+      await interaction.editReply({ content: 'Error while getting auto-role-assignment for token owners. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
   createDetailsDropdown(tokenRoles, locale) {
@@ -92,7 +92,7 @@ export default <ConfigureTokenrolesListCommand> {
     } catch (error) {
       interaction.client.logger.error(error);
       await interaction.editReply({ components: [] });
-      await interaction.followUp({ content: 'Error while showing token role details. Please contact your bot admin via https://www.hazelnet.io.', ephemeral: true });
+      await interaction.followUp({ content: 'Error while showing token role details. Please contact your bot admin via https://www.vibrantnet.io.', ephemeral: true });
     }
   },
 };
