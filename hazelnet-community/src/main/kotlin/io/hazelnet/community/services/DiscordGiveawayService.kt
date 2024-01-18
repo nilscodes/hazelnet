@@ -5,9 +5,11 @@ import io.hazelnet.community.data.discord.giveaways.*
 import io.hazelnet.community.data.external.tokenregistry.TokenMetadata
 import io.hazelnet.community.persistence.DiscordGiveawayRepository
 import io.hazelnet.community.services.external.CardanoTokenRegistryService
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
+import javax.transaction.Transactional
 import kotlin.random.Random
 
 @Service
@@ -132,6 +134,22 @@ class DiscordGiveawayService(
             return 1
         }
         return snapshotService.getTokenWeightOfExternalAccount(giveaway.snapshotIds, externalAccountId, giveaway.weighted)
+    }
+
+    fun recalculateEntries(giveaway: DiscordGiveaway) {
+        giveaway.entries.forEach {
+            it.weight = getGiveawayEntryWeight(giveaway, it.externalAccountId)
+        }
+        giveaway.recalculationRequested = null
+        discordGiveawayRepository.save(giveaway)
+    }
+
+    @Scheduled(fixedDelay = 300000, initialDelay = 10000)
+    @Transactional
+    fun recalculateEntries() {
+        discordGiveawayRepository.findGiveawaysToRecalculate(Date()).forEach {
+            recalculateEntries(it)
+        }
     }
 
     fun getParticipationForGiveaway(guildId: Long, giveawayId: Int): ParticipationData {
