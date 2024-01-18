@@ -64,6 +64,7 @@ class MultiAssetSnapshotService(
                 it.data = snapshotData.map { tokenOwnershipInfo ->  MultiAssetSnapshotEntry(tokenOwnershipInfo.stakeAddress, tokenOwnershipInfo.assetCount) }.toMutableSet()
                 it.taken = true
                 multiAssetSnapshotRepository.save(it)
+                logger.info { "Snapshot with ID ${it.id} successfully taken" }
             } catch (e: WebClientResponseException) {
                 logger.error(e) { "Error retrieving snapshot data for ${it.id}" }
             }

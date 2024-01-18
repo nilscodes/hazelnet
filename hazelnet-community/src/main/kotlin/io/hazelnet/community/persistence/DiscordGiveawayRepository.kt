@@ -20,4 +20,7 @@ interface DiscordGiveawayRepository : CrudRepository<DiscordGiveaway, Int> {
 
     @Query(value = "SELECT ge.external_account_id FROM discord_giveaway_entries ge JOIN discord_giveaways g ON ge.discord_giveaway_id=g.discord_giveaway_id WHERE g.discord_giveaway_id<>:excludeGiveaway AND g.discord_server_id=:discordServerId AND g.giveaway_group=:groupName AND ge.winning_count>0", nativeQuery = true)
     fun findWinnersOfGroupExcept(@Param("excludeGiveaway") excludeGiveaway: Int, @Param("discordServerId") discordServerId: Int, @Param("groupName") group: String): List<Long>
+
+    @Query(value = "SELECT g FROM DiscordGiveaway g WHERE g.recalculationRequested<=:now AND g.archived=false")
+    fun findGiveawaysToRecalculate(@Param("now") now: Date): List<DiscordGiveaway>
 }

@@ -107,6 +107,10 @@ class DiscordGiveaway @JsonCreator constructor(
     @Column(name = "giveaway_group")
     @field:Size(min = 1, max = 30)
     var group: String? = null,
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "recalculation_requested")
+    var recalculationRequested: Date? = null,
     ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -135,6 +139,7 @@ class DiscordGiveaway @JsonCreator constructor(
         if (entries != other.entries) return false
         if (logoUrl != other.logoUrl) return false
         if (group != other.group) return false
+        if (recalculationRequested != other.recalculationRequested) return false
 
         return true
     }
@@ -161,11 +166,12 @@ class DiscordGiveaway @JsonCreator constructor(
         result = 31 * result + entries.hashCode()
         result = 31 * result + (logoUrl?.hashCode() ?: 0)
         result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + (recalculationRequested?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, archived=$archived, winnerCount=$winnerCount, drawType=$drawType, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles, entries=$entries, logoUrl=$logoUrl, group=$group)"
+        return "DiscordGiveaway(id=$id, discordServer=$discordServer, creator=$creator, channelId=$channelId, messageId=$messageId, name='$name', displayName='$displayName', description='$description', createTime=$createTime, openAfter=$openAfter, openUntil=$openUntil, weighted=$weighted, uniqueWinners=$uniqueWinners, archived=$archived, winnerCount=$winnerCount, drawType=$drawType, snapshotIds=$snapshotIds, requiredRoles=$requiredRoles, entries=$entries, logoUrl=$logoUrl, group=$group, recalculationRequested=$recalculationRequested)"
     }
 
 }
