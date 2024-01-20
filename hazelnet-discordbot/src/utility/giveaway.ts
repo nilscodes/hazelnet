@@ -240,9 +240,7 @@ export default {
           const member = await guild.members.fetch(winnerList.winners[i]);
           winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawDiscordId', locale }, { place: `${i + 1}`, userId: member.user.id }));
         } catch (e) {
-          if ((e as DiscordAPIError).code === 10013) {
-            winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawError', locale }, { place: `${i + 1}` }));
-          }
+          winnerTextList.push(i18n.__({ phrase: 'configure.giveaway.end.winnerDrawError', locale }, { place: `${i + 1}` }));
         }
       }
     } else if (giveaway.drawType === GiveawayDrawType.WALLET_ADDRESS) {
