@@ -1,5 +1,5 @@
 import {
-  ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, StringSelectMenuBuilder, ButtonStyle, APIEmbedField, Guild, DiscordAPIError,
+  ActionRowBuilder, ButtonBuilder, GuildMember, MessageActionRowComponentBuilder, StringSelectMenuBuilder, ButtonStyle, APIEmbedField, Guild,
 } from 'discord.js';
 import i18n from 'i18n';
 import {
@@ -125,8 +125,8 @@ export default {
     this.augmentRequiredRoles(giveaway, detailFields, locale);
     return detailFields;
   },
-  augmentGiveawayDates(giveaway: Giveaway, detailFields: APIEmbedField[], locale: string) {
-    const openTime = this.getTimePhrase(giveaway.openAfter, 'configure.giveaway.list.giveawayInfoOpen', locale);
+  augmentGiveawayDates(giveaway: Giveaway, detailFields: APIEmbedField[], locale: string, includeOpenTime = true) {
+    const openTime = includeOpenTime ? this.getTimePhrase(giveaway.openAfter, 'configure.giveaway.list.giveawayInfoOpen', locale) : '';
     const closeTime = this.getTimePhrase(giveaway.openUntil, 'configure.giveaway.list.giveawayInfoClose', locale);
     const snapshotTime = this.getTimePhrase(giveaway.snapshotTime, 'configure.giveaway.list.giveawayInfoSnapshot', locale);
     if (openTime !== '' || closeTime !== '' || snapshotTime !== '') {

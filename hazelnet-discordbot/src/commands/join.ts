@@ -83,6 +83,19 @@ export default <JoinCommand> {
               phrase = 'join.success';
             }
             const { detailFields, components } = await this.getGiveawayDetails(giveaway, interaction, discordServer, member, participationOfUser);
+            if (!isGiveawayRunning) {
+              if (!hasGiveawayStarted) {
+                detailFields.unshift({
+                  name: i18n.__({ phrase: 'join.giveawayNotStarted', locale }),
+                  value: giveawayutil.getTimePhrase(giveaway.openAfter, 'join.giveawayNotStartedDetails', locale),
+                });
+              } else if (hasGiveawayEnded) {
+                detailFields.unshift({
+                  name: i18n.__({ phrase: 'join.giveawayEnded', locale }),
+                  value: giveawayutil.getTimePhrase(giveaway.openUntil, 'join.giveawayEndedDetails', locale),
+                });
+              }
+            }
             const embed = embedBuilder.buildForUser(discordServer, giveaway.displayName, i18n.__({ phrase, locale }), 'join', detailFields);
             await interaction.reply({ embeds: [embed], components, ephemeral: true });
           } else if (interaction.customId.indexOf('join/removeentry') === 0) {
@@ -163,7 +176,7 @@ export default <JoinCommand> {
   async getGiveawayDetails(giveaway, interaction, discordServer, member, participationOfUser) {
     const locale = discordServer.getBotLanguage();
     const tokenMetadata = await giveawayutil.getTokenMetadataFromRegistry(interaction.guild!.id, giveaway, interaction.client);
-    const participation = await interaction.client.services.discordserver.getParticipationForGiveaway(interaction.guild!.id, giveaway.id);
+    const hasGiveawayStarted = giveawayutil.hasGiveawayStarted(giveaway);
     const detailFields = [
       {
         name: i18n.__({ phrase: 'configure.giveaway.list.detailsDescription', locale }),
@@ -171,47 +184,50 @@ export default <JoinCommand> {
       },
     ];
 
-    giveawayutil.augmentGiveawayDates(giveaway, detailFields, locale);
+    giveawayutil.augmentGiveawayDates(giveaway, detailFields, locale, hasGiveawayStarted);
     giveawayutil.augmentGiveawayOptions(giveaway, detailFields, locale);
     giveawayutil.augmentGiveawayGroup(giveaway, detailFields, locale);
     giveawayutil.augmentRequiredRoles(giveaway, detailFields, locale);
-    giveawayutil.augmentCurrentParticipation(giveaway, detailFields, discordServer, participation, tokenMetadata);
-
-    const totalEntriesForUser = participationOfUser.totalEntries;
-    detailFields.push({
-      name: i18n.__({ phrase: 'join.yourEntryWeight', locale }),
-      value: this.getUserParticipationText(discordServer, giveaway, totalEntriesForUser, tokenMetadata),
-    });
     const components = [];
-    const hasEntered = participationOfUser.participants > 0;
-    const userCanParticipate = giveawayutil.userCanParticipateInGiveaway(member, giveaway, totalEntriesForUser);
-    if (hasEntered) {
-      const decimals = (giveaway.weighted && tokenMetadata?.decimals?.value) || 0;
-      const formattedTotalEntriesForUser = discordServer.formatNumber(giveawayutil.calculateParticipationCountNumber(totalEntriesForUser, decimals));
+    if (hasGiveawayStarted) {
+      const participation = await interaction.client.services.discordserver.getParticipationForGiveaway(interaction.guild!.id, giveaway.id);
+      giveawayutil.augmentCurrentParticipation(giveaway, detailFields, discordServer, participation, tokenMetadata);
+
+      const totalEntriesForUser = participationOfUser.totalEntries;
       detailFields.push({
-        name: i18n.__({ phrase: 'join.yourEntry', locale }),
-        value: i18n.__({ phrase: 'join.yourEntryDetails', locale }, { entries: formattedTotalEntriesForUser }),
+        name: i18n.__({ phrase: 'join.yourEntryWeight', locale }),
+        value: this.getUserParticipationText(discordServer, giveaway, totalEntriesForUser, tokenMetadata),
       });
-      if (userCanParticipate) {
-        components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`join/removeentry/giveaway/${giveaway.id}`)
-            .setLabel(i18n.__({ phrase: 'join.removeEntry', locale }))
-            .setStyle(ButtonStyle.Danger),
-        ));
-      }
-    } else {
-      detailFields.push({
-        name: i18n.__({ phrase: 'join.yourEntry', locale }),
-        value: i18n.__({ phrase: 'join.yourEntryMissing', locale }),
-      });
-      if (userCanParticipate) {
-        components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`join/addentry/giveaway/${giveaway.id}`)
-            .setLabel(i18n.__({ phrase: 'join.addEntry', locale }))
-            .setStyle(ButtonStyle.Primary),
-        ));
+      const hasEntered = participationOfUser.participants > 0;
+      const userCanParticipate = giveawayutil.userCanParticipateInGiveaway(member, giveaway, totalEntriesForUser);
+      if (hasEntered) {
+        const decimals = (giveaway.weighted && tokenMetadata?.decimals?.value) || 0;
+        const formattedTotalEntriesForUser = discordServer.formatNumber(giveawayutil.calculateParticipationCountNumber(totalEntriesForUser, decimals));
+        detailFields.push({
+          name: i18n.__({ phrase: 'join.yourEntry', locale }),
+          value: i18n.__({ phrase: 'join.yourEntryDetails', locale }, { entries: formattedTotalEntriesForUser }),
+        });
+        if (userCanParticipate) {
+          components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId(`join/removeentry/giveaway/${giveaway.id}`)
+              .setLabel(i18n.__({ phrase: 'join.removeEntry', locale }))
+              .setStyle(ButtonStyle.Danger),
+          ));
+        }
+      } else {
+        detailFields.push({
+          name: i18n.__({ phrase: 'join.yourEntry', locale }),
+          value: i18n.__({ phrase: 'join.yourEntryMissing', locale }),
+        });
+        if (userCanParticipate) {
+          components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId(`join/addentry/giveaway/${giveaway.id}`)
+              .setLabel(i18n.__({ phrase: 'join.addEntry', locale }))
+              .setStyle(ButtonStyle.Primary),
+          ));
+        }
       }
     }
     return { detailFields, components };
