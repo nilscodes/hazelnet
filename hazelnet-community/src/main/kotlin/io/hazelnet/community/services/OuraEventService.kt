@@ -76,7 +76,7 @@ class OuraEventService(
             }
         } catch(e: Exception) {
             // Catch all exceptions, Oura always wants a 200 back
-            logger.error("Error while processing Oura event", e)
+            logger.error(e) { "Error while processing Oura event" }
         }
     }
 
