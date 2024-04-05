@@ -64,19 +64,22 @@ class OuraEventService(
                     quantity = mint["quantity"].toString().toLong()
                 )
                 mintQueue.add(mintEvent)
+                logger.debug { "Received mint event with transaction hash ${mintEvent.transactionHash} and body $mintEvent" }
             } else if (ouraEvent["variant"] == "Metadata") {
                 val context = (ouraEvent["context"] as Map<String, Any>)
                 val metadata = (ouraEvent["metadata"] as Map<String, Any>)
+                val json = metadata["map_json"] as Map<String, Any>?
                 val metadataEvent = OuraMetadataEvent(
                     date = Date(context["timestamp"].toString().toLong() * 1000),
                     transactionHash = context["tx_hash"].toString(),
-                    metadata = metadata["map_json"] as Map<String, Any>,
+                    metadata = json ?: emptyMap(),
                 )
                 metadataMap[metadataEvent.transactionHash] = metadataEvent
+                logger.debug { "Received metadata event with transaction hash ${metadataEvent.transactionHash} and body $metadataEvent" }
             }
         } catch(e: Exception) {
             // Catch all exceptions, Oura always wants a 200 back
-            logger.error(e) { "Error while processing Oura event" }
+            logger.error("Error while processing Oura event with variant {} and context {}", ouraEvent["variant"], ouraEvent["context"], e)
         }
     }
 
