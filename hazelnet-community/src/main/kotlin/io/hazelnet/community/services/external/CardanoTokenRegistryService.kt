@@ -6,10 +6,12 @@ import io.hazelnet.community.services.ConnectService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.core.publisher.Mono
 
 @Service
 class CardanoTokenRegistryService(
@@ -18,11 +20,14 @@ class CardanoTokenRegistryService(
     private val connectService: ConnectService,
 ) {
     private fun getTokenMetadata(policyId: String, assetNameHex: String): TokenMetadata {
-        return tokenRegistryClient.get()
+        val result = tokenRegistryClient.get()
             .uri("/metadata/{subject}", policyId + assetNameHex)
             .retrieve()
+            .onStatus({ status -> status == HttpStatus.NO_CONTENT }, { Mono.empty() })
             .bodyToMono(TokenMetadata::class.java)
-            .block()!!
+            .blockOptional() // Use blockOptional() to avoid NullPointerException
+
+        return result.orElse(null)
     }
 
     @Cacheable(cacheNames = ["tokenRegistryMetadata"])

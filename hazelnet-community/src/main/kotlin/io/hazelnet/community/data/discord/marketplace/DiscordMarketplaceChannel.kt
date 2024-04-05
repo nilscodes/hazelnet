@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
-import com.jayway.jsonpath.JsonPath
-import com.jayway.jsonpath.PathNotFoundException
 import io.hazelnet.community.data.discord.MetadataFilter
 import io.hazelnet.community.data.discord.TokenOwnershipAggregationType
 import io.hazelnet.marketplace.data.Marketplace
