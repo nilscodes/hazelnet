@@ -19,7 +19,7 @@ class CardanoTokenRegistryService(
     private val tokenRegistryClient: WebClient,
     private val connectService: ConnectService,
 ) {
-    private fun getTokenMetadata(policyId: String, assetNameHex: String): TokenMetadata {
+    private fun getTokenMetadata(policyId: String, assetNameHex: String): TokenMetadata? {
         val result = tokenRegistryClient.get()
             .uri("/metadata/{subject}", policyId + assetNameHex)
             .retrieve()
