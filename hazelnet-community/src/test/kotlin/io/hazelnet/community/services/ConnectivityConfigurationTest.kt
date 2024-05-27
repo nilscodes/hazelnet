@@ -2,13 +2,13 @@ package io.hazelnet.community.services
 
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.NftCdnConfiguration
+import io.hazelnet.community.configuration.ConnectivityConfiguration
 import io.mockk.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.http.HttpMethod
 import org.springframework.web.reactive.function.client.ClientRequest
-import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.ExchangeFunction
 import reactor.core.publisher.Mono
 import java.net.URI
@@ -19,6 +19,7 @@ class ConnectivityConfigurationTest {
     fun nftCdnHash() {
         val connectivityConfiguration = ConnectivityConfiguration(
             CommunityApplicationConfiguration(
+                mockk(),
                 mockk(),
                 mockk(),
                 mockk(),

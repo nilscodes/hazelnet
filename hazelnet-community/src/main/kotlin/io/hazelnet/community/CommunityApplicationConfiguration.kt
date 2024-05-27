@@ -10,6 +10,7 @@ data class CommunityApplicationConfiguration(
     val voteaire: VoteaireConfiguration,
     val mutantstaking: MutantStakingConfiguration,
     val tokenregistry: TokenRegistryConfiguration,
+    val vibrantAuth: VibrantAuthConfiguration,
     val fundedpool: String?,
     val fundedhandle: String?,
     val salesIpfslink: String?,
@@ -33,6 +34,12 @@ data class MutantStakingConfiguration(
 
 data class TokenRegistryConfiguration(
     val url: String
+)
+
+data class VibrantAuthConfiguration(
+    val url: String,
+    val clientId: String,
+    val clientSecret: String,
 )
 
 data class MarketplaceConfiguration(

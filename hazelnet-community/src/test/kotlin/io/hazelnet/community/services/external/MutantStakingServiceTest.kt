@@ -1,7 +1,7 @@
 package io.hazelnet.community.services.external
 
 import io.hazelnet.community.CommunityApplicationConfiguration
-import io.hazelnet.community.services.ConnectivityConfiguration
+import io.hazelnet.community.configuration.ConnectivityConfiguration
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

@@ -45,6 +45,7 @@ gradle-build:
       - hazelnet-cardano-connect/build/libs
       - hazelnet-external/build/libs
       - marketplace-aggregator/build/libs
+      - vibrant-auth/build/libs
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -58,6 +59,7 @@ gradle-build:
         - "hazelnet-cardano-shared/**/*"
         - "hazelnet-external/**/*"
         - "marketplace-aggregator/**/*"
+        - "vibrant-auth/**/*"
 
 community-docker:
   image: docker:latest
@@ -166,3 +168,29 @@ market-docker:
       changes:
         - "marketplace-aggregator/**/*"
         - "hazelnet-cardano-shared/**/*"
+
+auth-docker:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - cd vibrant-auth
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/auth${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE/auth${tag}"
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "vibrant-auth/Dockerfile"
+      changes:
+        - "vibrant-auth/**/*"
