@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.hazelnet.community.security
+package io.hazelnet.auth.security
 
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
+import io.hazelnet.auth.AuthApplicationConfiguration
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.Bean
@@ -30,8 +31,6 @@ import org.springframework.core.annotation.Order
 import org.springframework.jdbc.core.JdbcOperations
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -39,8 +38,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
+import org.springframework.security.oauth2.server.authorization.config.ClientSettings
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings
-import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -75,21 +74,41 @@ class OAuth2AuthorizationServerSecurityConfiguration(
 
         http
                 .requestMatcher(endpointsMatcher)
-                .authorizeRequests { it.anyRequest().authenticated() }
+                .authorizeRequests { it
+                    .anyRequest().authenticated()
+                }
                 .csrf { it.ignoringRequestMatchers(endpointsMatcher) }
                 .apply(authorizationServerConfigurer)
     }
 
     @Bean
-    fun registeredClientRepository(): RegisteredClientRepository {
-        val registeredClient = RegisteredClient.withId("b5f5479d-4a6a-4d88-89ca-f1bfba7d2e89")
+    fun registeredClientRepository(config: AuthApplicationConfiguration): RegisteredClientRepository {
+        val vibrantExternalClient = RegisteredClient.withId("b5f5479d-4a6a-4d88-89ca-f1bfba7d2e89")
                 .clientId(introspectionClientId)
                 .clientSecret(introspectionClientSecret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .scope("whitelist:read")
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build()
-        return InMemoryRegisteredClientRepository(registeredClient)
+
+        val rypClient = RegisteredClient.withId("6a952f5c-d223-4d86-b62e-fa71e99ca06b")
+            .clientId(config.ryp.clientId)
+            .clientSecret(config.ryp.clientSecret)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .scope("api")
+            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+            .build()
+
+        val vibrantInternalClient = RegisteredClient.withId("320c4892-37a3-463f-a9a4-bd644283fc0f")
+            .clientId(config.internal.clientId)
+            .clientSecret(config.internal.clientSecret)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .scope("api")
+            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
+            .build()
+
+        return InMemoryRegisteredClientRepository(vibrantExternalClient, rypClient, vibrantInternalClient)
     }
 
     @Bean
@@ -112,22 +131,14 @@ class OAuth2AuthorizationServerSecurityConfiguration(
 
     @Bean
     fun jwtDecoder(keyPair: KeyPair): JwtDecoder {
-        return NimbusJwtDecoder.withPublicKey(keyPair.public as RSAPublicKey).build()
+        return NimbusJwtDecoder
+            .withJwkSetUri("$oauth2BaseUrl/oauth2/jwks")
+            .build()
     }
 
     @Bean
     fun providerSettings(): ProviderSettings {
         return ProviderSettings.builder().issuer(oauth2BaseUrl).build()
-    }
-
-    @Bean
-    fun userDetailsService(): UserDetailsService {
-        val userDetails = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build()
-        return InMemoryUserDetailsManager(userDetails)
     }
 
     @Bean

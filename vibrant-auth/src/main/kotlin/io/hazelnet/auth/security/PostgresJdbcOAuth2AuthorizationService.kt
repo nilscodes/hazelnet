@@ -1,4 +1,4 @@
-package io.hazelnet.community.security
+package io.hazelnet.auth.security
 
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcOperations
@@ -59,26 +59,32 @@ class PostgresJdbcOAuth2AuthorizationService(jdbcOperations: JdbcOperations, reg
     override fun findByToken(token: String, @Nullable tokenType: OAuth2TokenType?): OAuth2Authorization? {
         Assert.hasText(token, "token cannot be empty")
         val parameters: MutableList<SqlParameterValue> = ArrayList()
-        if (tokenType == null) {
-            parameters.add(SqlParameterValue(Types.VARCHAR, token))
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            return findBy(UNKNOWN_TOKEN_TYPE_FILTER, parameters)
-        } else if (OAuth2ParameterNames.STATE == tokenType.value) {
-            parameters.add(SqlParameterValue(Types.VARCHAR, token))
-            return findBy(STATE_FILTER, parameters)
-        } else if (OAuth2ParameterNames.CODE == tokenType.value) {
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            return findBy(AUTHORIZATION_CODE_FILTER, parameters)
-        } else if (OAuth2TokenType.ACCESS_TOKEN == tokenType) {
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            return findBy(ACCESS_TOKEN_FILTER, parameters)
-        } else if (OAuth2TokenType.REFRESH_TOKEN == tokenType) {
-            parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
-            return findBy(REFRESH_TOKEN_FILTER, parameters)
+        return when {
+            tokenType == null -> {
+                parameters.add(SqlParameterValue(Types.VARCHAR, token))
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                findBy(UNKNOWN_TOKEN_TYPE_FILTER, parameters)
+            }
+            OAuth2ParameterNames.STATE == tokenType.value -> {
+                parameters.add(SqlParameterValue(Types.VARCHAR, token))
+                findBy(STATE_FILTER, parameters)
+            }
+            OAuth2ParameterNames.CODE == tokenType.value -> {
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                findBy(AUTHORIZATION_CODE_FILTER, parameters)
+            }
+            OAuth2TokenType.ACCESS_TOKEN == tokenType -> {
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                findBy(ACCESS_TOKEN_FILTER, parameters)
+            }
+            OAuth2TokenType.REFRESH_TOKEN == tokenType -> {
+                parameters.add(SqlParameterValue(Types.BINARY, token.toByteArray(StandardCharsets.UTF_8)))
+                findBy(REFRESH_TOKEN_FILTER, parameters)
+            }
+            else -> null
         }
-        return null
     }
 
     private fun findBy(filter: String, parameters: List<SqlParameterValue>): OAuth2Authorization? {
