@@ -117,7 +117,7 @@ export default {
       case MarketplaceLinkType.TAPTOOLS:
         return new ButtonBuilder()
           .setLabel(i18n.__({ phrase: 'configure.marketplace.general.viewOnTapTools', locale }))
-          .setURL(`https://www.taptools.io/charts/nft?policyID=${linkData.policyId}`)
+          .setURL(`https://www.taptools.io/charts/nft/${linkData.policyId}`)
           .setStyle(ButtonStyle.Link);
       case MarketplaceLinkType.POOLPMHANDLE:
         return new ButtonBuilder()
