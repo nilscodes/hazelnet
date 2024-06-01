@@ -91,8 +91,9 @@ const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.e
 if (queueFiles.length) {
   const connectToAmqp = async () => {
     const rabbitPw = process.env.RABBITMQ_PASSWORD as string;
+    const port = (process.env.RABBITMQ_PORT as string) ?? '5672';
     try {
-      const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}`);
+      const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}:${port}`);
       queueFiles.forEach(async (file) => {
         const importName = file.substring(0, file.lastIndexOf('.'));
         const queue = (await import(`./queues/${importName}`)).default;
