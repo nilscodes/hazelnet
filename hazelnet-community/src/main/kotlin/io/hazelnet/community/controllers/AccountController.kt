@@ -34,9 +34,7 @@ class AccountController(
     @PutMapping("/{accountId}/settings/{settingName}")
     @ResponseStatus(HttpStatus.OK)
     fun updateSetting(@PathVariable accountId: Long, @PathVariable settingName: String, @RequestBody @Valid embeddableSetting: EmbeddableSetting): EmbeddableSetting {
-        if (embeddableSetting.name != settingName) {
-            throw IllegalArgumentException("Account server setting name in path $settingName did not match setting in request body ${embeddableSetting.name}.")
-        }
+        require(embeddableSetting.name == settingName) { "Account setting name in path $settingName did not match setting in request body ${embeddableSetting.name}." }
         return accountService.updateSettings(accountId, embeddableSetting)
     }
 
