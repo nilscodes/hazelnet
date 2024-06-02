@@ -21,6 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.min
 
 private val logger = KotlinLogging.logger {}
 
@@ -86,13 +87,21 @@ class OuraEventService(
     @Scheduled(fixedDelay = 30000)
     fun processEvents() {
         val currentMintChannels = marketplaceService.listAllMintMarketplaceChannels()
+        val relevantPolicyIds = currentMintChannels.map { it.policyId }.toSet()
+        logger.trace { "Processing ${mintQueue.size} mint events and ${metadataMap.size} metadata events, across ${currentMintChannels.size} mint trackers and ${relevantPolicyIds.size} unique policy IDs" }
         val queueToRetry = mutableListOf<OuraMintEvent>()
         while (mintQueue.isNotEmpty()) {
             val mintToProcess = mintQueue.pop()
             if (metadataMap.containsKey(mintToProcess.transactionHash)) {
+                if (!relevantPolicyIds.contains(mintToProcess.policyId)) {
+                    logger.trace { "Skipping mint event with transaction hash ${mintToProcess.transactionHash} as policy ID ${mintToProcess.policyId} is not tracked" }
+                    continue
+                }
                 val metadataOfPolicy = metadataMap[mintToProcess.transactionHash]?.metadata?.get(mintToProcess.policyId) as Map<String, Any>?
+                logger.trace { "Processing mint event with transaction hash ${mintToProcess.transactionHash} and metadata $metadataOfPolicy" }
                 if (metadataOfPolicy is Map<String, Any>) {
                     val cip68Token = Cip68Token(mintToProcess.assetNameHex)
+                    logger.trace { "CIP-0068 status for token from transaction ${mintToProcess.transactionHash}: $cip68Token" }
                     val (metadataOfAsset, assetName) = if (cip68Token.isValidCip68Token()) {
                         Pair(metadataOfPolicy[mintToProcess.assetNameHex] as Map<String, Any>?, cip68Token.assetName)
                     } else {
@@ -109,7 +118,6 @@ class OuraEventService(
                             mintTransaction = mintToProcess.transactionHash,
                             quantity = mintToProcess.quantity,
                         )
-                        val cip68Token = Cip68Token(mintToProcess.assetNameHex)
 
                         currentMintChannels
                             .filter { it.policyId == mintToProcess.policyId
@@ -131,10 +139,14 @@ class OuraEventService(
                                     highlightAttributeValue = it.extractHighlightAttribute(combinedAssetInfo.metadata)
                                 )
                             }
-                            .forEach { rabbitTemplate.convertAndSend("mintannouncements", it) }
+                            .forEach {
+                                logger.trace { "Sending mint announcement to guild ${it.guildId} and channel ${it.channelId} for mint event with transaction hash ${mintToProcess.transactionHash} and asset $cip68Token" }
+                                rabbitTemplate.convertAndSend("mintannouncements", it)
+                            }
                     }
                 }
             } else if (mintToProcess.date.after(Date(System.currentTimeMillis() - KEEP_MINT_EVENTS_WITHOUT_METADATA_MILLISECONDS))) {
+                logger.trace { "Retrying mint event with transaction hash ${mintToProcess.transactionHash} as metadata is not yet available" }
                 queueToRetry.add(mintToProcess)
             }
         }
