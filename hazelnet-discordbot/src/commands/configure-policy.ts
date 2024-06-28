@@ -32,7 +32,8 @@ export default <BotCommand> {
         .addChannelOption((option) => option.setName('voice-channel').setDescription(ci18n.option('voice-channel')).setRequired(true))
         .addStringOption((option) => option.setName('policy-id').setDescription(ci18n.option('policy-id')).setRequired(true))
         .addIntegerOption((option) => option.setName('max-count').setDescription(ci18n.option('max-count')).setRequired(false))
-        .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false)));;
+        .addBooleanOption((option) => option.setName('status').setDescription(ci18n.option('status')).setRequired(false))
+        .addBooleanOption((option) => option.setName('cip68').setDescription(ci18n.option('cip68')).setRequired(false)));
   },
   commandTags: ['token', 'marketplace'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,

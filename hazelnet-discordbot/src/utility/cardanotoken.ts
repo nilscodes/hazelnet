@@ -55,8 +55,9 @@ export default {
     }
     return i18n.__({ phrase: joinPhrase, locale });
   },
-  getMintCountText(policyInfo: DiscordMintCounterUpdate | PolicyInfo, maxCount: number, locale: string) {
+  getMintCountText(policyInfo: DiscordMintCounterUpdate | PolicyInfo, maxCount: number, locale: string, cip68 = false) {
     const phrase = maxCount > 0 ? 'configure.policy.mintcounter.mintCountWithMax' : 'configure.policy.mintcounter.mintCount';
-    return i18n.__({ phrase, locale }, { count: policyInfo.tokenCount, maxCount } as any);
+    const finalCount = cip68 ? policyInfo.tokenCount / 2 : policyInfo.tokenCount;
+    return i18n.__({ phrase, locale }, { count: finalCount, maxCount } as any);
   },
 };

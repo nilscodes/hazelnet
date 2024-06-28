@@ -207,7 +207,8 @@
 				"info-text": "A text included in your announcement that contains additional information.",
 				"status": "Set to False to turn this feature off.",
 				"voice-channel": "Voice channel to update with mint counts",
-				"max-count": "The maximum number of tokens that will be minted"
+				"max-count": "The maximum number of tokens that will be minted",
+				"cip68": "If this is a CIP-0068 mint, this should be true so the count gets accurately tracked."
 			},
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
