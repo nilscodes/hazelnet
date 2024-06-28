@@ -30,20 +30,25 @@ class DiscordInfoService(
 
     fun listChannelsForMintCounterUpdate(): List<DiscordMintCounterUpdate> {
         val emptyUpdates = discordServerRepository.findChannelsForMintCounterUpdate().map {
-            val (channelId, policyId, maxCount) = it.getUpdateInfo().split(",")
+            val updateInfoSplit = it.getUpdateInfo().split(",")
+            val (channelId, policyId, maxCount) = updateInfoSplit
+            val cip68 = updateInfoSplit.getOrNull(3) ?: "false"
             DiscordMintCounterUpdate(
                 guildId = it.getGuildId(),
                 channelId = channelId.toLong(),
                 policyId = policyId,
                 tokenCount = 0,
                 maxCount = maxCount.toLong(),
+                cip68 = cip68.toBoolean()
             )
         }
         val policyInfo = connectService
             .getPolicyInfo(emptyUpdates.map { it.policyId })
             .associate { Pair(it.policyId.policyId, it.tokenCount) }
         return emptyUpdates.map {
-            it.withCount(policyInfo[it.policyId] ?: 0L)
+            val count = policyInfo[it.policyId] ?: 0L
+            val finalCount = if (it.cip68) count / 2 else count
+            it.withCount(finalCount)
         }
     }
 

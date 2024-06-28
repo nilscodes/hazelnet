@@ -18,6 +18,7 @@ data class DiscordMintCounterUpdate(
     val tokenCount: Long,
     @JsonSerialize(using = ToStringSerializer::class)
     val maxCount: Long,
+    val cip68: Boolean = false
 ) {
-    fun withCount(tokenCount: Long) = DiscordMintCounterUpdate(guildId, channelId, policyId, tokenCount, maxCount)
+    fun withCount(tokenCount: Long) = DiscordMintCounterUpdate(guildId, channelId, policyId, tokenCount, maxCount, cip68)
 }

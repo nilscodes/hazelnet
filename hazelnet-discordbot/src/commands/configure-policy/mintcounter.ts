@@ -10,6 +10,7 @@ export default <BotSubcommand> {
     const maxCount = interaction.options.getInteger('max-count') ?? 0;
     const policyId = interaction.options.getString('policy-id', true);
     const mintCountChannel = interaction.options.getChannel('voice-channel', true);
+    const cip68 = interaction.options.getBoolean('cip68') ?? false;
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
@@ -19,11 +20,11 @@ export default <BotSubcommand> {
           if (newStatus !== false) {
             const policyInfo = await interaction.client.services.cardanoinfo.policyInfo(policyId);
             if (policyInfo) {
-              const mintCount = cardanotoken.getMintCountText(policyInfo, maxCount, locale);
+              const mintCount = cardanotoken.getMintCountText(policyInfo, maxCount, locale, cip68);
               await (mintCountChannel as BaseGuildVoiceChannel).setName(mintCount);
             }
           }
-          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild!.id, 'WIDGET_MINTCOUNTER', newStatus === false ? '' : `${mintCountChannel.id},${policyId},${maxCount}`);
+          await interaction.client.services.discordserver.updateDiscordServerSetting(interaction.guild!.id, 'WIDGET_MINTCOUNTER', newStatus === false ? '' : `${mintCountChannel.id},${policyId},${maxCount},${cip68}`);
           const changeMessage = i18n.__({ phrase: (newStatus ? 'configure.policy.mintcounter.mintcounterOn' : 'configure.policy.mintcounter.mintcounterOff'), locale }, { mintcounter: mintCountChannel.id });
           const embed = embedBuilder.buildForAdmin(discordServer, '/configure-info mintcounter', changeMessage, 'configure-info-mintcounter');
           await interaction.editReply({ embeds: [embed] });
