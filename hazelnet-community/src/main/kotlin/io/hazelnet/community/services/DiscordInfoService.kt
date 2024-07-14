@@ -46,9 +46,7 @@ class DiscordInfoService(
             .getPolicyInfo(emptyUpdates.map { it.policyId })
             .associate { Pair(it.policyId.policyId, it.tokenCount) }
         return emptyUpdates.map {
-            val count = policyInfo[it.policyId] ?: 0L
-            val finalCount = if (it.cip68) count / 2 else count
-            it.withCount(finalCount)
+            it.withCount(policyInfo[it.policyId] ?: 0L)
         }
     }
 

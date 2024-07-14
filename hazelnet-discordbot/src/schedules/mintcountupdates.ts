@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
-import HazelnetClient from "../utility/hazelnetclient";
 import { BaseGuildVoiceChannel, PermissionsBitField } from 'discord.js';
-import cardanotoken from "../utility/cardanotoken";
+import HazelnetClient from '../utility/hazelnetclient';
+import cardanotoken from '../utility/cardanotoken';
 
 export default {
   cron: '*/5 * * * *',
@@ -17,11 +17,15 @@ export default {
             const mintCounterChannel = await guild.channels.fetch(mintCounterUpdateInfo.channelId) as BaseGuildVoiceChannel;
             if (mintCounterChannel) {
               const voiceChannelPermissions = mintCounterChannel.permissionsFor(client.application!.id);
-              if (voiceChannelPermissions && voiceChannelPermissions.has(PermissionsBitField.Flags.Connect) && voiceChannelPermissions.has(PermissionsBitField.Flags.ManageChannels) && voiceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel)) {
+              if (voiceChannelPermissions
+                && voiceChannelPermissions.has(PermissionsBitField.Flags.Connect)
+                && voiceChannelPermissions.has(PermissionsBitField.Flags.ManageChannels)
+                && voiceChannelPermissions.has(PermissionsBitField.Flags.ViewChannel)
+              ) {
                 try {
                   const discordServer = await client.services.discordserver.getDiscordServer(guild.id);
                   const locale = discordServer.getBotLanguage();
-                  await mintCounterChannel.setName(cardanotoken.getMintCountText(mintCounterUpdateInfo, mintCounterUpdateInfo.maxCount, locale));
+                  await mintCounterChannel.setName(cardanotoken.getMintCountText(mintCounterUpdateInfo, mintCounterUpdateInfo.maxCount, locale, (mintCounterUpdateInfo as any).cip68));
                 } catch (discordError: any) {
                   client.logger.error({ guildId: mintCounterUpdateInfo.guildId, msg: `Channel ${mintCounterUpdateInfo.channelId} was not updated with mint count info due to unknown error.` });
                 }

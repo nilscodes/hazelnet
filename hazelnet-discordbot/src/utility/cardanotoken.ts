@@ -57,7 +57,7 @@ export default {
   },
   getMintCountText(policyInfo: DiscordMintCounterUpdate | PolicyInfo, maxCount: number, locale: string, cip68 = false) {
     const phrase = maxCount > 0 ? 'configure.policy.mintcounter.mintCountWithMax' : 'configure.policy.mintcounter.mintCount';
-    const finalCount = cip68 ? policyInfo.tokenCount / 2 : policyInfo.tokenCount;
+    const finalCount = cip68 ? Math.ceil(policyInfo.tokenCount / 2.0) : policyInfo.tokenCount;
     return i18n.__({ phrase, locale }, { count: finalCount, maxCount } as any);
   },
 };
