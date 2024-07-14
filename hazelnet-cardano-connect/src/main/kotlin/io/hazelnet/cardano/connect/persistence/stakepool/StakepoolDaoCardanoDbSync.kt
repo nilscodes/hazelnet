@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository
 import java.io.IOException
 import java.sql.ResultSet
 
-const val GET_ALL_STAKEPOOL_INFO: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN pool_offline_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
-        " WHERE registered_tx_id IN (SELECT max(registered_tx_id) FROM pool_update GROUP BY hash_id) AND offl.id IN (SELECT max(id) FROM pool_offline_data GROUP BY pool_id)"
-const val GET_ALL_STAKEPOOL_INFO_BY_VIEW: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN pool_offline_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
+const val GET_ALL_STAKEPOOL_INFO: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN off_chain_pool_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
+        " WHERE registered_tx_id IN (SELECT max(registered_tx_id) FROM pool_update GROUP BY hash_id) AND offl.id IN (SELECT max(id) FROM off_chain_pool_data GROUP BY pool_id)"
+const val GET_ALL_STAKEPOOL_INFO_BY_VIEW: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN off_chain_pool_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
         " WHERE h.view=? AND registered_tx_id IN (SELECT max(registered_tx_id) FROM pool_update GROUP BY hash_id) ORDER BY offl.id DESC LIMIT 1"
-const val GET_ALL_STAKEPOOL_INFO_BY_HASH: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN pool_offline_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
+const val GET_ALL_STAKEPOOL_INFO_BY_HASH: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN off_chain_pool_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
         " WHERE h.hash_raw=decode(?, 'hex') AND registered_tx_id IN (SELECT max(registered_tx_id) FROM pool_update GROUP BY hash_id) ORDER BY offl.id DESC LIMIT 1"
 const val GET_DELEGATION_TO_POOL_IN_EPOCH = "SELECT e.amount, sa.view FROM epoch_stake e JOIN pool_hash h ON e.pool_id=h.id JOIN stake_address sa ON e.addr_id = sa.id WHERE h.hash_raw=decode(?, 'hex') AND epoch_no=?;"
 const val GET_ACTIVE_DELEGATION_TO_POOL = "WITH stake AS\n" +
