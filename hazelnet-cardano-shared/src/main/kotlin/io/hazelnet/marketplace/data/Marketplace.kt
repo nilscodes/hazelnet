@@ -5,4 +5,10 @@ enum class Marketplace {
     MINT_ONCHAIN,
     PLUTUSART,
     ALL_MARKETPLACES,
+    SPACEBUDZ,
+    PXLZ,
+    DERPBIRDS,
+    CSWAP,
+    DROPSPOT,
+    OTHER,
 }

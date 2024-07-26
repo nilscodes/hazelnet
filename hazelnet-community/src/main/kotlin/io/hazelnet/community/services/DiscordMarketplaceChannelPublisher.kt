@@ -1,17 +1,20 @@
 package io.hazelnet.community.services
 
 import com.bloxbean.cardano.client.util.AssetUtil
+import io.hazelnet.cardano.connect.data.token.Cip67Label
 import io.hazelnet.cardano.connect.data.token.Cip68Token
 import io.hazelnet.cardano.connect.data.token.GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.getImageUrlFromAssetInfo
 import io.hazelnet.community.data.getItemNameFromAssetInfo
+import io.hazelnet.community.data.getMarketplaceUrl
 import io.hazelnet.community.services.external.NftCdnService
 import io.hazelnet.marketplace.data.ListingAnnouncement
 import io.hazelnet.marketplace.data.ListingsInfo
 import io.hazelnet.marketplace.data.SaleAnnouncement
 import io.hazelnet.marketplace.data.SalesInfo
+import io.hazelnet.shared.decodeHex
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -34,8 +37,7 @@ class DiscordMarketplaceChannelPublisher(
     fun processSales(sale: SalesInfo) {
         val policyIdToUse = if (sale.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else sale.policyId
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllSalesMarketplaceChannels(policyIdToUse)
-        val cip68Token = Cip68Token(sale.assetNameHex)
-        val combinedAssetInfo = retrieveAssetInfo(sale.policyId, cip68Token)
+        val (cip68Token, combinedAssetInfo) = getAssetInfo(sale.assetNameHex, sale.policyId)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || sale.price >= it.minimumValue!!)
                 && (it.maximumValue == null || sale.price <= it.maximumValue!!)
@@ -51,8 +53,8 @@ class DiscordMarketplaceChannelPublisher(
                     assetName = combinedAssetInfo.assetName,
                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),
                     source = sale.source,
-                    marketplaceAssetUrl = sale.marketplaceAssetUrl,
-                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo),
+                    marketplaceAssetUrl = getMarketplaceUrl(sale.marketplaceAssetUrl, combinedAssetInfo, cip68Token),
+                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo, sale.imageUrl),
                     price = sale.price,
                     saleDate = sale.saleDate,
                     rarityRank = 0,
@@ -67,12 +69,22 @@ class DiscordMarketplaceChannelPublisher(
             .forEach { rabbitTemplate.convertAndSend("saleannouncements", it) }
     }
 
+    private fun getAssetInfo(assetNameHex: String, policyId: String): Pair<Cip68Token, MultiAssetInfo> {
+        var cip68Token = Cip68Token(assetNameHex)
+        var combinedAssetInfo = retrieveAssetInfo(policyId, cip68Token)
+        if (combinedAssetInfo.metadata.isBlank()) {
+            logger.debug { "Received no metadata for asset - attempting to query for Cip68 token as marketplace may not share hex name. Asset name: ${assetNameHex}" }
+            cip68Token = Cip68Token(Cip67Label(222), assetNameHex.decodeHex())
+            combinedAssetInfo = retrieveAssetInfo(policyId, cip68Token)
+        }
+        return Pair(cip68Token, combinedAssetInfo)
+    }
+
     @RabbitListener(queues = ["listings"])
     fun processListings(listing: ListingsInfo) {
         val policyIdToUse = if (listing.globalMarketplaceTracking) GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER else listing.policyId
         val marketplaceChannelsForPolicy = discordMarketplaceService.listAllListingMarketplaceChannels(policyIdToUse)
-        val cip68Token = Cip68Token(listing.assetNameHex)
-        val combinedAssetInfo = retrieveAssetInfo(listing.policyId, cip68Token)
+        val (cip68Token, combinedAssetInfo) = getAssetInfo(listing.assetNameHex, listing.policyId)
         marketplaceChannelsForPolicy.mapNotNull {
             if ((it.minimumValue == null || listing.price >= it.minimumValue!!)
                 && (it.maximumValue == null || listing.price <= it.maximumValue!!)
@@ -88,8 +100,8 @@ class DiscordMarketplaceChannelPublisher(
                     assetName = combinedAssetInfo.assetName,
                     displayName = getItemNameFromAssetInfo(combinedAssetInfo),
                     source = listing.source,
-                    marketplaceAssetUrl = listing.marketplaceAssetUrl,
-                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo),
+                    marketplaceAssetUrl = getMarketplaceUrl(listing.marketplaceAssetUrl, combinedAssetInfo, cip68Token),
+                    assetImageUrl = getImageUrlFromAssetInfo(config.salesIpfslink!!, combinedAssetInfo, listing.imageUrl),
                     price = listing.price,
                     listingDate = listing.listingDate,
                     rarityRank = 0,

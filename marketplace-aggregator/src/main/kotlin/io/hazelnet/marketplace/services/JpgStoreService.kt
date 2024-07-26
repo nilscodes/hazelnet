@@ -19,7 +19,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-@Service
+//@Service
 class JpgStoreService(
     @Qualifier("jpgStoreClient")
     private val connectClient: WebClient,

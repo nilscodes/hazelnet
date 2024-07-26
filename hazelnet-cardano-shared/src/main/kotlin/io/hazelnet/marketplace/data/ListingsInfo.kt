@@ -13,6 +13,8 @@ data class ListingsInfo @JsonCreator constructor(
     val source: Marketplace,
     @JsonProperty("marketplaceAssetUrl")
     val marketplaceAssetUrl: String,
+    @JsonProperty("imageUrl")
+    val imageUrl: String? = null,
     @JsonProperty("price")
     val price: Long,
     @JsonProperty("listingDate")
