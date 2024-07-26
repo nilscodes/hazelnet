@@ -1,6 +1,10 @@
-import { ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
+import {
+  ActionRowBuilder, APIEmbedField, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder,
+} from 'discord.js';
 import i18n from 'i18n';
-import { DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy, } from '@vibrantnet/core';
+import {
+  DiscordServer, ListingAnnouncement, Marketplace, MarketplaceChannel, MarketplaceLinkType, MintAnnouncement, SaleAnnouncement, SalesType, TokenPolicy,
+} from '@vibrantnet/core';
 import { AugmentedCommandInteraction } from './hazelnetclient';
 import cardanotoken from './cardanotoken';
 import nftcdn, { NftCdnAttachment } from './nftcdn';
@@ -228,6 +232,7 @@ export default {
     let useMarketplaces = marketplaces;
     if (showAllMarketplaceNamesInsteadOfCatchAll && marketplaces.find((marketplace) => marketplace === Marketplace.ALL_MARKETPLACES)) {
       useMarketplaces = [];
+      // eslint-disable-next-line no-restricted-syntax
       for (const [_, value] of Object.entries(Marketplace)) {
         if (value !== Marketplace.ALL_MARKETPLACES && value !== Marketplace.MINT_ONCHAIN) {
           useMarketplaces.push(value);

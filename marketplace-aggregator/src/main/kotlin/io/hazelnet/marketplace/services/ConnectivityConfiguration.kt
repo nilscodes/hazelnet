@@ -24,6 +24,17 @@ class ConnectivityConfiguration {
                     .build()
 
     @Bean
+    fun tapToolsClient(config: AggregatorApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.tapTools.url)
+            .defaultHeader("x-api-key", config.tapTools.apiKey)
+            .exchangeStrategies(
+                ExchangeStrategies.builder().codecs {
+                    it.defaultCodecs().maxInMemorySize(10000000)
+                }.build())
+            .build()
+
+    @Bean
     fun plutusArtClient(config: AggregatorApplicationConfiguration) =
         WebClient.builder()
             .baseUrl(config.plutusArt.url)

@@ -8,27 +8,27 @@ private val policiesToInfoLog: List<String> = emptyList()
 
 @Service
 class AggregationService(
-    private val jpgStoreService: JpgStoreService,
-    private val plutusArtService: PlutusArtService,
+    private val tapToolsService: TapToolsService,
+//    private val plutusArtService: PlutusArtService,
 ) {
 
     @RabbitListener(queues = ["salespolicies"])
     fun processSalesForPolicy(policyId: String) {
         if (policyId == GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER) {
-            plutusArtService.processAllSales()
+//            plutusArtService.processAllSales()
         } else {
-            jpgStoreService.processSalesForPolicy(policyId, policiesToInfoLog)
-            plutusArtService.processSalesForPolicy(policyId, policiesToInfoLog)
+            tapToolsService.processSalesForPolicy(policyId, policiesToInfoLog)
+//            plutusArtService.processSalesForPolicy(policyId, policiesToInfoLog)
         }
     }
 
     @RabbitListener(queues = ["listingspolicies"])
     fun processListingsForPolicy(policyId: String) {
         if (policyId == GLOBAL_TRACKING_POLICY_ID_PLACEHOLDER) {
-            plutusArtService.processAllListings()
+//            plutusArtService.processAllListings()
         } else {
-            jpgStoreService.processListingsForPolicy(policyId, policiesToInfoLog)
-            plutusArtService.processListingsForPolicy(policyId, policiesToInfoLog)
+            tapToolsService.processListingsForPolicy(policyId, policiesToInfoLog)
+//            plutusArtService.processListingsForPolicy(policyId, policiesToInfoLog)
         }
     }
 }
