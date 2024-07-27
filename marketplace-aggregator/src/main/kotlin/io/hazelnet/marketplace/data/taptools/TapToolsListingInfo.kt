@@ -10,7 +10,7 @@ import java.util.*
 
 data class TapToolsListingInfo @JsonCreator constructor(
     @JsonProperty("image")
-    val image: String,
+    val image: String?,
 
     @JsonProperty("market")
     val market: String,
