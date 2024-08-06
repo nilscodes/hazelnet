@@ -73,7 +73,8 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedRate = 60000)
     fun publishPoliciesForSalesAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % config.marketplace.aggregationFrequency
+        val currentTimeMillis = System.currentTimeMillis()
+        val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
             .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }
@@ -84,7 +85,8 @@ class DiscordMarketplaceService(
 
     @Scheduled(fixedRate = 60000)
     fun publishPoliciesForListingsAggregation() {
-        val shard = Calendar.getInstance().get(Calendar.MINUTE) % config.marketplace.aggregationFrequency
+        val currentTimeMillis = System.currentTimeMillis()
+        val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
             .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }

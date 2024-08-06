@@ -43,7 +43,7 @@ data class VibrantAuthConfiguration(
 )
 
 data class MarketplaceConfiguration(
-    val aggregationFrequency: Long = 5L
+    val aggregationFrequency: Long = 180L
 )
 
 data class NftCdnConfiguration(
