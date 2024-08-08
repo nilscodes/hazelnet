@@ -6,6 +6,7 @@ import io.hazelnet.community.data.discord.marketplace.DiscordMarketplaceChannel
 import io.hazelnet.community.data.discord.marketplace.TrackerMetadataFilter
 import io.hazelnet.community.persistence.DiscordMarketplaceChannelRepository
 import io.hazelnet.community.persistence.DiscordTrackerMetadataFilterRepository
+import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -23,6 +24,8 @@ class DiscordMarketplaceService(
     private val rabbitTemplate: RabbitTemplate,
     private val config: CommunityApplicationConfiguration
 ) {
+    private val logger = KotlinLogging.logger {}
+
     fun listMarketplaceChannels(guildId: Long): List<DiscordMarketplaceChannel> {
         val discordServer = discordServerService.getDiscordServer(guildId)
         return discordMarketplaceChannelRepository.findByDiscordServerId(discordServer.id!!)
@@ -75,9 +78,15 @@ class DiscordMarketplaceService(
     fun publishPoliciesForSalesAggregation() {
         val currentTimeMillis = System.currentTimeMillis()
         val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
+        logger.debug { "Publishing sales policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency}" }
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }
+            .filter {
+                val shardOfPolicy = (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue
+                val match = shardOfPolicy == shard
+                logger.debug { "Checking shard $shard for ${it.policyId} with hash ${it.policyId.hashCode()} and policy shard $shardOfPolicy for sales marketplace channel with ID ${it.id}: $match" }
+                match
+            }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("salespolicies", it) }
@@ -87,9 +96,15 @@ class DiscordMarketplaceService(
     fun publishPoliciesForListingsAggregation() {
         val currentTimeMillis = System.currentTimeMillis()
         val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
+        logger.debug { "Publishing listings policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency}" }
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
-            .filter { (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue == shard }
+            .filter {
+                val shardOfPolicy = (it.policyId.hashCode() % config.marketplace.aggregationFrequency).absoluteValue
+                val match = shardOfPolicy == shard
+                logger.debug { "Checking shard $shard for ${it.policyId} with hash ${it.policyId.hashCode()} and policy shard $shardOfPolicy for listings marketplace channel with ID ${it.id}: $match" }
+                match
+            }
             .map { it.policyId }
             .toSet()
             .forEach { rabbitTemplate.convertAndSend("listingspolicies", it) }
