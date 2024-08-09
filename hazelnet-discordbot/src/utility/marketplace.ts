@@ -44,7 +44,8 @@ export default {
     return fields;
   },
   getSaleAnnouncementTitle(saleAnnouncement: SaleAnnouncement, locale: string) {
-    const displayName = this.getAugmentedDisplayName(saleAnnouncement.displayName);
+    // Prefix all underscores and asterisks with a backslash to escape them in the title because Discord uses them for markdown
+    const displayName = this.getAugmentedDisplayName(saleAnnouncement.displayName).replace(/(_|\*)/g, '\\$1');
     if (saleAnnouncement.type === SalesType.OFFER) {
       return i18n.__({ phrase: 'configure.marketplace.sales.announce.itemContentOffer', locale }, { displayName });
     }

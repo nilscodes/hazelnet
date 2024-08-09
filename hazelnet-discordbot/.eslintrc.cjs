@@ -1,15 +1,16 @@
 module.exports = {
   extends: [
-    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'airbnb-base',
     'airbnb-typescript/base',
+    'prettier',
+    'plugin:import/typescript',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'import', 'prettier'],
   rules: {
     'max-len': ['error', 250, 2, {
       ignoreUrls: true,
@@ -20,7 +21,8 @@ module.exports = {
     }],
     'no-underscore-dangle': ['off'],
     'no-unused-vars': ['off'],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-explicit-any': ['off'],
   },
   root: true,
 };
