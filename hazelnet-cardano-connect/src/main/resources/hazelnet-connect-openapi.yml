@@ -172,6 +172,13 @@ paths:
         - stakepools
       parameters:
         - $ref: '#/components/parameters/PoolHashPathParameter'
+        - name: withoutAmount
+          in: query
+          description: 'If set to true, data can be retrieved without requiring stake amounts. Defaults to false if omitted.'
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: 'A list of all active delegations'

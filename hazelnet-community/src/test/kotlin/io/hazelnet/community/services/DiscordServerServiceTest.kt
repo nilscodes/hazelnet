@@ -44,7 +44,7 @@ class DiscordServerServiceTest {
         every { discordServerRepository.save(any()) } returnsArgument 0
         every { discordServerRepository.resetPremiumWeightForExternalAccount(5652) } returns Unit
 
-        val discordServerService = DiscordServerService(mockk(), mockk(), mockk(), discordServerRepository, mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
+        val discordServerService = DiscordServerService(mockk(), mockk(), mockk(), discordServerRepository, mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
         discordServerService.updateMember(testServer.guildId, 5652, DiscordMemberPartial(true))
         verify { discordServerRepository.resetPremiumWeightForExternalAccount(5652) }
     }

@@ -1,6 +1,7 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
+import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
@@ -40,6 +41,7 @@ class DiscordServerService(
     private val discordMemberActivityRepository: DiscordMemberActivityRepository,
     private val rabbitTemplate: RabbitTemplate,
     private val apiTokenService: ApiTokenService,
+    private val config: CommunityApplicationConfiguration,
     tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
     meterRegistry: MeterRegistry,
 ) {
@@ -355,7 +357,16 @@ class DiscordServerService(
 
     fun getAllCurrentDelegatorRoleAssignmentsForGuild(guildId: Long): Set<DiscordRoleAssignment> {
         val discordServer = getDiscordServer(guildId)
-        val allDelegationToAllowedPools = connectService.getActiveDelegationForPools(discordServer.stakepools.map { it.poolHash })
+        // Calculating live stake is currently very expensive (3 minutes for a small pool vs 2 seconds for the same data without amounts), so if below a certain threshold, we skip the amount calculation in DB sync
+        val hasRoleWithAmountOverThreshold = discordServer.delegatorRoles.any { it.minimumStake > config.connect.ignoreAmountIfStakeBelow }
+        val allDelegationToAllowedPools = connectService.getActiveDelegationForPools(discordServer.stakepools.map { it.poolHash }, !hasRoleWithAmountOverThreshold)
+            .map {
+                if (!hasRoleWithAmountOverThreshold) {
+                    it.copy(amount = config.connect.ignoreAmountIfStakeBelow)
+                } else {
+                    it
+                }
+            }
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMembers, allDelegationToAllowedPools, discordServer)
     }

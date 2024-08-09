@@ -90,17 +90,18 @@ const queueFiles = fs.readdirSync(__dirname + '/queues').filter((file) => file.e
 
 if (queueFiles.length) {
   const connectToAmqp = async () => {
+    client.logger.info(`Connecting to AMQP server at ${process.env.RABBITMQ_HOST}...`);
     const rabbitPw = process.env.RABBITMQ_PASSWORD as string;
     const port = process.env.RABBITMQ_PORT ? `:${process.env.RABBITMQ_PORT}` : '';
     try {
-      const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}${port}`);
+      const conn = await amqplib.connect(`amqp://hazelnet:${encodeURIComponent(rabbitPw)}@${process.env.RABBITMQ_HOST}${port}`) as any;
       queueFiles.forEach(async (file) => {
         const importName = file.substring(0, file.lastIndexOf('.'));
         const queue = (await import(`./queues/${importName}`)).default;
         if (queue.name && queue.consume) {
           const queueChannel = await conn.createChannel();
           await queueChannel.assertQueue(queue.name);
-          queueChannel.consume(queue.name, (msg) => {
+          queueChannel.consume(queue.name, (msg: any) => {
             if (msg !== null) {
               queue.consume(client, JSON.parse(msg.content.toString()));
               queueChannel.ack(msg);
@@ -114,7 +115,7 @@ if (queueFiles.length) {
         client.logger.error({ msg: 'Connection to AMQP server was closed. Reconnecting in 10 seconds...' });
         setTimeout(connectToAmqp, 10000);
       });
-      conn.on('error', (e) => {
+      conn.on('error', (e: any) => {
         client.logger.error({ msg: 'Error during AMQP connection', error: e });
       });
     } catch (e) {
