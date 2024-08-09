@@ -1,7 +1,9 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
+import {
+  ActionRowBuilder, MessageActionRowComponentBuilder, StringSelectMenuBuilder,
+} from 'discord.js';
 import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
 import whitelistUtil from '../../utility/whitelist';
 import embedBuilder from '../../utility/embedbuilder';
 
@@ -46,7 +48,7 @@ export default <WhitelistUpdateRemoveRoleCommand> {
           }
           const components = [new ActionRowBuilder()
             .addComponents(
-              new SelectMenuBuilder()
+              new StringSelectMenuBuilder()
                 .setCustomId('configure-whitelist/update-removerole/complete')
                 .setPlaceholder(i18n.__({ phrase: '', locale }))
                 .addOptions(roles.map((role) => ({
