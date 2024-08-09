@@ -17,7 +17,7 @@ export default <BotSubcommand> {
       const marketplaceChannelToAddFilterTo = (await interaction.client.services.discordserver.listMarketplaceChannels(interaction.guild!.id))
         .find((channel) => channel.id === trackerId);
       if (marketplaceChannelToAddFilterTo) {
-        const maxFiltersPerMarketplaceChannel = await interaction.client.services.globalsettings.getGlobalSetting('MAX_FILTERS_PER_TRACKER') || 10;
+        const maxFiltersPerMarketplaceChannel = +(await interaction.client.services.globalsettings.getGlobalSetting('MAX_FILTERS_PER_TRACKER')) || 10;
         if (!marketplaceChannelToAddFilterTo.filters || marketplaceChannelToAddFilterTo.filters.length < maxFiltersPerMarketplaceChannel) {
           if (attributeName.length <= 64) {
             if (attributeValue.length <= 128) {

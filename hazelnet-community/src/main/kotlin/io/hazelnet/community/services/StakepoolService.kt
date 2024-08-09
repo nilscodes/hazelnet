@@ -32,5 +32,5 @@ class StakepoolService(
     }
 
     @Cacheable(cacheNames = ["delegation"])
-    fun getDelegation(poolHash: String) = connectService.getActiveDelegationForPools(listOf(poolHash))
+    fun getDelegation(poolHash: String) = connectService.getActiveDelegationForPools(listOf(poolHash), false)
 }

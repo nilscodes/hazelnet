@@ -15,7 +15,10 @@ class StakepoolController(
 
     @GetMapping("/{poolHash}/delegation")
     @ResponseStatus(HttpStatus.OK)
-    fun getActiveDelegation(@PathVariable poolHash: String) = stakepoolService.getActiveDelegation(poolHash)
+    fun getActiveDelegation(
+        @PathVariable poolHash: String,
+        @RequestParam(required = false, defaultValue = "false") withoutAmount: Boolean,
+    ) = stakepoolService.getActiveDelegation(poolHash, withoutAmount)
 
     @GetMapping("/{poolHash}/delegation/{epochNo}")
     @ResponseStatus(HttpStatus.OK)

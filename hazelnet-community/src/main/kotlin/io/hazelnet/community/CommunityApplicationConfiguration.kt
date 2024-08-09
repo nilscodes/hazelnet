@@ -21,7 +21,8 @@ data class CommunityApplicationConfiguration(
 )
 
 data class ConnectConfiguration(
-    val url: String
+    val url: String,
+    val ignoreAmountIfStakeBelow: Long = 50000000L,
 )
 
 data class VoteaireConfiguration(

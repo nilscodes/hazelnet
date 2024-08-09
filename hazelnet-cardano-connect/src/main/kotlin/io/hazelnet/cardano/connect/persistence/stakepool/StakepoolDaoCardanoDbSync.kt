@@ -50,6 +50,24 @@ const val GET_ACTIVE_DELEGATION_TO_POOL = "WITH stake AS\n" +
         "    ) AS t\n" +
         "GROUP BY view"
 
+const val SQL_GET_ACTIVE_DELEGATION_TO_POOL_WITHOUT_AMOUNT = """
+        SELECT sa.view
+          FROM delegation d1, pool_hash, stake_address sa
+          WHERE pool_hash.id=d1.pool_hash_id
+            AND pool_hash.hash_raw=decode(?, 'hex')
+            AND d1.addr_id=sa.id
+            AND NOT EXISTS
+              (SELECT TRUE
+               FROM delegation d2
+               WHERE d2.addr_id=d1.addr_id
+                 AND d2.tx_id>d1.tx_id)
+            AND NOT EXISTS
+              (SELECT TRUE
+               FROM stake_deregistration
+               WHERE stake_deregistration.addr_id=d1.addr_id
+                 AND stake_deregistration.tx_id>d1.tx_id)
+"""
+
 @Repository
 class StakepoolDaoCardanoDbSync(
         private val jdbcTemplate: JdbcTemplate
@@ -95,6 +113,12 @@ class StakepoolDaoCardanoDbSync(
     override fun getActiveDelegation(poolHash: String): List<DelegationInfo> {
         return jdbcTemplate.query(GET_ACTIVE_DELEGATION_TO_POOL, { rs, _ ->
             DelegationInfo(poolHash, rs.getLong("amount"), rs.getString("view"))
+        }, poolHash)
+    }
+
+    override fun getActiveDelegationWithoutAmount(poolHash: String): List<DelegationInfo> {
+        return jdbcTemplate.query(SQL_GET_ACTIVE_DELEGATION_TO_POOL_WITHOUT_AMOUNT, { rs, _ ->
+            DelegationInfo(poolHash, 1, rs.getString("view"))
         }, poolHash)
     }
 

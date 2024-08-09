@@ -62,11 +62,16 @@ class ConnectService(
             .block()!!
     }
 
-    fun getActiveDelegationForPools(stakepoolHashes: List<String>): List<DelegationInfo> {
+    fun getActiveDelegationForPools(stakepoolHashes: List<String>, withoutAmount: Boolean): List<DelegationInfo> {
         return Flux.fromIterable(stakepoolHashes)
-            .flatMap {
+            .flatMap { poolHash ->
                 connectClient.get()
-                    .uri("/stakepools/{poolHash}/delegation", it)
+                    .uri { uriBuilder ->
+                        uriBuilder
+                            .path("/stakepools/$poolHash/delegation")
+                            .queryParam("withoutAmount", withoutAmount.toString())
+                            .build()
+                    }
                     .retrieve()
                     .bodyToFlux(DelegationInfo::class.java)
             }.collectList().block()!!

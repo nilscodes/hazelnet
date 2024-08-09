@@ -614,7 +614,18 @@ class RoleAssignmentService(
     }
 
     private fun getDelegationIfNeeded(discordServer: DiscordServer) =
-        if (discordServer.delegatorRoles.isNotEmpty()) connectService.getActiveDelegationForPools(discordServer.stakepools.map { pool -> pool.poolHash })
+        if (discordServer.delegatorRoles.isNotEmpty()) {
+            // Calculating live stake is currently very expensive (3 minutes for a small pool vs 2 seconds for the same data without amounts), so if below a certain threshold, we skip the amount calculation in DB sync
+            val hasRoleWithAmountOverThreshold = discordServer.delegatorRoles.any { it.minimumStake > config.connect.ignoreAmountIfStakeBelow }
+            connectService.getActiveDelegationForPools(discordServer.stakepools.map { pool -> pool.poolHash }, !hasRoleWithAmountOverThreshold)
+                .map {
+                    if (!hasRoleWithAmountOverThreshold) {
+                        it.copy(amount = config.connect.ignoreAmountIfStakeBelow)
+                    } else {
+                        it
+                    }
+                }
+        }
         else listOf()
 
     private fun publishTokenRoleAssignmentsForGuildMember(
