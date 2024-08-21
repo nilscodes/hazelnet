@@ -15,5 +15,5 @@ EXPOSE 8086
 
 ENTRYPOINT [ "sh", \
     "-c", \
-    "java -jar -Dspring.datasource.url=\"${HAZELNET_CONNECT_POSTGRES_URL}\" -Dspring.datasource.username=${HAZELNET_CONNECT_POSTGRES_USER} -Dspring.datasource.password=${HAZELNET_CONNECT_POSTGRES_PASSWORD} -Dio.hazelnet.connect.cardano.network=${CARDANO_NETWORK} /app.jar" \
+    "java -jar -Dspring.datasource.url=\"${HAZELNET_CONNECT_POSTGRES_URL}\" -Dspring.datasource.username=${HAZELNET_CONNECT_POSTGRES_USER} -Dspring.datasource.password=${HAZELNET_CONNECT_POSTGRES_PASSWORD} -Dio.hazelnet.connect.cardano.network=${CARDANO_NETWORK} -Dio.hazelnet.connect.cardano.blockfrost.apiKey=${BF_PROJECT_ID} /app.jar" \
 ]
