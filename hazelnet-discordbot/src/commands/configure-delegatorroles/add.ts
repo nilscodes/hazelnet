@@ -8,7 +8,7 @@ import embedBuilder from '../../utility/embedbuilder';
 
 interface DelegatorRoleAddCommand extends BotSubcommand {
   cache: NodeCache
-  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null, minimumStakeAda: number, roleId: string): APIEmbed
+  createDelegatorRole(interaction: AugmentedCommandInteraction | AugmentedButtonInteraction, discordServer: DiscordServer, poolHash: string | null, minimumStake: number, maximumStake: number | null, roleId: string): APIEmbed
   confirm(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
   cancel(interaction: AugmentedButtonInteraction, discordServer: DiscordServer, roleToAdd: DelegatorRole): void
 }
@@ -18,6 +18,7 @@ export default <DelegatorRoleAddCommand> {
   async execute(interaction) {
     const role = interaction.options.getRole('role', true);
     const minimumStakeAda = interaction.options.getInteger('minimum-stake', true);
+    const maximumStakeAda = interaction.options.getInteger('maximum-stake');
     const poolHash = interaction.options.getString('pool-id');
     try {
       await interaction.deferReply({ ephemeral: true });
@@ -30,17 +31,19 @@ export default <DelegatorRoleAddCommand> {
           if (discordServer.premium || delegatorRoles.length === 0) {
             if (minimumStakeAda > 0) {
               const minimumStake = minimumStakeAda * 1000000;
+              const maximumStake = maximumStakeAda ? maximumStakeAda * 1000000 : null;
               const guild = await interaction.client.guilds.fetch(interaction.guild!.id);
               const allUsers = await guild.members.fetch();
               const usersWithRole = allUsers.filter((member) => member.roles.cache.some((memberRole) => memberRole.id === role.id)); // Can't use role.members.size since not all members might be cached
               if (usersWithRole.size === 0) {
-                const embed = await this.createDelegatorRole(interaction, discordServer, poolHash, minimumStake, role.id);
+                const embed = await this.createDelegatorRole(interaction, discordServer, poolHash, minimumStake, maximumStake, role.id);
                 await interaction.editReply({ embeds: [embed] });
               } else {
                 // Register add data in cache, as we cannot send it along with the button data.
                 this.cache.set(`${interaction.guild!.id}-${interaction.user.id}`, {
                   poolHash,
                   minimumStake,
+                  maximumStake,
                   roleId: role.id,
                 });
 
@@ -80,9 +83,9 @@ export default <DelegatorRoleAddCommand> {
       await interaction.editReply({ content: 'Error while adding delegator role to your server. Please contact your bot admin via https://www.vibrantnet.io.' });
     }
   },
-  async createDelegatorRole(interaction, discordServer, poolHash, minimumStake, roleId) {
+  async createDelegatorRole(interaction, discordServer, poolHash, minimumStake, maximumStake, roleId) {
     const locale = discordServer.getBotLanguage();
-    const newDelegatorRolePromise = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild!.id, poolHash, minimumStake, roleId);
+    const newDelegatorRolePromise = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild!.id, poolHash, minimumStake, maximumStake, roleId);
     const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
     const newDelegatorRole = newDelegatorRolePromise.data;
 
@@ -93,10 +96,11 @@ export default <DelegatorRoleAddCommand> {
     } else if (officialStakepool) {
       fieldHeader = 'configure.delegatorroles.list.stakepoolNameOfficial';
     }
+    const maxInfo = newDelegatorRole.maximumStake ? i18n.__({ phrase: 'configure.delegatorroles.list.maxInfo', locale }, { maximumStake: newDelegatorRole.maximumStake / 1000000 } as any) : '';
     const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles add', i18n.__({ phrase: 'configure.delegatorroles.add.success', locale }), 'configure-delegatorroles-add', [
       {
         name: i18n.__({ phrase: fieldHeader, locale }, { delegatorRole: newDelegatorRole, officialStakepool } as any),
-        value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale }, { delegatorRole: newDelegatorRole, minimumStake: newDelegatorRole.minimumStake / 1000000 } as any),
+        value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale }, { delegatorRole: newDelegatorRole, minimumStake: newDelegatorRole.minimumStake / 1000000, maxInfo } as any),
       },
     ]);
     return embed;
@@ -115,7 +119,7 @@ export default <DelegatorRoleAddCommand> {
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {
-    const embed = await this.createDelegatorRole(interaction, discordServer, roleToAdd.poolHash ?? null, roleToAdd.minimumStake, roleToAdd.roleId);
+    const embed = await this.createDelegatorRole(interaction, discordServer, roleToAdd.poolHash ?? null, roleToAdd.minimumStake, roleToAdd.maximumStake ?? null, roleToAdd.roleId);
     await interaction.update({ embeds: [embed], components: [] });
   },
   async cancel(interaction, discordServer, roleToAdd) {

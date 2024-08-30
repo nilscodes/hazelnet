@@ -26,6 +26,11 @@ class DelegatorRole @JsonCreator constructor(
         @field:JsonSerialize(using = ToStringSerializer::class)
         var minimumStake: Long,
 
+        @Column(name = "maximum_stake")
+        @field:Min(1)
+        @field:JsonSerialize(using = ToStringSerializer::class)
+        var maximumStake: Long? = null,
+
         @Column(name = "discord_role_id")
         @NonNull
         @field:Min(1)
@@ -41,6 +46,7 @@ class DelegatorRole @JsonCreator constructor(
         if (id != other.id) return false
         if (poolHash != other.poolHash) return false
         if (minimumStake != other.minimumStake) return false
+        if (maximumStake != other.maximumStake) return false
         if (roleId != other.roleId) return false
 
         return true
@@ -50,11 +56,12 @@ class DelegatorRole @JsonCreator constructor(
         var result = id?.hashCode() ?: 0
         result = 31 * result + (poolHash?.hashCode() ?: 0)
         result = 31 * result + minimumStake.hashCode()
+        result = 31 * result + (maximumStake?.hashCode() ?: 0)
         result = 31 * result + roleId.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "DelegatorRole(id=$id, poolHash=$poolHash, minimumStake=$minimumStake, roleId=$roleId)"
+        return "DelegatorRole(id=$id, poolHash=$poolHash, minimumStake=$minimumStake, maximumStake=$maximumStake, roleId=$roleId)"
     }
 }

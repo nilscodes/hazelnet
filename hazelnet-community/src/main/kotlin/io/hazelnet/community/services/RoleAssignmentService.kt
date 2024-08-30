@@ -496,7 +496,9 @@ class RoleAssignmentService(
             rolesToAssign.mapNotNull { role ->
                 val lookupName = role.poolHash ?: LOOKUP_NAME_ALL_POOLS
                 externalAccountLookup[delegations.key]?.let {
-                    if ((delegations.value[lookupName] ?: 0) >= role.minimumStake) {
+                    val delegationAmount = (delegations.value[lookupName] ?: 0)
+                    val maximumStake = role.maximumStake
+                    if (delegationAmount >= role.minimumStake && (maximumStake == null || delegationAmount < maximumStake)) {
                         DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
                     } else {
                         null
