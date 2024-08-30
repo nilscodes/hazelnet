@@ -213,6 +213,7 @@
 			"configure-delegatorroles": {
 				"role": "Role to assign users with the given amount of stake for configured pools.",
 				"minimum-stake": "The minimum stake (in ADA) required for this role (0 for any amount).",
+				"maximum-stake": "The maximum stake (in ADA) for this role. The stake has to be less than this amount.",
 				"pool-id": "Pool ID (not ticker) required to be delegating to, or ignore for all pools of this server.",
 				"user": "The user to check delegator roles for"
 			},
@@ -1119,7 +1120,8 @@
 				"stakepoolNameOfficial": "Stakepool {{{officialStakepool.info.ticker}}}, {{officialStakepool.poolHash}} (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameAny": "Any official stakepool of this server (see list via /info) (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameInofficial": "{{delegatorRole.poolHash}} (Role-ID: {{delegatorRole.id}})",
-				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}** to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>.",
+				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}**{{{maxInfo}}} to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>.",
+				"maxInfo": " and less than **₳{{maximumStake}}**",
 				"noPremium": "🙀 Users currently only get the delegator role with the lowest ID automatically assigned (Role-ID: {{delegatorRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
@@ -1128,7 +1130,7 @@
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
-				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}",
+				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}\nMaximum staked ADA: {{maximumStakeAda}}",
 				"noPremium": "🙀 You currently can not add any additional delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
 				"noMatchingStakepool": "⚠ The pool hash *{{poolHash}}* you have provided is not included in your list of supported stakepools on this server. Make sure it is added via **/configure-stakepool add** or verify the right pool hash via **/configure-stakepool list**.",
 				"noStakepools": "⚠ You have to add at least one supported stake pool to your server via the **/configure-stakepool add** command, to be able to add a delegator role."

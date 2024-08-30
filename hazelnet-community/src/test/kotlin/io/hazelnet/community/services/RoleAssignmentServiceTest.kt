@@ -168,9 +168,9 @@ internal class RoleAssignmentServiceTest {
                 Stakepool("f5b2ef0d7db63c8d00446cd7d9ce9cdb9e73023ffaa5e806decceb66", null),
             ),
             mutableSetOf(
-                DelegatorRole(1, null, 60000, 78),
-                DelegatorRole(2, "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 10000, 21),
-                DelegatorRole(3, "9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 1, 662)
+                DelegatorRole(1, null, 60000, null, 78),
+                DelegatorRole(2, "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 10000, 10000000, 21),
+                DelegatorRole(3, "9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 1, null, 662)
             ),
             useTokenRoles,
             mutableSetOf(),
@@ -215,6 +215,39 @@ internal class RoleAssignmentServiceTest {
                 DiscordRoleAssignment(testServer.guildId, acc3.referenceId.toLong(), 78),
                 DiscordRoleAssignment(testServer.guildId, acc4.referenceId.toLong(), 78),
                 DiscordRoleAssignment(testServer.guildId, acc4.referenceId.toLong(), 21),
+            ), actual
+        )
+    }
+
+    @Test
+    fun `delegation roles respect maximum stake value`() {
+        val connectService = mockk<ConnectService>()
+        every { connectService.getSyncInfo() } returns SyncInfo(311, Date(), 100.0)
+
+        val activeDelegation = listOf(
+            DelegationInfo("be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 100000000, "acc4_hazel"),
+        )
+        val roleAssignmentService = RoleAssignmentService(
+            connectService,
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            mockk(),
+            makeDiscordBanRepository(emptyList()),
+            mockk(),
+            mockk(relaxed = true),
+        )
+        val testServer = makeTestDiscordServer()
+        val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
+            getMockVerificationData(),
+            activeDelegation,
+            testServer
+        )
+        Assertions.assertEquals(
+            setOf(
+                DiscordRoleAssignment(testServer.guildId, acc4.referenceId.toLong(), 78),
             ), actual
         )
     }

@@ -215,6 +215,7 @@ CREATE TABLE "discord_spo_roles"
     "discord_server_id" int,
     "stakepool_hash"    varchar(56),
     "minimum_stake"     bigint not null,
+    "maximum_stake"     bigint null,
     "discord_role_id"   bigint not null,
     UNIQUE ("discord_server_id", "discord_role_id", "stakepool_hash")
 );

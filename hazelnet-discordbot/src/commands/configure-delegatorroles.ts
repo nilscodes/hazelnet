@@ -1,5 +1,5 @@
-import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from "../utility/commandtypes";
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 
@@ -14,6 +14,7 @@ export default <BotCommand> {
         .setDescription(ci18n.subDescription('add'))
         .addRoleOption((option) => option.setName('role').setDescription(ci18n.option('role')).setRequired(true))
         .addIntegerOption((option) => option.setName('minimum-stake').setDescription(ci18n.option('minimum-stake')).setRequired(true))
+        .addIntegerOption((option) => option.setName('maximum-stake').setDescription(ci18n.option('maximum-stake')).setRequired(false))
         .addStringOption((option) => option.setName('pool-id').setDescription(ci18n.option('pool-id')).setRequired(false)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')

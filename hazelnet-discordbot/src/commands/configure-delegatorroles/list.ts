@@ -1,6 +1,6 @@
-import { BotSubcommand } from "../../utility/commandtypes";
 import i18n from 'i18n';
-import { DelegatorRole, Stakepool } from '@vibrantnet/core';
+import { DelegatorRole } from '@vibrantnet/core';
+import { BotSubcommand } from "../../utility/commandtypes";
 import embedBuilder from '../../utility/embedbuilder';
 
 export default <BotSubcommand> {
@@ -10,7 +10,7 @@ export default <BotSubcommand> {
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id) as DelegatorRole[];
       const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
-      const useLocale = discordServer.getBotLanguage();
+      const locale = discordServer.getBotLanguage();
       const delegatorRoleFields = delegatorRoles.map((delegatorRole) => {
         // TODO: Share Code across delegator role modules
         let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
@@ -20,23 +20,24 @@ export default <BotSubcommand> {
         } else if (officialStakepool) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameOfficial';
         }
+        const maxInfo = delegatorRole.maximumStake ? i18n.__({ phrase: 'configure.delegatorroles.list.maxInfo', locale }, { maximumStake: delegatorRole.maximumStake / 1000000 } as any) : '';
         return {
-          name: i18n.__({ phrase: fieldHeader, locale: useLocale }, { delegatorRole, officialStakepool } as any),
-          value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale: useLocale }, { delegatorRole, minimumStake: delegatorRole.minimumStake / 1000000 } as any),
+          name: i18n.__({ phrase: fieldHeader, locale }, { delegatorRole, officialStakepool } as any),
+          value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale }, { delegatorRole, minimumStake: delegatorRole.minimumStake / 1000000, maxInfo } as any),
         };
       });
       if (!delegatorRoleFields.length) {
-        delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale: useLocale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale: useLocale }) });
+        delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale }) });
       }
       if (!discordServer.premium && delegatorRoles.length > 1) {
         const lowestDelegatorRoleId = Math.min(...delegatorRoles.map((delegatorRole) => +delegatorRole.id));
         const lowestIdDelegatorRole = delegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
         delegatorRoleFields.unshift({
-          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale: useLocale }),
-          value: i18n.__({ phrase: 'configure.delegatorroles.list.noPremium', locale: useLocale }, { delegatorRole: lowestIdDelegatorRole } as any),
+          name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
+          value: i18n.__({ phrase: 'configure.delegatorroles.list.noPremium', locale }, { delegatorRole: lowestIdDelegatorRole } as any),
         });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale: useLocale }), 'configure-delegatorroles-list', delegatorRoleFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale }), 'configure-delegatorroles-list', delegatorRoleFields);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);

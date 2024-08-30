@@ -246,10 +246,11 @@ export class DiscordServerApi extends BaseCacheApi {
     axios.delete(`${this.apiUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
   }
 
-  async createDelegatorRole(guildId: string, poolHash: string | null, minimumStake: number, discordRoleId: string): Promise<any> {
+  async createDelegatorRole(guildId: string, poolHash: string | null, minimumStake: number, maximumStake: number | null, discordRoleId: string): Promise<any> {
     return axios.post(`${this.apiUrl}/discord/servers/${guildId}/delegatorroles`, {
       poolHash,
       minimumStake,
+      maximumStake,
       roleId: discordRoleId,
     });
   }

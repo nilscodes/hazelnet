@@ -3624,6 +3624,11 @@ components:
           description: Minimum stake in Lovelace
           format: int64
           example: 1000000000
+        maximumStake:
+          type: integer
+          description: Maximum stake in Lovelace (exclusive)
+          format: int64
+          example: 20000000000
         roleId:
           $ref: "#/components/schemas/DiscordRole"
     DiscordTokenRole:
