@@ -7,6 +7,7 @@ import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.ExposedWalletRepository
 import io.hazelnet.community.persistence.ExternalAccountRepository
 import io.hazelnet.community.persistence.VerificationRepository
+import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.data.ExternalAccountType
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
@@ -85,8 +86,22 @@ class ExternalAccountService(
             succeededBy = verification.succeededBy,
         )
         val createdVerification = verificationRepository.save(newVerification);
-        verificationRepository.invalidateOutdatedVerifications(createdVerification.cardanoStakeAddress!!, createdVerification.id!!)
+        invalidateNowOutdatedVerifications(createdVerification)
         return createdVerification
+    }
+
+    fun invalidateNowOutdatedVerifications(createdVerification: Verification) {
+        if (createdVerification.blockchain == BlockchainType.CARDANO) { // For Cardano, we invalidate all stake addresses with the same stake key
+            verificationRepository.invalidateOutdatedVerificationsForStakeAddress(
+                createdVerification.cardanoStakeAddress!!,
+                createdVerification.id!!
+            )
+        } else { // On other blockchains, we outdate all verifications for the same address
+            verificationRepository.invalidateOutdatedVerificationsForAddress(
+                createdVerification.address,
+                createdVerification.id!!
+            )
+        }
     }
 
     fun getVerifiedStakeAddressesForExternalAccount(externalAccountId: Long): Set<String> {

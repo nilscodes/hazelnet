@@ -10,7 +10,6 @@ import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.lang.IllegalStateException
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -23,13 +22,13 @@ class IncomingPaymentService(
     private val config: CommunityApplicationConfiguration,
     private val connectService: ConnectService,
     private val incomingDiscordPaymentRepository: IncomingDiscordPaymentRepository,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val billingService: BillingService,
 ) {
     @Transactional
     fun requestIncomingPayment(guildId: Long, incomingDiscordPaymentRequest: IncomingDiscordPaymentRequest): IncomingDiscordPayment {
         if (config.fundedhandle != null) {
-            val discordServer = discordServerService.getDiscordServer(guildId)
+            val discordServer = discordServerRetriever.getDiscordServer(guildId)
             val existingIncomingPayment = incomingDiscordPaymentRepository.findByDiscordServerId(discordServer.id!!)
             if (existingIncomingPayment.isPresent) {
                 throw IncomingPaymentAlreadyRequestedException("A payment of ${existingIncomingPayment.get().amount} lovelace for guild $guildId is already in progress")
@@ -74,7 +73,7 @@ class IncomingPaymentService(
     }
 
     fun getCurrentPayment(guildId: Long): IncomingDiscordPayment {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return incomingDiscordPaymentRepository.findByDiscordServerId(discordServer.id!!)
             .orElseThrow()
     }

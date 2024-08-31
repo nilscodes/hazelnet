@@ -8,7 +8,7 @@ import io.hazelnet.community.data.discord.DiscordServerMemberStakeImpl
 import io.hazelnet.community.persistence.DiscordServerRepository
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -76,14 +76,14 @@ internal class BillingServiceTest {
                 "stake1u85p5zmf22334d83yzf76femww5zm6cf2cdzfsceehh3eggzfyypy"
             ),
         )
-        val discordServerService = mockk<DiscordServerService>()
-        every { discordServerService.getDiscordServer(testServer.guildId) } returns(testServer)
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
+        every { discordServerRetriever.getDiscordServer(testServer.guildId) } returns(testServer)
         val mockConfig = mockk<CommunityApplicationConfiguration>()
         every { mockConfig.fundedpool } returns "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4"
         val billingService = BillingService(
             mockConfig,
             stakepoolService,
-            discordServerService,
+            discordServerRetriever,
             discordServerRepository,
             mockk(),
             mockk(),
@@ -109,14 +109,14 @@ internal class BillingServiceTest {
                 "stake1u85acdjxss6vl3wlcjalf8ygxydt6frv3getwvs4eqn25gss9a3ff"
             ),
         )
-        val discordServerService = mockk<DiscordServerService>()
-        every { discordServerService.getDiscordServer(testServer.guildId) } returns(testServer)
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
+        every { discordServerRetriever.getDiscordServer(testServer.guildId) } returns(testServer)
         val mockConfig = mockk<CommunityApplicationConfiguration>()
         every { mockConfig.fundedpool } returns "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4"
         val billingService = BillingService(
             mockConfig,
             stakepoolService,
-            discordServerService,
+            discordServerRetriever,
             discordServerRepository,
             mockk(),
             mockk(),

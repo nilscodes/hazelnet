@@ -26,6 +26,31 @@ paths:
                                     $ref: '#/components/schemas/WhitelistSignup'
                 default:
                     $ref: '#/components/responses/DefaultErrorResponse'
+    /community/whitelists/{whitelistName}/autojoin:
+        post:
+            summary: 'Add an autojoin signup for a whitelist'
+            operationId: addWhitelistAutojoin
+            tags:
+                - discord
+                - whitelist
+            parameters:
+                - $ref: '#/components/parameters/WhitelistNamePathParameter'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/NewWhitelistAutojoin"
+            responses:
+                '200':
+                    description: 'The autojoin data added to the whitelist'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/WhitelistAutojoin'
+                default:
+                    $ref: '#/components/responses/DefaultErrorResponse'
     /community/whitelists/shared:
         get:
             summary: 'Get signups for all shared whitelists'
@@ -44,7 +69,27 @@ paths:
                                     $ref: '#/components/schemas/SharedWhitelist'
                 default:
                     $ref: '#/components/responses/DefaultErrorResponse'
-
+    /community/authorizations/{authorizationCode}:
+        post:
+            summary: Confirm an authorization request for a web-role
+            operationId: confirmWebRoleAuthorization
+            tags:
+                - discord
+                - web
+            parameters:
+                - $ref: "#/components/parameters/AuthorizationCodePathParameter"
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DiscordWebRoleConfirmation"
+            responses:
+                "200":
+                    description: "Confirmed web role authorization request"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/DiscordWebRoleAuthorization"
     /community/claimlists/{claimListName}/orders:
         get:
             summary: 'Get orders for a claim list'
@@ -145,6 +190,14 @@ components:
             style: simple
             schema:
                 $ref: "#/components/schemas/TokenPolicyId"
+        AuthorizationCodePathParameter:
+            name: authorizationCode
+            in: path
+            required: true
+            style: simple
+            schema:
+                type: string
+                format: uuid
 
     responses:
         DefaultErrorResponse:
@@ -187,13 +240,81 @@ components:
             type: object
             required:
                 - address
+                - blockchain
             properties:
                 address:
                     $ref: '#/components/schemas/WalletAddress'
+                blockchain:
+                    $ref: '#/components/schemas/BlockchainType'
                 signupTime:
                     type: string
                     format: date-time
                     example: 2021-11-10T13:20:57Z
+
+        NewWhitelistAutojoin:
+            type: object
+            required:
+                - address
+                - blockchain
+            properties:
+                address:
+                    $ref: '#/components/schemas/WalletAddress'
+                blockchain:
+                    $ref: '#/components/schemas/BlockchainType'
+
+        WhitelistAutojoin:
+            type: object
+            required:
+                - address
+                - blockchain
+                - autojoinCreation
+            properties:
+                address:
+                    $ref: '#/components/schemas/WalletAddress'
+                blockchain:
+                    $ref: '#/components/schemas/BlockchainType'
+                autojoinCreation:
+                    description: The time at which this autojoin address was added to the system
+                    type: string
+                    format: date-time
+                    example: 2021-11-10T13:20:57Z
+
+        DiscordWebRoleAuthorization:
+            type: object
+            required:
+                - discordWebRoleId
+                - authorizationCode
+                - requestTime
+            properties:
+                discordWebRoleId:
+                    type: integer
+                    format: int64
+                authorizationCode:
+                    type: string
+                    format: uuid
+                requestTime:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                    example: 2021-11-10T12:21:43Z
+                confirmationId:
+                    type: string
+                    format: uuid
+                confirmationTime:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                    example: 2021-11-10T12:21:43Z
+        DiscordWebRoleConfirmation:
+            type: object
+            properties:
+                roleIds:
+                    description: An optional list of web role IDs to grant. If not provided, all web roles associated with the initial authorization request will be awarded to the user
+                    type: array
+                    items:
+                        type: integer
+                        format: int64
+
         AnonymousPhysicalOrder:
             type: object
             required:
@@ -294,6 +415,8 @@ components:
             enum:
                 - CARDANO
                 - ETHEREUM
+                - POLYGON
+                - BITCOIN
         CreatedResponseHeader:
             type: string
             format: uri

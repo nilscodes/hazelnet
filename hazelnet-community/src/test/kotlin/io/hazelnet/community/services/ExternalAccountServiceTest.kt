@@ -41,6 +41,6 @@ class ExternalAccountServiceTest {
             obsolete = false,
             confirmedAt = Date(),
         ))
-        verify { verificationRepository.invalidateOutdatedVerifications("stake1", 3)}
+        verify { verificationRepository.invalidateOutdatedVerificationsForStakeAddress("stake1", 3)}
     }
 }

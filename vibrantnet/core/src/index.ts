@@ -105,3 +105,4 @@ export * from './types/whitelist/whitelistType';
 
 export * from './util/adahandle';
 export * from './util/cardanoaddress';
+export * from './util/bitcoinaddress';

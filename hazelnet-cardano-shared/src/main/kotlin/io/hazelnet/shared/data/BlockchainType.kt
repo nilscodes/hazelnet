@@ -4,4 +4,5 @@ enum class BlockchainType {
     CARDANO,
     ETHEREUM,
     POLYGON,
+    BITCOIN,
 }

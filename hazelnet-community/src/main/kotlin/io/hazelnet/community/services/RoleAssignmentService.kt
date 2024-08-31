@@ -2,17 +2,20 @@ package io.hazelnet.community.services
 
 import com.bloxbean.cardano.client.util.AssetUtil
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
-import io.hazelnet.cardano.connect.data.token.*
+import io.hazelnet.cardano.connect.data.token.Cip68Token
+import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetCount
+import io.hazelnet.cardano.connect.data.token.TokenOwnershipInfoWithAssetList
 import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.ExternalAccount
 import io.hazelnet.community.data.Verification
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
 import io.hazelnet.community.persistence.DiscordQuizRepository
-import io.hazelnet.community.persistence.DiscordServerRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
 import io.hazelnet.community.services.external.MutantStakingService
 import io.hazelnet.community.services.external.NftCdnService
+import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.decodeHex
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -28,7 +31,7 @@ class RoleAssignmentService(
     private val connectService: ConnectService,
     private val externalAccountService: ExternalAccountService,
     private val rabbitTemplate: RabbitTemplate,
-    private val discordServerRepository: DiscordServerRepository,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val mutantStakingService: MutantStakingService,
     private val whitelistRepository: DiscordWhitelistRepository,
     private val quizRepository: DiscordQuizRepository,
@@ -46,6 +49,7 @@ class RoleAssignmentService(
         val bans = discordBanRepository.findByDiscordServerId(discordServer.id!!)
         val bannedStakeAddresses = bans.filter { it.type == DiscordBanType.STAKE_ADDRESS_BAN }.map { it.pattern }.toSet()
         val allEligibleStakeAddresses = verifications
+            .filter { it.blockchain == BlockchainType.CARDANO } // We only do Cardano token roles currently
             .mapNotNull { it.cardanoStakeAddress }
             .filterNot { bannedStakeAddresses.contains(it) }
         val bannedAssetFingerprints = bans.filter { it.type == DiscordBanType.ASSET_FINGERPRINT_BAN }.map { it.pattern }.toSet()
@@ -99,7 +103,7 @@ class RoleAssignmentService(
                     memberIdsToTokenPolicyOwnershipAssets
                 )
                 if (logger.isDebugEnabled && config.logging?.tokenroles?.externalAccountIds?.contains(verification.externalAccount.id) == true) {
-                    logger.debug("Processing verification ${verification.id} for Discord ID ${verification.externalAccount.referenceId} with the following data:\n$verification")
+                    logger.debug { "Processing verification ${verification.id} for Discord ID ${verification.externalAccount.referenceId} with the following data:\n$verification" }
                 }
                 relevantPolicyIds.forEach { policy ->
                     val tokenListForStakeAddressAndPolicy =
@@ -473,7 +477,9 @@ class RoleAssignmentService(
         val bannedStakeAddresses = bans.filter { it.type == DiscordBanType.STAKE_ADDRESS_BAN }.map { it.pattern }.toSet()
         val memberIdsToDelegationBuckets = mutableMapOf<Long, Map<String, Long>>()
         val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
-        allVerificationsOfMembers.forEach { verification ->
+        allVerificationsOfMembers
+            .filter { it.blockchain == BlockchainType.CARDANO } // Only Cardano addresses can be delegating to a stake pool
+            .forEach { verification ->
             val mapOfExternalAccount = prepareExternalAccountMapForCountBased(
                 verification,
                 externalAccountLookup,
@@ -563,9 +569,8 @@ class RoleAssignmentService(
 
     @Async
     @Transactional
-    fun publishRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
-        val discordServer = discordServerRepository.findByGuildId(guildId)
-            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+    fun publishWalletBasedRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         if (discordServer.tokenRoles.isNotEmpty() || discordServer.delegatorRoles.isNotEmpty()) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             val allVerificationsOfMember =
@@ -579,8 +584,7 @@ class RoleAssignmentService(
     // Cannot be @Async for now because if it is called from external, the transaction that updates the whitelist is not yet committed while this thread starts immediately
     @Transactional
     fun publishWhitelistRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
-        val discordServer = discordServerRepository.findByGuildId(guildId)
-            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         if (discordServer.whitelists.any { it.awardedRole != null }) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             publishWhitelistRoleAssignmentsForGuildMember(discordServer, externalAccount)
@@ -590,8 +594,7 @@ class RoleAssignmentService(
     // Cannot be @Async for now because if it is called from external, the transaction that updates the whitelist is not yet committed while this thread starts immediately
     @Transactional
     fun publishQuizRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
-        val discordServer = discordServerRepository.findByGuildId(guildId)
-            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quizzes = quizRepository.findByDiscordServerId(discordServer.id!!)
         if (quizzes.any { it.awardedRole != null }) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
@@ -602,7 +605,7 @@ class RoleAssignmentService(
     @Async
     @Transactional
     fun publishRoleAssignmentsForGuildMemberOnAllServers(externalAccountId: Long) {
-        val discordServers = discordServerRepository.getDiscordServersForMember(externalAccountId = externalAccountId)
+        val discordServers = discordServerRetriever.getDiscordServersForMember(externalAccountId = externalAccountId)
         if (discordServers.isNotEmpty()) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             val allVerificationsOfMember =
@@ -686,8 +689,7 @@ class RoleAssignmentService(
 
     @Async
     fun publishRemoveRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
-        val discordServer = discordServerRepository.findByGuildId(guildId)
-            .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
         fun publishRoleRemoval(roleType: String) {
             rabbitTemplate.convertAndSend(

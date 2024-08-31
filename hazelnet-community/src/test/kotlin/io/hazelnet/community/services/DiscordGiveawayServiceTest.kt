@@ -270,8 +270,8 @@ internal class DiscordGiveawayServiceTest {
         ), false, 1, false)
         basicGiveaway.group = "potatoes"
 
-        val discordServerService = mockk<DiscordServerService>()
-        every { discordServerService.getDiscordServer(testServer.guildId) } returns testServer
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
+        every { discordServerRetriever.getDiscordServer(testServer.guildId) } returns testServer
 
         val externalAccountRepository = mockk<ExternalAccountRepository>()
         every { externalAccountRepository.findById(any()) } returns Optional.of(ExternalAccount(1, "12", "shared", Date(), ExternalAccountType.DISCORD, null, false, mutableSetOf()))
@@ -282,7 +282,7 @@ internal class DiscordGiveawayServiceTest {
         every { giveawayRepository.findWinnersOfGroupExcept(2, 12, "potatoes") } returns listOf(1, 3)
         every { giveawayRepository.save(any()) } returnsArgument 0
 
-        val giveawayService = DiscordGiveawayService(giveawayRepository, discordServerService, externalAccountService, mockk(), mockk())
+        val giveawayService = DiscordGiveawayService(giveawayRepository, discordServerRetriever, externalAccountService, mockk(), mockk())
 
         for (i in 1..100) {
             giveawayService.drawWinners(testServer.guildId, basicGiveaway.id!!)

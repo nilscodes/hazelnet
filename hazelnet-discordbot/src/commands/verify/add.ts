@@ -3,7 +3,9 @@ import i18n from 'i18n';
 import NodeCache from 'node-cache';
 import {
   Account, cardanoaddress, adahandle, DiscordServer, ExternalAccount, Verification,
+  bitcoinaddress,
 } from '@vibrantnet/core';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from 'discord.js';
 import { BotSubcommand } from '../../utility/commandtypes';
 import embedBuilder from '../../utility/embedbuilder';
 import { AugmentedButtonInteraction } from '../../utility/hazelnetclient';
@@ -12,10 +14,22 @@ import verifyutil from '../../utility/verify';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const wait = require('util').promisify(setTimeout);
 
+const baseUrl = process.env.VIBRANTNET_WEBSITE_URL || 'https://www.vibrantnet.io';
+
 interface VerifyAddCommand extends BotSubcommand {
   cache: NodeCache
   confirmExposeWalletsDenied(interaction: AugmentedButtonInteraction, externalAccount: ExternalAccount, discordServer: DiscordServer): Promise<void>
   confirmExposeWalletsSuccess(interaction: AugmentedButtonInteraction, walletsToExpose: string[], existingConfirmedVerifications: Verification[], externalAccount: ExternalAccount, discordServer: DiscordServer): Promise<void>
+}
+
+function getWebsiteVerificationComponents(guildId: string, locale: string) {
+  return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
+    .addComponents(
+      new ButtonBuilder()
+        .setURL(`${baseUrl}/app/wallets?guildId=${guildId}`)
+        .setLabel(i18n.__({ phrase: 'verify.add.widgetLinkButton', locale }))
+        .setStyle(ButtonStyle.Link),
+    )];
 }
 
 export default <VerifyAddCommand> {
@@ -114,6 +128,10 @@ export default <VerifyAddCommand> {
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.blacklistedTitle', locale }), i18n.__({ phrase: 'verify.add.blacklisted', locale }), 'verify-link');
           await interaction.editReply({ embeds: [embed] });
         }
+      } else if (bitcoinaddress.isTaprootAddress(addressToVerify)) {
+        const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.bitcoinInstructions', locale }), 'verify-add');
+        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale);
+        await interaction.editReply({ embeds: [embed], components });
       } else {
         const addressError = handle !== null ? 'verify.add.verificationInvalidHandle' : 'verify.add.verificationInvalidAddress';
         const failureEmbed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: addressError, locale }, {
@@ -161,7 +179,8 @@ export default <VerifyAddCommand> {
       } else {
         const instructions = i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
-        await interaction.followUp({ ephemeral: true, embeds: [embed] });
+        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale);
+        await interaction.followUp({ ephemeral: true, embeds: [embed], components });
       }
     } else if (interaction.customId === 'verify/add/exposewalletsconfirm' && currentMemberData /* Only expose linked users */) {
       const walletsToExpose = this.cache.take(`${interaction.guild!.id}-${interaction.user.id}`) as string[];

@@ -15,25 +15,25 @@ import kotlin.random.Random
 @Service
 class DiscordGiveawayService(
     private val discordGiveawayRepository: DiscordGiveawayRepository,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val externalAccountService: ExternalAccountService,
     private val snapshotService: MultiAssetSnapshotService,
     private val cardanoTokenRegistryService: CardanoTokenRegistryService,
 ) {
     fun listGiveaways(guildId: Long): List<DiscordGiveaway> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordGiveawayRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addGiveaway(guildId: Long, discordGiveaway: DiscordGiveaway): DiscordGiveaway {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordGiveaway.discordServer = discordServer
         discordGiveaway.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordGiveawayRepository.save(discordGiveaway)
     }
 
     fun updateGiveaway(guildId: Long, giveawayId: Int, discordGiveawayPartial: DiscordGiveawayPartial): DiscordGiveaway {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val giveaway = getGiveaway(discordServer, giveawayId)
         if (discordGiveawayPartial.channelId != null) {
             giveaway.channelId = discordGiveawayPartial.channelId
@@ -70,13 +70,13 @@ class DiscordGiveawayService(
     }
 
     fun deleteGiveaway(guildId: Long, giveawayId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val giveaway = getGiveaway(discordServer, giveawayId)
         discordGiveawayRepository.delete(giveaway)
     }
 
     fun getGiveaway(guildId: Long, giveawayId: Int): DiscordGiveaway {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getGiveaway(discordServer, giveawayId)
     }
 
@@ -226,7 +226,7 @@ class DiscordGiveawayService(
     }
 
     fun getTokenRegistryMetadataForGiveaway(guildId: Long, giveawayId: Int): TokenMetadata? {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val giveaway = getGiveaway(discordServer, giveawayId)
         if (giveaway.snapshotIds.size == 1) {
             val assetFingerprint = snapshotService.getAssetFingerprintForSnapshot(giveaway.snapshotIds.first())

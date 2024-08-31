@@ -152,7 +152,7 @@ internal class WhitelistServiceTest {
         )
         )
 
-        val mockDiscordServerService = getMockDiscordServerService()
+        val mockDiscordServerService = getMockDiscordServerRetriever()
         every {
             mockDiscordServerService.getDiscordServerByInternalId(sharedServer.id!!)
         } returns sharedServer
@@ -180,7 +180,7 @@ internal class WhitelistServiceTest {
             mockWhitelistRepository.save(capture(whitelistSaveSlot))
         }.answers { whitelistSaveSlot.captured }
         val whitelistService = WhitelistService(
-            getMockDiscordServerService(),
+            getMockDiscordServerRetriever(),
             mockk(),
             mockk(),
             mockWhitelistRepository,
@@ -189,9 +189,9 @@ internal class WhitelistServiceTest {
         return Pair(whitelistSaveSlot, whitelistService)
     }
 
-    private fun getMockDiscordServerService(): DiscordServerService {
-        val discordServerService = mockk<DiscordServerService>()
-        every { discordServerService.getDiscordServer(testServer.guildId) } returns testServer
-        return discordServerService
+    private fun getMockDiscordServerRetriever(): DiscordServerRetriever {
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
+        every { discordServerRetriever.getDiscordServer(testServer.guildId) } returns testServer
+        return discordServerRetriever
     }
 }

@@ -10,23 +10,23 @@ import java.util.*
 @Service
 class DiscordQuizService(
     private val discordQuizRepository: DiscordQuizRepository,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val roleAssignmentService: RoleAssignmentService,
 ) {
     fun listQuizzes(guildId: Long): List<DiscordQuiz> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordQuizRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addQuiz(guildId: Long, discordQuiz: DiscordQuiz): DiscordQuiz {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordQuiz.discordServer = discordServer
         discordQuiz.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordQuizRepository.save(discordQuiz)
     }
 
     fun updateQuiz(guildId: Long, quizId: Int, discordQuizPartial: DiscordQuizPartial): DiscordQuiz {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         if (discordQuizPartial.channelId != null) {
             quiz.channelId = discordQuizPartial.channelId
@@ -72,13 +72,13 @@ class DiscordQuizService(
     }
 
     fun deleteQuiz(guildId: Long, quizId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         discordQuizRepository.delete(quiz)
     }
 
     fun getQuiz(guildId: Long, quizId: Int): DiscordQuiz {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getQuiz(discordServer, quizId)
     }
 
@@ -102,13 +102,13 @@ class DiscordQuizService(
     }
 
     fun listQuizQuestions(guildId: Long, quizId: Int): Set<DiscordQuizQuestion> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         return quiz.questions
     }
 
     fun addQuizQuestion(guildId: Long, quizId: Int, discordQuizQuestion: DiscordQuizQuestion): DiscordQuizQuestion {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         quiz.questions.add(discordQuizQuestion)
         discordQuizRepository.save(quiz)
@@ -116,7 +116,7 @@ class DiscordQuizService(
     }
 
     fun getQuizQuestion(guildId: Long, quizId: Int, quizQuestionId: Int): DiscordQuizQuestion {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         val question = quiz.questions.find { it.id == quizQuestionId }
         if (question != null) {
@@ -126,20 +126,20 @@ class DiscordQuizService(
     }
 
     fun deleteQuizQuestion(guildId: Long, quizId: Int, quizQuestionId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         quiz.questions.removeIf { it.id == quizQuestionId }
         discordQuizRepository.save(quiz)
     }
 
     fun listQuizCompletions(guildId: Long, quizId: Int): Set<DiscordQuizCompletion> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         return quiz.completions
     }
 
     fun addQuizCompletion(guildId: Long, quizId: Int, discordQuizCompletion: DiscordQuizCompletion): DiscordQuizCompletion {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         quiz.completions.removeIf { it.externalAccountId == discordQuizCompletion.externalAccountId }
         discordQuizCompletion.time = Date.from(ZonedDateTime.now().toInstant())
@@ -152,7 +152,7 @@ class DiscordQuizService(
     }
 
     fun getQuizCompletionForExternalAccount(guildId: Long, quizId: Int, externalAccountId: Long): DiscordQuizCompletion {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         val completion = quiz.completions.find { it.externalAccountId == externalAccountId }
         if (completion != null) {
@@ -162,7 +162,7 @@ class DiscordQuizService(
     }
 
     fun deleteQuizCompletionForExternalAccount(guildId: Long, quizId: Int, externalAccountId: Long) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val quiz = getQuiz(discordServer, quizId)
         val removed = quiz.completions.removeIf { it.externalAccountId == externalAccountId }
         if (removed) {

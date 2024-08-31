@@ -9,28 +9,28 @@ import java.util.*
 
 @Service
 class DiscordBanService(
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val discordBanRepository: DiscordBanRepository,
 ) {
     fun listBans(guildId: Long): List<DiscordBan> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordBanRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addBan(guildId: Long, discordBan: DiscordBan): DiscordBan {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordBan.discordServerId = discordServer.id
         discordBan.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordBanRepository.save(discordBan)
     }
 
     fun getBan(guildId: Long, banId: Int): Any {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getBan(discordServer, banId)
     }
 
     fun deleteBan(guildId: Long, banId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val ban = getBan(discordServer, banId)
         discordBanRepository.delete(ban)
     }

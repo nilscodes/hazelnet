@@ -13,34 +13,32 @@ import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
 
-private val logger = KotlinLogging.logger {}
-
 @Service
 class DiscordReminderService(
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val discordReminderRepository: DiscordReminderRepository,
     private val connectService: ConnectService,
     private val rabbitTemplate: RabbitTemplate,
 ) {
     fun listReminders(guildId: Long): List<DiscordReminder> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordReminderRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addReminder(guildId: Long, discordReminder: DiscordReminder): DiscordReminder {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordReminder.discordServerId = discordServer.id
         discordReminder.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordReminderRepository.save(discordReminder)
     }
 
     fun getReminder(guildId: Long, reminderId: Int): Any {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getReminder(discordServer, reminderId)
     }
 
     fun deleteReminder(guildId: Long, reminderId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val reminder = getReminder(discordServer, reminderId)
         discordReminderRepository.delete(reminder)
     }
@@ -67,7 +65,7 @@ class DiscordReminderService(
 
     private fun sendReminder(reminder: DiscordReminder, epochDetails: EpochDetails) {
         try {
-            val discordServer = discordServerService.getDiscordServerByInternalId(reminder.discordServerId!!)
+            val discordServer = discordServerRetriever.getDiscordServerByInternalId(reminder.discordServerId!!)
             val reminderMessageRequest = ReminderInfo(discordServer.guildId, reminder.id!!)
             rabbitTemplate.convertAndSend("scheduledreminders", reminderMessageRequest)
             reminder.lastEpochSent = epochDetails.epochNo
@@ -76,6 +74,10 @@ class DiscordReminderService(
         } catch (e: Exception) {
             logger.error(e) { "Error sending reminder ${reminder.id} to Discord server ${reminder.discordServerId}" }
         }
+    }
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 
 }

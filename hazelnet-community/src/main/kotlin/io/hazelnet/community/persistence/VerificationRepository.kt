@@ -28,8 +28,13 @@ interface VerificationRepository : CrudRepository<Verification, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Verification SET succeededBy=:successorVerification, obsolete=true WHERE confirmed=true AND obsolete=false AND cardanoStakeAddress=:stakeAddress AND id<>:successorVerification") // Cannot use now() or current_timestamp, need to pass the time in as parameter to get the correct time zone
-    fun invalidateOutdatedVerifications(@Param("stakeAddress") stakeAddress: String, @Param("successorVerification") successorVerification: Long)
+    @Query("UPDATE Verification SET succeededBy=:successorVerification, obsolete=true WHERE confirmed=true AND obsolete=false AND cardanoStakeAddress=:stakeAddress AND id<>:successorVerification")
+    fun invalidateOutdatedVerificationsForStakeAddress(@Param("stakeAddress") stakeAddress: String, @Param("successorVerification") successorVerification: Long)
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Verification SET succeededBy=:successorVerification, obsolete=true WHERE confirmed=true AND obsolete=false AND address=:address AND id<>:successorVerification")
+    fun invalidateOutdatedVerificationsForAddress(@Param("address") address: String, @Param("successorVerification") successorVerification: Long)
 
     @Query("SELECT v FROM Verification v WHERE v.confirmed=false AND v.obsolete=false")
     fun findAllOutstanding() : List<Verification>

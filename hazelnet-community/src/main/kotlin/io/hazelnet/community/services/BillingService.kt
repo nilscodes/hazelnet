@@ -30,7 +30,7 @@ val REFERRAL_BONUS_MONTHS = mapOf(Pair("re23", 30))
 class BillingService(
     private val config: CommunityApplicationConfiguration,
     private val stakepoolService: StakepoolService,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val discordServerRepository: DiscordServerRepository,
     private val billingRepository: DiscordBillingRepository,
     private val paymentRepository: DiscordPaymentRepository,
@@ -80,7 +80,7 @@ class BillingService(
 
     fun billPremiumStatusWithTimes(currentTime: ZonedDateTime, endOfMonth: ZonedDateTime) {
         val percentageOfMonthCompleted = (currentTime.dayOfMonth - 1.0) / endOfMonth.dayOfMonth
-        val discordServers = discordServerService.getDiscordServers()
+        val discordServers = discordServerRetriever.getDiscordServers()
         discordServers.forEach { discordServer ->
             if (discordServer.premiumUntil == null || currentTime.isAfter(ZonedDateTime.ofInstant(discordServer.premiumUntil!!.toInstant(), ZoneId.of("UTC")))) {
                 val premiumInfo = getPremiumInfoForServer(discordServer, false)
@@ -101,7 +101,7 @@ class BillingService(
     }
 
     fun getPremiumInfo(guildId: Long): DiscordServerPremiumInfo {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getPremiumInfoForServer(discordServer, true)
     }
 
@@ -129,7 +129,7 @@ class BillingService(
 
     fun getBotFunding(guildId: Long): Long {
         if(config.fundedpool != null) {
-            val discordServer = discordServerService.getDiscordServer(guildId)
+            val discordServer = discordServerRetriever.getDiscordServer(guildId)
             val discordMemberDelegations = discordServerRepository.getDiscordMembersWithStakeAndPremiumPledge(discordServer.id!!)
             val stakeAddressesOnThisServer = discordMemberDelegations
                 .filter { it.getDiscordServerId() == discordServer.id }

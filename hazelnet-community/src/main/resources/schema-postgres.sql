@@ -1,4 +1,10 @@
 DROP TABLE IF EXISTS "exposed_wallets";
+DROP TABLE IF EXISTS "discord_bans";
+DROP TABLE IF EXISTS "discord_reminders";
+DROP TABLE IF EXISTS "discord_quiz_completion";
+DROP TABLE IF EXISTS "discord_quiz_questions";
+DROP TABLE IF EXISTS "discord_quiz_required_roles";
+DROP TABLE IF EXISTS "discord_quiz";
 DROP TABLE IF EXISTS "discord_activity";
 DROP TABLE IF EXISTS "discord_marketplace_markets";
 DROP TABLE IF EXISTS "discord_marketplace_filters";
@@ -19,6 +25,7 @@ DROP TABLE IF EXISTS "discord_poll_options";
 DROP TABLE IF EXISTS "discord_poll_required_roles";
 DROP TABLE IF EXISTS "discord_polls";
 DROP TABLE IF EXISTS "stake_snapshot_cardano";
+DROP TABLE IF EXISTS "discord_whitelists_autojoin";
 DROP TABLE IF EXISTS "discord_whitelists_required_roles";
 DROP TABLE IF EXISTS "discord_whitelists_blockchains";
 DROP TABLE IF EXISTS "discord_whitelists_signup";
@@ -55,7 +62,8 @@ CREATE TYPE "accounts_external_type" AS ENUM (
 CREATE TYPE "blockchain_type" AS ENUM (
     'CARDANO',
     'ETHEREUM',
-    'POLYGON'
+    'POLYGON',
+    'BITCOIN'
 );
 
 CREATE TABLE "accounts"
@@ -287,13 +295,23 @@ CREATE TABLE "discord_whitelists"
     UNIQUE ("discord_server_id", "whitelist_name")
 );
 
+CREATE TABLE "discord_whitelists_autojoin"
+(
+    "discord_whitelist_id" bigint,
+    "address"              varchar(150),
+    "blockchain"           blockchain_type NOT NULL,
+    "autojoin_creation"    timestamp       NOT NULL,
+    UNIQUE ("discord_whitelist_id", "address", "blockchain")
+);
+
 CREATE TABLE "discord_whitelists_signup"
 (
-    "discord_whitelist_id"      bigint,
-    "external_account_id"       bigint,
-    "address"                   varchar(150),
-    "signup_time"               timestamp NOT NULL,
-    UNIQUE("discord_whitelist_id", "external_account_id")
+    "discord_whitelist_id" bigint,
+    "external_account_id"  bigint,
+    "address"              varchar(150),
+    "blockchain"           blockchain_type,
+    "signup_time"          timestamp       NOT NULL,
+    UNIQUE ("discord_whitelist_id", "external_account_id")
 );
 
 CREATE TABLE "discord_whitelists_required_roles"

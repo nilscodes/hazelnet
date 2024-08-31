@@ -230,8 +230,7 @@ paths:
                 $ref: "#/components/schemas/Verification"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /externalaccounts/{externalAccountId}/exposedwallets:
     get:
       summary: "Get all exposed wallets for this external account based on optional filter criteria"
@@ -340,7 +339,7 @@ paths:
   /externalaccounts/{externalAccountId}/premium:
     get:
       summary: "Get Premium data for this specific account"
-      operationId: getPremiumInfoForAccount
+      operationId: getPremiumInfo
       tags:
         - account
         - premium
@@ -425,6 +424,59 @@ paths:
         - account
       parameters:
         - $ref: "#/components/parameters/DiscordUserIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExternalAccount"
+      responses:
+        "200":
+          description: "External Account Info that was created or matching existing external account"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalAccount"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /externalaccounts/twitter/{twitterUserId}:
+    get:
+      summary: Get external account matching a Twitter user ID
+      operationId: getExternalAccountForTwitterUser
+      tags:
+        - account
+      parameters:
+        - $ref: "#/components/parameters/TwitterUserIdPathParameter"
+      responses:
+        "200":
+          description: "External Account Info that was created or matching existing external account"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalAccount"
+        "404":
+          description: No external account found for this Twitter user ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: "Create/Retrieve External account for Twitter user"
+      operationId: setExternalAccountForTwitterUser
+      tags:
+        - account
+      parameters:
+        - $ref: "#/components/parameters/TwitterUserIdPathParameter"
       requestBody:
         content:
           application/json:
@@ -581,8 +633,7 @@ paths:
                 $ref: "#/components/schemas/ExternalAccountPing"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists:
     post:
       summary: Add Claim List
@@ -603,8 +654,7 @@ paths:
                 $ref: "#/components/schemas/ClaimList"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists/{claimListId}:
     get:
       summary: Get Claim List
@@ -658,8 +708,7 @@ paths:
                 $ref: "#/components/schemas/PhysicalOrder"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /claimlists/{claimListId}/orders/physical/{orderId}:
     get:
       summary: Get physical order by order ID
@@ -697,8 +746,7 @@ paths:
                 $ref: "#/components/schemas/PhysicalProduct"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /products/{productId}:
     get:
       summary: Get Product Info
@@ -749,8 +797,7 @@ paths:
                 $ref: "#/components/schemas/DiscordServer"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}:
     get:
       summary: Get Discord Server Details
@@ -785,6 +832,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscordServer"
+  /discord/servers/{guildId}/authorizations:
+    post:
+      summary: Request an authorization code for a web-role
+      operationId: requestWebRoleAuthorization
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordWebRoleAuthorizationRequest"
+      responses:
+        "201":
+          description: "Added web role authorization request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordWebRoleAuthorization"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/authorizations/{authorizationCode}:
+    post:
+      summary: Confirm an authorization request for a web-role
+      operationId: confirmWebRoleAuthorization
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/AuthorizationCodePathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordWebRoleConfirmation"
+      responses:
+        "200":
+          description: "Confirmed web role authorization request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordWebRoleAuthorization"
   /discord/servers/{guildId}/bans:
     get:
       summary: Get the current set of bans active on this Discord
@@ -825,8 +918,7 @@ paths:
                 $ref: "#/components/schemas/DiscordBan"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/bans/{banId}:
     get:
       summary: Get details of a specific ban
@@ -954,6 +1046,23 @@ paths:
       responses:
         "200":
           description: "Role assignment list for token roles"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordRoleAssignment"
+  /discord/servers/{guildId}/roleassignments/webroles:
+    get:
+      summary: Get the current set of web-verification role assignments for this server
+      operationId: getCurrentWebVerificationRoleAssignments
+      tags:
+        - discord
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Role assignment list for web roles"
           content:
             application/json:
               schema:
@@ -1209,7 +1318,7 @@ paths:
   /discord/servers/{guildId}/premium:
     get:
       summary: Get the information about the premium status of this server
-      operationId: getPremiumInfoForServer
+      operationId: getPremiumInfo
       tags:
         - discord
         - premium
@@ -1351,8 +1460,7 @@ paths:
                 $ref: "#/components/schemas/TokenPolicy"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/tokenpolicies/{policyId}:
     delete:
       summary: Remove an official token policy from this discord server
@@ -1406,8 +1514,7 @@ paths:
                 $ref: "#/components/schemas/Stakepool"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/stakepools/{poolHash}:
     delete:
       summary: Remove an official stakepool from this discord server
@@ -1464,8 +1571,7 @@ paths:
                 $ref: "#/components/schemas/DiscordDelegatorRole"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/delegatorroles/{delegatorRoleId}:
     delete:
       summary: Remove a delegator role assignment from this discord server
@@ -1519,8 +1625,7 @@ paths:
                 $ref: "#/components/schemas/DiscordTokenRole"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}:
     patch:
       summary: Update a token role
@@ -1579,8 +1684,7 @@ paths:
                 $ref: "#/components/schemas/MetadataFilter"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/tokenroles/{tokenRoleId}/metadatafilters/{filterId}:
     delete:
       summary: Remove a metadata filter from the designated token role
@@ -1592,6 +1696,81 @@ paths:
         - $ref: "#/components/parameters/GuildIdPathParameter"
         - $ref: "#/components/parameters/TokenRoleIdPathParameter"
         - $ref: "#/components/parameters/TokenRoleFilterIdPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+  /discord/servers/{guildId}/webroles:
+    get:
+      summary: Get all auto-assigned roles based on web verification flows for this discord server
+      operationId: listWebVerificationRoles
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "All current web roles"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordWebRole"
+    post:
+      summary: Add an auto-assigned role based on web verification to this discord server
+      operationId: addWebVerificationRole
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordWebRole"
+      responses:
+        "201":
+          description: "Newly created web role"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordWebRole"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/webroles/{webRoleId}:
+    patch:
+      summary: Update a web role
+      operationId: updateWebVerificationRole
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WebRoleIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordWebRolePartial"
+      responses:
+        "200":
+          description: "Updated web role"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordWebRole"
+    delete:
+      summary: Remove a web role assignment from this discord server
+      operationId: deleteWebVerificationRole
+      tags:
+        - discord
+        - web
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WebRoleIdPathParameter"
       responses:
         "204":
           description: Successful deletion
@@ -1641,8 +1820,7 @@ paths:
                 $ref: "#/components/schemas/DiscordPoll"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/polls/{pollId}:
     get:
       summary: "Get specific poll for this Discord server"
@@ -1817,8 +1995,7 @@ paths:
                 $ref: "#/components/schemas/DiscordGiveaway"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/giveaways/{giveawayId}:
     get:
       summary: "Get specific giveaway for this Discord server"
@@ -2037,8 +2214,7 @@ paths:
                 $ref: "#/components/schemas/DiscordQuiz"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/quizzes/{quizId}:
     get:
       summary: "Get specific quiz for this Discord server"
@@ -2202,8 +2378,7 @@ paths:
                 $ref: "#/components/schemas/DiscordQuizCompletion"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/quizzes/{quizId}/completions/{externalAccountId}:
     get:
       summary: "Get one specific question for a specific quiz"
@@ -2277,8 +2452,7 @@ paths:
                 $ref: "#/components/schemas/DiscordMarketplaceChannel"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}:
     get:
       summary: "Get specific marketplace channel for this Discord server"
@@ -2332,8 +2506,7 @@ paths:
                 $ref: "#/components/schemas/MetadataFilter"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/marketplaces/channels/{marketplaceChannelId}/metadatafilters/{filterId}:
     delete:
       summary: Remove a metadata filter from the designated marketplace channel
@@ -2388,8 +2561,7 @@ paths:
                 $ref: "#/components/schemas/Whitelist"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/whitelists/shared:
     get:
       summary: Get external whitelists shared with this Discord server
@@ -2449,6 +2621,28 @@ paths:
       responses:
         "204":
           description: Successful deletion
+  /discord/servers/{guildId}/whitelists/{whitelistId}/autojoin:
+    post:
+      summary: 'Add an autojoin signup for a whitelist'
+      operationId: addWhitelistAutojoin
+      tags:
+        - discord
+        - whitelist
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/WhitelistIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewWhitelistAutojoin"
+      responses:
+        "200":
+          description: 'The autojoin data added to the whitelist'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhitelistAutojoin"
   /discord/servers/{guildId}/whitelists/{whitelistId}/signups:
     get:
       summary: "Get signups for a whitelist"
@@ -2497,8 +2691,7 @@ paths:
                 $ref: "#/components/schemas/WhitelistSignup"
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
         "400":
           description: "Failed signup due to conditions not being met"
           content:
@@ -2551,7 +2744,7 @@ paths:
   /discord/servers/{guildId}/settings/{settingName}:
     put:
       summary: Create or update a guild setting with the provided value
-      operationId: updateServerSetting
+      operationId: updateDiscordServerSetting
       tags:
         - discord
       parameters:
@@ -2571,7 +2764,7 @@ paths:
                 $ref: "#/components/schemas/EmbeddableSetting"
     delete:
       summary: "Delete guild setting by Name"
-      operationId: deleteServerSetting
+      operationId: deleteDiscordServerSetting
       tags:
         - discord
       parameters:
@@ -2598,8 +2791,7 @@ paths:
                 type: string
           headers:
             Location:
-              schema:
-                $ref: "#/components/schemas/CreatedResponseHeader"
+              $ref: "#/components/schemas/CreatedResponseHeader"
     delete:
       summary: Delete the currently active access token for this Discord server
       operationId: deleteAccessToken
@@ -2783,6 +2975,14 @@ components:
       style: simple
       schema:
         $ref: "#/components/schemas/DiscordUser"
+    TwitterUserIdPathParameter:
+      name: twitterUserId
+      in: path
+      description: The Twitter Users's ID
+      required: true
+      style: simple
+      schema:
+        $ref: "#/components/schemas/TwitterUser"
     PingIdPathParameter:
       name: pingId
       in: path
@@ -2856,6 +3056,16 @@ components:
       required: true
       style: simple
       example: 2
+      schema:
+        type: integer
+        format: int64
+    WebRoleIdPathParameter:
+      name: webRoleId
+      in: path
+      description: The ID of this web verification role assignment
+      required: true
+      style: simple
+      example: 1529
       schema:
         type: integer
         format: int64
@@ -2989,6 +3199,14 @@ components:
           value: 231
       schema:
         type: string
+    AuthorizationCodePathParameter:
+      name: authorizationCode
+      in: path
+      required: true
+      style: simple
+      schema:
+        type: string
+        format: uuid
     SettingNamePathParameter:
       name: settingName
       in: path
@@ -3748,6 +3966,80 @@ components:
           format: int32
           default: 1
           description: Gives tokens matched by this filter a different weight when used in token roles with the EVERY_POLICY_FILTERED_OR aggregation type
+    DiscordWebRole:
+      type: object
+      required:
+        - authorizationBaseUrl
+        - roleId
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        authorizationBaseUrl:
+          type: string
+          format: uri
+        roleId:
+          $ref: "#/components/schemas/DiscordRole"
+    DiscordWebRolePartial:
+      type: object
+      properties:
+        authorizationBaseUrl:
+          type: string
+          format: uri
+        roleId:
+          $ref: "#/components/schemas/DiscordRole"
+    DiscordWebRoleAuthorizationRequest:
+      type: object
+      required:
+        - externalAccountId
+      properties:
+        externalAccountId:
+          type: integer
+          format: int64
+    DiscordWebRoleAuthorization:
+      type: object
+      required:
+        - id
+        - discordWebRoleId
+        - externalAccountId
+        - authorizationCode
+        - requestTime
+      properties:
+        id:
+          type: integer
+          format: int64
+        discordWebRoleId:
+          type: integer
+          format: int64
+        externalAccountId:
+          type: integer
+          format: int64
+        authorizationCode:
+          type: string
+          format: uuid
+        requestTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+        confirmationId:
+          type: string
+          format: uuid
+        confirmationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          example: 2021-11-10T12:21:43Z
+    DiscordWebRoleConfirmation:
+      type: object
+      properties:
+        roleIds:
+          description: An optional list of web role IDs to grant. If not provided, all web roles associated with the initial authorization request will be awarded to the user
+          type: array
+          items:
+            type: integer
+            format: int64
     DiscordPoll:
       type: object
       required:
@@ -4350,6 +4642,10 @@ components:
         maxCount:
           type: integer
           format: int64
+        cip68:
+          description: If the mint policy is CIP-0068, we halve the tokenCount during display
+          type: boolean
+          default: false
     TokenMetadata:
       type: object
       required:
@@ -4863,6 +5159,11 @@ components:
       type: integer
       format: int64
       example: 468589032310412
+    TwitterUser:
+      description: Snowflake ID matching a Twitter user
+      type: integer
+      format: int64
+      example: 1256468171122282497
     StakeAddressView:
       type: string
       description: The staking address of a wallet, in viewable format
