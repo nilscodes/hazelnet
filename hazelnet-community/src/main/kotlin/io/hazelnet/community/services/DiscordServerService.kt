@@ -31,6 +31,7 @@ class DiscordServerService(
     private val verificationService: VerificationService,
     private val connectService: ConnectService,
     private val discordServerRepository: DiscordServerRepository,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val discordDelegatorRoleRepository: DiscordDelegatorRoleRepository,
     private val discordTokenOwnershipRoleRepository: DiscordTokenOwnershipRoleRepository,
     private val discordTokenRoleMetadataFilterRepository: DiscordTokenRoleMetadataFilterRepository,
@@ -41,9 +42,9 @@ class DiscordServerService(
     private val discordMemberActivityRepository: DiscordMemberActivityRepository,
     private val rabbitTemplate: RabbitTemplate,
     private val apiTokenService: ApiTokenService,
-    private val config: CommunityApplicationConfiguration,
     tokenOwnershipRoleRepository: TokenOwnershipRoleRepository,
     meterRegistry: MeterRegistry,
+    private val whitelistService: WhitelistService,
 ) {
     private val lastManualUserLinking: MutableMap<Long, Date> = mutableMapOf()
 
@@ -98,25 +99,16 @@ class DiscordServerService(
         }
     }
 
-    fun getDiscordServer(guildId: Long): DiscordServer {
-        return discordServerRepository.findByGuildId(guildId)
-                .orElseThrow { NoSuchElementException("No Discord Server with guild ID $guildId found") }
-    }
 
     fun getDiscordServerWithStakepoolInfo(guildId: Long): DiscordServer {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val stakepoolMap = stakepoolService.getStakepools()
         discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
         return discordServer
     }
 
-    fun getDiscordServerByInternalId(serverId: Int): DiscordServer {
-        return discordServerRepository.findById(serverId)
-            .orElseThrow { NoSuchElementException("No Discord Server with server ID $serverId found") }
-    }
-
     fun updateDiscordServer(guildId: Long, discordServerPartial: DiscordServerPartial): DiscordServer {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         if (discordServerPartial.guildMemberCount != null) {
             discordServer.guildMemberCount = discordServerPartial.guildMemberCount
             discordServer.guildMemberUpdateTime = Date.from(ZonedDateTime.now().toInstant())
@@ -137,14 +129,14 @@ class DiscordServerService(
     }
 
     fun addTokenPolicy(guildId: Long, tokenPolicy: TokenPolicy): TokenPolicy {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.tokenPolicies.add(tokenPolicy)
         discordServerRepository.save(discordServer)
         return tokenPolicy
     }
 
     fun addStakepool(guildId: Long, stakepool: Stakepool): Stakepool {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         this.confirmValidPoolAndUpdateHashIfNeeded(stakepool)
         discordServer.stakepools.add(stakepool)
         discordServerRepository.save(discordServer)
@@ -172,7 +164,7 @@ class DiscordServerService(
     }
 
     fun addDelegatorRole(guildId: Long, delegatorRole: DelegatorRole): DelegatorRole {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         this.confirmValidPoolAndUpdateHashIfNeeded(delegatorRole)
         discordDelegatorRoleRepository.save(delegatorRole)
         discordServer.delegatorRoles.add(delegatorRole)
@@ -192,7 +184,7 @@ class DiscordServerService(
     }
 
     fun addTokenOwnershipRole(guildId: Long, tokenOwnershipRole: TokenOwnershipRole): TokenOwnershipRole {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordTokenOwnershipRoleRepository.save(tokenOwnershipRole)
         discordServer.tokenRoles.add(tokenOwnershipRole)
         discordServerRepository.save(discordServer)
@@ -233,22 +225,27 @@ class DiscordServerService(
 
     @Transactional
     fun addMember(guildId: Long, discordMember: DiscordMember): DiscordMember {
-        val discordServer = getDiscordServer(guildId)
-        discordMember.joinTime = Date.from(ZonedDateTime.now().toInstant())
-        discordServer.members.add(discordMember)
-        discordServerRepository.save(discordServer)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
+        var existingMember = discordServer.members.find { it.externalAccountId == discordMember.externalAccountId }
+        if (existingMember == null) {
+            discordMember.joinTime = Date.from(ZonedDateTime.now().toInstant())
+            discordServer.members.add(discordMember)
+            discordServerRepository.save(discordServer)
+            existingMember = discordMember
+        }
         val lastManualUserLinkingForUser = lastManualUserLinking[discordMember.externalAccountId]
         if (lastManualUserLinkingForUser == null
             || lastManualUserLinkingForUser.before(Date(System.currentTimeMillis() - MIN_PAUSE_BETWEEN_MANUAL_LINKING))
         ) {
             lastManualUserLinking[discordMember.externalAccountId] = Date()
-            roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
+            whitelistService.autojoinWhitelistsForUser(discordMember.externalAccountId)
+            roleAssignmentService.publishWalletBasedRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
         }
-        return discordMember
+        return existingMember
     }
 
     fun getMember(guildId: Long, externalAccountId: Long): DiscordMember {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getMember(discordServer, externalAccountId)
     }
 
@@ -257,7 +254,7 @@ class DiscordServerService(
 
     @Transactional
     fun updateMember(guildId: Long, externalAccountId: Long, discordMemberPartial: DiscordMemberPartial): DiscordMember {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val member = getMember(discordServer, externalAccountId)
         member.premiumSupport = discordMemberPartial.premiumSupport
         discordServerRepository.save(discordServer)
@@ -266,7 +263,7 @@ class DiscordServerService(
     }
 
     fun removeMember(guildId: Long, externalAccountId: Long, skipRoleUpdates: Boolean) {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.members.removeIf { it.externalAccountId == externalAccountId }
         discordServerRepository.save(discordServer)
         if (!skipRoleUpdates) {
@@ -275,17 +272,17 @@ class DiscordServerService(
     }
 
     fun getMembers(guildId: Long): Set<DiscordMember> {
-        return getDiscordServer(guildId).members
+        return discordServerRetriever.getDiscordServer(guildId).members
     }
 
-    fun getTokenPolicies(guildId: Long) = getDiscordServer(guildId).tokenPolicies.toSet()
-    fun getTokenRoles(guildId: Long) = getDiscordServer(guildId).tokenRoles.toSet()
-    fun getDelegatorRoles(guildId: Long) = getDiscordServer(guildId).delegatorRoles.toSet()
+    fun getTokenPolicies(guildId: Long) = discordServerRetriever.getDiscordServer(guildId).tokenPolicies.toSet()
+    fun getTokenRoles(guildId: Long) = discordServerRetriever.getDiscordServer(guildId).tokenRoles.toSet()
+    fun getDelegatorRoles(guildId: Long) = discordServerRetriever.getDiscordServer(guildId).delegatorRoles.toSet()
     fun getStakepools(guildId: Long) = getDiscordServerWithStakepoolInfo(guildId).stakepools.toSet()
-    fun getWhitelists(guildId: Long) = getDiscordServer(guildId).whitelists.toSet()
+    fun getWhitelists(guildId: Long) = discordServerRetriever.getDiscordServer(guildId).whitelists.toSet()
 
     fun updateSettings(guildId: Long, embeddableSetting: EmbeddableSetting): EmbeddableSetting {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.settings.removeIf { it.name == embeddableSetting.name }
         discordServer.settings.add(embeddableSetting)
         discordServerRepository.save(discordServer)
@@ -293,19 +290,19 @@ class DiscordServerService(
     }
 
     fun deleteSettings(guildId: Long, settingName: String) {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.settings.removeIf { it.name == settingName }
         discordServerRepository.save(discordServer)
     }
 
     fun deleteTokenPolicy(guildId: Long, policyId: String) {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.tokenPolicies.removeIf { it.policyId.equals(policyId, ignoreCase = true) }
         discordServerRepository.save(discordServer)
     }
 
     fun deleteStakepool(guildId: Long, poolHash: String) {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordServer.stakepools.removeIf { it.poolHash.equals(poolHash, ignoreCase = true) }
         discordServerRepository.save(discordServer)
     }
@@ -331,7 +328,7 @@ class DiscordServerService(
         guildId: Long,
         tokenRoleId: Long
     ): TokenOwnershipRole {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordServer.tokenRoles
             .find { it.id == tokenRoleId }
             ?: throw NoSuchElementException("No token role with ID $tokenRoleId found on guild $guildId")
@@ -341,22 +338,20 @@ class DiscordServerService(
         guildId: Long,
         delegatorRoleId: Long
     ): DelegatorRole {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordServer.delegatorRoles
             .find { it.id == delegatorRoleId }
             ?: throw NoSuchElementException("No delegator role with ID $delegatorRoleId found on guild $guildId")
     }
 
-    fun getDiscordServers(): Iterable<DiscordServer> = discordServerRepository.findAll()
-
     fun getAllCurrentTokenRoleAssignmentsForGuild(guildId: Long): Set<DiscordRoleAssignment> {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(allVerificationsOfMembers, discordServer)
     }
 
     fun getAllCurrentDelegatorRoleAssignmentsForGuild(guildId: Long): Set<DiscordRoleAssignment> {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val allDelegationToAllowedPools = connectService.getActiveDelegationForPools(discordServer.stakepools.map { it.poolHash }, false)
         val allVerificationsOfMembers = verificationService.getAllCompletedVerificationsForDiscordServer(discordServer.id!!)
         return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMembers, allDelegationToAllowedPools, discordServer)
@@ -364,43 +359,43 @@ class DiscordServerService(
 
     fun getAllCurrentWhitelistRoleAssignmentsForGuild(guildId: Long) =
         roleAssignmentService.getAllCurrentWhitelistRoleAssignmentsForGuild(
-            getDiscordServer(guildId)
+            discordServerRetriever.getDiscordServer(guildId)
         )
 
     fun getAllCurrentQuizRoleAssignmentsForGuild(guildId: Long) =
         roleAssignmentService.getAllCurrentQuizRoleAssignmentsForGuild(
-            getDiscordServer(guildId)
+            discordServerRetriever.getDiscordServer(guildId)
         )
 
     fun regenerateAccessToken(guildId: Long): String {
-        getDiscordServer(guildId)
+        discordServerRetriever.getDiscordServer(guildId)
         return apiTokenService.regenerateAccessToken(guildId)
     }
 
     fun deleteAccessToken(guildId: Long) {
-        getDiscordServer(guildId)
+        discordServerRetriever.getDiscordServer(guildId)
         apiTokenService.deleteAccessToken(guildId)
     }
 
     fun getEligibleTokenRolesOfUser(guildId: Long, externalAccountId: Long): Set<DiscordRoleAssignment> {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForGuildMember(discordServer, externalAccountId)
     }
 
     fun getEligibleDelegatorRolesOfUser(guildId: Long, externalAccountId: Long): Set<DiscordRoleAssignment> {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForGuildMember(discordServer, externalAccountId)
     }
 
     @Transactional
     fun queueRoleAssignments(guildId: Long, externalAccountId: Long) {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val discordMember = getMember(discordServer, externalAccountId)
-        roleAssignmentService.publishRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
+        roleAssignmentService.publishWalletBasedRoleAssignmentsForGuildMember(discordServer.guildId, discordMember.externalAccountId)
     }
 
     fun getEligibleClaimListsOfUser(guildId: Long, externalAccountId: Long): ClaimListsWithProducts {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val discordMember = discordServer.members.find { it.externalAccountId == externalAccountId }
         if (discordMember != null) {
             val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
@@ -442,7 +437,7 @@ class DiscordServerService(
         guildId: Long,
         claimListId: Int
     ): ClaimList {
-        val discordServer = getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
         val claimListForOrder = claimListsOfDiscord.find { claimListId == it.id }
         if (claimListForOrder != null) {
@@ -460,7 +455,7 @@ class DiscordServerService(
             return getClaimListForDiscordServer(guildId, claimListId)
         }
         catch(e: NumberFormatException) {
-            val discordServer = getDiscordServer(guildId)
+            val discordServer = discordServerRetriever.getDiscordServer(guildId)
             val claimListsOfDiscord = claimListService.getClaimListsOfDiscordServer(discordServer.id!!)
             val claimListForOrder = claimListsOfDiscord.find { claimListIdOrName == it.name }
             claimListForOrder ?: throw NoSuchElementException("No claim list with name $claimListIdOrName found on Discord server with guild ID $guildId")
@@ -473,7 +468,7 @@ class DiscordServerService(
     @Cacheable(cacheNames = ["serverIdToGuildId"])
     fun getGuildIdFromServerId(discordServerId: Int): Long {
         return try {
-            getDiscordServerByInternalId(discordServerId).guildId
+            discordServerRetriever.getDiscordServerByInternalId(discordServerId).guildId
         } catch (e: NoSuchElementException) {
             0
         }
@@ -484,7 +479,7 @@ class DiscordServerService(
         activityMap.forEach { activityEntry ->
             val (guildId, userId) = activityEntry.key.split("-")
             val serverId = guildIdToServerIdMap.computeIfAbsent(guildId.toLong()) {
-                getDiscordServer(it).id!!
+                discordServerRetriever.getDiscordServer(it).id!!
             }
             val activity = DiscordMemberActivity(serverId, userId.toLong(), Date(activityEntry.value), null)
             discordMemberActivityRepository.save(activity)

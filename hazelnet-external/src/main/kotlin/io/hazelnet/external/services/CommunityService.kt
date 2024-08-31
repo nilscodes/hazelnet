@@ -8,11 +8,14 @@ import io.hazelnet.shared.data.SharedWhitelist
 import io.hazelnet.shared.data.WhitelistSignup
 import io.hazelnet.external.data.claim.AnonymousPhysicalOrder
 import io.hazelnet.external.data.claim.PhysicalProduct
+import io.hazelnet.shared.data.NewWhitelistAutojoinDto
+import io.hazelnet.shared.data.WhitelistAutojoinDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.body
 
 @Service
 class CommunityService(
@@ -28,6 +31,19 @@ class CommunityService(
                 }.retrieve()
                 .bodyToMono(object : ParameterizedTypeReference<List<WhitelistSignup>>() {})
                 .block()!!
+    }
+
+    fun autojoinWhitelist(guildId: Long, whitelistName: String, autojoinDto: NewWhitelistAutojoinDto): WhitelistAutojoinDto {
+        return communityClient.post()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/discord/servers/$guildId/whitelists/$whitelistName/autojoin")
+                    .build()
+            }
+            .bodyValue(autojoinDto)
+            .retrieve()
+            .bodyToMono(WhitelistAutojoinDto::class.java)
+            .block()!!
     }
 
     fun getSharedWhitelists(guildId: Long): List<SharedWhitelist> {

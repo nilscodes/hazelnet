@@ -2,6 +2,8 @@ package io.hazelnet.external.services
 
 import io.hazelnet.external.data.SanitizedSharedWhitelist
 import io.hazelnet.external.data.SanitizedWhitelistSignup
+import io.hazelnet.shared.data.NewWhitelistAutojoinDto
+import io.hazelnet.shared.data.WhitelistAutojoinDto
 import io.hazelnet.shared.data.WhitelistSignup
 import org.springframework.stereotype.Service
 
@@ -16,6 +18,7 @@ class WhitelistService(
 
     private fun sanitizeWhitelistSignup(unsanitizedSignup: WhitelistSignup) = SanitizedWhitelistSignup(
         address = unsanitizedSignup.address,
+        blockchain = unsanitizedSignup.blockchain,
         signupTime = unsanitizedSignup.signupTime,
         referenceType = unsanitizedSignup.referenceType,
         referenceId = unsanitizedSignup.referenceId,
@@ -31,5 +34,9 @@ class WhitelistService(
                 whitelistDisplayName = it.whitelistDisplayName,
                 signups = it.signups.map { signup -> sanitizeWhitelistSignup(signup) }.toSet()
             ) }
+    }
+
+    fun autojoinWhitelist(guildId: Long, whitelistName: String, autojoin: NewWhitelistAutojoinDto): WhitelistAutojoinDto {
+        return communityService.autojoinWhitelist(guildId, whitelistName, autojoin)
     }
 }

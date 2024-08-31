@@ -17,7 +17,7 @@ class PingService(
     private val pingRepository: PingRepository,
     private val externalAccountService: ExternalAccountService,
     private val accountService: AccountService,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val connectService: ConnectService,
     private val verificationRepository: VerificationRepository,
 ) {
@@ -25,7 +25,7 @@ class PingService(
     fun addPing(externalAccountPing: ExternalAccountPingDto): ExternalAccountPingDto {
         val sender = externalAccountService.getExternalAccount(externalAccountPing.sender)
         val discordServer = if (externalAccountPing.sentFromServer != null) {
-            discordServerService.getDiscordServerByInternalId(externalAccountPing.sentFromServer)
+            discordServerRetriever.getDiscordServerByInternalId(externalAccountPing.sentFromServer)
         } else {
             null
         }

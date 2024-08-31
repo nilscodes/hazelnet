@@ -18,6 +18,12 @@ annotation class ValidBlockchainAddress(
     val allowedTypes: Array<BlockchainType> = []
 )
 
+const val cardanoPattern = "^(addr1|ADDR1)[A-Za-z0-9]{98}$"
+const val ethereumPattern = "^(0x)?[0-9a-fA-F]{40}$"
+const val bitcoinPaymentPattern = "^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$"
+const val bitcoinTaprootPattern = "^[bB][cC]1[pP][a-zA-Z0-9]{38,58}$"
+const val bitcoinSegwitPattern = "^[bB][cC]1[qQ][a-zA-Z0-9]{38,58}$"
+
 class BlockchainAddressValidator : ConstraintValidator<ValidBlockchainAddress, String> {
     private lateinit var allowedTypes: Array<BlockchainType>
 
@@ -36,19 +42,38 @@ class BlockchainAddressValidator : ConstraintValidator<ValidBlockchainAddress, S
             return false
         }
 
-        val cardanoPattern = "^addr1[A-Za-z0-9]{98}$"
-        val ethereumPattern = "^(0x)?[0-9a-fA-F]{40}$"
-
         for (type in allowedTypes) {
             val pattern = when (type) {
                 BlockchainType.CARDANO -> cardanoPattern
                 BlockchainType.ETHEREUM -> ethereumPattern
                 BlockchainType.POLYGON -> ethereumPattern
+                BlockchainType.BITCOIN -> bitcoinPaymentPattern
             }
             if (value.matches(pattern.toRegex())) {
                 return true
             }
         }
         return false
+    }
+
+    companion object {
+        fun blockchainFromAddress(address: String): Set<BlockchainType> {
+            return when {
+                address.matches(cardanoPattern.toRegex()) -> {
+                    setOf(BlockchainType.CARDANO)
+                }
+                address.matches(ethereumPattern.toRegex()) -> {
+                    setOf(BlockchainType.ETHEREUM, BlockchainType.POLYGON)
+                }
+                address.matches(bitcoinPaymentPattern.toRegex())
+                        || address.matches(bitcoinTaprootPattern.toRegex())
+                        || address.matches(bitcoinSegwitPattern.toRegex()) -> {
+                    setOf(BlockchainType.BITCOIN)
+                }
+                else -> {
+                    emptySet()
+                }
+            }
+        }
     }
 }

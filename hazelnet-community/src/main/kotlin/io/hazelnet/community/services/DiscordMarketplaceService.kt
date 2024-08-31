@@ -20,37 +20,37 @@ import kotlin.math.absoluteValue
 class DiscordMarketplaceService(
     private val discordMarketplaceChannelRepository: DiscordMarketplaceChannelRepository,
     private val discordMarketplaceChannelMetadataFilterRepository: DiscordTrackerMetadataFilterRepository,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val rabbitTemplate: RabbitTemplate,
     private val config: CommunityApplicationConfiguration
 ) {
     private val logger = KotlinLogging.logger {}
 
     fun listMarketplaceChannels(guildId: Long): List<DiscordMarketplaceChannel> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordMarketplaceChannelRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addMarketplaceChannel(guildId: Long, discordMarketplaceChannel: DiscordMarketplaceChannel): DiscordMarketplaceChannel {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordMarketplaceChannel.discordServerId = discordServer.id
         discordMarketplaceChannel.createTime = Date.from(ZonedDateTime.now().toInstant())
         return discordMarketplaceChannelRepository.save(discordMarketplaceChannel)
     }
 
     fun getMarketplaceChannel(guildId: Long, marketplaceChannelId: Int): Any {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getMarketplaceChannel(discordServer, marketplaceChannelId)
     }
 
     fun deleteMarketplaceChannel(guildId: Long, marketplaceChannelId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
         discordMarketplaceChannelRepository.delete(marketplaceChannel)
     }
 
     fun addMetadataFilter(guildId: Long, marketplaceChannelId: Int, trackerMetadataFilter: TrackerMetadataFilter): TrackerMetadataFilter {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
         discordMarketplaceChannelMetadataFilterRepository.save(trackerMetadataFilter)
         marketplaceChannel.filters.add(trackerMetadataFilter)
@@ -59,7 +59,7 @@ class DiscordMarketplaceService(
     }
 
     fun deleteMetadataFilter(guildId: Long, marketplaceChannelId: Int, filterId: Long) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val marketplaceChannel = getMarketplaceChannel(discordServer, marketplaceChannelId)
         val metadataFilter = marketplaceChannel.filters
             .find { it.id == filterId } ?: throw NoSuchElementException("No filter with ID $filterId found on marketplace channel with ID $marketplaceChannelId on guild $guildId")
@@ -78,7 +78,7 @@ class DiscordMarketplaceService(
     fun publishPoliciesForSalesAggregation() {
         val currentTimeMillis = System.currentTimeMillis()
         val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
-        logger.debug { "Publishing sales policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency}" }
+        logger.debug { "Publishing sales policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency})" }
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllSalesChannelsForActivePremium(Date())
         allMarketplaceChannels
             .filter {
@@ -96,7 +96,7 @@ class DiscordMarketplaceService(
     fun publishPoliciesForListingsAggregation() {
         val currentTimeMillis = System.currentTimeMillis()
         val shard = (currentTimeMillis / 60000) % config.marketplace.aggregationFrequency
-        logger.debug { "Publishing listings policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency}" }
+        logger.debug { "Publishing listings policies for shard $shard (aggregation frequency ${config.marketplace.aggregationFrequency})" }
         val allMarketplaceChannels = discordMarketplaceChannelRepository.findAllListingChannelsForActivePremium(Date())
         allMarketplaceChannels
             .filter {

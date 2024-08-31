@@ -12,25 +12,24 @@ import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
-import kotlin.NoSuchElementException
 import kotlin.math.floor
 
 @Service
 class DiscordPollService(
     private val discordPollRepository: DiscordPollRepository,
-    private val discordServerService: DiscordServerService,
+    private val discordServerRetriever: DiscordServerRetriever,
     private val externalAccountService: ExternalAccountService,
     private val snapshotService: MultiAssetSnapshotService,
     private val voteaireService: VoteaireService,
     private val cardanoTokenRegistryService: CardanoTokenRegistryService,
 ) {
     fun listPolls(guildId: Long): List<DiscordPoll> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordPollRepository.findByDiscordServerId(discordServer.id!!)
     }
 
     fun addPoll(guildId: Long, discordPoll: DiscordPoll): DiscordPoll {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         discordPoll.discordServer = discordServer
         discordPoll.createTime = Date.from(ZonedDateTime.now().toInstant())
         if (discordPoll.voteaireUUID != null) {
@@ -40,7 +39,7 @@ class DiscordPollService(
     }
 
     fun updatePoll(guildId: Long, pollId: Int, discordPollPartial: DiscordPollPartial): DiscordPoll {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val poll = getPoll(discordServer, pollId)
         if (discordPollPartial.channelId != null) {
             poll.channelId = discordPollPartial.channelId
@@ -74,13 +73,13 @@ class DiscordPollService(
     }
 
     fun deletePoll(guildId: Long, pollId: Int) {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val poll = getPoll(discordServer, pollId)
         discordPollRepository.delete(poll)
     }
 
     fun getVotesInPoll(guildId: Long, pollId: Int): VoteData {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val poll = getPoll(discordServer, pollId)
         return getExistingVotesFromPoll(poll)
     }
@@ -115,7 +114,7 @@ class DiscordPollService(
     }
 
     fun getVoteOfUser(guildId: Long, pollId: Int, externalAccountId: Long): VoteData {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val voter = externalAccountService.getExternalAccount(externalAccountId)
         val poll = getPoll(discordServer, pollId)
         val totalVotingPower = this.getVotingPower(poll, externalAccountId)
@@ -148,7 +147,7 @@ class DiscordPollService(
     }
 
     fun getTokenRegistryMetadataForPoll(guildId: Long, pollId: Int): TokenMetadata? {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val poll = getPoll(discordServer, pollId)
         if (poll.snapshotId != null) {
             val assetFingerprint = snapshotService.getAssetFingerprintForSnapshot(poll.snapshotId!!)
@@ -161,7 +160,7 @@ class DiscordPollService(
 
     @Transactional
     fun setVoteForUser(guildId: Long, pollId: Int, externalAccountId: Long, options: List<Long>): Map<String, VoteData> {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val voter = externalAccountService.getExternalAccount(externalAccountId) // Verify the voter exists - throws if not
         val poll = getPoll(discordServer, pollId)
         if (votingIsPossible(poll)) {
@@ -207,7 +206,7 @@ class DiscordPollService(
     }
 
     fun getPoll(guildId: Long, pollId: Int): DiscordPoll {
-        val discordServer = discordServerService.getDiscordServer(guildId)
+        val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return getPoll(discordServer, pollId)
     }
 

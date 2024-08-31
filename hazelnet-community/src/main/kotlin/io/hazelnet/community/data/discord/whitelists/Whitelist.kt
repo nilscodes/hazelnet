@@ -90,6 +90,11 @@ class Whitelist @JsonCreator constructor(
     @field:JsonIgnore
     var signups: MutableSet<WhitelistSignup> = mutableSetOf(),
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "discord_whitelists_autojoin", joinColumns = [JoinColumn(name = "discord_whitelist_id")])
+    @field:JsonIgnore
+    var autojoins: MutableSet<WhitelistAutojoin> = mutableSetOf(),
+
     @Column(name = "shared_with_discord_server")
     var sharedWithServer: Int? = null,
 
@@ -118,6 +123,7 @@ class Whitelist @JsonCreator constructor(
         if (maxUsers != other.maxUsers) return false
         if (closed != other.closed) return false
         if (signups != other.signups) return false
+        if (autojoins != other.autojoins) return false
         if (sharedWithServer != other.sharedWithServer) return false
         if (logoUrl != other.logoUrl) return false
 
@@ -141,13 +147,14 @@ class Whitelist @JsonCreator constructor(
         result = 31 * result + (maxUsers ?: 0)
         result = 31 * result + closed.hashCode()
         result = 31 * result + signups.hashCode()
+        result = 31 * result + autojoins.hashCode()
         result = 31 * result + (sharedWithServer ?: 0)
         result = 31 * result + (logoUrl?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "Whitelist(id=$id, discordServerId=$discordServerId, type=$type, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoles=$requiredRoles, blockchains=$blockchains, awardedRole=$awardedRole, maxUsers=$maxUsers, closed=$closed, signups=$signups, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
+        return "Whitelist(id=$id, discordServerId=$discordServerId, type=$type, creator=$creator, createTime=$createTime, name='$name', displayName='$displayName', signupAfter=$signupAfter, signupUntil=$signupUntil, launchDate=$launchDate, requiredRoles=$requiredRoles, blockchains=$blockchains, awardedRole=$awardedRole, maxUsers=$maxUsers, closed=$closed, signups=$signups, autojoins=$autojoins, sharedWithServer=$sharedWithServer, logoUrl=$logoUrl)"
     }
 
 }

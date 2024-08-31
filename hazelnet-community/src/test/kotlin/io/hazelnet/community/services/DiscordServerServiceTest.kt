@@ -10,7 +10,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
 class DiscordServerServiceTest {
@@ -40,11 +39,12 @@ class DiscordServerServiceTest {
     @Test
     fun `updating a member in any way resets their premium pledge weights`() {
         val discordServerRepository = mockk<DiscordServerRepository>()
-        every { discordServerRepository.findByGuildId(testServer.guildId) } returns Optional.of(testServer)
         every { discordServerRepository.save(any()) } returnsArgument 0
         every { discordServerRepository.resetPremiumWeightForExternalAccount(5652) } returns Unit
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
+        every { discordServerRetriever.getDiscordServer(testServer.guildId) } returns testServer
 
-        val discordServerService = DiscordServerService(mockk(), mockk(), mockk(), discordServerRepository, mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry())
+        val discordServerService = DiscordServerService(mockk(), mockk(), mockk(), discordServerRepository, discordServerRetriever, mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), mockk(), SimpleMeterRegistry(), mockk())
         discordServerService.updateMember(testServer.guildId, 5652, DiscordMemberPartial(true))
         verify { discordServerRepository.resetPremiumWeightForExternalAccount(5652) }
     }

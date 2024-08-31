@@ -143,7 +143,7 @@ class VerificationService(
                 verification.confirmed = true
                 verification.confirmedAt = Date.from(ZonedDateTime.now().toInstant())
                 verificationRepository.save(verification)
-                verificationRepository.invalidateOutdatedVerifications(verification.cardanoStakeAddress!!, verification.id!!)
+                externalAccountService.invalidateNowOutdatedVerifications(verification)
                 roleAssignmentService.publishRoleAssignmentsForGuildMemberOnAllServers(verification.externalAccount.id!!)
             } catch (e: WebClientResponseException) {
                 logger.debug { "No valid verification found for ${verification.address} for verification with ID ${verification.id}" }
@@ -213,7 +213,7 @@ class VerificationService(
         if (exposedWallet.verificationId != verificationId) {
             throw IllegalArgumentException("Verification ID of exposed wallet does not match verification ID of verification.")
         }
-        // TODO Consider verifying if verification owner is linked ot the server
+        // TODO Consider verifying if verification owner is linked to the server
         exposedWallet.exposedAt = Date()
         return exposedWalletRepository.save(exposedWallet)
     }

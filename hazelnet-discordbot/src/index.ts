@@ -134,4 +134,5 @@ app.get('/metrics', async (_, res) => {
   res.end(await prometheus.register.metrics());
 });
 
-app.listen(3000);
+const metricsPort = process.env.METRICS_PORT || 3000;
+app.listen(metricsPort);

@@ -10,10 +10,8 @@ import io.hazelnet.community.data.discord.whitelists.WhitelistPartial
 import io.hazelnet.community.data.discord.whitelists.WhitelistSignup
 import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import io.hazelnet.community.data.premium.IncomingDiscordPaymentRequest
-import io.hazelnet.community.services.BillingService
-import io.hazelnet.community.services.DiscordServerService
-import io.hazelnet.community.services.IncomingPaymentService
-import io.hazelnet.community.services.WhitelistService
+import io.hazelnet.community.services.*
+import io.hazelnet.shared.data.NewWhitelistAutojoinDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -24,6 +22,7 @@ import javax.validation.Valid
 @RequestMapping("/discord/servers")
 class DiscordServerController(
         private val discordServerService: DiscordServerService,
+        private val discordServerRetriever: DiscordServerRetriever,
         private val whitelistService: WhitelistService,
         private val billingService: BillingService,
         private val incomingPaymentService: IncomingPaymentService,
@@ -42,15 +41,15 @@ class DiscordServerController(
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    fun listDiscordServers() = discordServerService.getDiscordServers()
+    fun listDiscordServers() = discordServerRetriever.getDiscordServers()
 
     @GetMapping(value = ["/{guildId}"], params = ["!byId"])
     @ResponseStatus(HttpStatus.OK)
-    fun getDiscordServer(@PathVariable guildId: Long) = discordServerService.getDiscordServer(guildId)
+    fun getDiscordServer(@PathVariable guildId: Long) = discordServerRetriever.getDiscordServer(guildId)
 
     @GetMapping(value = ["/{serverId}"], params = ["byId"])
     @ResponseStatus(HttpStatus.OK)
-    fun getDiscordServerByInternalId(@PathVariable serverId: Int) = discordServerService.getDiscordServerByInternalId(serverId)
+    fun getDiscordServerByInternalId(@PathVariable serverId: Int) = discordServerRetriever.getDiscordServerByInternalId(serverId)
 
     @PatchMapping("/{guildId}")
     @ResponseStatus(HttpStatus.OK)
@@ -199,6 +198,11 @@ class DiscordServerController(
                         .toUri())
                 .body(newWhitelistSignup)
     }
+
+    @PostMapping("/{guildId}/whitelists/{whitelistIdOrName}/autojoin")
+    @ResponseStatus(HttpStatus.OK)
+    fun addWhitelistAutojoin(@PathVariable guildId: Long, @PathVariable whitelistIdOrName: String, @RequestBody @Valid autojoin: NewWhitelistAutojoinDto)
+        = whitelistService.addWhitelistAutojoin(guildId, whitelistIdOrName, autojoin)
 
     @GetMapping("/{guildId}/whitelists/{whitelistId}/signups/{externalAccountId}")
     @ResponseStatus(HttpStatus.OK)

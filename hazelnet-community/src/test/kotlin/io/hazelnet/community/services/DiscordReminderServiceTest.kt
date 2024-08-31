@@ -92,13 +92,13 @@ class DiscordReminderServiceTest {
 
     @Test
     fun checkReminders() {
-        val discordServerService = mockk<DiscordServerService>()
+        val discordServerRetriever = mockk<DiscordServerRetriever>()
         val discordReminderRepository = mockk<DiscordReminderRepository>()
         val connectService = mockk<ConnectService>()
         val rabbitTemplate = mockk<RabbitTemplate>(relaxUnitFun = true)
-        val discordReminderService = DiscordReminderService(discordServerService, discordReminderRepository, connectService, rabbitTemplate)
+        val discordReminderService = DiscordReminderService(discordServerRetriever, discordReminderRepository, connectService, rabbitTemplate)
 
-        every { discordServerService.getDiscordServerByInternalId(testServer.id!!) } returns testServer
+        every { discordServerRetriever.getDiscordServerByInternalId(testServer.id!!) } returns testServer
         every { connectService.getEpochDetails() } returns EpochDetails(333, 0, 0, 0, 0, Date(System.currentTimeMillis() - 86400000))
         every { discordReminderRepository.save(any()) } returnsArgument 0
         every { discordReminderRepository.findAllByLastEpochSentIsNullOrLastEpochSentIsNot(333) } returns testReminders.values.toList()
