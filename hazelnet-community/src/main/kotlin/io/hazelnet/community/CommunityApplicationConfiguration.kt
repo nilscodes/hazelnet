@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class CommunityApplicationConfiguration(
     val connect: ConnectConfiguration,
     val voteaire: VoteaireConfiguration,
-    val mutantstaking: MutantStakingConfiguration,
     val tokenregistry: TokenRegistryConfiguration,
     val vibrantAuth: VibrantAuthConfiguration,
     val fundedpool: String?,
@@ -26,10 +25,6 @@ data class ConnectConfiguration(
 )
 
 data class VoteaireConfiguration(
-    val url: String
-)
-
-data class MutantStakingConfiguration(
     val url: String
 )
 

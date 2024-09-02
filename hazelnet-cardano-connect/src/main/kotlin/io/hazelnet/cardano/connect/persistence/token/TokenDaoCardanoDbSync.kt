@@ -12,36 +12,148 @@ import java.sql.ResultSet
 import java.sql.Types
 import java.util.*
 
-const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_ALL =
-    "SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? GROUP BY policy"
-const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_ALL =
-    "SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=?"
-const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES =
-    "SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) %s GROUP BY policy"
-const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES =
-    "SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s)"
-const val GET_ALL_MULTI_ASSET_NAMES_IN_WALLET_ADDRESS_FOR_POLICIES =
-    "SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id WHERE u.address=? AND ma.policy IN (%s)"
-const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT =
-    "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint"
-const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT =
-    "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, encode(ma.name, 'hex') as name FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE sa.view=? AND ma.policy IN (%s) AND ma.fingerprint IN (%s)"
+const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_ALL = """
+    SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+    GROUP BY policy
+"""
 
-const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES =
-    "SELECT encode(ma.policy, 'hex') AS policy, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) GROUP BY policy, sa.view"
-const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES_AND_FINGERPRINT =
-    "SELECT encode(ma.policy, 'hex') AS policy, fingerprint, sa.view AS stakeview, SUM(mto.quantity) AS number FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.policy IN (%s) AND ma.fingerprint IN (%s) GROUP BY policy, fingerprint, sa.view"
+const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_ALL = """
+    SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+"""
 
-const val GET_STAKE_ADDRESS_BY_ASSET_FINGERPRINT =
-    "SELECT sa.view FROM utxo_view u JOIN ma_tx_out mto ON u.id = mto.tx_out_id JOIN multi_asset ma ON mto.ident = ma.id JOIN stake_address sa ON u.stake_address_id = sa.id WHERE ma.fingerprint=?"
+const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES = """
+    SELECT encode(ma.policy, 'hex') AS policy, SUM(mto.quantity) AS number
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+      AND ma.policy IN (%s) %s
+    GROUP BY policy
+"""
 
-const val GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME =
-    "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash, tm.json FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx_metadata tm ON mtm.tx_id = tm.tx_id JOIN tx ON mtm.tx_id = tx.id WHERE policy=DECODE(?, 'hex') AND name=cast(? as asset32type) AND key=? AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
-const val GET_ASSET_MINT_METADATA_BY_ASSET_FINGERPRINT =
-    "SELECT ma.fingerprint, encode(ma.name, 'hex') as name, encode(ma.policy, 'hex') as policy, mtm.quantity, encode(tx.hash, 'hex') as hash FROM multi_asset ma JOIN ma_tx_mint mtm ON ma.id = mtm.ident JOIN tx ON mtm.tx_id = tx.id WHERE ma.fingerprint=? AND mtm.quantity>0 ORDER BY mtm.tx_id DESC LIMIT 1"
+const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES = """
+    SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+      AND ma.policy IN (%s)
+"""
 
-const val GET_POLICY_INFO_BY_POLICY_ID =
-    "select sum(quantity) as count FROM multi_asset ma JOIN ma_tx_mint mtm on ma.id = mtm.ident WHERE ma.policy=decode(?, 'hex')"
+const val GET_ALL_MULTI_ASSET_NAMES_IN_WALLET_ADDRESS_FOR_POLICIES = """
+    SELECT encode(ma.policy, 'hex') AS policy, encode(ma.name, 'hex') as name
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+    WHERE u.consumed_by_tx_id IS NULL AND u.address=?
+      AND ma.policy IN (%s)    
+"""
+
+const val GET_ALL_MULTI_ASSETS_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT = """
+    SELECT encode(ma.policy, 'hex') AS policy, fingerprint, SUM(mto.quantity) AS number
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+      AND ma.policy IN (%s)
+      AND ma.fingerprint IN (%s)
+    GROUP BY policy, fingerprint
+"""
+
+const val GET_ALL_MULTI_ASSET_NAMES_IN_STAKE_ADDRESS_FOR_POLICIES_BY_FINGERPRINT = """
+    SELECT encode(ma.policy, 'hex') AS policy, fingerprint, encode(ma.name, 'hex') as name
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND sa.view=?
+      AND ma.policy IN (%s)
+      AND ma.fingerprint IN (%s)
+"""
+
+const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES = """
+    SELECT encode(ma.policy, 'hex') AS policy, sa.view AS stakeview, SUM(mto.quantity) AS number
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND ma.policy IN (%s)
+    GROUP BY policy, sa.view    
+"""
+
+const val GET_SNAPSHOT_OF_STAKES_BY_POLICIES_AND_FINGERPRINT = """
+    SELECT encode(ma.policy, 'hex') AS policy, fingerprint, sa.view AS stakeview, SUM(mto.quantity) AS number
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND ma.policy IN (%s)
+      AND ma.fingerprint IN (%s)
+    GROUP BY policy, fingerprint, sa.view    
+"""
+
+const val GET_STAKE_ADDRESS_BY_ASSET_FINGERPRINT = """
+    SELECT sa.view
+    FROM tx_out u
+             JOIN ma_tx_out mto ON u.id = mto.tx_out_id
+             JOIN multi_asset ma ON mto.ident = ma.id
+             JOIN stake_address sa ON u.stake_address_id = sa.id
+    WHERE u.consumed_by_tx_id IS NULL AND ma.fingerprint=?
+"""
+
+const val GET_ASSET_MINT_METADATA_BY_POLICY_AND_NAME = """
+    SELECT ma.fingerprint,
+           encode(ma.name, 'hex')   as name,
+           encode(ma.policy, 'hex') as policy,
+           mtm.quantity,
+           encode(tx.hash, 'hex')   as hash,
+           tm.json
+    FROM multi_asset ma
+             JOIN ma_tx_mint mtm ON ma.id = mtm.ident
+             JOIN tx_metadata tm ON mtm.tx_id = tm.tx_id
+             JOIN tx ON mtm.tx_id = tx.id
+    WHERE policy = DECODE(?, 'hex')
+      AND name = cast(? as asset32type)
+      AND key=?
+      AND mtm.quantity > 0
+    ORDER BY mtm.tx_id DESC
+    LIMIT 1    
+"""
+
+const val GET_ASSET_MINT_METADATA_BY_ASSET_FINGERPRINT = """
+    SELECT ma.fingerprint,
+       encode(ma.name, 'hex')   as name,
+       encode(ma.policy, 'hex') as policy,
+       mtm.quantity,
+       encode(tx.hash, 'hex')   as hash
+    FROM multi_asset ma
+             JOIN ma_tx_mint mtm ON ma.id = mtm.ident
+             JOIN tx ON mtm.tx_id = tx.id
+    WHERE ma.fingerprint=?
+      AND mtm.quantity > 0
+    ORDER BY mtm.tx_id DESC
+    LIMIT 1
+"""
+
+const val GET_POLICY_INFO_BY_POLICY_ID = """
+    select sum(quantity) as count
+    FROM multi_asset ma
+             JOIN ma_tx_mint mtm on ma.id = mtm.ident
+    WHERE ma.policy = decode(?, 'hex')
+"""
 
 const val NFT_METADATA_KEY = 721
 

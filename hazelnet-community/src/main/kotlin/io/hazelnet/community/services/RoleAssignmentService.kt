@@ -13,7 +13,6 @@ import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
 import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
-import io.hazelnet.community.services.external.MutantStakingService
 import io.hazelnet.community.services.external.NftCdnService
 import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.decodeHex
@@ -32,7 +31,6 @@ class RoleAssignmentService(
     private val externalAccountService: ExternalAccountService,
     private val rabbitTemplate: RabbitTemplate,
     private val discordServerRetriever: DiscordServerRetriever,
-    private val mutantStakingService: MutantStakingService,
     private val whitelistRepository: DiscordWhitelistRepository,
     private val quizRepository: DiscordQuizRepository,
     private val discordBanRepository: DiscordBanRepository,
@@ -90,10 +88,9 @@ class RoleAssignmentService(
         val filterBasedRoleAssignments = mutableSetOf<DiscordRoleAssignment>()
         // TODO We could try to filter out all users that already received a role
         if (relevantPolicyIds.isNotEmpty()) {
-            val tokenStakingData = getStakingAssets(allVerifiedStakeAddresses, filterBasedRoles)
             val tokenOwnershipDataInWallet =
                 connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
-            val tokenOwnershipData = mergeOwnershipForAssetLists(tokenOwnershipDataInWallet, tokenStakingData)
+            val tokenOwnershipData = mergeOwnershipForAssetLists(tokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
             val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, MutableMap<String, MutableList<MultiAssetInfo>>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -294,10 +291,9 @@ class RoleAssignmentService(
             role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
         }.flatten().toSet()
         if (relevantPolicyIds.isNotEmpty()) {
-            val tokenStakingData = getStakingCounts(allVerifiedStakeAddresses, countBasedRoles)
             val tokenOwnershipDataInWallet =
                 connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
-            val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, tokenStakingData)
+            val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -375,70 +371,6 @@ class RoleAssignmentService(
                 list2.filter { it2 ->
                     !(list1.any { it1 -> it2.stakeAddress == it1.stakeAddress && it2.policyIdWithOptionalAssetFingerprint == it1.policyIdWithOptionalAssetFingerprint })
                 }
-
-    private fun getStakingCounts(stakeAddresses: List<String>, roles: List<TokenOwnershipRole>): List<TokenOwnershipInfoWithAssetCount>
-    {
-        val policiesToRetrieveMutantInfoFor = getPoliciesToRetrieveMutantStakingInfoFor(roles)
-        if (policiesToRetrieveMutantInfoFor.isNotEmpty()) {
-            val mapForStakeAddresses = mutableMapOf<String, MutableMap<String, Long>>()
-            try {
-                mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
-                    .forEach { stakeEntry ->
-                        if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
-                            val mapForStakeAddress =
-                                mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
-                            stakeEntry.assets.forEach { asset ->
-                                mapForStakeAddress.compute(asset.policyId!!) { _, v -> (v ?: 0) + 1 }
-                            }
-                        }
-                    }
-                return mapForStakeAddresses.map { stakeAddressEntry ->
-                    stakeAddressEntry.value.map {
-                        TokenOwnershipInfoWithAssetCount(stakeAddressEntry.key, it.key, it.value)
-                    }
-                }.flatten()
-            } catch (stakingApiError: WebClientResponseException) {
-                logger.info(stakingApiError) { "Error when retrieving staking information for the following set of policies: $policiesToRetrieveMutantInfoFor" }
-            }
-        }
-        return emptyList()
-    }
-
-    private fun getStakingAssets(stakeAddresses: List<String>, roles: List<TokenOwnershipRole>): List<TokenOwnershipInfoWithAssetList> {
-        val policiesToRetrieveMutantInfoFor = getPoliciesToRetrieveMutantStakingInfoFor(roles)
-        if (policiesToRetrieveMutantInfoFor.isNotEmpty()) {
-            val mapForStakeAddresses = mutableMapOf<String, MutableMap<String, MutableSet<String>>>()
-            mutantStakingService.getStakedAssetsForPolicies(policiesToRetrieveMutantInfoFor)
-                .forEach { stakeEntry ->
-                    if (stakeAddresses.contains(stakeEntry.stakerStakeAddress)) {
-                        val mapForStakeAddress =
-                            mapForStakeAddresses.computeIfAbsent(stakeEntry.stakerStakeAddress) { mutableMapOf() }
-                        stakeEntry.assets.forEach { asset ->
-                            mapForStakeAddress.computeIfAbsent(asset.policyId!!) { mutableSetOf() }.add(asset.assetNameHex)
-                        }
-                    }
-                }
-            return mapForStakeAddresses.map { stakeAddressEntry ->
-                stakeAddressEntry.value.map {
-                    TokenOwnershipInfoWithAssetList(stakeAddressEntry.key, null, it.key, it.value)
-                }
-            }.flatten()
-        }
-        return emptyList()
-    }
-
-    private fun getPoliciesToRetrieveMutantStakingInfoFor(roles: List<TokenOwnershipRole>): Set<String> {
-        val mutantEnabledPolicies = roles
-            .filter { it.stakingType == TokenStakingType.MUTANT_STAKING }
-            .map { it.acceptedAssets.map { aa -> aa.policyId } }
-            .flatten()
-        return if (mutantEnabledPolicies.isNotEmpty()) {
-            val mutantSupportedPolicies = mutantStakingService.getStakeablePolicies()
-            mutantEnabledPolicies.intersect(mutantSupportedPolicies)
-        } else {
-            emptySet()
-        }
-    }
 
     private fun calculateMatchedTokenCountForCountBased(
         role: TokenOwnershipRole,

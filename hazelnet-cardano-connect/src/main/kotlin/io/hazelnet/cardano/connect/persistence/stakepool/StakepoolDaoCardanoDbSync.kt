@@ -16,39 +16,42 @@ const val GET_ALL_STAKEPOOL_INFO_BY_VIEW: String = "SELECT encode(h.hash_raw, 'h
 const val GET_ALL_STAKEPOOL_INFO_BY_HASH: String = "SELECT encode(h.hash_raw, 'hex') as hash, offl.ticker_name, h.view, offl.json, u.pledge FROM pool_update u JOIN off_chain_pool_data offl ON u.hash_id=offl.pool_id JOIN pool_hash h ON u.hash_id=h.id" +
         " WHERE h.hash_raw=decode(?, 'hex') AND registered_tx_id IN (SELECT max(registered_tx_id) FROM pool_update GROUP BY hash_id) ORDER BY offl.id DESC LIMIT 1"
 const val GET_DELEGATION_TO_POOL_IN_EPOCH = "SELECT e.amount, sa.view FROM epoch_stake e JOIN pool_hash h ON e.pool_id=h.id JOIN stake_address sa ON e.addr_id = sa.id WHERE h.hash_raw=decode(?, 'hex') AND epoch_no=?;"
-const val GET_ACTIVE_DELEGATION_TO_POOL = "WITH stake AS\n" +
-        "         (SELECT d1.addr_id, sa.view\n" +
-        "          FROM delegation d1, pool_hash, stake_address sa\n" +
-        "          WHERE pool_hash.id=d1.pool_hash_id\n" +
-        "            AND pool_hash.hash_raw=decode(?, 'hex')\n" +
-        "            AND d1.addr_id=sa.id\n" +
-        "            AND NOT EXISTS\n" +
-        "              (SELECT TRUE\n" +
-        "               FROM delegation d2\n" +
-        "               WHERE d2.addr_id=d1.addr_id\n" +
-        "                 AND d2.tx_id>d1.tx_id)\n" +
-        "            AND NOT EXISTS\n" +
-        "              (SELECT TRUE\n" +
-        "               FROM stake_deregistration\n" +
-        "               WHERE stake_deregistration.addr_id=d1.addr_id\n" +
-        "                 AND stake_deregistration.tx_id>d1.tx_id))\n" +
-        "SELECT sum(total) AS amount, view\n" +
-        "FROM\n" +
-        "    (SELECT sum(value) total, stake.view AS view\n" +
-        "     FROM utxo_view\n" +
-        "              INNER JOIN stake ON utxo_view.stake_address_id=stake.addr_id\n" +
-        "     GROUP BY stake.view\n" +
-        "     UNION SELECT sum(amount), stake.view\n" +
-        "     FROM reward\n" +
-        "              INNER JOIN stake ON reward.addr_id=stake.addr_id\n" +
-        "     WHERE reward.spendable_epoch <= (SELECT MAX(epoch_no) FROM block)\n" +
-        "     GROUP BY stake.view\n" +
-        "     UNION SELECT -sum(amount), stake.view\n" +
-        "     FROM withdrawal\n" +
-        "              INNER JOIN stake ON withdrawal.addr_id=stake.addr_id\n" +
-        "     GROUP BY stake.view\n" +
-        "    ) AS t\n" +
-        "GROUP BY view"
+const val GET_ACTIVE_DELEGATION_TO_POOL = """
+        WITH stake AS
+                 (SELECT d1.addr_id, sa.view
+                  FROM delegation d1, pool_hash, stake_address sa
+                  WHERE pool_hash.id=d1.pool_hash_id
+                    AND pool_hash.hash_raw=decode(?, 'hex')
+                    AND d1.addr_id=sa.id
+                    AND NOT EXISTS
+                      (SELECT TRUE
+                       FROM delegation d2
+                       WHERE d2.addr_id=d1.addr_id
+                         AND d2.tx_id>d1.tx_id)
+                    AND NOT EXISTS
+                      (SELECT TRUE
+                       FROM stake_deregistration
+                       WHERE stake_deregistration.addr_id=d1.addr_id
+                         AND stake_deregistration.tx_id>d1.tx_id))
+        SELECT sum(total) AS amount, view
+        FROM
+            (SELECT sum(value) total, stake.view AS view
+             FROM tx_out
+                      INNER JOIN stake ON tx_out.stake_address_id=stake.addr_id
+             WHERE tx_out.consumed_by_tx_id IS NULL
+             GROUP BY stake.view
+             UNION SELECT sum(amount), stake.view
+             FROM reward
+                      INNER JOIN stake ON reward.addr_id=stake.addr_id
+             WHERE reward.spendable_epoch <= (SELECT MAX(epoch_no) FROM block)
+             GROUP BY stake.view
+             UNION SELECT -sum(amount), stake.view
+             FROM withdrawal
+                      INNER JOIN stake ON withdrawal.addr_id=stake.addr_id
+             GROUP BY stake.view
+            ) AS t
+        GROUP BY view
+"""
 
 const val SQL_GET_ACTIVE_DELEGATION_TO_POOL_WITHOUT_AMOUNT = """
         SELECT sa.view

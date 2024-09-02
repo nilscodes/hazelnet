@@ -197,7 +197,6 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
@@ -229,7 +228,6 @@ internal class RoleAssignmentServiceTest {
         )
         val roleAssignmentService = RoleAssignmentService(
             connectService,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -293,7 +291,6 @@ internal class RoleAssignmentServiceTest {
         } answers { emptyList() }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -600,7 +597,6 @@ internal class RoleAssignmentServiceTest {
             mockk(),
             mockk(),
             mockk(),
-            mockk(),
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
@@ -671,7 +667,6 @@ internal class RoleAssignmentServiceTest {
         } answers { emptyList() }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -818,7 +813,6 @@ internal class RoleAssignmentServiceTest {
         }
         val roleAssignmentService = RoleAssignmentService(
             connectService,
-            mockk(),
             mockk(),
             mockk(),
             mockk(),

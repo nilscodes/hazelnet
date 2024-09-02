@@ -699,6 +699,8 @@ ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("discord_whitelist_id")
 
 ALTER TABLE "discord_whitelists_signup" ADD FOREIGN KEY ("external_account_id") REFERENCES "external_accounts" ("external_account_id") ON DELETE CASCADE;
 
+ALTER TABLE "discord_whitelists_autojoin" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
+
 CREATE INDEX "discord_whitelists_signup_external_account_id_index" ON "discord_whitelists_signup" ("external_account_id");
 
 ALTER TABLE "discord_whitelists_required_roles" ADD FOREIGN KEY ("discord_whitelist_id") REFERENCES "discord_whitelists" ("discord_whitelist_id") ON DELETE CASCADE;
