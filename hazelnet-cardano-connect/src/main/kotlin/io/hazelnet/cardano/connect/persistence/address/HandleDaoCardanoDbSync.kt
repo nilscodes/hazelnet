@@ -9,7 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
-const val GET_ADDRESS_FOR_HANDLE = "SELECT u.address FROM ma_tx_out mto JOIN multi_asset ma ON mto.ident = ma.id JOIN utxo_view u ON mto.tx_out_id=u.id WHERE policy=decode(?, 'hex') AND ma.fingerprint=?"
+const val GET_ADDRESS_FOR_HANDLE = "SELECT u.address FROM ma_tx_out mto JOIN multi_asset ma ON mto.ident = ma.id JOIN tx_out u ON mto.tx_out_id=u.id WHERE u.consumed_by_tx_id IS NULL AND policy=decode(?, 'hex') AND ma.fingerprint=?"
 
 @Repository
 class HandleDaoCardanoDbSync(
