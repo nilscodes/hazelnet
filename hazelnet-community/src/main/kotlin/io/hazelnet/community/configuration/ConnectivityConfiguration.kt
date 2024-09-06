@@ -99,7 +99,10 @@ class ConnectivityConfiguration(
     fun tokenRolesQueue() = Queue("tokenroles")
 
     @Bean
-    fun delegatorRolesQueue() = Queue("delegatorroles")
+    fun stakepoolDelegatorRolesQueue() = Queue("delegatorroles")
+
+    @Bean
+    fun dRepDelegatorRolesQueue() = Queue("drepdelegatorroles")
 
     @Bean
     fun whitelistRolesQueue() = Queue("whitelistroles")
@@ -152,8 +155,12 @@ class ConnectivityConfiguration(
             = BindingBuilder.bind(tokenRolesQueue).to(exchange)
 
     @Bean
-    fun delegatorRolesBinding(@Qualifier("delegatorRolesQueue") delegatorRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
-            = BindingBuilder.bind(delegatorRolesQueue).to(exchange)
+    fun stakepoolDelegatorRolesBinding(@Qualifier("stakepoolDelegatorRolesQueue") stakepoolDelegatorRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(stakepoolDelegatorRolesQueue).to(exchange)
+
+    @Bean
+    fun dRepDelegatorRolesBinding(@Qualifier("dRepDelegatorRolesQueue") dRepDelegatorRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer
+            = BindingBuilder.bind(dRepDelegatorRolesQueue).to(exchange)
 
     @Bean
     fun whitelistRolesBinding(@Qualifier("whitelistRolesQueue") whitelisttRolesQueue: Queue, exchange: DirectExchange): BindingBuilder.DirectExchangeRoutingKeyConfigurer

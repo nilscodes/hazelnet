@@ -45,6 +45,11 @@ export default {
       description: i18n.__({ phrase: 'features.marketplace', locale }),
       value: 'marketplace',
       emoji: { name: '🛒' },
+    }, {
+      label: i18n.__({ phrase: 'features.governanceTitle', locale }),
+      description: i18n.__({ phrase: 'features.governance', locale }),
+      value: 'governance',
+      emoji: { name: '🏛️' },
     }];
   },
 };

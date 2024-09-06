@@ -43,6 +43,8 @@ import { DiscordMintCounterUpdate } from '../types/cardano/discordMintCounterUpd
 import { GlobalSettingsApi } from './globalSettings';
 import { PollPartial } from '../types/poll/pollPartial';
 import { BlockchainType } from '../types/blockchainType';
+import { DRepDelegatorRole } from '../types/roles/dRepDelegatorRole';
+import { DRep } from '../types/cardano/drep';
 
 export class DiscordServerApi extends BaseCacheApi {
   globalsettings: GlobalSettingsApi;
@@ -127,12 +129,21 @@ export class DiscordServerApi extends BaseCacheApi {
     return memberPromise.data;
   }
 
+  async getEligibleDRepDelegatorRolesOfUser(guildId: string, externalAccountId: string): Promise<DiscordRoleAssignment[]> {
+    const memberPromise = await axios.get(`${this.apiUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/drepdelegatorroles`);
+    return memberPromise.data;
+  }
+
   async queueTokenRoleAssignments(guildId: string, externalAccountId: string) {
     await axios.post(`${this.apiUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/tokenroles`);
   }
 
   async queueDelegatorRoleAssignments(guildId: string, externalAccountId: string) {
     await axios.post(`${this.apiUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/delegatorroles`);
+  }
+
+  async queueDRepDelegatorRoleAssignments(guildId: string, externalAccountId: string) {
+    await axios.post(`${this.apiUrl}/discord/servers/${guildId}/members/${externalAccountId}/roleassignments/drepdelegatorroles`);
   }
 
   async updateDiscordServerSetting(guildId: string, settingName: string, settingValue: string) {
@@ -152,6 +163,10 @@ export class DiscordServerApi extends BaseCacheApi {
     await axios.delete(`${this.apiUrl}/discord/servers/${guildId}/stakepools/${poolToRemove}`);
   }
 
+  async deleteDRep(guildId: string, dRepToRemove: string) {
+    await axios.delete(`${this.apiUrl}/discord/servers/${guildId}/dreps/${dRepToRemove}`);
+  }
+
   async deleteTokenPolicy(guildId: string, policyToRemove: string) {
     await axios.delete(`${this.apiUrl}/discord/servers/${guildId}/tokenpolicies/${policyToRemove}`);
   }
@@ -162,6 +177,10 @@ export class DiscordServerApi extends BaseCacheApi {
 
   async deleteDelegatorRole(guildId: string, delegatorRoleIdToRemove: number) {
     await axios.delete(`${this.apiUrl}/discord/servers/${guildId}/delegatorroles/${delegatorRoleIdToRemove}`);
+  }
+
+  async deleteDRepDelegatorRole(guildId: string, dRepDelegatorRoleIdToRemove: number) {
+    await axios.delete(`${this.apiUrl}/discord/servers/${guildId}/drepdelegatorroles/${dRepDelegatorRoleIdToRemove}`);
   }
 
   async deleteWhitelist(guildId: string, whitelistIdToRemove: number) {
@@ -176,8 +195,16 @@ export class DiscordServerApi extends BaseCacheApi {
     return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/stakepools`)).data;
   }
 
+  async listDReps(guildId: string): Promise<DRep[]> {
+    return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/dreps`)).data;
+  }
+
   async listDelegatorRoles(guildId: string): Promise<DelegatorRole[]> {
     return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/delegatorroles`)).data;
+  }
+
+  async listDRepDelegatorRoles(guildId: string): Promise<DRepDelegatorRole[]> {
+    return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/drepdelegatorroles`)).data;
   }
 
   async listTokenOwnershipRoles(guildId: string): Promise<TokenOwnershipRole[]> {
@@ -188,10 +215,16 @@ export class DiscordServerApi extends BaseCacheApi {
     return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/whitelists`)).data;
   }
 
-  async addStakepool(guildId: string, poolHash: string): Promise<any> {
-    return axios.post(`${this.apiUrl}/discord/servers/${guildId}/stakepools`, {
+  async addStakepool(guildId: string, poolHash: string): Promise<Stakepool> {
+    return (await axios.post(`${this.apiUrl}/discord/servers/${guildId}/stakepools`, {
       poolHash,
-    });
+    })).data;
+  }
+
+  async addDRep(guildId: string, dRepHash: string): Promise<DRep> {
+    return (await axios.post(`${this.apiUrl}/discord/servers/${guildId}/dreps`, {
+      dRepHash,
+    })).data;
   }
 
   async addTokenPolicy(guildId: string, policyId: string, projectName: string): Promise<any> {
@@ -246,13 +279,22 @@ export class DiscordServerApi extends BaseCacheApi {
     axios.delete(`${this.apiUrl}/discord/servers/${guildId}/tokenroles/${tokenRoleId}/metadatafilters/${filterIdToRemove}`);
   }
 
-  async createDelegatorRole(guildId: string, poolHash: string | null, minimumStake: number, maximumStake: number | null, discordRoleId: string): Promise<any> {
-    return axios.post(`${this.apiUrl}/discord/servers/${guildId}/delegatorroles`, {
+  async createDelegatorRole(guildId: string, poolHash: string | null, minimumStake: number, maximumStake: number | null, discordRoleId: string): Promise<DelegatorRole> {
+    return (await axios.post(`${this.apiUrl}/discord/servers/${guildId}/delegatorroles`, {
       poolHash,
       minimumStake,
       maximumStake,
       roleId: discordRoleId,
-    });
+    })).data;
+  }
+
+  async createDRepDelegatorRole(guildId: string, dRepHash: string | null, minimumStake: number, maximumStake: number | null, discordRoleId: string): Promise<DRepDelegatorRole> {
+    return (await axios.post(`${this.apiUrl}/discord/servers/${guildId}/drepdelegatorroles`, {
+      dRepHash,
+      minimumStake,
+      maximumStake,
+      roleId: discordRoleId,
+    })).data;
   }
 
   async createPoll(guildId: string, pollObject: Poll): Promise<Poll> {
@@ -373,6 +415,10 @@ export class DiscordServerApi extends BaseCacheApi {
 
   async getCurrentDelegatorRoleAssignments(guildId: string): Promise<DiscordRoleAssignment[]> {
     return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/roleassignments/delegatorroles`)).data;
+  }
+
+  async getCurrentDRepDelegatorRoleAssignments(guildId: string): Promise<DiscordRoleAssignment[]> {
+    return (await axios.get(`${this.apiUrl}/discord/servers/${guildId}/roleassignments/drepdelegatorroles`)).data;
   }
 
   async getCurrentTokenRoleAssignments(guildId: string): Promise<DiscordRoleAssignment[]> {

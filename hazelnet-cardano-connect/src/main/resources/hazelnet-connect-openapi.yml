@@ -166,7 +166,7 @@ paths:
                   $ref: '#/components/schemas/StakepoolInfo'
   /stakepools/{poolHash}/delegation:
     get:
-      summary: Get the active delegation (i.e. current delegation) of a pool for a given epoch
+      summary: Get the active stakepool delegation (i.e. current delegation) of a pool for a given epoch
       operationId: getActiveDelegation
       tags:
         - stakepools
@@ -181,7 +181,7 @@ paths:
             default: false
       responses:
         '200':
-          description: 'A list of all active delegations'
+          description: 'A list of all active stakepool delegations'
           content:
             application/json:
               schema:
@@ -190,7 +190,7 @@ paths:
                   $ref: '#/components/schemas/DelegationInfo'
   /stakepools/{poolHash}/delegation/{epochNo}:
     get:
-      summary: Get the delegation (i.e. delegation snapshot) of a pool for a given epoch
+      summary: Get the stakepool delegation (i.e. delegation snapshot) of a pool for a given epoch
       operationId: getDelegationInEpoch
       tags:
         - stakepools
@@ -199,13 +199,65 @@ paths:
         - $ref: '#/components/parameters/EpochNumberPathParameter'
       responses:
         '200':
-          description: 'A list of delegations at the snapshot time'
+          description: 'A list of stakepool delegations at the snapshot time'
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/DelegationInfo'
+  /dreps:
+    get:
+      summary: Get a list of dReps, optionally filtered by parameters
+      operationId: listDReps
+      tags:
+        - dreps
+      parameters:
+        - name: dRepView
+          in: query
+          description: The dRep view string to resolve search the dRep by
+          required: false
+          schema:
+            $ref: '#/components/schemas/DRepView'
+        - name: poolHash
+          in: query
+          description: The dRep hash string to resolve search the dRep by
+          required: false
+          schema:
+            $ref: '#/components/schemas/DRepHash'
+      responses:
+        '200':
+          description: 'A list of dReps'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DRepInfo'
+  /dreps/{dRepHash}/delegation:
+    get:
+      summary: Get the active delegation (i.e. current delegation) of a pool for a given epoch
+      operationId: getActiveDRepDelegation
+      tags:
+        - dreps
+      parameters:
+        - $ref: '#/components/parameters/DRepHashPathParameter'
+        - name: withoutAmount
+          in: query
+          description: 'If set to true, data can be retrieved without requiring stake amounts. Defaults to false if omitted.'
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 'A list of all active dRep delegations'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DRepDelegationInfo'
   /token/stake:
     post:
       summary: Get the policy IDs and token counts that currently reside in all stake addresses, for the policy IDs/fingerprint combinations in the body
@@ -427,6 +479,15 @@ components:
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
       schema:
         $ref: '#/components/schemas/StakepoolHash'
+    DRepHashPathParameter:
+      name: dRepHash
+      in: path
+      description: The dRep hash
+      required: true
+      style: simple
+      example: 0ff7116e9136390c8a3033ee68dd6257a0dfa3867d79fea193402a2e
+      schema:
+        $ref: '#/components/schemas/DRepHash'
     PolicyIdPathParameter:
       name: policyId
       in: path
@@ -495,7 +556,7 @@ components:
       properties:
         hash:
           type: string
-          pattern: '^[_A-Z0-9]{56}$'
+          pattern: '^[A-Z0-9]{56}$'
         view:
           type: string
         ticker:
@@ -506,6 +567,19 @@ components:
           type: string
         description:
           type: string
+    DRepInfo:
+      type: object
+      required:
+        - hash
+        - view
+        - name
+      properties:
+        hash:
+          $ref: '#/components/schemas/DRepHash'
+        view:
+          $ref: '#/components/schemas/DRepId'
+        name:
+          type: string
     DelegationInfo:
       type: object
       required:
@@ -515,6 +589,20 @@ components:
       properties:
         poolHash:
           $ref: '#/components/schemas/StakepoolHash'
+        amount:
+          type: integer
+          format: int64
+        stakeAddress:
+          $ref: '#/components/schemas/StakeAddressView'
+    DRepDelegationInfo:
+      type: object
+      required:
+        - dRepHash
+        - amount
+        - stakeAddress
+      properties:
+        dRepHash:
+          $ref: '#/components/schemas/DRepHash'
         amount:
           type: integer
           format: int64
@@ -665,7 +753,17 @@ components:
       type: string
       description: The Stakepool hash
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
-      pattern: '^[_A-Za-z0-9]{56}$'
+      pattern: '^[A-Za-z0-9]{56}$'
+    DRepId:
+      type: string
+      description: The dRep ID (bech32)
+      example: drep1plm3zm53xcusez3sx0hx3htz27sdlgux04ulagvngq4zu7cry5f
+      pattern: "^drep1[a-z0-9]{51}$"
+    DRepHash:
+      type: string
+      description: The dRep hash
+      example: 0ff7116e9136390c8a3033ee68dd6257a0dfa3867d79fea193402a2e
+      pattern: "^[A-Za-z0-9]{56}$"
     StakeAddressView:
       type: string
       description: The staking address of a wallet, in viewable format

@@ -1,7 +1,7 @@
 import { APIRole, Guild, GuildMember, Role } from 'discord.js';
 import i18n from 'i18n';
-import HazelnetClient from './hazelnetclient';
 import { DiscordRoleAssignment, DiscordServer, WithRoleId } from '@vibrantnet/core';
+import HazelnetClient from './hazelnetclient';
 
 type RoleToUserMap = {
   [index: string]: string[]
@@ -36,10 +36,14 @@ export default {
     if (roleProperty === 'delegatorRoles') {
       return client.services.discordserver.listDelegatorRoles(guildId);
     }
+    if (roleProperty === 'dRepDelegatorRoles') {
+      return client.services.discordserver.listDRepDelegatorRoles(guildId);
+    }
     if (roleProperty === 'whitelistRoles') {
       const whitelists = await client.services.discordserver.listWhitelists(guildId);
       return whitelists.filter((whitelist) => !!whitelist.awardedRole).map((whitelist) => ({ roleId: whitelist.awardedRole! }));
-    } else if (roleProperty === 'quizRoles') {
+    }
+    if (roleProperty === 'quizRoles') {
       const quizzes = await client.services.discordquiz.getQuizzes(guildId);
       return quizzes.filter((quiz) => !!quiz.awardedRole).map((quiz) => ({ roleId: quiz.awardedRole! }));
     }

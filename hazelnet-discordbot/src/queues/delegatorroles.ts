@@ -1,5 +1,5 @@
-import HazelnetClient from "../utility/hazelnetclient";
 import { DiscordRoleAssignmentListForGuildMember } from '@vibrantnet/core';
+import HazelnetClient from "../utility/hazelnetclient";
 import roleassignments from '../utility/roleassignments';
 
 export default {
@@ -12,10 +12,10 @@ export default {
         const removeInvalid = discordServer.settings?.REMOVE_INVALID_DELEGATORROLES !== 'false';
         await roleassignments.ensureRoleAssignmentsForUser(client, discordServer, 'delegatorRoles', guild, roleAssignmentsForUser.assignments, roleAssignmentsForUser.userId, removeInvalid);
       } else {
-        client.logger.error({ guildId: roleAssignmentsForUser.guildId, msg: 'Guild not found while processing delegator role assignments' });
+        client.logger.error({ guildId: roleAssignmentsForUser.guildId, msg: 'Guild not found while processing stakepool delegator role assignments' });
       }
     } catch (assignmentError) {
-      client.logger.error({ guildId: roleAssignmentsForUser.guildId, msg: 'Failed to process delegator role assignments queue', error: assignmentError });
+      client.logger.error({ guildId: roleAssignmentsForUser.guildId, msg: 'Failed to process stakepool delegator role assignments queue', error: assignmentError });
     }
   },
 };

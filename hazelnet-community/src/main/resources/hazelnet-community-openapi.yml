@@ -1246,7 +1246,7 @@ paths:
           description: "Token role assignments successfully queued"
   /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/delegatorroles:
     get:
-      summary: Get the delegator roles this user is eligible for on this server, if linked
+      summary: Get the stakepool delegator roles this user is eligible for on this server, if linked
       operationId: getEligibleDelegatorRoles
       tags:
         - discord
@@ -1256,13 +1256,13 @@ paths:
         - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
         "200":
-          description: "All delegator roles this user is eligible for on this server"
+          description: "All stakepool delegator roles this user is eligible for on this server"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscordRoleAssignment"
     post:
-      summary: Queue assigning all delegator roles this user is currently eligible for on this server, if linked
+      summary: Queue assigning all stakepool delegator roles this user is currently eligible for on this server, if linked
       operationId: queueDelegatorRoleAssignments
       tags:
         - discord
@@ -1272,7 +1272,36 @@ paths:
         - $ref: "#/components/parameters/ExternalAccountPathParameter"
       responses:
         "204":
-          description: "Delegator role assignments successfully queued"
+          description: "Stakepool delegator role assignments successfully queued"
+  /discord/servers/{guildId}/members/{externalAccountId}/roleassignments/drepdelegatorroles:
+    get:
+      summary: Get the dRep delegation roles this user is eligible for on this server, if linked
+      operationId: getEligibleDrepDelegatorRoles
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "200":
+          description: "All dRep delegator roles this user is eligible for on this server"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordRoleAssignment"
+    post:
+      summary: Queue assigning all dRep delegator roles this user is currently eligible for on this server, if linked
+      operationId: queueDrepDelegatorRoleAssignments
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/ExternalAccountPathParameter"
+      responses:
+        "204":
+          description: "dRep delegator role assignments successfully queued"
   /discord/servers/{guildId}/members/{externalAccountId}/claimlists/{claimListId}/orders:
     get:
       summary: Get any order this user might have had for the given claim list
@@ -1564,7 +1593,7 @@ paths:
               $ref: "#/components/schemas/DiscordDelegatorRole"
       responses:
         "201":
-          description: "Newly created Delegator Role"
+          description: "Newly created stakepool delegator Role"
           content:
             application/json:
               schema:
@@ -1574,7 +1603,7 @@ paths:
               $ref: "#/components/schemas/CreatedResponseHeader"
   /discord/servers/{guildId}/delegatorroles/{delegatorRoleId}:
     delete:
-      summary: Remove a delegator role assignment from this discord server
+      summary: Remove a stakepool delegator role assignment from this discord server
       operationId: deleteDelegatorRole
       tags:
         - discord
@@ -1585,6 +1614,114 @@ paths:
       responses:
         "204":
           description: Successful deletion
+
+  /discord/servers/{guildId}/dreps:
+    get:
+      summary: List all official dReps on this discord server
+      operationId: listDReps
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "200":
+          description: "Details of all added dReps"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DRep"
+    post:
+      summary: Add an official dRep to this discord server
+      operationId: addDRep
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DRep"
+      responses:
+        "201":
+          description: "Details of added dRep"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DRep"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/dreps/{dRepHash}:
+    delete:
+      summary: Remove an official dRep from this discord server
+      operationId: deleteDRep
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/DRepHashPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+  /discord/servers/{guildId}/dreproles:
+    get:
+      summary: Get all auto-assigned roles based on dRep delegation for this discord server
+      operationId: listDRepDelegatorRoles
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      responses:
+        "201":
+          description: "Newly created dRep delegator Role"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordDRepDelegatorRole"
+    post:
+      summary: Add an auto-assigned role based on drep delegation to this discord server
+      operationId: addDRepDelegatorRole
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscordDRepDelegatorRole"
+      responses:
+        "201":
+          description: "Newly created dRep delegator Role"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscordDRepDelegatorRole"
+          headers:
+            Location:
+              $ref: "#/components/schemas/CreatedResponseHeader"
+  /discord/servers/{guildId}/dreproles/{dRepDelegatorRoleId}:
+    delete:
+      summary: Remove a dRep delegator role assignment from this discord server
+      operationId: deleteDRepDelegatorRole
+      tags:
+        - discord
+        - drep
+      parameters:
+        - $ref: "#/components/parameters/GuildIdPathParameter"
+        - $ref: "#/components/parameters/DRepDelegatorRoleIdPathParameter"
+      responses:
+        "204":
+          description: Successful deletion
+
   /discord/servers/{guildId}/tokenroles:
     get:
       summary: Get all auto-assigned roles based on token ownership for this discord server
@@ -3032,7 +3169,25 @@ components:
     DelegatorRoleIdPathParameter:
       name: delegatorRoleId
       in: path
-      description: The ID of this delegator role assignment
+      description: The ID of this stakepool delegator role assignment
+      required: true
+      style: simple
+      example: 235
+      schema:
+        type: integer
+        format: int64
+    DRepHashPathParameter:
+      name: dRepHash
+      in: path
+      description: The dRep hash
+      required: true
+      style: simple
+      schema:
+        $ref: "#/components/schemas/DRepHash"
+    DRepDelegatorRoleIdPathParameter:
+      name: dRepDelegatorRoleId
+      in: path
+      description: The ID of this dRep delegator role assignment
       required: true
       style: simple
       example: 235
@@ -3801,6 +3956,13 @@ components:
           $ref: "#/components/schemas/StakepoolHash"
         info:
           $ref: "#/components/schemas/StakepoolInfo"
+    DRep:
+      type: object
+      required:
+        - dRepHash
+      properties:
+        dRepHash:
+          $ref: "#/components/schemas/DRepHash"
     StakepoolInfo:
       type: object
       required:
@@ -3837,6 +3999,30 @@ components:
           format: int64
         poolHash:
           $ref: "#/components/schemas/StakepoolHash"
+        minimumStake:
+          type: integer
+          description: Minimum stake in Lovelace
+          format: int64
+          example: 1000000000
+        maximumStake:
+          type: integer
+          description: Maximum stake in Lovelace (exclusive)
+          format: int64
+          example: 20000000000
+        roleId:
+          $ref: "#/components/schemas/DiscordRole"
+    DiscordDRepDelegatorRole:
+      type: object
+      required:
+        - minimumStake
+        - roleId
+      properties:
+        id:
+          readOnly: true
+          type: integer
+          format: int64
+        dRepHash:
+          $ref: "#/components/schemas/DRepHash"
         minimumStake:
           type: integer
           description: Minimum stake in Lovelace
@@ -5173,6 +5359,16 @@ components:
       type: string
       description: The Stakepool hash
       example: be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4
+      pattern: "^[A-Za-z0-9]{56}$"
+    DRepId:
+      type: string
+      description: The dRep ID (bech32)
+      example: drep1plm3zm53xcusez3sx0hx3htz27sdlgux04ulagvngq4zu7cry5f
+      pattern: "^drep1[a-z0-9]{51}$"
+    DRepHash:
+      type: string
+      description: The dRep hash
+      example: 0ff7116e9136390c8a3033ee68dd6257a0dfa3867d79fea193402a2e
       pattern: "^[A-Za-z0-9]{56}$"
     TokenPolicyId:
       type: string

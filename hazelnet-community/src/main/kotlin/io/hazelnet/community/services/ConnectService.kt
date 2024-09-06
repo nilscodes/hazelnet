@@ -2,6 +2,8 @@ package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.address.AddressDetails
 import io.hazelnet.cardano.connect.data.address.Handle
+import io.hazelnet.cardano.connect.data.drep.DRepDelegationInfo
+import io.hazelnet.cardano.connect.data.drep.DRepInfo
 import io.hazelnet.cardano.connect.data.other.EpochDetails
 import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.payment.PaymentConfirmation
@@ -9,8 +11,8 @@ import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.cardano.connect.data.verifications.VerificationConfirmation
-import io.hazelnet.cardano.connect.util.toHex
 import io.hazelnet.community.data.Verification
+import io.hazelnet.community.data.cardano.DRep
 import io.hazelnet.community.data.premium.IncomingDiscordPayment
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.ParameterizedTypeReference
@@ -77,6 +79,21 @@ class ConnectService(
             }.collectList().block()!!
     }
 
+    fun getActiveDelegationForDReps(dRepHashes: List<String>, withoutAmount: Boolean): List<DRepDelegationInfo> {
+        return Flux.fromIterable(dRepHashes)
+            .flatMap { dRepHash ->
+                connectClient.get()
+                    .uri { uriBuilder ->
+                        uriBuilder
+                            .path("/dreps/$dRepHash/delegation")
+                            .queryParam("withoutAmount", withoutAmount.toString())
+                            .build()
+                    }
+                    .retrieve()
+                    .bodyToFlux(DRepDelegationInfo::class.java)
+            }.collectList().block()!!
+    }
+
     fun getDelegationSnapshotForPools(stakepoolHashes: List<String>, epoch: Int): List<DelegationInfo> {
         return Flux.fromIterable(stakepoolHashes)
             .flatMap {
@@ -108,6 +125,14 @@ class ConnectService(
             .uri("/stakepools")
             .retrieve()
             .bodyToMono(object : ParameterizedTypeReference<List<StakepoolInfo>>() {})
+            .block()!!
+    }
+
+    fun getDReps(): List<DRepInfo> {
+        return connectClient.get()
+            .uri("/dreps")
+            .retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<DRepInfo>>() {})
             .block()!!
     }
 
@@ -194,6 +219,30 @@ class ConnectService(
                     .build()
             }.retrieve()
             .bodyToMono(object : ParameterizedTypeReference<List<StakepoolInfo>>() {})
+            .block()!!
+    }
+
+    fun resolveDRepView(dRepView: String): List<DRepInfo> {
+        return connectClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/dreps")
+                    .queryParam("dRepView", dRepView)
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<DRepInfo>>() {})
+            .block()!!
+    }
+
+    fun resolveDRepHash(dRepHash: String): List<DRepInfo> {
+        return connectClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/dreps")
+                    .queryParam("dRepHash", dRepHash)
+                    .build()
+            }.retrieve()
+            .bodyToMono(object : ParameterizedTypeReference<List<DRepInfo>>() {})
             .block()!!
     }
 

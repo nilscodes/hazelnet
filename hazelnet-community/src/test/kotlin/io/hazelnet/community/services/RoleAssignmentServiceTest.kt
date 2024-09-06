@@ -4,6 +4,7 @@ import io.hazelnet.cardano.connect.data.other.SyncInfo
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.token.*
 import io.hazelnet.community.data.*
+import io.hazelnet.community.data.cardano.DRep
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
@@ -171,6 +172,15 @@ internal class RoleAssignmentServiceTest {
                 DelegatorRole(1, null, 60000, null, 78),
                 DelegatorRole(2, "be80794a946cf5e578846fc81e3c62ac13f4ab3335e0f5dc046edad4", 10000, 10000000, 21),
                 DelegatorRole(3, "9679eaa0fa242a9cdae4b030e714b66c0119fc9b3f7564b8f03a5316", 1, null, 662)
+            ),
+            mutableSetOf(
+                DRep("0ff7116e9136390c8a3033ee68dd6257a0dfa3867d79fea193402a2e", null),
+                DRep("abcabc0000abcabc0000abcabc0000abcabc0000abcabc0000abcabc", null),
+            ),
+            mutableSetOf(
+                DRepDelegatorRole(1, null, 60000, null, 78),
+                DRepDelegatorRole(2, "0ff7116e9136390c8a3033ee68dd6257a0dfa3867d79fea193402a2e", 10000, 10000000, 21),
+                DRepDelegatorRole(3, "abcabc0000abcabc0000abcabc0000abcabc0000abcabc0000abcabc", 1, null, 662)
             ),
             useTokenRoles,
             mutableSetOf(),

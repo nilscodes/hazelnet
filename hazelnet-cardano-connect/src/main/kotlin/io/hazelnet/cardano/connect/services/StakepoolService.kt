@@ -1,7 +1,6 @@
 package io.hazelnet.cardano.connect.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
-import io.hazelnet.cardano.connect.persistence.stakepool.StakepoolDao
 import io.hazelnet.cardano.connect.persistence.stakepool.StakepoolDaoBlockfrost
 import io.hazelnet.cardano.connect.persistence.stakepool.StakepoolDaoCardanoDbSync
 import org.springframework.stereotype.Service

@@ -1,7 +1,6 @@
 package io.hazelnet.community.services
 
 import io.hazelnet.cardano.connect.data.stakepool.StakepoolInfo
-import io.hazelnet.community.CommunityApplicationConfiguration
 import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
@@ -22,7 +21,6 @@ import java.time.ZonedDateTime
 import java.util.*
 import javax.transaction.Transactional
 
-const val LOOKUP_NAME_ALL_POOLS = "all"
 const val MIN_PAUSE_BETWEEN_MANUAL_LINKING = 24 * 60 * 60 * 1000L
 
 @Service
@@ -100,7 +98,7 @@ class DiscordServerService(
     }
 
 
-    fun getDiscordServerWithStakepoolInfo(guildId: Long): DiscordServer {
+    private fun getDiscordServerWithStakepoolInfo(guildId: Long): DiscordServer {
         val discordServer = discordServerRetriever.getDiscordServer(guildId)
         val stakepoolMap = stakepoolService.getStakepools()
         discordServer.stakepools.map { it.info = stakepoolMap[it.poolHash] }
@@ -151,7 +149,7 @@ class DiscordServerService(
             stakepool.poolHash = validPools[0].hash
             return
         }
-        throw NoSuchElementException("No stakepool found with pool ID ${stakepool.poolHash}")
+        throw NoSuchElementException("No stakepool found with pool hash ${stakepool.poolHash}")
     }
 
     private fun getValidPools(poolHash: String): List<StakepoolInfo> {
@@ -179,7 +177,7 @@ class DiscordServerService(
                 delegatorRole.poolHash = validPools[0].hash
                 return
             }
-            throw NoSuchElementException("No stakepool found with pool ID ${delegatorRole.poolHash}")
+            throw NoSuchElementException("No stakepool found with pool hash ${delegatorRole.poolHash}")
         }
     }
 
@@ -341,7 +339,7 @@ class DiscordServerService(
         val discordServer = discordServerRetriever.getDiscordServer(guildId)
         return discordServer.delegatorRoles
             .find { it.id == delegatorRoleId }
-            ?: throw NoSuchElementException("No delegator role with ID $delegatorRoleId found on guild $guildId")
+            ?: throw NoSuchElementException("No stakepool delegator role with ID $delegatorRoleId found on guild $guildId")
     }
 
     fun getAllCurrentTokenRoleAssignmentsForGuild(guildId: Long): Set<DiscordRoleAssignment> {

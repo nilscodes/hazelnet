@@ -7,8 +7,7 @@ export default <BotSubcommand> {
     const poolHash = interaction.options.getString('pool-id', true);
     try {
       await interaction.deferReply({ ephemeral: true });
-      const newPoolPromise = await interaction.client.services.discordserver.addStakepool(interaction.guild!.id, poolHash);
-      const newPoolData = newPoolPromise.data;
+      const newPoolData = await interaction.client.services.discordserver.addStakepool(interaction.guild!.id, poolHash);
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const embed = embedBuilder.buildForAdmin(discordServer, '/configure-stakepool add', i18n.__({ phrase: 'configure.stakepool.add.success', locale }), 'configure-stakepool-add', [
