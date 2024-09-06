@@ -13,7 +13,7 @@ export default <BotSubcommand> {
       const locale = discordServer.getBotLanguage();
       const delegatorRoleToRemove = delegatorRoles.find((delegatorRole) => delegatorRole.id === delegatorRoleIdToRemove);
       if (delegatorRoleToRemove) {
-        await interaction.client.services.discordserver.deleteDelegatorRole(interaction.guild!.id, delegatorRoleToRemove.id);
+        await interaction.client.services.discordserver.deleteDRepDelegatorRole(interaction.guild!.id, delegatorRoleToRemove.id);
         let fieldHeader = 'configure.drepdelegatorroles.list.dRepNameInofficial';
         const officialDRep = dReps.find((dRep) => dRep.dRepHash === delegatorRoleToRemove.dRepHash);
         if (!delegatorRoleToRemove.dRepHash) {
