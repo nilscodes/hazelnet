@@ -18,9 +18,9 @@ export default <BotSubcommand> {
           const currentMembers = await interaction.client.services.discordserver.listExternalAccounts(interaction.guild!.id);
           const currentMemberData = currentMembers.find((member) => member.externalAccountId === externalAccountOfOtherUser.id);
           if (currentMemberData) {
-            const roleAssignments = await interaction.client.services.discordserver.getEligibleDelegatorRolesOfUser(interaction.guild!.id, externalAccountOfOtherUser.id);
+            const roleAssignments = await interaction.client.services.discordserver.getEligibleDRepDelegatorRolesOfUser(interaction.guild!.id, externalAccountOfOtherUser.id);
             const member = await interaction.guild!.members.fetch(user.id);
-            const { roleData, missingRoleField } = roleassignments.getEligibleAndMissingRoles(roleAssignments, member, locale, 'delegatorroles');
+            const { roleData, missingRoleField } = roleassignments.getEligibleAndMissingRoles(roleAssignments, member, locale, 'drepdelegatorroles');
             const components = [];
             const missingRoleFields = [];
             if (missingRoleField !== null) {
@@ -28,8 +28,8 @@ export default <BotSubcommand> {
               components.push(new ActionRowBuilder<MessageActionRowComponentBuilder>()
                 .addComponents(
                   new ButtonBuilder()
-                    .setCustomId(`configure-delegatorroles/test/assignroles.${externalAccountOfOtherUser.id}`)
-                    .setLabel(i18n.__({ phrase: 'configure.delegatorroles.test.assignRoles', locale }))
+                    .setCustomId(`configure-drepdelegatorroles/test/assignroles.${externalAccountOfOtherUser.id}`)
+                    .setLabel(i18n.__({ phrase: 'configure.drepdelegatorroles.test.assignRoles', locale }))
                     .setStyle(ButtonStyle.Primary),
                 ));
             }  else {
@@ -40,22 +40,22 @@ export default <BotSubcommand> {
             }
             const embed = embedBuilder.buildForAdmin(
               discordServer,
-              '/configure-delegatorroles test',
-              i18n.__({ phrase: 'configure.delegatorroles.test.purpose', locale }, { user, roleData } as any),
-              'configure-delegatorroles-test',
+              '/configure-drepdelegatorroles test',
+              i18n.__({ phrase: 'configure.drepdelegatorroles.test.purpose', locale }, { user, roleData } as any),
+              'configure-drepdelegatorroles-test',
               missingRoleFields,
             );
             await interaction.editReply({ embeds: [embed], components });
           } else {
-            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles test', i18n.__({ phrase: 'configure.delegatorroles.test.notLinkedError', locale }), 'configure-delegatorroles-test');
+            const embed = embedBuilder.buildForAdmin(discordServer, '/configure-drepdelegatorroles test', i18n.__({ phrase: 'configure.drepdelegatorroles.test.notLinkedError', locale }), 'configure-drepdelegatorroles-test');
             await interaction.editReply({ embeds: [embed] });
           }
         } else {
-          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles test', i18n.__({ phrase: 'configure.delegatorroles.test.blacklistedError', locale }), 'configure-delegatorroles-test');
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-drepdelegatorroles test', i18n.__({ phrase: 'configure.drepdelegatorroles.test.blacklistedError', locale }), 'configure-drepdelegatorroles-test');
           await interaction.editReply({ embeds: [embed] });
         }
       } else {
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles test', i18n.__({ phrase: 'configure.delegatorroles.test.notLinkedError', locale }), 'configure-delegatorroles-test');
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-drepdelegatorroles test', i18n.__({ phrase: 'configure.drepdelegatorroles.test.notLinkedError', locale }), 'configure-drepdelegatorroles-test');
         await interaction.editReply({ embeds: [embed] });
       }
     } catch (error) {
@@ -64,14 +64,14 @@ export default <BotSubcommand> {
     }
   },
   async executeButton(interaction) {
-    if (interaction.customId.indexOf('configure-delegatorroles/test/assignroles') === 0) {
+    if (interaction.customId.indexOf('configure-drepdelegatorroles/test/assignroles') === 0) {
       await interaction.deferUpdate();
       await interaction.editReply({ components: [] });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const externalAccountIdOfOtherUser = interaction.customId.split('.')[1];
-      await interaction.client.services.discordserver.queueDelegatorRoleAssignments(interaction.guild!.id, externalAccountIdOfOtherUser);
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles test', i18n.__({ phrase: 'configure.delegatorroles.test.queueSuccess', locale }), 'configure-delegatorroles-test');
+      await interaction.client.services.discordserver.queueDRepDelegatorRoleAssignments(interaction.guild!.id, externalAccountIdOfOtherUser);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-drepdelegatorroles test', i18n.__({ phrase: 'configure.drepdelegatorroles.test.queueSuccess', locale }), 'configure-drepdelegatorroles-test');
       await interaction.followUp({ embeds: [embed], ephemeral: true });
     }
   },

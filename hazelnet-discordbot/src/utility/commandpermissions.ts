@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
+import { DiscordServer } from '@vibrantnet/core';
 import { ApplicationCommandPermissionType, Guild } from "discord.js";
 import HazelnetClient from "./hazelnetclient";
-import { DiscordServer } from '@vibrantnet/core';
 
 export default {
   userCommands: ['verify', 'info', 'policyid', 'whitelist', 'vote', 'claim', 'premium', 'help'],
-  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-protection', 'configure-tokenroles', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck', 'configure-social', 'configure-giveaway', 'configure-marketplace', 'configure-info'],
+  adminCommands: ['start', 'configure-adminaccess', 'configure-delegatorroles', 'configure-drepdelegatorroles', 'configure-policy', 'configure-poll', 'configure-stakepool', 'configure-drep', 'configure-protection', 'configure-tokenroles', 'configure-whitelist', 'configure-settings', 'configure-api', 'configure-premium', 'configure-healthcheck', 'configure-social', 'configure-giveaway', 'configure-marketplace', 'configure-info'],
   async setSlashCommandPermissions(client: HazelnetClient, guildId: string, discordServer: DiscordServer) {
     const guild = await client.guilds.fetch(guildId);
     if (guild && discordServer) {

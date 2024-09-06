@@ -23,7 +23,7 @@ export default <DelegatorRoleAddCommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id) as DelegatorRole[];
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id);
       const locale = discordServer.getBotLanguage();
       const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       if (stakepools.length) {
@@ -85,9 +85,8 @@ export default <DelegatorRoleAddCommand> {
   },
   async createDelegatorRole(interaction, discordServer, poolHash, minimumStake, maximumStake, roleId) {
     const locale = discordServer.getBotLanguage();
-    const newDelegatorRolePromise = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild!.id, poolHash, minimumStake, maximumStake, roleId);
+    const newDelegatorRole = await interaction.client.services.discordserver.createDelegatorRole(interaction.guild!.id, poolHash, minimumStake, maximumStake, roleId);
     const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
-    const newDelegatorRole = newDelegatorRolePromise.data;
 
     let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
     const officialStakepool = stakepools.find((stakepool) => stakepool.poolHash === newDelegatorRole.poolHash);
@@ -115,7 +114,7 @@ export default <DelegatorRoleAddCommand> {
         this.cancel(interaction, discordServer, roleToAdd);
       }
     } else {
-      interaction.client.logger.warn(`User ${interaction.user.id} tried to add a delegator role for guild ${interaction.guild!.id}, but the role add cache was empty.`);
+      interaction.client.logger.warn(`User ${interaction.user.id} tried to add a stakepool delegator role for guild ${interaction.guild!.id}, but the role add cache was empty.`);
     }
   },
   async confirm(interaction, discordServer, roleToAdd) {

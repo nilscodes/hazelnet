@@ -1,6 +1,7 @@
 package io.hazelnet.community.services
 
 import com.bloxbean.cardano.client.util.AssetUtil
+import io.hazelnet.cardano.connect.data.drep.DRepDelegationInfo
 import io.hazelnet.cardano.connect.data.stakepool.DelegationInfo
 import io.hazelnet.cardano.connect.data.token.Cip68Token
 import io.hazelnet.cardano.connect.data.token.MultiAssetInfo
@@ -20,7 +21,6 @@ import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import javax.transaction.Transactional
 
 private val logger = KotlinLogging.logger {}
@@ -446,6 +446,52 @@ class RoleAssignmentService(
         }.flatten().toSet()
     }
 
+    fun getAllCurrentDRepDelegatorRoleAssignmentsForVerifications(
+        allVerificationsOfMembers: List<Verification>,
+        allDelegationToAllowedDReps: List<DRepDelegationInfo>,
+        discordServer: DiscordServer
+    ): Set<DiscordRoleAssignment> {
+        val bans = discordBanRepository.findByDiscordServerId(discordServer.id!!)
+        val bannedStakeAddresses = bans.filter { it.type == DiscordBanType.STAKE_ADDRESS_BAN }.map { it.pattern }.toSet()
+        val memberIdsToDelegationBuckets = mutableMapOf<Long, Map<String, Long>>()
+        val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
+        allVerificationsOfMembers
+            .filter { it.blockchain == BlockchainType.CARDANO } // Only Cardano addresses can be delegating to a stake pool
+            .forEach { verification ->
+                val mapOfExternalAccount = prepareExternalAccountMapForCountBased(
+                    verification,
+                    externalAccountLookup,
+                    memberIdsToDelegationBuckets
+                )
+                val delegationForStakeAddress =
+                    allDelegationToAllowedDReps.find { it.stakeAddress == verification.cardanoStakeAddress && !bannedStakeAddresses.contains(verification.cardanoStakeAddress) }
+                delegationForStakeAddress?.let {
+                    val newAmount = delegationForStakeAddress.amount
+                    mapOfExternalAccount.compute(delegationForStakeAddress.dRepHash) { _, v -> (v ?: 0) + newAmount }
+                    mapOfExternalAccount.compute(LOOKUP_NAME_ALL_DREPS) { _, v -> (v ?: 0) + newAmount }
+                }
+            }
+
+        val rolesToAssign =
+            if (discordServer.getPremium()) discordServer.drepDelegatorRoles
+            else listOfNotNull(discordServer.drepDelegatorRoles.minByOrNull { it.id!! })
+
+        return memberIdsToDelegationBuckets.map { delegations ->
+            rolesToAssign.mapNotNull { role ->
+                val lookupName = role.dRepHash ?: LOOKUP_NAME_ALL_DREPS
+                externalAccountLookup[delegations.key]?.let {
+                    val delegationAmount = (delegations.value[lookupName] ?: 0)
+                    val maximumStake = role.maximumStake
+                    if (delegationAmount >= role.minimumStake && (maximumStake == null || delegationAmount < maximumStake)) {
+                        DiscordRoleAssignment(discordServer.guildId, it.referenceId.toLong(), role.roleId)
+                    } else {
+                        null
+                    }
+                }
+            }
+        }.flatten().toSet()
+    }
+
     private fun prepareExternalAccountMapForCountBased(verification: Verification, externalAccountLookup: MutableMap<Long, ExternalAccount>, memberIdsToTokenPolicyOwnershipCounts: MutableMap<Long, Map<String, Long>>): MutableMap<String, Long> {
         val externalAccountId = verification.externalAccount.id!!
         externalAccountLookup[externalAccountId] = verification.externalAccount
@@ -482,8 +528,19 @@ class RoleAssignmentService(
         return if (discordServer.delegatorRoles.isNotEmpty()) {
             val allVerificationsOfMember =
                 externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
-            val allDelegationToAllowedPools = getDelegationIfNeeded(discordServer)
+            val allDelegationToAllowedPools = getStakepoolDelegationIfNeeded(discordServer)
             getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedPools, discordServer)
+        } else {
+            emptySet()
+        }
+    }
+
+    fun getAllCurrentDRepDelegatorRoleAssignmentsForGuildMember(discordServer: DiscordServer, externalAccountId: Long): Set<DiscordRoleAssignment> {
+        return if (discordServer.drepDelegatorRoles.isNotEmpty()) {
+            val allVerificationsOfMember =
+                externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
+            val allDelegationToAllowedDReps = getDRepDelegationIfNeeded(discordServer)
+            getAllCurrentDRepDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedDReps, discordServer)
         } else {
             emptySet()
         }
@@ -503,13 +560,15 @@ class RoleAssignmentService(
     @Transactional
     fun publishWalletBasedRoleAssignmentsForGuildMember(guildId: Long, externalAccountId: Long) {
         val discordServer = discordServerRetriever.getDiscordServer(guildId)
-        if (discordServer.tokenRoles.isNotEmpty() || discordServer.delegatorRoles.isNotEmpty()) {
+        if (discordServer.tokenRoles.isNotEmpty() || discordServer.delegatorRoles.isNotEmpty() || discordServer.drepDelegatorRoles.isNotEmpty()) {
             val externalAccount = externalAccountService.getExternalAccount(externalAccountId)
             val allVerificationsOfMember =
                 externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
-            val allDelegationToAllowedPools = getDelegationIfNeeded(discordServer)
+            val allDelegationToAllowedPools = getStakepoolDelegationIfNeeded(discordServer)
+            val allDelegationToAllowedDReps = getDRepDelegationIfNeeded(discordServer)
             publishTokenRoleAssignmentsForGuildMember(allVerificationsOfMember, discordServer, externalAccount)
             publishDelegatorRoleAssignmentsForGuildMember(allVerificationsOfMember, allDelegationToAllowedPools, discordServer, externalAccount)
+            publishDRepDelegatorRoleAssignmentsForGuildMember(allVerificationsOfMember, allDelegationToAllowedDReps, discordServer, externalAccount)
         }
     }
 
@@ -543,16 +602,24 @@ class RoleAssignmentService(
             val allVerificationsOfMember =
                 externalAccountService.getConfirmedExternalAccountVerifications(externalAccountId)
             discordServers.forEach {
-                val allDelegationToAllowedPools = getDelegationIfNeeded(it)
+                val allDelegationToAllowedPools = getStakepoolDelegationIfNeeded(it)
+                val allDelegationToAllowedDReps = getDRepDelegationIfNeeded(it)
                 publishTokenRoleAssignmentsForGuildMember(allVerificationsOfMember, it, externalAccount)
                 publishDelegatorRoleAssignmentsForGuildMember(allVerificationsOfMember, allDelegationToAllowedPools, it, externalAccount)
+                publishDRepDelegatorRoleAssignmentsForGuildMember(allVerificationsOfMember, allDelegationToAllowedDReps, it, externalAccount)
             }
         }
     }
 
-    private fun getDelegationIfNeeded(discordServer: DiscordServer) =
+    private fun getStakepoolDelegationIfNeeded(discordServer: DiscordServer) =
         if (discordServer.delegatorRoles.isNotEmpty()) {
             connectService.getActiveDelegationForPools(discordServer.stakepools.map { pool -> pool.poolHash }, false)
+        }
+        else listOf()
+
+    private fun getDRepDelegationIfNeeded(discordServer: DiscordServer) =
+        if (discordServer.drepDelegatorRoles.isNotEmpty()) {
+            connectService.getActiveDelegationForDReps(discordServer.dreps.map { dRep -> dRep.dRepHash }, false)
         }
         else listOf()
 
@@ -581,13 +648,32 @@ class RoleAssignmentService(
         externalAccount: ExternalAccount
     ) {
         if (discordServer.delegatorRoles.isNotEmpty()) {
-            val delegatorRoleAssignmentsForGuildMember =
+            val stakepoolDelegatorRoleAssignmentsForGuildMember =
                 getAllCurrentDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedPools, discordServer)
             rabbitTemplate.convertAndSend(
                 "delegatorroles", DiscordRoleAssignmentListForGuildMember(
                     guildId = discordServer.guildId,
                     userId = externalAccount.referenceId.toLong(),
-                    assignments = delegatorRoleAssignmentsForGuildMember,
+                    assignments = stakepoolDelegatorRoleAssignmentsForGuildMember,
+                )
+            )
+        }
+    }
+
+    private fun publishDRepDelegatorRoleAssignmentsForGuildMember(
+        allVerificationsOfMember: List<Verification>,
+        allDelegationToAllowedDReps: List<DRepDelegationInfo>,
+        discordServer: DiscordServer,
+        externalAccount: ExternalAccount
+    ) {
+        if (discordServer.drepDelegatorRoles.isNotEmpty()) {
+            val dRepDelegatorRoleAssignmentsForGuildMember =
+                getAllCurrentDRepDelegatorRoleAssignmentsForVerifications(allVerificationsOfMember, allDelegationToAllowedDReps, discordServer)
+            rabbitTemplate.convertAndSend(
+                "drepdelegatorroles", DiscordRoleAssignmentListForGuildMember(
+                    guildId = discordServer.guildId,
+                    userId = externalAccount.referenceId.toLong(),
+                    assignments = dRepDelegatorRoleAssignmentsForGuildMember,
                 )
             )
         }
@@ -636,6 +722,11 @@ class RoleAssignmentService(
         publishRoleRemoval("tokenroles")
         publishRoleRemoval("delegatorroles")
         // Whitelist roles are independent of verifications and not removed here
+    }
+
+    companion object {
+        const val LOOKUP_NAME_ALL_POOLS = "all"
+        const val LOOKUP_NAME_ALL_DREPS = "all"
     }
 
 }

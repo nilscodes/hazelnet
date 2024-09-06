@@ -5,30 +5,30 @@ import CommandTranslations from '../utility/commandtranslations';
 
 export default <BotCommand> {
   getCommandData(locale) {
-    const ci18n = new CommandTranslations('configure-stakepool', locale);
+    const ci18n = new CommandTranslations('configure-drep', locale);
     return new SlashCommandBuilder()
-      .setName('configure-stakepool')
+      .setName('configure-drep')
       .setDescription(ci18n.description())
       .addSubcommand((subcommand) => subcommand
         .setName('add')
         .setDescription(ci18n.subDescription('add'))
-        .addStringOption((option) => option.setName('pool-id').setDescription(ci18n.option('pool-id')).setRequired(true)))
+        .addStringOption((option) => option.setName('drep-id').setDescription(ci18n.option('drep-id')).setRequired(true)))
       .addSubcommand((subcommand) => subcommand
         .setName('list')
         .setDescription(ci18n.subDescription('list')))
       .addSubcommand((subcommand) => subcommand
         .setName('remove')
         .setDescription(ci18n.subDescription('remove'))
-        .addStringOption((option) => option.setName('pool-id').setDescription(ci18n.option('pool-id')).setRequired(true)));
+        .addStringOption((option) => option.setName('drep-id').setDescription(ci18n.option('drep-id')).setRequired(true)));
     /*
       .addSubcommand((subcommand) => subcommand
         .setName('infochannel')
-        .setDescription('Toggle the stakepool update feed for the given channel.')
-        .addChannelOption((option) => option.setName('infochannel').setDescription('The channel to send pool update messages to.').setRequired(true))
+        .setDescription('Toggle the dRep update feed for the given channel.')
+        .addChannelOption((option) => option.setName('infochannel').setDescription('The channel to send dRep update messages to.').setRequired(true))
         .addStringOption((option) => option.setName('off').setDescription('Set this parameter to off when disabling the info channel').setRequired(false)));
         */
   },
   augmentPermissions: commandbase.augmentPermissionsAdmin,
-  commandTags: ['stakepool'],
+  commandTags: ['governance'],
   execute: commandbase.executeSubcommandIfAdmin,
 };

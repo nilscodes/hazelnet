@@ -1,5 +1,4 @@
 import i18n from 'i18n';
-import { DelegatorRole } from '@vibrantnet/core';
 import { BotSubcommand } from "../../utility/commandtypes";
 import embedBuilder from '../../utility/embedbuilder';
 
@@ -9,7 +8,7 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id) as DelegatorRole[];
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id);
       const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       const locale = discordServer.getBotLanguage();
       const delegatorRoleToRemove = delegatorRoles.find((delegatorRole) => delegatorRole.id === delegatorRoleIdToRemove);
@@ -36,7 +35,7 @@ export default <BotSubcommand> {
       }
     } catch (error) {
       interaction.client.logger.error(error);
-      await interaction.editReply({ content: `Error while removing auto-role assignment for role with ID ${delegatorRoleIdToRemove} from your server. Please contact your bot admin via https://www.vibrantnet.io.` });
+      await interaction.editReply({ content: `Error while removing auto-role assignment for stakepool delegator role with ID ${delegatorRoleIdToRemove} from your server. Please contact your bot admin via https://www.vibrantnet.io.` });
     }
   },
 };

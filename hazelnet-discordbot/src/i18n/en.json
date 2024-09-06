@@ -103,15 +103,24 @@
 			"configure-tokenroles-policies-remove": "Remove an accepted policy from your existing token role.",
 			"configure-tokenroles-remove": "Remove the auto-assignment for the given role for NFT and FT holders.",
 			"configure-tokenroles-test": "Test what token roles a user is currently eligible for.",
-			"configure-delegatorroles": "Configure delegator-roles",
+			"configure-delegatorroles": "Configure stakepool delegator-roles",
 			"configure-delegatorroles-add": "Adds an auto-assignment for the given role.",
 			"configure-delegatorroles-list": "List all auto-assigned roles for delegators of the pools configured for this server.",
 			"configure-delegatorroles-remove": "Remove all auto-assignments (for all stake amounts) for the given role for delegators.",
 			"configure-delegatorroles-test": "Test what delegator roles a user is currently eligible for.",
+			"configure-drepdelegatorroles": "Configure dRep delegator-roles",
+			"configure-drepdelegatorroles-add": "Adds an auto-assignment for the given role.",
+			"configure-drepdelegatorroles-list": "List all auto-assigned roles for delegators of the dReps configured for this server.",
+			"configure-drepdelegatorroles-remove": "Remove all auto-assignments (for all stake amounts) for the given role for delegators.",
+			"configure-drepdelegatorroles-test": "Test what delegator roles a user is currently eligible for.",
 			"configure-stakepool": "Configure stakepools",
 			"configure-stakepool-add": "Add a Cardano stakepool ID for which this Discord server is assigning auto-roles.",
 			"configure-stakepool-list": "List all Cardano stakepool IDs for which this Discord server is assigning auto-roles for delegators.",
 			"configure-stakepool-remove": "Remove the Cardano stakepool ID from the list of pools this server is configured for.",
+			"configure-drep": "Configure dReps",
+			"configure-drep-add": "Add a Cardano dRep ID for which this Discord server is assigning auto-roles.",
+			"configure-drep-list": "List all Cardano dRep IDs for which this Discord server is assigning auto-roles for delegators.",
+			"configure-drep-remove": "Remove the Cardano dRep ID from the list of pools this server is configured for.",
 			"configure-policy": "Manage asset policies that are officially represented by this server",
 			"configure-policy-add": "Add a Cardano policy ID and associated project name to the list of official projects on this server.",
 			"configure-policy-list": "List all Cardano policy IDs configured as official policies for projects on this server.",
@@ -200,6 +209,9 @@
 			"configure-stakepool": {
 				"pool-id": "'Pool ID (not ticker) for the pool you want to add/remove"
 			},
+			"configure-drep": {
+				"drep-id": "'Pool ID (not ticker) for the pool you want to add/remove"
+			},
 			"configure-policy": {
 				"policy-id": "Policy ID to add/remove as an official token policy on this server",
 				"project-name": "The project name to list this policy ID under",
@@ -215,7 +227,15 @@
 				"minimum-stake": "The minimum stake (in ADA) required for this role (0 for any amount).",
 				"maximum-stake": "The maximum stake (in ADA) for this role. The stake has to be less than this amount.",
 				"pool-id": "Pool ID (not ticker) required to be delegating to, or ignore for all pools of this server.",
-				"user": "The user to check delegator roles for"
+				"user": "The user to check stakepool delegator roles for"
+			},
+			"configure-drepdelegatorroles": {
+				"role": "Role to assign users with the given amount of stake for configured dReps.",
+				"minimum-stake": "The minimum stake (in ADA) required for this role (0 for any amount).",
+				"maximum-stake": "The maximum stake (in ADA) for this role. The stake has to be less than this amount.",
+				"pool-id": "DRep Hash required to be delegating to, or ignore for all dReps of this server.",
+				"user": "The user to check dRep delegator roles for",
+				"drep-id": "commands.options.configure-drepdelegatorroles.drep-id"
 			},
 			"configure-poll": {
 				"poll-name": "The internal name for this poll (can only be up to 30 alphanumeric characters)",
@@ -373,7 +393,13 @@
 			"other": "This server officially supports the following Cardano stakepools:"
 		},
 		"stakepoolDetails": "#️⃣ *Pool hash:*\n{{hash}}\n\nℹ *Description:*\n{{{description}}}\n\n🌍 *Website:*\n{{{website}}}\n\n👁 *Pool.pm:*\nhttps://pool.pm/{{hash}}",
-		"stakepoolDetailsShort": "https://pool.pm/{{hash}}"
+		"stakepoolDetailsShort": "https://pool.pm/{{hash}}",
+		"dRepsBaseText": {
+			"one": "This server officially supports this Cardano dRep:",
+			"other": "This server officially supports the following Cardano dReps:"
+		},
+		"dRepDetails": "#️⃣ *dRep hash:*\n{{hash}}\n\n📃 *dRep ID:*\n{{{view}}}\n\n👤 *Name:*\n{{{name}}}\n\n👁 *Pool.pm:*\nhttps://pool.pm/{{hash}}",
+		"dRepDetailsShort": "https://pool.pm/{{hash}}"
 	},
 	"help": {
 		"messageTitle": "Get help for {{{botName}}}",
@@ -938,6 +964,21 @@
 				"errorNotFound": "⚠ No stakepool with the hash **{{stakepoolHash}}** was found for this server. Nothing was removed."
 			}
 		},
+		"drep": {
+			"list": {
+				"purpose": "This is the list of official dReps that this server will present when end users use the /info command.\n\n⚠ Do not add dRep that are not your own or that you are not officially supporting. Reports of misused dReps will be taken seriously by the team and may result in your server being blacklisted for Vibrant usage.",
+				"dRepNameEmpty": "No name provided",
+				"noDRepName": "No official dReps",
+				"noDReps": "*Currently, this server has no dReps listed.*"
+			},
+			"add": {
+				"success": "✅ New official dRep added for this Discord server!"
+			},
+			"remove": {
+				"success": "🗑️ Removed the following dRep from the official dRep list of this server:",
+				"errorNotFound": "⚠ No dRep with the hash **{{dRepHash}}** was found for this server. Nothing was removed."
+			}
+		},
 		"bans": {
 			"list": {
 				"purpose": "This is the list of active bans on your server.\n\n{{{banText}}}",
@@ -1118,32 +1159,73 @@
 		"delegatorroles": {
 			"list": {
 				"purpose": "This is the list of Discord roles that will be automatically assigned, based on delegated ADA amounts and stakepools for verified users.",
-				"noDelegatorRolesTitle": "No delegator roles",
-				"noDelegatorRolesDetail": "*Currently, this server has no delegation-based roles configured.*",
+				"noDelegatorRolesTitle": "No stakepool delegator roles",
+				"noDelegatorRolesDetail": "*Currently, this server has no delegation-based stakepool roles configured.*",
 				"stakepoolNameOfficial": "Stakepool {{{officialStakepool.info.ticker}}}, {{officialStakepool.poolHash}} (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameAny": "Any official stakepool of this server (see list via /info) (Role-ID: {{delegatorRole.id}})",
 				"stakepoolNameInofficial": "{{delegatorRole.poolHash}} (Role-ID: {{delegatorRole.id}})",
 				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}**{{{maxInfo}}} to the above pool will be assigned the role <@&{{delegatorRole.roleId}}>.",
 				"maxInfo": " and less than **₳{{maximumStake}}**",
-				"noPremium": "🙀 Users currently only get the delegator role with the lowest ID automatically assigned (Role-ID: {{delegatorRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
+				"noPremium": "🙀 Users currently only get the stakepool delegator role with the lowest ID automatically assigned (Role-ID: {{delegatorRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
 			},
 			"add": {
-				"success": "✅ New automatic role-assignment for the following delegators added to this server:",
-				"errorMinimumStake": "⚠ Automatic delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳.",
+				"success": "✅ New automatic role-assignment for the following stakepool delegators added to this server:",
+				"errorMinimumStake": "⚠ Automatic stakepool delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳.",
 				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
 				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
 				"confirmRole": "I understand - continue",
 				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\nPool hash: {{poolHash}}\nMinimum staked ADA: {{minimumStakeAda}}\nMaximum staked ADA: {{maximumStakeAda}}",
-				"noPremium": "🙀 You currently can not add any additional delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"noPremium": "🙀 You currently can not add any additional stakepool delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
 				"noMatchingStakepool": "⚠ The pool hash *{{poolHash}}* you have provided is not included in your list of supported stakepools on this server. Make sure it is added via **/configure-stakepool add** or verify the right pool hash via **/configure-stakepool list**.",
-				"noStakepools": "⚠ You have to add at least one supported stake pool to your server via the **/configure-stakepool add** command, to be able to add a delegator role."
+				"noStakepools": "⚠ You have to add at least one supported stake pool to your server via the **/configure-stakepool add** command, to be able to add a stakepool delegator role."
 			},
 			"remove": {
-				"success": "🗑️ Removed the following delegator role auto-assignment from this server:",
-				"errorNotFound": "⚠ No delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
+				"success": "🗑️ Removed the following stakepool delegator role auto-assignment from this server:",
+				"errorNotFound": "⚠ No stakepool delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
 			},
 			"test": {
-				"purpose": "The user <@{{user.id}}> is eligible for the following delegator roles on this Discord server:\n\n{{{roleData}}}",
+				"purpose": "The user <@{{user.id}}> is eligible for the following stakepool delegator roles on this Discord server:\n\n{{{roleData}}}",
+				"roleEntry": "   • <@&{{roleId}}>",
+				"roleEntryNoneEligible": "ℹ The user is not eligible for any roles. If you feel roles are missing, check your delegator role configuration and have them confirm their verified wallets and delegated amounts.",
+				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
+				"blacklistedError": "🛑 The user is currently banned from any use of the Discord server service. Please contact your support team for further details.",
+				"noMissingRolesTitle": "No missing roles",
+				"noMissingRoles": "✅ The user is not currently missing any roles that should be assigned to them.",
+				"missingRolesTitle": "Missing roles",
+				"missingRoles": "⚠ The user is currently not assigned the following roles that they are eligible for:\n\n{{{roleData}}}\n\n💡 They can either run **/verify unlink** and immediately **/verify link** once a day to get their roles assigned, or wait for up to two hours for automatic assignments to kick in. Alternatively, click the button below to assign their roles (be warned that this will make it you will be asked to do this for your end users manually constantly).",
+				"assignRoles": "Assign missing roles",
+				"queueSuccess": "✅ Successfully queued role assignments for the user. Their roles should appear within the next minutes."
+			}
+		},
+		"drepdelegatorroles": {
+			"list": {
+				"purpose": "This is the list of Discord roles that will be automatically assigned, based on delegated ADA amounts and dReps for verified users.",
+				"noDelegatorRolesTitle": "No dRep delegator roles",
+				"noDelegatorRolesDetail": "*Currently, this server has no delegation-based dRep roles configured.*",
+				"dRepNameOfficial": "DRep {{{officialDRep.info.name}}}, {{officialDRep.dRepHash}} (Role-ID: {{delegatorRole.id}})",
+				"dRepNameAny": "Any official dRep of this server (see list via /info) (Role-ID: {{delegatorRole.id}})",
+				"dRepNameInofficial": "{{delegatorRole.dRepHash}} (Role-ID: {{delegatorRole.id}})",
+				"delegatorRoleDetails": "All verified users that delegate at least **₳{{minimumStake}}**{{{maxInfo}}} to the above dRep will be assigned the role <@&{{delegatorRole.roleId}}>.",
+				"maxInfo": " and less than **₳{{maximumStake}}**",
+				"noPremium": "🙀 Users currently only get the dRep delegator role with the lowest ID automatically assigned (Role-ID: {{delegatorRole.id}}), as your server is not running **Black Edition**. All other automatic role changes are suspended. Please run **/configure-premium status** to check your Black Edition status."
+			},
+			"add": {
+				"success": "✅ New automatic role-assignment for the following dRep delegators added to this server:",
+				"errorMinimumStake": "⚠ Automatic dRep delegator role-assignment could not be added, as minimum stake amount needs to be at least 1₳.",
+				"roleInUseWarning": "⚠ WARNING - ROLE IN USE",
+				"roleInUseDetails": "The role <@&{{roleId}}> is currently assigned to {{memberCount}} members on this Discord server. If you continue, the bot will regularly remove every user from this role unless they are verified and have fulfilled the delegation requirements you are configuring.\n\nPlease confirm, if you want to proceed regardless.\n\n💡 Do NOT make delegator role assignments with roles that are assigned by other bots. The bots will \"battle\" to assign and unassign, otherwise.",
+				"confirmRole": "I understand - continue",
+				"canceled": "ℹ Adding the following delegator role was cancelled:\n\nRole <@&{{roleId}}>\ndRep hash: {{dRepHash}}\nMinimum staked ADA: {{minimumStakeAda}}\nMaximum staked ADA: {{maximumStakeAda}}",
+				"noPremium": "🙀 You currently can not add any additional dRep delegator roles as your server is not running **Black Edition**. Please run **/configure-premium status** to check your Black Edition status.",
+				"noMatchingDRep": "⚠ The dRep hash *{{dRepHash}}* you have provided is not included in your list of supported dReps on this server. Make sure it is added via **/configure-drep add** or verify the right dRep hash via **/configure-drep list**.",
+				"noDReps": "⚠ You have to add at least one supported dRep to your server via the **/configure-drep add** command, to be able to add a dRep delegator role."
+			},
+			"remove": {
+				"success": "🗑️ Removed the following dRep delegator role auto-assignment from this server:",
+				"errorNotFound": "⚠ No dRep delegator role with the ID **{{delegatorRoleId}}** was found for this server. Nothing was removed."
+			},
+			"test": {
+				"purpose": "The user <@{{user.id}}> is eligible for the following dRep delegator roles on this Discord server:\n\n{{{roleData}}}",
 				"roleEntry": "   • <@&{{roleId}}>",
 				"roleEntryNoneEligible": "ℹ The user is not eligible for any roles. If you feel roles are missing, check your delegator role configuration and have them confirm their verified wallets and delegated amounts.",
 				"notLinkedError": "🔌 The user is not linked to your Discord server. If they are wanting to get roles assigned, they will have to link their existing verifications to this server via **/verify link** or verify at least one wallet address successfully via **/verify add**.",
@@ -1917,10 +1999,13 @@
 		"claimphysical": "Claiming physical items via verified lists",
 		"marketplaceTitle": "Marketplaces and Mints (Black Edition only)",
 		"marketplace": "Marketplace integrations, listings, minting, and sales trackers",
+		"governanceTitle": "Governance and dReps",
+		"governance": "Decentralized governance and dRep integrations",
 		"engagementTitle": "Engagement Tools (Black Edition only)",
 		"engagement": "Various tools to track and improve community engagement",
 		"cardolphins": "Cardolphins Special",
-		"handle": "ADA Handle Integration"
+		"handle": "ADA Handle Integration",
+		"web": "features.web"
 	},
 	"marketplaces": {
 		"JPGSTORE": "JPG.store",

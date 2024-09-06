@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import io.hazelnet.community.data.Account
 import io.hazelnet.community.data.EmbeddableSetting
 import io.hazelnet.community.data.EmbeddableSettingSerializer
+import io.hazelnet.community.data.cardano.DRep
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.cardano.TokenPolicy
 import io.hazelnet.community.data.discord.whitelists.Whitelist
@@ -83,6 +84,18 @@ class DiscordServer @JsonCreator constructor(
     @field:JsonIgnore
     var delegatorRoles: MutableSet<DelegatorRole> = mutableSetOf(),
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "discord_drep", joinColumns = [JoinColumn(name = "discord_server_id")])
+    @field:Valid
+    @field:JsonIgnore
+    var dreps: MutableSet<DRep> = mutableSetOf(),
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "discord_server_id")
+    @field:Valid
+    @field:JsonIgnore
+    var drepDelegatorRoles: MutableSet<DRepDelegatorRole> = mutableSetOf(),
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "discord_server_id")
     @field:Valid
@@ -137,6 +150,8 @@ class DiscordServer @JsonCreator constructor(
         if (tokenPolicies != other.tokenPolicies) return false
         if (stakepools != other.stakepools) return false
         if (delegatorRoles != other.delegatorRoles) return false
+        if (dreps != other.dreps) return false
+        if (drepDelegatorRoles != other.drepDelegatorRoles) return false
         if (tokenRoles != other.tokenRoles) return false
         if (whitelists != other.whitelists) return false
         if (settings != other.settings) return false
@@ -162,6 +177,8 @@ class DiscordServer @JsonCreator constructor(
         result = 31 * result + tokenPolicies.hashCode()
         result = 31 * result + stakepools.hashCode()
         result = 31 * result + delegatorRoles.hashCode()
+        result = 31 * result + dreps.hashCode()
+        result = 31 * result + drepDelegatorRoles.hashCode()
         result = 31 * result + tokenRoles.hashCode()
         result = 31 * result + whitelists.hashCode()
         result = 31 * result + settings.hashCode()
@@ -173,7 +190,7 @@ class DiscordServer @JsonCreator constructor(
     }
 
     override fun toString(): String {
-        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, premiumReminder=$premiumReminder, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active, referral=$referral, referralPaidOut=$referralPaidOut"
+        return "DiscordServer(id=$id, guildId=$guildId, guildName='$guildName', guildOwner=$guildOwner, joinTime=$joinTime, guildMemberCount=$guildMemberCount, guildMemberUpdateTime=$guildMemberUpdateTime, ownerAccount=$ownerAccount, premiumUntil=$premiumUntil, premiumReminder=$premiumReminder, tokenPolicies=$tokenPolicies, stakepools=$stakepools, delegatorRoles=$delegatorRoles, dreps=$dreps, drepDelegatorRoles=$drepDelegatorRoles, tokenRoles=$tokenRoles, whitelists=$whitelists, settings=$settings, members=$members, active=$active, referral=$referral, referralPaidOut=$referralPaidOut"
     }
 
 }

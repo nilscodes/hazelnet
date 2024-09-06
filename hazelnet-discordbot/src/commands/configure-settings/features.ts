@@ -1,8 +1,8 @@
 import NodeCache from 'node-cache';
 import i18n from 'i18n';
-import { BotSubcommand } from '../../utility/commandtypes';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import { DiscordServer } from '@vibrantnet/core';
+import { BotSubcommand } from '../../utility/commandtypes';
 import { AugmentedButtonInteraction, AugmentedSelectMenuInteraction } from '../../utility/hazelnetclient';
 import embedBuilder from '../../utility/embedbuilder';
 import botfeatures from '../../utility/botfeatures';
@@ -39,7 +39,7 @@ export default <ConfigureSettingsFeaturesCommand> {
     const components = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>()
         .addComponents(
-          new SelectMenuBuilder()
+          new StringSelectMenuBuilder()
             .setCustomId('configure-settings/features/change')
             .setPlaceholder(i18n.__({ phrase: 'start.chooseFeatures', locale }))
             .addOptions(featureOptions)
