@@ -1,5 +1,5 @@
-import { BotCommand } from "../utility/commandtypes";
 import { SlashCommandBuilder } from 'discord.js';
+import { BotCommand } from "../utility/commandtypes";
 import commandbase from '../utility/commandbase';
 import CommandTranslations from '../utility/commandtranslations';
 
@@ -19,7 +19,7 @@ export default <BotCommand> {
         .addStringOption((option) => option.setName('welcome-text').setDescription(ci18n.option('welcome-text')).setRequired(false))
         .addStringOption((option) => option.setName('logo-url').setDescription(ci18n.option('logo-url')).setRequired(false)));
   },
-  commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
+  commandTags: ['token', 'stakepool', 'poll', 'claimphysical', 'governance'],
   augmentPermissions: commandbase.augmentPermissionsAdmin,
   execute: commandbase.executeSubcommandIfAdmin,
   executeButton: commandbase.executeButtonIfAdmin,
