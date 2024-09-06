@@ -7,36 +7,36 @@ export default <BotSubcommand> {
     try {
       await interaction.deferReply({ ephemeral: true });
       const discordServer = await interaction.client.services.discordserver.getDiscordServer(interaction.guild!.id);
-      const dRepDelegatorRoles = await interaction.client.services.discordserver.listDRepDelegatorRoles(interaction.guild!.id);
-      const dReps = await interaction.client.services.discordserver.listDReps(interaction.guild!.id);;
+      const delegatorRoles = await interaction.client.services.discordserver.listDelegatorRoles(interaction.guild!.id);
+      const stakepools = await interaction.client.services.discordserver.listStakepools(interaction.guild!.id);;
       const locale = discordServer.getBotLanguage();
-      const dRepDelegatorRoleFields = dRepDelegatorRoles.map((dRepDelegatorRole) => {
+      const delegatorRoleFields = delegatorRoles.map((delegatorRole) => {
         // TODO: Share Code across delegator role modules
         let fieldHeader = 'configure.delegatorroles.list.stakepoolNameInofficial';
-        const officialDRep = dReps.find((dRep) => dRep.dRepHash === dRepDelegatorRole.dRepHash);
-        if (!dRepDelegatorRole.dRepHash) {
+        const officialStakepool = stakepools.find((stakepool) => stakepool.poolHash === delegatorRole.poolHash);
+        if (!delegatorRole.poolHash) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameAny';
-        } else if (officialDRep) {
+        } else if (officialStakepool) {
           fieldHeader = 'configure.delegatorroles.list.stakepoolNameOfficial';
         }
-        const maxInfo = dRepDelegatorRole.maximumStake ? i18n.__({ phrase: 'configure.delegatorroles.list.maxInfo', locale }, { maximumStake: dRepDelegatorRole.maximumStake / 1000000 } as any) : '';
+        const maxInfo = delegatorRole.maximumStake ? i18n.__({ phrase: 'configure.delegatorroles.list.maxInfo', locale }, { maximumStake: delegatorRole.maximumStake / 1000000 } as any) : '';
         return {
-          name: i18n.__({ phrase: fieldHeader, locale }, { delegatorRole: dRepDelegatorRole, officialStakepool: officialDRep } as any),
-          value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale }, { delegatorRole: dRepDelegatorRole, minimumStake: dRepDelegatorRole.minimumStake / 1000000, maxInfo } as any),
+          name: i18n.__({ phrase: fieldHeader, locale }, { delegatorRole, officialStakepool } as any),
+          value: i18n.__({ phrase: 'configure.delegatorroles.list.delegatorRoleDetails', locale }, { delegatorRole, minimumStake: delegatorRole.minimumStake / 1000000, maxInfo } as any),
         };
       });
-      if (!dRepDelegatorRoleFields.length) {
-        dRepDelegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale }) });
+      if (!delegatorRoleFields.length) {
+        delegatorRoleFields.push({ name: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesTitle', locale }), value: i18n.__({ phrase: 'configure.delegatorroles.list.noDelegatorRolesDetail', locale }) });
       }
-      if (!discordServer.premium && dRepDelegatorRoles.length > 1) {
-        const lowestDelegatorRoleId = Math.min(...dRepDelegatorRoles.map((delegatorRole) => +delegatorRole.id));
-        const lowestIdDelegatorRole = dRepDelegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
-        dRepDelegatorRoleFields.unshift({
+      if (!discordServer.premium && delegatorRoles.length > 1) {
+        const lowestDelegatorRoleId = Math.min(...delegatorRoles.map((delegatorRole) => +delegatorRole.id));
+        const lowestIdDelegatorRole = delegatorRoles.find((delegatorRole) => delegatorRole.id === lowestDelegatorRoleId);
+        delegatorRoleFields.unshift({
           name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
           value: i18n.__({ phrase: 'configure.delegatorroles.list.noPremium', locale }, { delegatorRole: lowestIdDelegatorRole } as any),
         });
       }
-      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale }), 'configure-delegatorroles-list', dRepDelegatorRoleFields);
+      const embed = embedBuilder.buildForAdmin(discordServer, '/configure-delegatorroles list', i18n.__({ phrase: 'configure.delegatorroles.list.purpose', locale }), 'configure-delegatorroles-list', delegatorRoleFields);
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       interaction.client.logger.error(error);

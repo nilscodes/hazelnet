@@ -37,7 +37,7 @@ export default <BotCommand> {
     return commandBuilder;
   },
   augmentPermissions: commandbase.augmentPermissionsUser,
-  commandTags: ['token', 'stakepool', 'poll', 'claimphysical'],
+  commandTags: ['token', 'stakepool', 'poll', 'claimphysical', 'governance'],
   execute: commandbase.executeSubcommand,
   executeButton: commandbase.executeButtonIfUser,
   executeSelectMenu: commandbase.executeSubcommandSelectMenu,
