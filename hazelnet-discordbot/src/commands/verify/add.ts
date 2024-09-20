@@ -22,12 +22,12 @@ interface VerifyAddCommand extends BotSubcommand {
   confirmExposeWalletsSuccess(interaction: AugmentedButtonInteraction, walletsToExpose: string[], existingConfirmedVerifications: Verification[], externalAccount: ExternalAccount, discordServer: DiscordServer): Promise<void>
 }
 
-function getWebsiteVerificationComponents(guildId: string, locale: string) {
+function getWebsiteVerificationComponents(guildId: string, locale: string, buttonPhrase: string) {
   return [new ActionRowBuilder<MessageActionRowComponentBuilder>()
     .addComponents(
       new ButtonBuilder()
         .setURL(`${baseUrl}/app/wallets?guildId=${guildId}`)
-        .setLabel(i18n.__({ phrase: 'verify.add.widgetLinkButton', locale }))
+        .setLabel(i18n.__({ phrase: buttonPhrase, locale }))
         .setStyle(ButtonStyle.Link),
     )];
 }
@@ -130,7 +130,7 @@ export default <VerifyAddCommand> {
         }
       } else if (bitcoinaddress.isTaprootAddress(addressToVerify)) {
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), i18n.__({ phrase: 'verify.add.bitcoinInstructions', locale }), 'verify-add');
-        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale);
+        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale, 'verify.add.widgetLinkButton');
         await interaction.editReply({ embeds: [embed], components });
       } else {
         const addressError = handle !== null ? 'verify.add.verificationInvalidHandle' : 'verify.add.verificationInvalidAddress';
@@ -174,12 +174,13 @@ export default <VerifyAddCommand> {
         } else {
           const instructions = `${i18n.__({ phrase: 'verify.link.success', locale })}\n\n${i18n.__({ phrase: 'verify.add.widgetInstructionsAlreadyVerified', locale }, { verifiedWallets: existingConfirmedVerifications.length } as any)}`;
           const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.link.messageTitle', locale }), instructions, 'verify-link');
-          await interaction.followUp({ ephemeral: true, embeds: [embed] });
+          const components = getWebsiteVerificationComponents(interaction.guild!.id, locale, 'verify.add.widgetAddMoreWalletsButton');
+          await interaction.followUp({ ephemeral: true, embeds: [embed], components });
         }
       } else {
         const instructions = i18n.__({ phrase: 'verify.add.widgetInstructions', locale });
         const embed = embedBuilder.buildForUser(discordServer, i18n.__({ phrase: 'verify.add.messageTitle', locale }), instructions, 'verify-add');
-        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale);
+        const components = getWebsiteVerificationComponents(interaction.guild!.id, locale, 'verify.add.widgetLinkButton');
         await interaction.followUp({ ephemeral: true, embeds: [embed], components });
       }
     } else if (interaction.customId === 'verify/add/exposewalletsconfirm' && currentMemberData /* Only expose linked users */) {

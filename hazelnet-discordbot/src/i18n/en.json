@@ -207,10 +207,10 @@
 				"admin-role": "Role to make an admin/remove as admin on this Discord server."
 			},
 			"configure-stakepool": {
-				"pool-id": "'Pool ID (not ticker) for the pool you want to add/remove"
+				"pool-id": "Pool ID (not ticker) for the pool you want to add/remove"
 			},
 			"configure-drep": {
-				"drep-id": "'Pool ID (not ticker) for the pool you want to add/remove"
+				"drep-id": "dRep ID for the dRep you want to add/remove"
 			},
 			"configure-policy": {
 				"policy-id": "Policy ID to add/remove as an official token policy on this server",
@@ -653,6 +653,7 @@
 			"widgetInstructions": "💡 Link your first wallet by clicking the button below. You will be sent to the Vibrant website to log in with Discord and confirm your wallet. Once you have your first wallet connected, you will be able to use all the Vibrant features this server has to offer!\n\n❔ For more information, use **/verify help** and **/help**.",
 			"bitcoinInstructions": "💡 Link your first Bitcoin address by clicking the button below. You will be sent to the Vibrant website to log in with Discord and confirm your Bitcoin address.",
 			"widgetLinkButton": "Verify on vibrantnet.io",
+			"widgetAddMoreWalletsButton": "Add additional wallets on vibrantnet.io",
 			"blacklistedTitle": "Blocked",
 			"blacklisted": "🛑 Your account is currently blocked from using Vibrant.",
 			"walletExposureRecommended": "⚠ This server is asking for your permission to expose your wallet addresses. If you do not want to expose your wallet addresses, you can deny this request and still have automatic role assignments and all other standard bot features, but you will not be able to use any custom features the server owner is offering.",
