@@ -45,6 +45,12 @@ class ConnectivityConfiguration(
             .build()
 
     @Bean
+    fun necroLeagueClient(config: CommunityApplicationConfiguration) =
+        WebClient.builder()
+            .baseUrl(config.necroleague.url)
+            .build()
+
+    @Bean
     fun nftCdnClient() =
         WebClient.builder()
             .filter(nftCdnHash())

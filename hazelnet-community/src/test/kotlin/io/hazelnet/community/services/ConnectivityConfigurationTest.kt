@@ -23,6 +23,7 @@ class ConnectivityConfigurationTest {
                 mockk(),
                 mockk(),
                 mockk(),
+                mockk(),
                 null,
                 null,
                 null,
