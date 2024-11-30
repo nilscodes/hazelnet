@@ -9,6 +9,7 @@ data class CommunityApplicationConfiguration(
     val connect: ConnectConfiguration,
     val voteaire: VoteaireConfiguration,
     val tokenregistry: TokenRegistryConfiguration,
+    val necroleague: NecroLeagueConfiguration,
     val vibrantAuth: VibrantAuthConfiguration,
     val fundedpool: String?,
     val fundedhandle: String?,
@@ -22,6 +23,11 @@ data class CommunityApplicationConfiguration(
 data class ConnectConfiguration(
     val url: String,
     val ignoreAmountIfStakeBelow: Long = 50000000L,
+)
+
+data class NecroLeagueConfiguration(
+    val url: String,
+    val policyId: String,
 )
 
 data class VoteaireConfiguration(

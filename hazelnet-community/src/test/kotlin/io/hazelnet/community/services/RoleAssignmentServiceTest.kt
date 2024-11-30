@@ -8,6 +8,7 @@ import io.hazelnet.community.data.cardano.DRep
 import io.hazelnet.community.data.cardano.Stakepool
 import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
+import io.hazelnet.community.services.external.NecroLeagueStakingService
 import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.data.ExternalAccountType
 import io.mockk.every
@@ -210,6 +211,7 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            mockk(),
         )
         val testServer = makeTestDiscordServer()
         val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
@@ -246,6 +248,7 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            mockk(),
         )
         val testServer = makeTestDiscordServer()
         val actual = roleAssignmentService.getAllCurrentDelegatorRoleAssignmentsForVerifications(
@@ -309,6 +312,7 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            makeMockNecroLeagueStakingService(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -610,6 +614,7 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            makeMockNecroLeagueStakingService(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -685,6 +690,7 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            makeMockNecroLeagueStakingService(),
         )
 
         val actual = roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
@@ -821,6 +827,7 @@ internal class RoleAssignmentServiceTest {
                 )
             }
         }
+
         val roleAssignmentService = RoleAssignmentService(
             connectService,
             mockk(),
@@ -831,12 +838,20 @@ internal class RoleAssignmentServiceTest {
             makeDiscordBanRepository(emptyList()),
             mockk(),
             mockk(relaxed = true),
+            makeMockNecroLeagueStakingService(),
         )
 
         return roleAssignmentService.getAllCurrentTokenRoleAssignmentsForVerifications(
             getMockVerificationData(),
             testServer
         )
+    }
+
+    private fun makeMockNecroLeagueStakingService(): NecroLeagueStakingService {
+        val mockNecroStakingService = mockk<NecroLeagueStakingService>()
+        every { mockNecroStakingService.getApplicableNecroLeagueStakeAddresses(any()) }.returns(emptySet())
+        every { mockNecroStakingService.getOriginalOwner(any(), any()) }.returns(null)
+        return mockNecroStakingService
     }
 
     @Test

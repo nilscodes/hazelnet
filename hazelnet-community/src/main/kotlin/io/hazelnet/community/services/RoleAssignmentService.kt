@@ -14,6 +14,7 @@ import io.hazelnet.community.data.discord.*
 import io.hazelnet.community.persistence.DiscordBanRepository
 import io.hazelnet.community.persistence.DiscordQuizRepository
 import io.hazelnet.community.persistence.DiscordWhitelistRepository
+import io.hazelnet.community.services.external.NecroLeagueStakingService
 import io.hazelnet.community.services.external.NftCdnService
 import io.hazelnet.shared.data.BlockchainType
 import io.hazelnet.shared.decodeHex
@@ -36,6 +37,7 @@ class RoleAssignmentService(
     private val discordBanRepository: DiscordBanRepository,
     private val nftCdnService: NftCdnService,
     private val config: CommunityApplicationConfiguration,
+    private val necroLeagueStakingService: NecroLeagueStakingService,
 ) {
     fun getAllCurrentTokenRoleAssignmentsForVerifications(
         verifications: List<Verification>,
@@ -88,9 +90,11 @@ class RoleAssignmentService(
         val filterBasedRoleAssignments = mutableSetOf<DiscordRoleAssignment>()
         // TODO We could try to filter out all users that already received a role
         if (relevantPolicyIds.isNotEmpty()) {
+            val allAllowedStakeAddresses = allVerifiedStakeAddresses + necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
             val tokenOwnershipDataInWallet =
-                connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
-            val tokenOwnershipData = mergeOwnershipForAssetLists(tokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
+                connectService.getAllTokenOwnershipAssetsByPolicyId(allAllowedStakeAddresses, relevantPolicyIds)
+            val remappedTokenOwnershipDataInWallet = remapStakedAddressesForList(tokenOwnershipDataInWallet)
+            val tokenOwnershipData = mergeOwnershipForAssetLists(remappedTokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
             val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, MutableMap<String, MutableList<MultiAssetInfo>>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -158,6 +162,30 @@ class RoleAssignmentService(
         }
         return filterBasedRoleAssignments
     }
+
+    private fun remapStakedAddressesForList(tokenOwnershipDataInWallet: List<TokenOwnershipInfoWithAssetList>) =
+        tokenOwnershipDataInWallet
+            .map {
+                val stakedForNecroLeague = necroLeagueStakingService.getOriginalOwner(it.stakeAddress, it.policyIdWithOptionalAssetFingerprint)
+                if (stakedForNecroLeague != null) {
+                    it.copy(stakeAddress = stakedForNecroLeague)
+                } else {
+                    it
+                }
+            }.toList()
+
+
+    private fun remapStakedAddressesForCounts(tokenOwnershipDataInWallet: List<TokenOwnershipInfoWithAssetCount>) =
+        tokenOwnershipDataInWallet
+            .map {
+                val stakedForNecroLeague = necroLeagueStakingService.getOriginalOwner(it.stakeAddress, it.policyIdWithOptionalAssetFingerprint)
+                if (stakedForNecroLeague != null) {
+                    it.copy(stakeAddress = stakedForNecroLeague)
+                } else {
+                    it
+                }
+            }.toList()
+
 
     private fun collectNonCip68TokenMetadata(
         nonCip68Tokens: List<String>,
@@ -291,9 +319,11 @@ class RoleAssignmentService(
             role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
         }.flatten().toSet()
         if (relevantPolicyIds.isNotEmpty()) {
+            val allAllowedStakeAddresses = allVerifiedStakeAddresses + necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
             val tokenOwnershipDataInWallet =
-                connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
-            val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
+                connectService.getAllTokenOwnershipCountsByPolicyId(allAllowedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
+            val remappedTokenOwnershipDataInWallet = remapStakedAddressesForCounts(tokenOwnershipDataInWallet)
+            val tokenOwnershipData = mergeOwnershipForAssetCounts(remappedTokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
