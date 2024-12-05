@@ -25,31 +25,46 @@ export default <ConfigureTokenrolesListCommand> {
         customTokenRoleMessage = 'configure.tokenroles.list.tokenRoleDetailsShortSelect';
       }
 
-      const CHUNK_SIZE = 20;
-      let page = 0;
-      while (tokenRoles.length) {
-        const currentTokenRoles = tokenRoles.splice(0, CHUNK_SIZE);
-        const tokenRoleFieldsNested = currentTokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, false, customTokenRoleMessage));
-        const tokenRoleFields = tokenRoleFieldsNested.flat();
-        if (!tokenRoleFields.length) {
-          tokenRoleFields.push({ name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }), value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale }) });
+      if (tokenRoles.length) {
+        const CHUNK_SIZE = 20;
+        let page = 0;
+        while (tokenRoles.length) {
+          const currentTokenRoles = tokenRoles.splice(0, CHUNK_SIZE);
+          const tokenRoleFieldsNested = currentTokenRoles.map((tokenRole) => tokenroles.getTokenRoleDetailsFields(tokenRole, tokenPolicies, locale, false, customTokenRoleMessage));
+          const tokenRoleFields = tokenRoleFieldsNested.flat();
+          if (!discordServer.premium && tokenRoles.length > 1 && page === 0) {
+            const lowestTokenRoleId = Math.min(...tokenRoles.map((tokenRole) => +tokenRole.id));
+            const lowestIdTokenRole = tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
+            tokenRoleFields.unshift({
+              name: i18n.__({phrase: 'generic.blackEditionWarning', locale}),
+              value: i18n.__({
+                phrase: 'configure.tokenroles.list.noPremium',
+                locale
+              }, {tokenRole: lowestIdTokenRole} as any),
+            });
+          }
+          const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({
+            phrase: 'configure.tokenroles.list.purpose',
+            locale
+          }), 'configure-tokenroles-list', tokenRoleFields);
+          const components = this.createDetailsDropdown(currentTokenRoles, discordServer.getBotLanguage());
+          if (page === 0) {
+            await interaction.editReply({embeds: [embed], components});
+          } else {
+            await interaction.followUp({embeds: [embed], components, ephemeral: true});
+          }
+          page += 1;
         }
-        if (!discordServer.premium && tokenRoles.length > 1 && page === 0) {
-          const lowestTokenRoleId = Math.min(...tokenRoles.map((tokenRole) => +tokenRole.id));
-          const lowestIdTokenRole = tokenRoles.find((tokenRole) => tokenRole.id === lowestTokenRoleId);
-          tokenRoleFields.unshift({
-            name: i18n.__({ phrase: 'generic.blackEditionWarning', locale }),
-            value: i18n.__({ phrase: 'configure.tokenroles.list.noPremium', locale }, { tokenRole: lowestIdTokenRole } as any),
-          });
-        }
-        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({ phrase: 'configure.tokenroles.list.purpose', locale }), 'configure-tokenroles-list', tokenRoleFields);
-        const components = this.createDetailsDropdown(currentTokenRoles, discordServer.getBotLanguage());
-        if (page === 0) {
-          await interaction.editReply({ embeds: [embed], components });
-        } else {
-          await interaction.followUp({ embeds: [embed], components, ephemeral: true });
-        }
-        page += 1;
+      } else {
+        const tokenRoleFields = [{
+          name: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesTitle', locale }),
+          value: i18n.__({ phrase: 'configure.tokenroles.list.noTokenRolesDetail', locale })
+        }];
+        const embed = embedBuilder.buildForAdmin(discordServer, '/configure-tokenroles list', i18n.__({
+          phrase: 'configure.tokenroles.list.purpose',
+          locale
+        }), 'configure-tokenroles-list', tokenRoleFields);
+        await interaction.editReply({embeds: [embed]});
       }
     } catch (error) {
       interaction.client.logger.error(error);
