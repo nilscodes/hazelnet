@@ -90,11 +90,28 @@ class RoleAssignmentService(
         val filterBasedRoleAssignments = mutableSetOf<DiscordRoleAssignment>()
         // TODO We could try to filter out all users that already received a role
         if (relevantPolicyIds.isNotEmpty()) {
-            val allAllowedStakeAddresses = allVerifiedStakeAddresses + necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
             val tokenOwnershipDataInWallet =
-                connectService.getAllTokenOwnershipAssetsByPolicyId(allAllowedStakeAddresses, relevantPolicyIds)
-            val remappedTokenOwnershipDataInWallet = remapStakedAddressesForList(tokenOwnershipDataInWallet)
-            val tokenOwnershipData = mergeOwnershipForAssetLists(remappedTokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
+                connectService.getAllTokenOwnershipAssetsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds)
+            val stakedAddresses = necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
+            var staked: List<TokenOwnershipInfoWithAssetList> = emptyList()
+            if (stakedAddresses.isNotEmpty()) {
+                val stakedTokenTokenOwnershipData = connectService.getAllTokenOwnershipAssetsByPolicyId(
+                    stakedAddresses.toList(),
+                    relevantPolicyIds
+                )
+                staked = remapStakedAddressesForList(stakedTokenTokenOwnershipData)
+                if (discordServer.id == 1129) {
+                    logger.warn { "Processing token roles for server ${discordServer.id} with the following policy IDs: $relevantPolicyIds" }
+                    logger.warn("Verified stake addresses: {}", allVerifiedStakeAddresses)
+                    logger.warn("Ownership before adding stake: {}", tokenOwnershipDataInWallet)
+                    logger.warn("Stake list: {}", staked)
+                    logger.warn("Remap data: {}", necroLeagueStakingService.getStakingMap())
+                }
+            }
+            val tokenOwnershipData = mergeOwnershipForAssetLists(tokenOwnershipDataInWallet, staked)
+            if (discordServer.id == 1129) {
+                logger.warn("Ownership after merging stake: {}", tokenOwnershipData)
+            }
             val memberIdsToTokenPolicyOwnershipAssets = mutableMapOf<Long, MutableMap<String, MutableList<MultiAssetInfo>>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -160,6 +177,11 @@ class RoleAssignmentService(
                 }
             }.flatten().toSet())
         }
+
+        if (discordServer.id == 1129) {
+            logger.warn("Returning the following role assignments for server ${discordServer.id}: $filterBasedRoleAssignments")
+        }
+
         return filterBasedRoleAssignments
     }
 
@@ -319,11 +341,29 @@ class RoleAssignmentService(
             role.acceptedAssets.map { it.policyId + (it.assetFingerprint ?: "") }
         }.flatten().toSet()
         if (relevantPolicyIds.isNotEmpty()) {
-            val allAllowedStakeAddresses = allVerifiedStakeAddresses + necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
             val tokenOwnershipDataInWallet =
-                connectService.getAllTokenOwnershipCountsByPolicyId(allAllowedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
-            val remappedTokenOwnershipDataInWallet = remapStakedAddressesForCounts(tokenOwnershipDataInWallet)
-            val tokenOwnershipData = mergeOwnershipForAssetCounts(remappedTokenOwnershipDataInWallet, emptyList()/* Used to merge from external staking services */)
+                connectService.getAllTokenOwnershipCountsByPolicyId(allVerifiedStakeAddresses, relevantPolicyIds, bannedAssetFingerprints)
+            val stakedAddresses = necroLeagueStakingService.getApplicableNecroLeagueStakeAddresses(relevantPolicyIds)
+            var staked: List<TokenOwnershipInfoWithAssetCount> = emptyList()
+            if (stakedAddresses.isNotEmpty()) {
+                val stakedTokenTokenOwnershipData = connectService.getAllTokenOwnershipCountsByPolicyId(
+                    stakedAddresses.toList(),
+                    relevantPolicyIds,
+                    bannedAssetFingerprints
+                )
+                staked = remapStakedAddressesForCounts(stakedTokenTokenOwnershipData)
+                if (discordServer.id == 1129) {
+                    logger.warn { "Processing token roles for server ${discordServer.id} with the following policy IDs: $relevantPolicyIds" }
+                    logger.warn("Verified stake addresses: {}", allVerifiedStakeAddresses)
+                    logger.warn("Ownership before adding stake: {}", tokenOwnershipDataInWallet)
+                    logger.warn("Stake list: {}", staked)
+                    logger.warn("Remap data: {}", necroLeagueStakingService.getStakingMap())
+                }
+            }
+            val tokenOwnershipData = mergeOwnershipForAssetCounts(tokenOwnershipDataInWallet, staked)
+            if (discordServer.id == 1129) {
+                logger.warn("Ownership after merging stake: {}", tokenOwnershipData)
+            }
             val memberIdsToTokenPolicyOwnershipCounts = mutableMapOf<Long, Map<String, Long>>()
             val externalAccountLookup = mutableMapOf<Long, ExternalAccount>()
             allVerificationsOfMembers.forEach { verification ->
@@ -342,6 +382,10 @@ class RoleAssignmentService(
                         }
                     }
                 }
+            }
+
+            if (discordServer.id == 1129) {
+                logger.warn("Ownership after processing: {}", memberIdsToTokenPolicyOwnershipCounts)
             }
 
             return memberIdsToTokenPolicyOwnershipCounts.map { tokenOwnershipInfo ->
